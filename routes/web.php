@@ -24,6 +24,9 @@ use App\Models\Order;
 Route::get('/mahalle-create', [MahalleController::class, 'create']);
 Route::get('/restaurant/orders/new', [MahalleController::class, 'create']);
 Route::get('/restaurant/couriers', [App\Http\Controllers\CourierController::class, 'index'])->name('restaurant.couriers.index');
+
+
+//Burak routes
 Route::get('/orders', [OrderController::class, 'index'])->name('getOrders');
 Route::get('/restaurant/customers', [CustomerController::class, 'index'])->name('restaurant.customers');
 Route::get('/restaurant/categories', [CategoryController::class, 'index'])->name('restaurant.categories');
@@ -32,7 +35,7 @@ Route::get('/restaurant/couriers', [CourierController::class, 'index'])->name('r
 Route::get('/restaurant/delivered-orders', [OrderController::class, 'deliveredOrders'])->name('restaurant.deliveredOrders');
 Route::get('/restaurant/deleted-orders', [OrderController::class, 'deletedOrders'])->name('restaurant.deletedOrders');
 Route::get('/restaurant/reports/orders', [ReportController::class, 'orders'])->name('restaurant.reports.orders');
-
+Route::get('/restaurant/reports/couriers', [ReportController::class, 'couriers'])->name('restaurant.reports.couriers');
 
 
 
