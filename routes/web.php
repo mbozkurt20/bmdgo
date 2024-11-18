@@ -36,6 +36,7 @@ Route::get('/restaurant/delivered-orders', [OrderController::class, 'deliveredOr
 Route::get('/restaurant/deleted-orders', [OrderController::class, 'deletedOrders'])->name('restaurant.deletedOrders');
 Route::get('/restaurant/reports/orders', [ReportController::class, 'orders'])->name('restaurant.reports.orders');
 Route::get('/restaurant/reports/couriers', [ReportController::class, 'couriers'])->name('restaurant.reports.couriers');
+Route::get('/restaurant/entegrations', [IntegrationController::class, 'index'])->name('restaurant.entegrations');
 
 
 
