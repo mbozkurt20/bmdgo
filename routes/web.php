@@ -28,6 +28,7 @@ Route::get('/orders', [OrderController::class, 'index'])->name('getOrders');
 Route::get('/restaurant/customers', [CustomerController::class, 'index'])->name('restaurant.customers');
 Route::get('/restaurant/categories', [CategoryController::class, 'index'])->name('restaurant.categories');
 Route::get('/restaurant/products', [ProductController::class, 'index'])->name('restaurant.products');
+Route::get('/restaurant/couriers', [CourierController::class, 'index'])->name('restaurant.couriers');
 
 
 
