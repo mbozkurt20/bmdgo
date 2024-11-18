@@ -24,6 +24,8 @@ use App\Models\Order;
 Route::get('/mahalle-create', [MahalleController::class, 'create']);
 Route::get('/restaurant/orders/new', [MahalleController::class, 'create']);
 Route::get('/restaurant/couriers', [App\Http\Controllers\CourierController::class, 'index'])->name('restaurant.couriers.index');
+Route::get('/orders', [OrderController::class, 'index'])->name('getOrders');
+
 
 // Change 'home' route name to avoid conflict
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home.index');  // Change 'home' to 'home.index'
