@@ -27,6 +27,7 @@ Route::get('/restaurant/couriers', [App\Http\Controllers\CourierController::clas
 Route::get('/orders', [OrderController::class, 'index'])->name('getOrders');
 Route::get('/restaurant/customers', [CustomerController::class, 'index'])->name('restaurant.customers');
 Route::get('/restaurant/categories', [CategoryController::class, 'index'])->name('restaurant.categories');
+Route::get('/restaurant/products', [ProductController::class, 'index'])->name('restaurant.products');
 
 
 
