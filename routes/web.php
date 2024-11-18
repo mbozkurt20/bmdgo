@@ -31,6 +31,7 @@ Route::get('/restaurant/products', [ProductController::class, 'index'])->name('r
 Route::get('/restaurant/couriers', [CourierController::class, 'index'])->name('restaurant.couriers');
 Route::get('/restaurant/delivered-orders', [OrderController::class, 'deliveredOrders'])->name('restaurant.deliveredOrders');
 Route::get('/restaurant/deleted-orders', [OrderController::class, 'deletedOrders'])->name('restaurant.deletedOrders');
+Route::get('/restaurant/reports/orders', [ReportController::class, 'orders'])->name('restaurant.reports.orders');
 
 
 
