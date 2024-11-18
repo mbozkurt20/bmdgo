@@ -26,6 +26,7 @@ Route::get('/restaurant/orders/new', [MahalleController::class, 'create']);
 Route::get('/restaurant/couriers', [App\Http\Controllers\CourierController::class, 'index'])->name('restaurant.couriers.index');
 Route::get('/orders', [OrderController::class, 'index'])->name('getOrders');
 Route::get('/restaurant/customers', [CustomerController::class, 'index'])->name('restaurant.customers');
+Route::get('/restaurant/categories', [CategoryController::class, 'index'])->name('restaurant.categories');
 
 
 
