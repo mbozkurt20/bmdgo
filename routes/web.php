@@ -65,7 +65,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('login', [App\Http\Controllers\AdminController::class, 'login'])->name('admin.auth');
     });
     Route::group(['middleware' => ['admin.auth']], function () {
-        Route::get('/', [App\Http\Controllers\AdminController::class, 'home3'])->name('admin.index');
+        Route::get('/', [App\Http\Controllers\AdminController::class, 'home'])->name('admin.index');
         Route::post('logout', [App\Http\Controllers\AdminController::class, 'logout'])->name('admin.logout');
         Route::get('/filter-by-date', [App\Http\Controllers\AdminController::class, 'filterByDate'])->name('admin.filterByDate');
         Route::get('/orders/filter', [App\Http\Controllers\AdminController::class, 'filterOrders'])->name('admin.filter');
