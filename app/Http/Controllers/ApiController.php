@@ -360,7 +360,51 @@ class ApiController extends Controller
     }
   }
 
-
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function reports(Request $request): JsonResponse
+    {
+        $vtoken = "3b44111837d8e28e846f4dc9dbac986cb0010e3e";
+    
+        // Token doğrulama
+        if ($request->input('token') !== $vtoken) {
+            return response()->json(['status' => 'ERROR', 'message' => 'Token uyuşmazlığı.'], 403);
+        }
+    
+        // Parametrelerin kontrolü
+        $courierId = $request->input('courier_id');
+        $startDate = $request->input('startDate');
+        $endDate = $request->input('endDate');
+    
+        if (!$courierId || !$startDate || !$endDate) {
+            return response()->json(['status' => 'ERROR', 'message' => 'Eksik parametreler.'], 400);
+        }
+    
+        // Tarihlerin formatlanması
+        $startDate = Carbon::createFromFormat('Y-m-d', $startDate)->startOfDay();
+        $endDate = Carbon::createFromFormat('Y-m-d', $endDate)->endOfDay();
+    
+        // Kurye ve sipariş verilerinin alınması
+        $courier = Courier::find($courierId);
+        if (!$courier) {
+            return response()->json(['status' => 'ERROR', 'message' => 'Kurye bulunamadı.'], 404);
+        }
+    
+        $orderCount = CourierOrder::where('courier_id', $courier->id)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->count();
+    
+        $totalProgressPayment = $courier->price * $orderCount;
+    
+        // JSON cevabı
+        return response()->json([
+            'courier_name' => $courier->name,
+            'order_count' => $orderCount,
+            'total_progress_payment' => $totalProgressPayment
+        ]);
+    }
     
 
 
