@@ -41,6 +41,7 @@ Route::get('/getLocations', [App\Http\Controllers\ApiController::class, 'getLoca
 Route::get('/courier/status/{token}/{user_id}/{status}', [App\Http\Controllers\ApiController::class, 'status']);
 Route::get('/courier/situation/{token}/{user_id}', [App\Http\Controllers\ApiController::class, 'situation']);
 Route::post('/courier/order_status', [App\Http\Controllers\ApiController::class, 'order_status']);
+Route::post('/courier/reports/', [App\Http\Controllers\ApiController::class, 'reports']);
 
 
 //Caller App
