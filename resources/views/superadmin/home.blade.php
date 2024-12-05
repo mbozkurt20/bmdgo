@@ -580,7 +580,8 @@
                                 <span>
                                     <i class="fa-solid fa-box" style="color: #fff;font-size:18px;padding-right:10px"></i>
                                     Tüm Siparişler</span>
-                                <span class="badge bg-light text-dark order-number">{{ count($tumu) }}</span>
+                                <span class="badge bg-light text-dark order-number">{{ count($someVariable ?? []) }}
+</span>
                             </button>
                         </div>
                         <!-- Getir Orders -->
