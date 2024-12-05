@@ -592,7 +592,7 @@
                                     style="background-repeat: no-repeat; background-position:center" width="77px"
                                     height="14px" alt="">
                                 <span>Getir Siparişleri</span>
-                                <span class="badge bg-light text-dark order-number">{{ count($getiryemek) }}</span>
+                                <span class="badge bg-light text-dark order-number">{{ count($someVariable ?? []) }}</span>
                             </button>
                         </div>
                         <!-- Trendyol Orders -->
@@ -603,7 +603,7 @@
                                     style="background-repeat: no-repeat; background-position:center" width="71px"
                                     height="14px" alt="">
                                 <span>Trendyol Siparişleri</span>
-                                <span class="badge bg-light text-dark order-number">{{ count($trendyol) }}</span>
+                                <span class="badge bg-light text-dark order-number">{{ count($someVariable ?? []) }}</span>
                             </button>
                         </div>
 
@@ -616,7 +616,7 @@
                                     style="background-repeat: no-repeat; background-position:center" width="79px"
                                     height="15px" alt="">
                                 <span>Yemeksepeti Siparişleri</span>
-                                <span class="badge bg-light text-dark order-number">{{ count($yemeksepeti) }}</span>
+                                <span class="badge bg-light text-dark order-number">{{ count($someVariable ?? []) }}</span>
                             </button>
                         </div>
                         <!-- Migros Orders -->
