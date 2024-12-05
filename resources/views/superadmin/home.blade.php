@@ -628,7 +628,7 @@
                                     style="background-repeat: no-repeat; background-position:center" width="69px"
                                     height="28px" alt="">
                                 <span>Migros Yemek Siparişleri</span>
-                                <span class="badge bg-light text-dark order-number">{{ $migros }}</span>
+                                <span class="badge bg-light text-dark order-number">{{ count($someVariable ?? []) }}</span>
                             </button>
                         </div>
                         <!-- Phone Orders -->
