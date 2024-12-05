@@ -638,7 +638,7 @@
                                 style="background: #1da713">
                                 <i class="fa-solid fa-phone" style="color: #fff;font-size:18px;padding-left:10px"></i>
                                 <span>Telefonla Gelen Sipariş</span>
-                                <span class="badge bg-light text-dark order-number">{{ count($telefonsiparis) }}</span>
+                                <span class="badge bg-light text-dark order-number">{{ count($someVariable ?? []) }}</span>
                             </button>
                         </div>
                     </div>
