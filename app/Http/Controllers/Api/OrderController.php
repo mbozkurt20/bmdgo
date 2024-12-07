@@ -51,9 +51,9 @@ class OrderController extends Controller
             ];
             $createOrder = Order::create($orderData);
             if ($createOrder){
-                AssignOrderToCourier::dispatch($createOrder);
-                event(new OrderNotification($order));
+                event(new OrderNotification($createOrder));
 
+                AssignOrderToCourier::dispatch($createOrder);
                 return response()->json(['message' => 'Sipariş oluşturuldu'], 200);
             }
         }
