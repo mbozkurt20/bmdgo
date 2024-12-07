@@ -984,7 +984,7 @@
                                                                             <div class="mb-2 col-md-12">
                                                                                 <p class="orderTitle">Adres</p>
                                                                                 <p class="orderProde">
-                                                                                    {{ $order->address }}</p>
+                                                                                    {{ \App\Helpers\OrdersHelper::addressReplace($order->address) }}</p>
                                                                             </div>
                                                                             <div class="mb-3 col-md-12">
                                                                                 @php $items = json_decode($order->items); @endphp
@@ -1080,7 +1080,7 @@
                                                                             <div class="mb-2 col-md-12">
                                                                                 <p class="orderTitle">Adres</p>
                                                                                 <p class="orderProde">
-                                                                                    {{ $order->address }}</p>
+                                                                                    {{ \App\Helpers\OrdersHelper::addressReplace($order->address) }}</p>
                                                                             </div>
                                                                             <div class="mb-3 col-md-12">
                                                                                 @php $items = json_decode($order->items); @endphp
@@ -1174,7 +1174,7 @@
                                                                             <div class="mb-2 col-md-12">
                                                                                 <p class="orderTitle">Adres</p>
                                                                                 <p class="orderProde">
-                                                                                    {{ $order->address }}</p>
+                                                                                    {{ \App\Helpers\OrdersHelper::addressReplace($order->address)  }}</p>
                                                                             </div>
                                                                             <div class="mb-3 col-md-12">
                                                                                 @php $items = json_decode($order->items); @endphp
@@ -1268,7 +1268,7 @@
                                                                             <div class="mb-2 col-md-12">
                                                                                 <p class="orderTitle">Adres</p>
                                                                                 <p class="orderProde">
-                                                                                    {{ $order->address }}</p>
+                                                                                    {{ \App\Helpers\OrdersHelper::addressReplace($order->address) }}</p>
                                                                             </div>
                                                                             <div class="mb-3 col-md-12">
                                                                                 @php $items = json_decode($order->items); @endphp

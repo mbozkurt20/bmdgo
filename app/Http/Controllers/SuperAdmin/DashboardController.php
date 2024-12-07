@@ -15,7 +15,30 @@ use Illuminate\Support\Facades\Validator;
 class DashboardController extends Controller
 {
     public function index(){
-        return view('superadmin.home');
+        $startTime = Carbon::today()->setTime(0, 0);
+        $endTime = Carbon::today()->setTime(23, 59);
+
+        $tumu = Order::whereDate('created_at', Carbon::today())->whereHas('restaurant', function($query){
+            return $query->where('admin_id', auth()->id());
+        })->orderBy('created_at', 'desc')->get();
+
+        $yemeksepeti = Order::where('platform', 'yemeksepeti')->whereHas('restaurant', function($query){
+            return $query->where('admin_id', auth()->id());
+        })->whereBetween('created_at', [$startTime, $endTime])->orderBy('id', 'desc')->get();
+        $getiryemek = Order::where('platform', 'getir')->whereHas('restaurant', function($query){
+            return $query->where('admin_id', auth()->id());
+        })->whereBetween('created_at', [$startTime, $endTime])->orderBy('id', 'desc')->get();
+        $trendyol = Order::where('platform', 'trendyol')->whereHas('restaurant', function($query){
+            return $query->where('admin_id', auth()->id());
+        })->whereBetween('created_at', [$startTime, $endTime])->orderBy('id', 'desc')->get();
+        $telefonsiparis = Order::where('platform', 'telefonsiparis')->whereHas('restaurant', function($query){
+            return $query->where('admin_id', auth()->id());
+        })->whereBetween('created_at', [$startTime, $endTime])->orderBy('id', 'desc')->get();
+        $migros = Order::where('platform', 'migros')->whereHas('restaurant', function($query){
+            return $query->where('admin_id', auth()->id());
+        })->whereBetween('created_at', [$startTime, $endTime])->orderBy('id', 'desc')->count();
+
+        return view('superadmin.home',compact('tumu','yemeksepeti','getiryemek','trendyol','telefonsiparis','migros','getiryemek'));
     }
 
     public function dealer(){
@@ -43,7 +66,7 @@ class DashboardController extends Controller
         DB::table('admins')->insert([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password), 
+            'password' => Hash::make($request->password),
 			'default_locations_lat' => $request->input('lat'),
 			'default_locations_lon' => $request->input('lon'),
             'created_at' => now(),
@@ -64,7 +87,7 @@ class DashboardController extends Controller
             'email' => 'required|email|unique:admins,email,' . $id,
             'password' => 'nullable|min:8', // Şifre boş olabilir
         ]);
-    
+
         if ($validator->fails()) {
             return redirect()->back()
                 ->withErrors($validator)
@@ -86,15 +109,15 @@ class DashboardController extends Controller
 			'default_locations_lon' => $request->input('lon'),
             'updated_at' => now(),
         ];
-    
+
         // Şifre değiştirildiyse hashleyip güncelle
         if ($request->filled('password')) {
             $updateData['password'] = Hash::make($request->password);
         }
-    
+
         // Veritabanında güncelleme işlemi
         $admin->update($updateData);
-    
+
         return redirect()->route('superadmin.dealer')->with('success', 'Admin bilgileri başarıyla güncellendi!');
     }
 
@@ -129,6 +152,6 @@ class DashboardController extends Controller
     }
 
     public function reports(){
-        
+
     }
 }
