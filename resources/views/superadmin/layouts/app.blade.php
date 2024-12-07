@@ -43,6 +43,40 @@
         </script>
     @endif
 
+    <script>
+        window.onload = function() {
+            var audio = document.getElementById('audioPlayer');
+
+            window.playAudio = function() {
+                audio.play();
+            };
+
+            window.pauseAudio = function() {
+                audio.pause();
+            };
+        }
+
+        // Enable pusher logging - don't include this in production
+        Pusher.logToConsole = true;
+
+        var pusher = new Pusher('a293a751fd7a10f5a071', {
+            cluster: 'mt1'
+        });
+
+
+        var channel = pusher.subscribe('new-order-channel');
+        channel.bind('new-order-event', function(data) {
+            var newOrderMessage = document.getElementById('new-order');
+            newOrderMessage.style.display = 'block';
+
+            setTimeout(function() {
+                newOrderMessage.style.display = 'none';
+            }, 3000);
+
+            playAudio()
+            console.log({da: data})
+        });
+    </script>
 
 <body>
     <!--*******************
@@ -91,6 +125,12 @@
                 <nav class="navbar navbar-expand">
                     <div class="collapse navbar-collapse justify-content-between">
                         <div class="header-left">
+                            <h5 id="new-order" style="display: none" class="text-success">Yeni Bir Sipariş Geldi!!</h5>
+
+                            <audio style="display: none" id="audioPlayer" controls>
+                                <source src="{{asset('upload/brass-new-level-151765.mp3')}}" type="audio/mp3">
+                            </audio>
+
                             <div class="nav-item">
                                 <div class="input-group search-area">
                                     <div class="form-check form-switch">

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\OrderNotification;
 use App\Traits\RequestTrait;
 use App\Models\Admin;
 use App\Models\Categorie;
@@ -459,6 +460,7 @@ class OrderController extends Controller
 
         $printed = $this->generateInvoice($order);
 
+        event(new OrderNotification($order));
         return response()->json(['status' => "OK", 'printed' => $printed]);
     }
 
@@ -575,9 +577,9 @@ class OrderController extends Controller
                   </style>
 
              <div id="invoice-POS">
- 
+
                   <div class="logo"></div>
-                  <div class="restaurant"> 
+                  <div class="restaurant">
                     ' . Auth::user()->name . '
                   </div><!--End Info-->
                   <div class="adres">
@@ -588,12 +590,12 @@ class OrderController extends Controller
                   </div>
                   <div class="order_time">
                     Sipariş Zamanı: ' . Carbon::parse($order->created_at)->format('d.m.Y H:i:s') . '
-                  </div> 
+                  </div>
                   <div class="trackingid">
                     <b>Sipariş No: </b>' . $order->tracking_id . '
                   </div>
                      <div class="dot"></div>
-                  
+
                   <div class="name"><b>Müşteri Adı:</b>' . $order->full_name . '</div>
                   <div class="adress">
                   <b>Adres:</b>' . $order->address . '
@@ -604,7 +606,7 @@ class OrderController extends Controller
                   <div class="adress">
                    <b>Müşteri İletişim Numarası: ' . $order->phone . '</b>
                   </div>
-                   
+
                   <div class="dot"></div>
 
 
@@ -613,10 +615,10 @@ class OrderController extends Controller
                       <div id="table"  style="padding-top: 20px;">
                           <table>
                               <tr class="tabletitle">
-                                  <td class="item">Adet</td> 
-                                  <td class="item">Yemek</td> 
-                                  <td class="item">Fiyat</td> 
-                                  <td class="item">Tutar</td> 
+                                  <td class="item">Adet</td>
+                                  <td class="item">Yemek</td>
+                                  <td class="item">Fiyat</td>
+                                  <td class="item">Tutar</td>
                               </tr>
                               ';
         $items = json_decode($order->items);
@@ -655,29 +657,29 @@ class OrderController extends Controller
         }
 
         $printed .= '
-                            
+
                               <tr class="tabletitle">
                                   <td></td>
                                   <td></td>
                                   <td class="item">Toplam:</td>
                                   <td class="payment">' . $order->amount . ' TL</td>
                               </tr>
-             
-             
+
+
 
                           </table>
                       </div><!--End Table-->
                        <div class="dot"></div>
-                      
+
                        <div class="adress" style="padding-top: 20px;">
-                        <span class="item">Ödeme Şekli:</span> ' . $order->payment_method . '.<br> 
-                        
+                        <span class="item">Ödeme Şekli:</span> ' . $order->payment_method . '.<br>
+
 
                       </div>
                       <div class="dot"></div>
 
                       <div class="legalcopy">
-                          <p class="legal"><strong></strong> 
+                          <p class="legal"><strong></strong>
                           <br>
                           <center>
                           <br>

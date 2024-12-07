@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\OrderNotification;
 use App\Http\Controllers\Auth\SuperAdmin;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MahalleController;
@@ -251,3 +252,13 @@ Route::get('/abcabc', function(){
     $order = Order::first();
     return $order->toJson();
 });*/
+
+Route::get('tt',function (){
+    $order = [
+        'id' => 1,
+        'restaurant_id' => 1
+
+    ];
+
+    event(new OrderNotification($order));
+});
