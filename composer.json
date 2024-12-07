@@ -8,14 +8,15 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^8.1.12",
+        "php": "^8.0",
         "darryldecode/cart": "^4.2",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
         "laravel/framework": "^8.12",
         "laravel/tinker": "^2.5",
-        "laravel/ui": "^3.1"
+        "laravel/ui": "^3.1",
+        "pusher/pusher-php-server": "*"
     },
     "require-dev": {
         "facade/ignition": "^2.5",
