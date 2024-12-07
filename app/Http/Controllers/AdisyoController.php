@@ -140,6 +140,7 @@ class AdisyoController extends Controller
             ];
 
             $order = Order::create($orderData);
+            event(new OrderNotification($order));
 			AssignOrderToCourier::dispatch($order);
 
 
@@ -188,9 +189,6 @@ class AdisyoController extends Controller
 				$data = [
 					'OrderId' => $orderId
 				];
-
-                $order = Order::find($orderId);
-                event(new OrderNotification($order));
 				break;
 			case 'VERIFY':
 				$type = 'VERIFY';
