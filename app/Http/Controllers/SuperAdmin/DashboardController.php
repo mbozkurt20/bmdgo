@@ -24,19 +24,19 @@ class DashboardController extends Controller
 
         $yemeksepeti = Order::where('platform', 'yemeksepeti')->whereHas('restaurant', function($query){
             return $query->where('admin_id', auth()->id());
-        })->whereBetween('created_at', [$startTime, $endTime])->orderBy('id', 'desc')->get();
+        })->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->get();
         $getiryemek = Order::where('platform', 'getir')->whereHas('restaurant', function($query){
             return $query->where('admin_id', auth()->id());
-        })->whereBetween('created_at', [$startTime, $endTime])->orderBy('id', 'desc')->get();
+        })->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->get();
         $trendyol = Order::where('platform', 'trendyol')->whereHas('restaurant', function($query){
             return $query->where('admin_id', auth()->id());
-        })->whereBetween('created_at', [$startTime, $endTime])->orderBy('id', 'desc')->get();
+        })->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->get();
         $telefonsiparis = Order::where('platform', 'telefonsiparis')->whereHas('restaurant', function($query){
             return $query->where('admin_id', auth()->id());
-        })->whereBetween('created_at', [$startTime, $endTime])->orderBy('id', 'desc')->get();
+        })->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->get();
         $migros = Order::where('platform', 'migros')->whereHas('restaurant', function($query){
             return $query->where('admin_id', auth()->id());
-        })->whereBetween('created_at', [$startTime, $endTime])->orderBy('id', 'desc')->count();
+        })->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->count();
 
         return view('superadmin.home',compact('tumu','yemeksepeti','getiryemek','trendyol','telefonsiparis','migros','getiryemek'));
     }
@@ -129,11 +129,11 @@ class DashboardController extends Controller
 
         $couriers = Courier::where('status', 'active')->where('restaurant_id', 0)->get();
         $tumu = Order::whereDate('created_at', Carbon::today())->orderBy('created_at', 'desc')->get();
-        $yemeksepeti = Order::where('platform', 'yemeksepeti')->whereBetween('created_at', [$startTime, $endTime])->orderBy('id', 'desc')->get();
-        $getiryemek = Order::where('platform', 'getir')->whereBetween('created_at', [$startTime, $endTime])->orderBy('id', 'desc')->get();
-        $trendyol = Order::where('platform', 'trendyol')->whereBetween('created_at', [$startTime, $endTime])->orderBy('id', 'desc')->get();
-        $telefonsiparis = Order::where('platform', 'telefonsiparis')->whereBetween('created_at', [$startTime, $endTime])->orderBy('id', 'desc')->get();
-        $migros = Order::where('platform', 'migros')->whereBetween('created_at', [$startTime, $endTime])->orderBy('id', 'desc')->count();
+        $yemeksepeti = Order::where('platform', 'yemeksepeti')->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->get();
+        $getiryemek = Order::where('platform', 'getir')->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->get();
+        $trendyol = Order::where('platform', 'trendyol')->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->get();
+        $telefonsiparis = Order::where('platform', 'telefonsiparis')->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->get();
+        $migros = Order::where('platform', 'migros')->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->count();
 
         $totalExpense = Order::whereBetween('created_at', [$startTime, $endTime])->sum('amount');
         $formattedExpense = number_format($totalExpense, 2, '.', ',');
