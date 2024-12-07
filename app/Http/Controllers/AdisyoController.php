@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\OrderNotification;
 use App\Jobs\AssignOrderToCourier;
 use Illuminate\Http\Request;
 use App\Models\Restaurant;
@@ -187,6 +188,9 @@ class AdisyoController extends Controller
 				$data = [
 					'OrderId' => $orderId
 				];
+
+                $order = Order::find($orderId);
+                event(new OrderNotification($order));
 				break;
 			case 'VERIFY':
 				$type = 'VERIFY';
