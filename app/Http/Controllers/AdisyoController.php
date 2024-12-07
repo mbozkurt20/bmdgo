@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\OrderNotification;
+use App\Helpers\OrdersHelper;
 use App\Jobs\AssignOrderToCourier;
 use Illuminate\Http\Request;
 use App\Models\Restaurant;
@@ -140,8 +140,11 @@ class AdisyoController extends Controller
             ];
 
             $order = Order::create($orderData);
-            event(new OrderNotification($order));
-			AssignOrderToCourier::dispatch($order);
+
+            //sipariş eklenince ses bildirimi gerçekleştirir.
+            OrdersHelper::createOrderNotification($order);
+
+			AssignOrderToCourier::dispatch($order)->onQueue('high');
 
 
         }

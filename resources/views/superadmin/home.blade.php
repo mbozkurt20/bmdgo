@@ -515,7 +515,26 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="orders-section" style="margin-bottom: 10px">
-                    <h4>Siparişler</h4>
+                    <form method="GET" action="{{ route('superadmin.filterByDate') }}"
+                          class="d-flex  gap-3 align-items-center">
+                        <div>
+                            <span class="mb-1 text-dark">{{isset($startDate) ? date('d-m-Y H:i',strtotime($startDate)):null}}</span>
+                            <input  type="date" class="form-control custom-input" id="start_date" name="start_date"
+                                   required>
+                        </div>
+                        <div>
+                            <span class="mb-2 text-dark">  {{isset($endDate) ? date('d-m-Y H:i',strtotime($endDate)):null}}</span>
+                            <input type="date" class="form-control custom-input" id="end_date" name="end_date" required>
+                        </div>
+                        <div class="d-flex align-items-end">
+                            <button style="background: #fd683e;color:#fff;font-size: 0.8rem" type="submit"
+                                    class="btn custom-btn">
+                                <i class="fas fa-calendar-day" style="padding-right:5px"></i>
+                                Filtrele</button>
+                        </div>
+                    </form>
+
+                    <h4 class="mt-4 mb-2">Siparişler</h4>
                     <div class="row g-3">
                         <!-- All Orders Button -->
                         <div class="col-md-6">

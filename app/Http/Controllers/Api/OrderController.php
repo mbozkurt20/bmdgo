@@ -1,11 +1,12 @@
 <?php
 namespace App\Http\Controllers\Api;
 
-use App\Events\OrderNotification;
+use App\Helpers\OrdersHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Restaurant;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Jobs\AssignOrderToCourier;
 
@@ -51,9 +52,11 @@ class OrderController extends Controller
             ];
             $createOrder = Order::create($orderData);
             if ($createOrder){
-                event(new OrderNotification($createOrder));
-
                 AssignOrderToCourier::dispatch($createOrder);
+
+                //sipariş eklenince ses bildirimi gerçekleştirir.
+                OrdersHelper::createOrderNotification($createOrder);
+
                 return response()->json(['message' => 'Sipariş oluşturuldu'], 200);
             }
         }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Events\OrderNotification;
+use App\Helpers\OrdersHelper;
 use App\Http\Controllers\Auth\SuperAdmin;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MahalleController;
@@ -55,6 +56,9 @@ Route::group(['prefix' => 'superadmin'], function(){
 
         Route::view('/reports', 'superadmin.reports.index')->name('superadmin.reports');
         Route::get('/reports/download', [ReportController::class, 'downloadReport'])->name('superadmin.reports.download');
+
+        Route::get('dashboard/filter-by-date', [DashboardController::class, 'filterByDate'])->name('superadmin.filterByDate');
+        Route::get('dashboard/orders/filter', [DashboardController::class, 'filterOrders'])->name('superadmin.filter');
     });
 });
 

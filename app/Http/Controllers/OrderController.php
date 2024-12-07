@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\OrderNotification;
+use App\Helpers\OrdersHelper;
 use App\Traits\RequestTrait;
 use App\Models\Admin;
 use App\Models\Categorie;
@@ -460,7 +460,9 @@ class OrderController extends Controller
 
         $printed = $this->generateInvoice($order);
 
-        event(new OrderNotification($order));
+        //sipariş eklenince ses bildirimi gerçekleştirir.
+        OrdersHelper::createOrderNotification($order);
+
         return response()->json(['status' => "OK", 'printed' => $printed]);
     }
 

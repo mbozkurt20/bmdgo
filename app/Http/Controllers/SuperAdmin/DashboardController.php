@@ -18,25 +18,22 @@ class DashboardController extends Controller
         $startTime = Carbon::today()->setTime(0, 0);
         $endTime = Carbon::today()->setTime(23, 59);
 
-        $tumu = Order::whereDate('created_at', Carbon::today())->whereHas('restaurant', function($query){
-            return $query->where('admin_id', auth()->id());
-        })->orderBy('created_at', 'desc')->get();
+        $tumu = Order::whereDate('created_at', Carbon::today())->orderBy('created_at', 'desc')->get();
 
-        $yemeksepeti = Order::where('platform', 'yemeksepeti')->whereHas('restaurant', function($query){
-            return $query->where('admin_id', auth()->id());
-        })->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->get();
-        $getiryemek = Order::where('platform', 'getir')->whereHas('restaurant', function($query){
-            return $query->where('admin_id', auth()->id());
-        })->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->get();
-        $trendyol = Order::where('platform', 'trendyol')->whereHas('restaurant', function($query){
-            return $query->where('admin_id', auth()->id());
-        })->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->get();
-        $telefonsiparis = Order::where('platform', 'telefonsiparis')->whereHas('restaurant', function($query){
-            return $query->where('admin_id', auth()->id());
-        })->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->get();
-        $migros = Order::where('platform', 'migros')->whereHas('restaurant', function($query){
-            return $query->where('admin_id', auth()->id());
-        })->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->count();
+        $yemeksepeti = Order::where('platform', 'yemeksepeti')
+            ->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->get();
+
+        $getiryemek = Order::where('platform', 'getir')
+            ->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->get();
+
+        $trendyol = Order::where('platform', 'trendyol')
+            ->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->get();
+
+        $telefonsiparis = Order::where('platform', 'telefonsiparis')
+            ->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->get();
+
+        $migros = Order::where('platform', 'migros')
+            ->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->count();
 
         return view('superadmin.home',compact('tumu','yemeksepeti','getiryemek','trendyol','telefonsiparis','migros','getiryemek'));
     }
@@ -128,12 +125,23 @@ class DashboardController extends Controller
         $endTime = Carbon::today()->setTime(23, 59);
 
         $couriers = Courier::where('status', 'active')->where('restaurant_id', 0)->get();
+
         $tumu = Order::whereDate('created_at', Carbon::today())->orderBy('created_at', 'desc')->get();
-        $yemeksepeti = Order::where('platform', 'yemeksepeti')->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->get();
-        $getiryemek = Order::where('platform', 'getir')->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->get();
-        $trendyol = Order::where('platform', 'trendyol')->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->get();
-        $telefonsiparis = Order::where('platform', 'telefonsiparis')->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->get();
-        $migros = Order::where('platform', 'migros')->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->count();
+
+        $yemeksepeti = Order::where('platform', 'yemeksepeti')
+            ->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->get();
+
+        $getiryemek = Order::where('platform', 'getir')
+            ->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->get();
+
+        $trendyol = Order::where('platform', 'trendyol')
+            ->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->get();
+
+        $telefonsiparis = Order::where('platform', 'telefonsiparis')
+            ->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->get();
+
+        $migros = Order::where('platform', 'migros')
+            ->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->count();
 
         $totalExpense = Order::whereBetween('created_at', [$startTime, $endTime])->sum('amount');
         $formattedExpense = number_format($totalExpense, 2, '.', ',');
@@ -153,5 +161,90 @@ class DashboardController extends Controller
 
     public function reports(){
 
+    }
+
+    public function filterByDate(Request $request)
+    {
+        // Başlangıç ve bitiş tarihlerini al
+        $startDate = Carbon::parse($request->start_date)->startOfDay();
+        $endDate = Carbon::parse($request->end_date)->endOfDay();
+
+        $couriers = Courier::where('status', 'active')->where('restaurant_id', 0)->get();
+        $tumu = Order::whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at', 'desc')->get();
+        $yemeksepeti = Order::where('platform', 'yemeksepeti')->whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at', 'desc')->get();
+        $getiryemek = Order::where('platform', 'getir')->whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at', 'desc')->get();
+        $trendyol = Order::where('platform', 'trendyol')->whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at', 'desc')->get();
+        $telefonsiparis = Order::where('platform', 'telefonsiparis')->whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at', 'desc')->get();
+        $migros = Order::where('platform', 'migros')->whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at', 'desc')->count();
+        // Kurye Sayısı - Total number of couriers
+        $totalCouriers = Courier::count();
+        // Boş Kurye - Count of couriers with "Boş" situation
+        $idleCouriers = Courier::where('situation', 'Aktif')->count();
+        // Molada Kurye - Count of couriers with "Molada" situation
+        $breakCouriers = Courier::where('situation', 'Molada')->count();
+
+        $totalExpense = Order::whereBetween('created_at', [$startDate, $endDate])->sum('amount');
+        $formattedExpense = number_format($totalExpense, 2, '.', ',');
+        $averageExpense = Order::whereBetween('created_at', [$startDate, $endDate])->avg('amount');
+        $formattedAverageExpense = number_format($averageExpense, 2, '.', ',');
+
+        return view('superadmin.home', compact('totalCouriers', 'idleCouriers', 'breakCouriers', 'totalExpense', 'formattedExpense', 'averageExpense', 'formattedAverageExpense', 'telefonsiparis', 'tumu', 'yemeksepeti', 'getiryemek', 'trendyol', 'couriers', 'migros','startDate','endDate'));
+    }
+    public function filterOrders(Request $request)
+    {
+        // Tarihe göre aralıkları belirleyelim
+        // Tarih filtresini al
+        $dateFilter = $request->input('date');
+        switch ($dateFilter) {
+            case 'today':
+                $startDate = Carbon::today()->startOfDay();
+                $endDate = Carbon::today()->endOfDay();
+                break;
+            case 'yesterday':
+                $startDate = Carbon::yesterday()->startOfDay();
+                $endDate = Carbon::yesterday()->endOfDay();
+                break;
+            case 'this_week':
+                $startDate = Carbon::now()->startOfWeek();
+                $endDate = Carbon::now()->endOfWeek();
+                break;
+            case 'last_week':
+                $startDate = Carbon::now()->subWeek()->startOfWeek();
+                $endDate = Carbon::now()->subWeek()->endOfWeek();
+                break;
+            case 'last_month':
+                $startDate = Carbon::now()->subMonth()->startOfMonth();
+                $endDate = Carbon::now()->subMonth()->endOfMonth();
+                break;
+            default:
+                // Varsayılan olarak bugünün verilerini döndür
+                $startDate = Carbon::today()->startOfDay();
+                $endDate = Carbon::today()->endOfDay();
+                break;
+        }
+        $couriers = Courier::where('status', 'active')->where('restaurant_id', 0)->get();
+        $tumu = Order::whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at', 'desc')->get();
+        $yemeksepeti = Order::where('platform', 'yemeksepeti')->whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at', 'desc')->get();
+        $getiryemek = Order::where('platform', 'getir')->whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at', 'desc')->get();
+        $trendyol = Order::where('platform', 'trendyol')->whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at', 'desc')->get();
+        $telefonsiparis = Order::where('platform', 'telefonsiparis')->whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at', 'desc')->get();
+        $migros = Order::where('platform', 'migros')->whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at', 'desc')->count();
+
+        $totalExpense = Order::whereBetween('created_at', [$startDate, $endDate])->sum('amount');
+        $formattedExpense = number_format($totalExpense, 2, '.', ',');
+        $averageExpense = Order::whereBetween('created_at', [$startDate, $endDate])->avg('amount');
+        $formattedAverageExpense = number_format($averageExpense, 2, '.', ',');
+
+        // Seçilen tarih aralığındaki siparişleri filtrele
+        $orders = Order::whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at', 'desc')->get();
+        // Kurye Sayısı - Total number of couriers
+        $totalCouriers = Courier::count();
+        // Boş Kurye - Count of couriers with "Boş" situation
+        $idleCouriers = Courier::where('situation', 'Aktif')->count();
+        // Molada Kurye - Count of couriers with "Molada" situation
+        $breakCouriers = Courier::where('situation', 'Molada')->count();
+
+        // Gerekli diğer veriler ve siparişler ile birlikte view döndürülür
+        return view('superadmin.home', compact('totalCouriers', 'idleCouriers', 'breakCouriers', 'totalExpense', 'orders', 'formattedExpense', 'averageExpense', 'formattedAverageExpense', 'telefonsiparis', 'tumu', 'yemeksepeti', 'getiryemek', 'trendyol', 'couriers', 'migros'));
     }
 }
