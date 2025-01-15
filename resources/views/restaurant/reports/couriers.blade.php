@@ -37,7 +37,7 @@
             <div class="row" style="width: 60%;">
                 <div class="col-lg-3">
                     <select class="form-control" id="courier">
-                        <option value="-1">EsnafExpress Kuryesi</option>
+                        <option value="-1">VerGelsin Kuryesi</option>
                         <option value="0">Restaurant Kuryeleri</option>
                         @foreach ($couriers as $courier)
                             <option value="{{ $courier->id }}">{{ $courier->name }}</option>

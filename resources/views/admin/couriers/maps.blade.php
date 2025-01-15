@@ -36,7 +36,7 @@
 		 let defaultLon = '{{auth()->user()->default_locations_lon}}';
 		 var map = L.map('map').setView([defaultLat, defaultLon], 14);
          L.tileLayer('https://mt1.google.com/vt/lyrs=r&x={x}&y={y}&z={z}', {
-             attribution: '&copy; <a href="#">Esnafexpress</a> Kurye Takip Otomasyonu'
+             attribution: '&copy; <a href="#">VerGelsin</a> Kurye Takip Otomasyonu'
          }).addTo(map);
 
          var markersLayer = L.layerGroup().addTo(map);
@@ -63,7 +63,7 @@
 
 
          function fetchLocations() {
-             fetch('https://panel.esnafexpress.com.tr/api/getLocations')
+             fetch('https://panel.VerGelsin.com.tr/api/getLocations')
                  .then(response => response.json())
                  .then(data => {
                      updateMarkers(data);

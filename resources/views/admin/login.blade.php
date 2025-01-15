@@ -9,14 +9,14 @@
     <meta name="author" content="">
     <meta name="robots" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="EsnafExpress">
-    <meta property="og:title" content="EsnafExpress">
-    <meta property="og:description" content="EsnafExpress">
+    <meta name="description" content="VerGelsin">
+    <meta property="og:title" content="VerGelsin">
+    <meta property="og:description" content="VerGelsin">
     <meta property="og:image" content="https://salero.dexignzone.com/xhtml/social-image.png">
     <meta name="format-detection" content="telephone=no">
 
     <!-- PAGE TITLE HERE -->
-    <title>EsnafExpress - Admin</title>
+    <title>VerGelsin - Admin</title>
 
     <!-- FAVICONS ICON -->
     <link rel="shortcut icon" type="image/png" href="{{asset('theme/login/img/favicon.png')}}">
@@ -94,7 +94,7 @@
                                 <div class="card-footer">
                                     <div class=" bottom-footer clearfix m-t10 m-b20 row text-center">
                                         <div class="col-lg-12 text-center">
-												<span> © Esnafexpress</span>
+												<span> © VerGelsin</span>
                                         </div>
                                     </div>
                                 </div>

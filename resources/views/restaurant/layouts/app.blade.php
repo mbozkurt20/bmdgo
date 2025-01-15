@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <!-- PAGE TITLE HERE -->
-    <title>{{ Auth::user()->restaurant_name }} Restaurant Paneli - EsnafExpress</title>
+    <title>{{ Auth::user()->restaurant_name }} Restaurant Paneli - VerGelsin</title>
     <!-- FAVICONS ICON -->
     <link rel="shortcut icon" type="image/png" href="{{ asset('theme/images/favicon.png') }}">
     <link rel="stylesheet" href="{{ asset('theme/css/chartist.min.css') }}">
@@ -283,7 +283,7 @@
                         <ul aria-expanded="false">
 
                             <li><a href="{{ route('restaurant.entegrations') }}">Entegrasyonlar</a></li>
-                            <li><a href="https://Esnafexpress.com.tr/download/printer.exe">Printer IO</a></li>
+                            <li><a href="https://VerGelsin.com.tr/download/printer.exe">Printer IO</a></li>
                             <li><a href="https://download.anydesk.com/AnyDesk.exe">Teknik Destek</a></li>
                         </ul>
                     </li>
@@ -292,7 +292,7 @@
 
                 <div class="copyright">
                     <p>
-                        <strong>EsnafExpress</strong> 2024.
+                        <strong>VerGelsin</strong> 2024.
                     </p>
                 </div>
             </div>
@@ -316,7 +316,7 @@
         <div class="footer">
             <div class="copyright">
                 <p>
-                    Copyright {{ date('Y') }} EsnafExpress
+                    Copyright {{ date('Y') }} VerGelsin
 
 
                 </p>

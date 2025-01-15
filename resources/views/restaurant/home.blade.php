@@ -1268,7 +1268,7 @@
                                                                                     onchange="Courier(event,{{ $order->id }})">
                                                                                     <option value="0">Kurye Seç
                                                                                     </option>
-                                                                                    <option value="-1">EsnafExpress
+                                                                                    <option value="-1">VerGelsin
                                                                                     </option>
                                                                                     @foreach ($couriers as $courier)
                                                                                         <option
@@ -2242,7 +2242,7 @@
 
         function ExitPos() {
 
-            window.location.href = 'https://panel.esnafexpress.com.tr';
+            window.location.href = 'https://panel.VerGelsin.com.tr';
 
         }
 
@@ -2417,7 +2417,7 @@
 <script>
 function fetchData() {
             $.ajax({
-                url: 'https://panel.esnafexpress.com.tr/restaurant/getAdisyoOrders', // Replace with the actual API URL
+                url: 'https://panel.VerGelsin.com.tr/restaurant/getAdisyoOrders', // Replace with the actual API URL
                 method: 'GET',
                 success: function(textStatus, jqXHR) {
 
