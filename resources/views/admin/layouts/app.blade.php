@@ -112,7 +112,7 @@
         <div class="nav-header">
             <a href="{{ url('/restaurant') }}" class="brand-logo">
                 <div class="brand-title" style="width: 165px; height:35px"> <img
-                        src="https://i.hizliresim.com/mw0l2sg.png" style="height: 50px"> </div>
+                        src="https://i.hizliresim.com/erh6qtm.png" style="height: 50px"> </div>
             </a>
             <div class="nav-control">
                 <div class="hamburger">

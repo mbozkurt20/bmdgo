@@ -85,7 +85,7 @@
                 <div class="logo-abbr" style="width: 56px; height:56px"> <img src="" style="height: 40px">
                 </div>
                 <div class="brand-title" style="width: 165px; height:35px"> <img
-                        src="https://i.hizliresim.com/mw0l2sg.png" style="height: 50px">
+                        src="https://i.hizliresim.com/erh6qtm.png" style="height: 50px">
                 </div>
             </a>
             <div class="nav-control">

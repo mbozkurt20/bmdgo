@@ -63,8 +63,8 @@
                         <div class="login-form style-2">
                             <div class="card-body">
                                 <div class="logo-header">
-                                    <a href="{{route('restaurant.login')}}" class="logo"><img style="height: 80px" src="https://i.hizliresim.com/g1dbih9.jpg" alt="" class="width-230 light-logo"></a>
-                                    <a href="{{route('restaurant.login')}}" class="logo"><img style="height: 80px" src="https://i.hizliresim.com/g1dbih9.jpg" alt="" class="width-230 dark-logo"></a>
+                                    <a href="{{route('restaurant.login')}}" class="logo"><img style="height: 80px" src="https://i.hizliresim.com/erh6qtm.png" alt="" class="width-230 light-logo"></a>
+                                    <a href="{{route('restaurant.login')}}" class="logo"><img style="height: 80px" src="https://i.hizliresim.com/erh6qtm.png" alt="" class="width-230 dark-logo"></a>
                                 </div>
                                 <nav>
                                     <div class="nav nav-tabs border-bottom-0" id="nav-tab" role="tablist">
