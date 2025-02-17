@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <!-- PAGE TITLE HERE -->
-    <title>{{ Auth::user()->restaurant_name }} Restaurant Paneli - VerGelsin</title>
+    <title>{{ Auth::user()->restaurant_name }} Restaurant Paneli - ParsKurye</title>
     <!-- FAVICONS ICON -->
     <link rel="shortcut icon" type="image/png" href="{{ asset('theme/images/favicon.png') }}">
     <link rel="stylesheet" href="{{ asset('theme/css/chartist.min.css') }}">
@@ -85,7 +85,7 @@
                 <div class="logo-abbr" style="width: 56px; height:56px"> <img src="" style="height: 40px">
                 </div>
                 <div class="brand-title" style="width: 165px; height:35px"> <img
-                        src="https://i.hizliresim.com/erh6qtm.png" style="height: 50px">
+                        src="https://i.hizliresim.com/oefzi6j.png" style="height: 50px">
                 </div>
             </a>
             <div class="nav-control">
@@ -283,7 +283,7 @@
                         <ul aria-expanded="false">
 
                             <li><a href="{{ route('restaurant.entegrations') }}">Entegrasyonlar</a></li>
-                            <li><a href="https://VerGelsin.com.tr/download/printer.exe">Printer IO</a></li>
+                            <li><a href="https://ParsKurye.com.tr/download/printer.exe">Printer IO</a></li>
                             <li><a href="https://download.anydesk.com/AnyDesk.exe">Teknik Destek</a></li>
                         </ul>
                     </li>
@@ -292,7 +292,7 @@
 
                 <div class="copyright">
                     <p>
-                        <strong>VerGelsin</strong> 2024.
+                        <strong>ParsKurye</strong> 2024.
                     </p>
                 </div>
             </div>
@@ -316,7 +316,7 @@
         <div class="footer">
             <div class="copyright">
                 <p>
-                    Copyright {{ date('Y') }} VerGelsin
+                    Copyright {{ date('Y') }} ParsKurye
 
 
                 </p>

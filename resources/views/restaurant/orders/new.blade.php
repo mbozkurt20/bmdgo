@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="author" content="Bootstrap-ecommerce by Vosidiy">
-    <title>Sipariş Ekranı - VerGelsin</title>
+    <title>Sipariş Ekranı - ParsKurye</title>
 
     <!-- Bootstrap4 files-->
     <link href="{{asset('pos/assets/css/bootstrap.css')}}" rel="stylesheet" type="text/css"/>
@@ -361,7 +361,7 @@
                     <div class="col-lg-12">
                         <select class="js-example-basic-single" onchange="CourierSet(event)" style="width: 100%;">
                             <option value="0" >Kurye Ata</option>
-                            <option value="-1">VerGelsin Kuryesi</option>
+                            <option value="-1">ParsKurye Kuryesi</option>
                             @foreach($couriers as $courier)
                                 <option value="{{$courier->id}}">{{$courier->name}}</option>
                             @endforeach
@@ -716,7 +716,7 @@
 
     function ExitPos(){
 
-         window.location.href = 'https://panel.VerGelsin.com.tr';
+         window.location.href = 'https://panel.parskurye.net';
 
     }
 

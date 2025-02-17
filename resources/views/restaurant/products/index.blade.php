@@ -45,7 +45,7 @@
                         <tbody>
                         @foreach($products as $product)
                             <tr id="data_{{$product->id}}">
-                                <td><img src="https://i.hizliresim.com/erh6qtm.png" style="height: 30px;"></td>
+                                <td><img src="https://i.hizliresim.com/oefzi6j.png" style="height: 30px;"></td>
                                 <td class="wspace-no">{{$product->code}}</td>
                                 <td>{{$product->name}}</td>
                                 <td class="text-ov">{{$product->price}} ₺</td>

@@ -9,13 +9,13 @@
     <meta name="author" content>
     <meta name="robots" content>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="VerGelsin :  Admin Ekranı">
-    <meta property="og:title" content="VerGelsin :  Admin Ekranı">
-    <meta property="og:description" content="VerGelsin :  Admin Ekranı">
+    <meta name="description" content="ParsKurye :  Admin Ekranı">
+    <meta property="og:title" content="ParsKurye :  Admin Ekranı">
+    <meta property="og:description" content="ParsKurye :  Admin Ekranı">
     <meta property="og:image" content="images/social-image.png">
     <meta name="format-detection" content="telephone=no">
     <!-- PAGE TITLE HERE -->
-    <title>Admin - VerGelsin</title>
+    <title>Admin - ParsKurye</title>
     <!-- FAVICONS ICON -->
     <link rel="shortcut icon" type="image/png" href="{{ asset('theme/images/favicon.png') }}">
     <link rel="stylesheet" href="{{ asset('theme/css/chartist.min.css') }}">
@@ -105,7 +105,7 @@
         <div class="nav-header">
             <a href="{{ url('/restaurant') }}" class="brand-logo">
                 <div class="brand-title" style="width: 165px; height:35px"> <img
-                        src="https://i.hizliresim.com/erh6qtm.png" style="height: 50px"> </div>
+                        src="https://i.hizliresim.com/oefzi6j.png" style="height: 50px"> </div>
             </a>
             <div class="nav-control">
                 <div class="hamburger">
@@ -280,7 +280,7 @@
         <div class="footer text-center">
 
             <p>
-                Copyright © Developed by <a href="#" target="_blank">VerGelsin</a> 2024
+                Copyright © Developed by <a href="#" target="_blank">ParsKurye</a> 2024
             </p>
 
         </div>
