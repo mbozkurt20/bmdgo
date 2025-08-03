@@ -7,42 +7,19 @@ use App\Models\Order;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-use Auth;
 use App\Models\Admin;
-// use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
     use AuthenticatesUsers;
-    /**
-     * The user has been authenticated.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  mixed  $user
-     * @return mixed
-     */
+
     protected function authenticated(Request $request, $user)
     {
         return redirect()->route('admin.index');
     }
 
-    // manual login function
-    // public function login(Request $request)
-    // {
-    //     $credentials = $request->only('email', 'password');
-    //     if (Auth::guard('admin')->attempt($credentials, $request->remember)) {
-    //         $user = Admin::where('email', $request->email)->first();
-    //         Auth::guard('admin')->login($user);
-    //         return redirect()->route('admin.index');
-    //     }
-    //     return redirect()->route('admin.login')->with('status', 'Failed to process login!');
-    // }
-    // public function logout()
-    // {
-    //     if (Auth::guard('admin')->logout()) {
-    //         return redirect()->route('admin.login');
-    //     }
-    // }
     public function logout(Request $request)
     {
         $this->guard()->logout();
@@ -63,19 +40,10 @@ class AdminController extends Controller
     {
         return redirect()->route('admin.login');
     }
-
-    /**
-     * Get the guard to be used during authentication.
-     *
-     * @return \Illuminate\Contracts\Auth\StatefulGuard
-     */
     protected function guard()
     {
         return Auth::guard('admin');
     }
-
-
-
     public function home()
     {
         $now = Carbon::now();
@@ -85,35 +53,35 @@ class AdminController extends Controller
 
         $couriers = Courier::where('status', 'active')->where('admin_id', auth()->id())->where('restaurant_id', 0)->get();
         $tumu = Order::whereDate('created_at', Carbon::today())->whereHas('restaurant', function($query){
-                return $query->where('admin_id', auth()->id());
-            })->orderBy('created_at', 'desc')->get();
+            return $query->where('admin_id', auth()->id());
+        })->orderBy('created_at', 'desc')->get();
         $yemeksepeti = Order::where('platform', 'yemeksepeti')->whereHas('restaurant', function($query){
-                return $query->where('admin_id', auth()->id());
-            })->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->get();
+            return $query->where('admin_id', auth()->id());
+        })->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->get();
         $getiryemek = Order::where('platform', 'getir')->whereHas('restaurant', function($query){
-                return $query->where('admin_id', auth()->id());
-            })->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->get();
+            return $query->where('admin_id', auth()->id());
+        })->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->get();
         $trendyol = Order::where('platform', 'trendyol')->whereHas('restaurant', function($query){
-                return $query->where('admin_id', auth()->id());
-            })->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->get();
+            return $query->where('admin_id', auth()->id());
+        })->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->get();
         $telefonsiparis = Order::where('platform', 'telefonsiparis')->whereHas('restaurant', function($query){
-                return $query->where('admin_id', auth()->id());
-            })->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->get();
+            return $query->where('admin_id', auth()->id());
+        })->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->get();
         $migros = Order::where('platform', 'migros')->whereHas('restaurant', function($query){
-                return $query->where('admin_id', auth()->id());
-            })->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->count();
+            return $query->where('admin_id', auth()->id());
+        })->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->count();
 
         $totalExpense = Order::whereBetween('created_at', [$startTime, $endTime])->whereHas('restaurant', function($query){
-                return $query->where('admin_id', auth()->id());
-            })->sum('amount');
+            return $query->where('admin_id', auth()->id());
+        })->sum('amount');
         $formattedExpense = number_format($totalExpense, 2, '.', ',');
         $averageExpense = Order::whereBetween('created_at', [$startTime, $endTime])->whereHas('restaurant', function($query){
-                return $query->where('admin_id', auth()->id());
-            })->avg('amount');
+            return $query->where('admin_id', auth()->id());
+        })->avg('amount');
         $formattedAverageExpense = number_format($averageExpense, 2, '.', ',');
         $teslimEdilenSiparisler = Order::where('status', 'DELIVERED')->whereHas('restaurant', function($query){
-                return $query->where('admin_id', auth()->id());
-            })->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->count();
+            return $query->where('admin_id', auth()->id());
+        })->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->count();
 
         // Kurye Sayısı - Total number of couriers
         $totalCouriers = Courier::where('admin_id', auth()->id())->count();
@@ -127,7 +95,7 @@ class AdminController extends Controller
 
     public function auto_order($status)
     {
-        $change = Admin::find(1);
+        $change = Admin::find(2);
         $change->auto_orders = $status;
         $change->save();
 

@@ -36,7 +36,7 @@
 		 let defaultLon = '{{auth()->user()->default_locations_lon}}';
 		 var map = L.map('map').setView([defaultLat, defaultLon], 14);
          L.tileLayer('https://mt1.google.com/vt/lyrs=r&x={x}&y={y}&z={z}', {
-             attribution: '&copy; <a href="#">ParsKurye</a> Kurye Takip Otomasyonu'
+             attribution: '&copy; <a href="#">{{env('APP_NAME')}}</a> Kurye Takip Otomasyonu'
          }).addTo(map);
 
          var markersLayer = L.layerGroup().addTo(map);

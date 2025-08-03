@@ -10,11 +10,9 @@ class MyController extends Controller
 {
     public function entegrations()
     {
-
         $restaurant = Restaurant::find(Auth::user()->id);
         return view('restaurant.profile.entegration', compact('restaurant'));
     }
-
     public function entegrastion_update(Request $request)
     {
         $restaurant = Restaurant::find(Auth::user()->id);

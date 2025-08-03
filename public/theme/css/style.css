@@ -2515,7 +2515,7 @@ textarea.form-control-lg {
 
 .btn-primary {
   color: #000;
-  background-color: #FD683E;
+  background-color: rgb(73,39,179);
   border-color: #FD683E; }
   .btn-primary:hover {
     color: #000;
@@ -9389,7 +9389,6 @@ label {
     justify-content: flex-start;
     align-items: center;
     font-size: 1.125rem;
-    color: #fff;
     text-decoration: none;
     padding-left: 1.875rem;
     padding-right: 1.875rem;

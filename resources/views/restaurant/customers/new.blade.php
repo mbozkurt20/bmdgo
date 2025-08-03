@@ -11,11 +11,17 @@
                 </ol>
             </div>
         </div>
-        @if (session()->has('message'))
-            <div class="alert alert-success alert-dismissible fade show">
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="btn-close">
-                </button>
-                <a href="#"> {{ session()->get('message') }}</a>
+        @if(session()->has('message'))
+            <div class="custom-alert success">
+                <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+                <span class="alert-message">{{ session()->get('message') }}</span>
+            </div>
+        @endif
+
+        @if(session()->has('test') )
+            <div class="custom-alert error">
+                <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+                <span class="alert-message">{{ session()->get('test') }}</span>
             </div>
         @endif
 
@@ -32,101 +38,98 @@
                                 <div class="row">
                                     <!-- Customer Name -->
                                     <div class="mb-3 col-md-12">
-                                        <label class="form-label">Müşteri Adı</label>
+                                        <label class="form-label text-dark">Müşteri Adı <small class="text-danger">*</small></label>
                                         <input type="text" class="form-control" name="name" placeholder="Müşteri Adı"
                                             required>
                                     </div>
                                     <!-- Customer Phone -->
                                     <div class="mb-3 col-md-6">
-                                        <label class="form-label">Telefon Numarası</label>
+                                        <label class="form-label text-dark">Telefon Numarası  <small class="text-danger">*</small></label>
                                         <input type="text" class="form-control" name="phone"
                                             placeholder="Telefon Numarası" required>
                                     </div>
                                     <!-- Customer Mobile (Secondary Phone) -->
                                     <div class="mb-3 col-md-6">
-                                        <label class="form-label">Telefon Numarası 2</label>
+                                        <label class="form-label text-dark">Telefon Numarası (opsiyonel)</label>
                                         <input type="text" class="form-control" name="mobile"
                                             placeholder="Diğer Telefon Numarası">
                                     </div>
                                 </div>
 
+                                <hr>
                                 <!-- Address Section -->
-                                <div class="card-body" style="border-top:1px solid #ddd">
-                                    <div>
-                                        <!-- Repeater Heading -->
-                                        <div class="repeater-heading">
-                                            <div class="row">
-                                                <div class="col-lg-10">
-                                                    <h5 class="pull-left">Adres Ekle</h5>
+                                <div>
+                                    <!-- Repeater Heading -->
+                                    <div class="repeater-heading">
+                                        <div class="row">
+                                            <div class="col-lg-10">
+                                                <h5 class="pull-left">Adres Ekle  <small class="text-danger">*</small></h5>
+                                            </div>
+                                            <div class="col-lg-2" style="text-align: right">
+                                                <a class="special-ok-button-small btn-xs repeater-add-btn"
+                                                   data-repeater-create>+ Yeni Ekle</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+
+                                    <!-- Repeater Items -->
+                                    <div data-repeater-list="address">
+                                        <!-- Repeater Content -->
+                                        <div data-repeater-item class="item-content row"
+                                             style="background: #f4f4f4;margin: 15px 0px 10px;padding:10px 0px;border-radius: 10px">
+                                            <!-- Address Name -->
+                                            <div class="mb-3 col-md-5">
+                                                <input type="text" class="form-control" name="name" required
+                                                       placeholder="Adres Başlığı">
+                                            </div>
+                                            <!-- Sokak/Cadde -->
+                                            <div class="mb-3 col-md-6">
+                                                <input type="text" class="form-control" name="sokak_cadde" required
+                                                       placeholder="Sokak/Cadde">
+                                            </div>
+                                            <!-- Remove Button -->
+                                            <div class="mb-3 col-md-1">
+                                                <div class="pull-right repeater-remove-btn">
+                                                    <a id="remove-btn" style="font-size: 20px;cursor: pointer"
+                                                       class="text-danger" data-repeater-delete>
+                                                        <i class="fa fa-trash"></i>
+                                                    </a>
                                                 </div>
-                                                <div class="col-lg-2" style="text-align: right">
-                                                    <a class="btn btn-primary repeater-add-btn"
-                                                        data-repeater-create>Ekle</a>
-                                                </div>
+                                            </div>
+                                            <!-- Bina No -->
+                                            <div class="mb-3 col-md-3">
+                                                <input type="text" class="form-control" name="bina_no" required
+                                                       placeholder="Bina No">
+                                            </div>
+                                            <!-- Kat -->
+                                            <div class="mb-3 col-md-3">
+                                                <input type="text" class="form-control" name="kat" required
+                                                       placeholder="Kat">
+                                            </div>
+                                            <!-- Daire No -->
+                                            <div class="mb-3 col-md-3">
+                                                <input type="text" class="form-control" name="daire_no" required
+                                                       placeholder="Daire No">
+                                            </div>
+                                            <!-- Mahalle -->
+                                            <div class="mb-3 col-md-3">
+                                                <input type="text" class="form-control" name="mahalle" required
+                                                       placeholder="Mahalle">
+                                            </div>
+                                            <!-- Adres Tarifi -->
+                                            <div class="mb-3 col-md-12">
+                                                <input type="text" name="adres_tarifi" class="form-control" required
+                                                       placeholder="Adres Tarifi">
                                             </div>
                                         </div>
                                         <div class="clearfix"></div>
-
-                                        <!-- Repeater Items -->
-                                        <div data-repeater-list="address">
-                                            <!-- Repeater Content -->
-                                            <div data-repeater-item class="item-content row"
-                                                style="background: #f4f4f4;margin: 15px 0px 10px;padding:10px 0px;border-radius: 10px">
-                                                <!-- Address Name -->
-                                                <div class="mb-3 col-md-5">
-                                                    <input type="text" class="form-control" name="name"
-                                                        placeholder="Adres Başlığı">
-                                                </div>
-                                                <!-- Sokak/Cadde -->
-                                                <div class="mb-3 col-md-6">
-                                                    <input type="text" class="form-control" name="sokak_cadde"
-                                                        placeholder="Sokak/Cadde">
-                                                </div>
-                                                <!-- Remove Button -->
-                                                <div class="mb-3 col-md-1">
-                                                    <div class="pull-right repeater-remove-btn">
-                                                        <a id="remove-btn" style="font-size: 20px;cursor: pointer"
-                                                            class="text-danger" data-repeater-delete>
-                                                            <i class="fa fa-trash"></i>
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                                <!-- Bina No -->
-                                                <div class="mb-3 col-md-3">
-                                                    <input type="text" class="form-control" name="bina_no"
-                                                        placeholder="Bina No">
-                                                </div>
-                                                <!-- Kat -->
-                                                <div class="mb-3 col-md-3">
-                                                    <input type="text" class="form-control" name="kat"
-                                                        placeholder="Kat">
-                                                </div>
-                                                <!-- Daire No -->
-                                                <div class="mb-3 col-md-3">
-                                                    <input type="text" class="form-control" name="daire_no"
-                                                        placeholder="Daire No">
-                                                </div>
-                                                <!-- Mahalle -->
-                                                <div class="mb-3 col-md-3">
-                                                    <input type="text" class="form-control" name="mahalle"
-                                                        placeholder="Mahalle">
-                                                </div>
-                                                <!-- Adres Tarifi -->
-                                                <div class="mb-3 col-md-12">
-                                                    <input type="text" name="adres_tarifi" class="form-control"
-                                                        placeholder="Adres Tarifi">
-                                                </div>
-                                            </div>
-                                            <div class="clearfix"></div>
-                                        </div>
                                     </div>
                                 </div>
 
                                 <!-- Submit Button -->
-                                <button type="submit" class="btn btn-primary">Kaydı Tamamla</button>
+                                <button type="submit" class="special-button float-end mt-4">Kaydı Tamamla</button>
                             </form>
-
-
                         </div>
                     </div>
                 </div>

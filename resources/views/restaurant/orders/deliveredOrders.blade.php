@@ -89,7 +89,7 @@
                                     <td>
                                         @php
                                             $courier = \App\Models\Courier::where('id', $order->courier_id)->first();
-                                            echo $courier->name;
+                                            echo $courier? $courier->name: env('APP_NAME');
                                         @endphp
                             </td>
                             <td class="text-ov">{{ $order->amount }} TL</td>

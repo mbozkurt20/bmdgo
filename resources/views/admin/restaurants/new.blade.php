@@ -11,13 +11,19 @@
                 </ol>
             </div>
         </div>
+
         @if(session()->has('message'))
+            <div class="custom-alert success">
+                <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+                <span class="alert-message">{{ session()->get('message') }}</span>
+            </div>
+        @endif
 
-        <div class="alert alert-success alert-dismissible fade show">
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="btn-close">
-            </button> <a href="#">   {{ session()->get('message') }}</a>
-        </div>
-
+        @if(session()->has('test') )
+            <div class="custom-alert error">
+                <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+                <span class="alert-message">{{ session()->get('test') }}</span>
+            </div>
         @endif
 
         <div class="row">
@@ -32,52 +38,62 @@
                                 @csrf
                                 <div class="row">
                                     <div class="mb-3 col-md-6">
-                                        <label class="form-label">İşyeri Adı</label>
-                                        <input type="text" class="form-control" name="restaurant_name" placeholder="İşyeri Adı">
+                                        <label class="form-label">İşyeri Adı  <small class="text-danger">*</small></label>
+                                        <input  required type="text" class="form-control" name="restaurant_name"
+                                               placeholder="İşyeri Adı">
                                     </div>
                                     <div class="mb-3 col-md-6">
-                                        <label class="form-label">Yetkili Adı</label>
-                                        <input type="text" class="form-control" name="name" placeholder="Yetkili Adı">
+                                        <label class="form-label">Yetkili Adı  <small class="text-danger">*</small></label>
+                                        <input required type="text" class="form-control" name="name" placeholder="Yetkili Adı">
                                     </div>
                                     <div class="mb-3 col-md-6">
-                                        <label class="form-label">E-posta Adresi</label>
-                                        <input type="email" class="form-control" name="email" placeholder="E-posta Adresi">
+                                        <label class="form-label">E-posta Adresi  <small class="text-danger">*</small></label>
+                                        <input required type="email" class="form-control" name="email"
+                                               placeholder="E-posta Adresi">
                                     </div>
                                     <div class="mb-3 col-md-6">
-                                        <label class="form-label">Telefon</label>
-                                        <input type="text" class="form-control" name="phone" placeholder="Telefon">
+                                        <label class="form-label">Telefon  <small class="text-danger">*</small></label>
+                                        <input required type="text" class="form-control" name="phone" placeholder="Telefon">
                                     </div>
                                     <div class="mb-3 col-md-6">
-                                        <label class="form-label">Şifre</label>
-                                        <input type="password" class="form-control" name="password"  placeholder="Şifre">
+                                        <label class="form-label">Şifre  <small class="text-danger">*</small></label>
+                                        <input required type="password" class="form-control" name="password" placeholder="Şifre">
                                     </div>
                                     <div class="mb-3 col-md-6">
                                         <label class="form-label">Vergi Dairesi</label>
-                                        <input type="text" class="form-control" name="tax_name" placeholder="Vergi Dairesi">
+                                        <input type="text" class="form-control" name="tax_name"
+                                               placeholder="Vergi Dairesi">
                                     </div>
                                     <div class="mb-3 col-md-6">
                                         <label class="form-label">Vergi Numarası</label>
-                                        <input type="text" class="form-control" name="tax_number" placeholder="Vergi Numarası">
+                                        <input type="text" class="form-control" name="tax_number"
+                                               placeholder="Vergi Numarası">
                                     </div>
                                     <div class="mb-3 col-md-6">
                                         <label class="form-label">Entegra ID</label>
-                                        <input type="text" class="form-control" name="entegra_id"   placeholder="Entegra Id">
+                                        <input type="text" class="form-control" name="entegra_id"
+                                               placeholder="Entegra Id">
                                     </div>
                                     <div class="mb-3 col-md-6">
                                         <label class="form-label">Entegra Token</label>
-                                        <input type="text" class="form-control" name="entegra_token"   placeholder="Entegra Token">
+                                        <input type="text" class="form-control" name="entegra_token"
+                                               placeholder="Entegra Token">
                                     </div>
                                     <div class="mb-3 col-md-6">
-                                        <label class="form-label">Paket Fiyatı</label>
-                                        <input type="text" class="form-control" name="package_price"  value="1.00" placeholder="Paket Fiyatı">
+                                        <label class="form-label">Paket Fiyatı  <small class="text-danger">*</small></label>
+                                        <input required type="text" class="form-control" name="package_price"
+                                               placeholder="Paket Fiyatı">
                                     </div>
                                     <div class="mb-3 col-md-12">
-                                        <label class="form-label">Adres</label>
-                                        <input type="text" class="form-control" name="address" placeholder="İşyeri Adresi">
+                                        <label class="form-label">Adres <small class="text-danger">*</small></label>
+                                        <textarea required rows="8" cols="8" class="form-control"  name="address"  placeholder="İşyeri Adresi"></textarea>
                                     </div>
                                 </div>
 
-                                <button type="submit" class="btn btn-primary">Kaydı Tamamla</button>
+                                <button
+                                    type="submit"
+                                    class="special-button float-end">Kaydet
+                                </button>
                             </form>
                         </div>
                     </div>

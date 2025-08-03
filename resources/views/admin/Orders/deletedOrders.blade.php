@@ -28,7 +28,7 @@
         </div>
         <div class="row">
             <div class="col-xl-12">
-                <div class="table-responsive">
+                <div class="table-responsive  card card-body">
                     <table id="example3" class="order-table shadow-hover card-table text-black" style="min-width: 845px">
                         <thead>
                             <tr>

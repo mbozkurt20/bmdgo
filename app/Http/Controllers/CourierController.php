@@ -10,43 +10,26 @@ use Illuminate\Support\Facades\Auth;
 
 class CourierController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->middleware('auth');
     }
-
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
     public function index()
     {
         $couriers = Courier::where('status', 'active')->where('restaurant_id', Auth::user()->id)->get();
 
         return view('restaurant.couriers.index', compact('couriers'));
     }
-
-    /**
-     * @returns
-     */
     public function new()
     {
         return view('restaurant.couriers.new');
     }
-
     public function edit($id)
     {
         $courier = Courier::find($id);
 
         return view('restaurant.couriers.edit', compact('courier'));
     }
-
     public function create(Request $request)
     {
         $data = $request->validate([
@@ -66,7 +49,6 @@ class CourierController extends Controller
 
         return redirect()->back()->with('message', 'Kurye kaydı tamamlandı.');
     }
-
     public function update(Request $request)
     {
         $data = $request->validate([
@@ -84,7 +66,6 @@ class CourierController extends Controller
 
         return redirect()->back()->with('message', 'Kurye kaydı güncellendi.');
     }
-
     public function delete($id)
     {
 
@@ -96,7 +77,6 @@ class CourierController extends Controller
             echo "ERR";
         }
     }
-
     public function report($id)
     {
         $courier = Courier::where('id', $id)->first();

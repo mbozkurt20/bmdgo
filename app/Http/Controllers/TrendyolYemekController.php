@@ -12,31 +12,21 @@ use Illuminate\Support\Facades\Log;
 
 class TrendyolYemekController extends Controller
 {
+    function remove_emoji($string)
+    {
+        $regex_sets = [
+            '/[\x{1F600}-\x{1F64F}]/u', // Emoticons
+            '/[\x{1F300}-\x{1F5FF}]/u', // Symbols & Pictographs
+            '/[\x{1F680}-\x{1F6FF}]/u', // Transport & Map
+            '/[\x{2600}-\x{26FF}]/u',   // Misc Symbols
+            '/[\x{2700}-\x{27BF}]/u'    // Dingbats
+        ];
 
+        foreach ($regex_sets as $regex) {
+            $string = preg_replace($regex, '', $string);
+        }
 
-    function remove_emoji($string) {
-
-        // Match Emoticons
-        $regex_emoticons = '/[\x{1F600}-\x{1F64F}]/u';
-        $clear_string = preg_replace($regex_emoticons, '', $string);
-
-        // Match Miscellaneous Symbols and Pictographs
-        $regex_symbols = '/[\x{1F300}-\x{1F5FF}]/u';
-        $clear_string = preg_replace($regex_symbols, '', $clear_string);
-
-        // Match Transport And Map Symbols
-        $regex_transport = '/[\x{1F680}-\x{1F6FF}]/u';
-        $clear_string = preg_replace($regex_transport, '', $clear_string);
-
-        // Match Miscellaneous Symbols
-        $regex_misc = '/[\x{2600}-\x{26FF}]/u';
-        $clear_string = preg_replace($regex_misc, '', $clear_string);
-
-        // Match Dingbats
-        $regex_dingbats = '/[\x{2700}-\x{27BF}]/u';
-        $clear_string = preg_replace($regex_dingbats, '', $clear_string);
-
-        return $clear_string;
+        return $string;
     }
 
     public function index()
@@ -48,7 +38,6 @@ class TrendyolYemekController extends Controller
         }
     }
 
-    //Siparişler
     private function orders($restaurant)
     {
         $url = 'https://api.trendyol.com/mealgw/suppliers/' . $restaurant->trendyol_satici_id . '/packages';
@@ -63,17 +52,16 @@ class TrendyolYemekController extends Controller
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         $result = curl_exec($ch);
         $content = json_decode($result);
-
 
         if (!isset($content->content)) {
             return;
         }
 
         foreach ($content->content as $row) {
+
             Log::info(json_encode($row));
 
             $order = Order::where('tracking_id', $row->orderId)->first();
@@ -85,36 +73,41 @@ class TrendyolYemekController extends Controller
 
             $orderAddress = $address->city . " " . $address->district . " " . $address->address1 . " Kat: " . $address->floor . " Kapi no:" . $address->doorNumber . " Adres Detay:" . $address->addressDescription;
 
-            $notes = $this->remove_emoji($row->customerNote);
+			$promotionsAmount = 0;
+            if (isset($row->promotions) && is_array($row->promotions)) {
+                foreach ($row->promotions as $promotion) {
+                    $promotionsAmount += (float) $promotion->totalSellerAmount;
+                }
+            }
+
+            $couponAmount = 0;
+            if (isset($row->coupon)) {
+                $couponAmount += (float) $row->coupon->totalSellerAmount;
+            }
 
             $orderData = [
                 'platform'       => 'trendyol',
                 'courier_id'     => 0,
-                'status'       => 'PENDING',
+                'status'         => 'PENDING',
                 'restaurant_id'  => $restaurant->id,
                 'tracking_id'    => $row->orderId,
                 'full_name'      => $address->firstName . " " . $address->lastName,
-                'phone'          => $address->phone . '/' . substr($row->orderId, -10 ,10),
-                'amount'         => $row->totalPrice,
-                'payment_method' => 'Online Kredi/Banka Kartı', //$row->payment->paymentType
-				'payment_method  == "CASH") ' => 'Kapıda Nakit ile Ödeme', //$row->payment->paymentType
-				'payment_method  == "CARD") ' => 'Kapıda Kart ile Ödeme', //$row->payment->paymentType
+                'phone'          => $address->phone . '/' . substr($row->orderId, -11 ,11),
+                'payment_method' => $row->payment->paymentType,
                 'items'          => json_encode($row->lines),
                 'address'        => $orderAddress,
-                //'notes'          => $notes
+   				'promotions'     => isset($row->promotions) ? json_encode($row->promotions) : [],
+                'coupon'         => isset($row->coupon) ? json_encode($row->coupon) : [],
+                'sub_amount'     => $row->totalPrice,
+                'amount'         => (float) $row->totalPrice - $couponAmount - $promotionsAmount,
+                'notes'          => $row->customerNote
             ];
 
-            $order = Order::create($orderData); 
+            $order = Order::create($orderData);
             AssignOrderToCourier::dispatch($order);
-
         }
     }
 
-    //Sipariş değişim 
-    /**
-     * tracking_id
-     * action
-     */
     public function orderStatus(Request $request)
     {
         $action = $request->action;
@@ -122,34 +115,25 @@ class TrendyolYemekController extends Controller
         $order = Order::where('tracking_id', $request->tracking_id)->first();
         if (!$order) {
             return response()->json(['message' => 'Sipariş bulunamadı'], 404);
-        }else{
-            
-            $order->status = $action;
-            $order->save();
-        } 
+        }
 
+        $order->status = $action;
+        $order->save();
 
-        $restaurant = Restaurant::where('id', $order->restaurant_id)->first();
+        $restaurant = Restaurant::find($order->restaurant_id);
         if (!$restaurant) {
             return response()->json(['message' => 'Restoran bulunamadı'], 404);
         }
 
         switch ($action) {
             case 'picked':
-                $type = 'picked';
-                break;
             case 'manual-shipped':
-                $type = 'manual-shipped';
-                break;
             case 'manual-delivered':
-                $type = 'manual-delivered';
-                break;
             case 'unsupplied':
-                $type = 'unsupplied';
+                $type = $action;
                 break;
             default:
-                # code...
-                break;
+                return response()->json(['message' => 'Geçersiz işlem'], 400);
         }
 
         $url = 'https://api.trendyol.com/mealgw/suppliers/' . $restaurant->trendyol_satici_id . '/packages/' . $type;
@@ -165,7 +149,6 @@ class TrendyolYemekController extends Controller
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         $result = curl_exec($ch);
         $content = json_decode($result);

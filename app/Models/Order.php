@@ -16,13 +16,16 @@ class Order extends Model
         'tracking_id',
         'full_name',
         'phone',
-        'amount',
         'payment_method',
         'items',
         'address',
         'status',
         'verify_code',
         'notes',
+        'promotions',
+        'coupon',
+        'amount',
+        'sub_amount',
     ];
 
     public function restaurant(): BelongsTo

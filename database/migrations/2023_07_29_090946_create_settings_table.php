@@ -15,8 +15,12 @@ class CreateSettingsTable extends Migration
     {
         Schema::create('settings', function (Blueprint $table) {
             $table->id();
-            $table->integer('restaurant_id');
-
+            $table->string('name')->nullable();
+            $table->string('description')->nullable();
+            $table->string('logo')->nullable();
+            $table->tinyText('address')->nullable();
+            $table->boolean('auto_courier')->default(0);
+            $table->boolean('auto_delivery')->default(0);
             $table->timestamps();
         });
     }

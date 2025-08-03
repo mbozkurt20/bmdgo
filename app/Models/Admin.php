@@ -20,6 +20,9 @@ class Admin extends Authenticatable
         'name',
         'email',
         'password',
+        'auto_orders',
+        'default_locations_lat',
+        'default_locations_lon',
     ];
 
     /**

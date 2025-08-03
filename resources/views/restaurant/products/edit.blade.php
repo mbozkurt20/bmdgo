@@ -12,13 +12,17 @@
             </div>
         </div>
         @if(session()->has('message'))
-
-            <div class="alert alert-success alert-dismissible fade show">
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="btn-close">
-                </button>
-                <a href="#">   {{ session()->get('message') }}</a>
+            <div class="custom-alert success">
+                <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+                <span class="alert-message">{{ session()->get('message') }}</span>
             </div>
+        @endif
 
+        @if(session()->has('test') )
+            <div class="custom-alert error">
+                <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+                <span class="alert-message">{{ session()->get('test') }}</span>
+            </div>
         @endif
 
         <div class="row">
@@ -31,57 +35,178 @@
                         <div class="basic-form">
                             <form method="post" action="{{route('restaurant.products.update')}}" enctype="multipart/form-data">
                                 @csrf
+
+                                <input type="hidden" name="id" value="{{$product->id}}">
                                 <div class="row">
-                                    <input type="hidden" name="id" value="{{$product->id}}">
-                                    <div class="mb-3 col-md-4">
-                                        <label class="form-label">Ürün Adı</label>
-                                        <input type="text" class="form-control" name="name" value="{{$product->name}}"
-                                               placeholder="Ürün Adı">
-                                    </div>
-                                    <div class="mb-3 col-md-4">
-                                        <label class="form-label">Ürün Kodu</label>
-                                        <input type="text" class="form-control" name="code" value="{{$product->code}}"
-                                               placeholder="Ürün Kodu">
-                                    </div>
-                                    <div class="mb-3 col-md-4">
-                                        <label class="form-label">Kategorisi</label>
-                                        <select class="me-sm-2 default-select form-control wide" name="categorie_id">
-                                            @foreach($categories as $categorie)
-                                                <option @if($categorie->id == $product->categorie_id) selected @endif value="{{$categorie->id}}">{{$categorie->name}}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="mb-3 col-md-4">
-                                        <label class="form-label">Ürün Fiyatı</label>
-                                        <input type="text" class="form-control" name="price" value="{{$product->price}}"
-                                               placeholder="Ürün Fiyatı">
-                                    </div>
-                                    <div class="mb-3 col-md-4">
-                                        <label class="form-label">Resim</label>
-                                        <input type="file" class="form-control" name="image">
-                                    </div>
-                                    <div class="mb-3 col-md-4">
-                                        <label class="form-label">Hazırlanma Süresi</label>
-                                        <input type="number" class="form-control" name="preparation_time"
-                                               value="{{$product->preparation_time}}"
-                                               placeholder="Hazırlanma Süresi (dk)">
-                                    </div>
-                                    <div class="mb-3 col-md-12">
-                                        <label class="form-label">Ürün Detayları</label>
-                                        <textarea class="form-control" name="details"
-                                                  rows="15">{{$product->details}}</textarea>
+                                    <div class="mb-3 col-md-4 mb-5">
+                                        <label class="form-label text-dark fw-bold" for="imageInput">Görsel</label>
+                                        <div class="image-upload-wrapper" onclick="document.getElementById('imageInput').click();">
+                                            <label for="imageInput" class="image-upload-label">
+                                                <!-- Basit resim ikon svg'si -->
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                                    <path d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 12.5l2.5 3.01L14.5 11l4.5 6H5l3.5-4.5z"/>
+                                                </svg>
+                                                Resim Seç veya Sürükle
+                                            </label>
+                                            <input type="file" id="imageInput" name="image" accept="image/*" required>
+                                            <img id="imagePreview" alt="Seçilen Resim">
+                                        </div>
                                     </div>
                                 </div>
 
-                                <button type="submit" class="btn btn-primary">Kaydı Güncelle</button>
+                                <div class="row">
+                                    <div class="mb-3 col-md-4 mb-5">
+                                        <label class="form-label text-dark fw-bold">Kategori Seçiniz</label>
+                                        <select class="form-control" name="category_id" required>
+                                            @foreach($categories as $category)
+                                                <option @if($category->id == $product->category_id) selected @endif value="{{$category->id}}">{{$category->name}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3 col-md-4 mb-5">
+                                        <label class="form-label text-dark fw-bold">Ürün Adı</label>
+                                        <input value="{{$product->name}}" type="text" class="form-control" name="name"
+                                               placeholder="Ürün Adı" required>
+                                    </div>
+
+
+                                    <div class="mb-3 col-md-4 mb-5">
+                                        <label class="form-label text-dark fw-bold">Ürün Kodu</label>
+                                        <input  value="{{$product->code}}" type="text" class="form-control"
+                                               name="code" placeholder="Ürün Kodu" required>
+                                    </div>
+
+                                    <div class="mb-3 col-md-4 mb-5">
+                                        <label class="form-label text-dark fw-bold">Ürün Fiyatı</label>
+                                        <input value="{{$product->price}}" type="text" class="form-control"
+                                               name="price" placeholder="Ürün Fiyatı" required>
+                                    </div>
+
+                                    <div class="mb-3 col-md-4 mb-5">
+                                        <label class="form-label text-dark fw-bold">Hazırlanma Süresi Seçiniz</label>
+                                        <input  type="number" class="form-control" name="preparation_time"
+                                               placeholder="Hazırlanma Süresi (dk)"
+                                                value="{{$product->preparation_time}}"  required>
+                                    </div>
+                                    <div class="mb-3 col-md-4 mb-5">
+                                        <label class="form-label text-dark fw-bold">Ürün Türü Seçiniz</label>
+                                        <select class="form-control form-select" name="begenilen" required>
+                                            <option {{$product->begenilen == 'deactive' ? 'selected' : null}}  value="deactive">Standart Ürün</option>
+                                            <option {{$product->begenilen == 'active' ? 'selected' : null}} value="active">Beğenilen Ürün</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3 col-md-8">
+                                        <label class="form-label text-dark fw-bold">Ürün Detayları</label>
+                                        <textarea
+                                            cols="15" class="form-control border border-dark"
+                                            name="details" rows="15">{{$product->details}}</textarea>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="special-button float-end mt-4">Kaydet</button>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
+
+
+    <style>
+        .image-upload-wrapper {
+            position: relative;
+            width: 250px;
+            cursor: pointer;
+            border: 2px dashed #6c757d;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: border-color 0.3s ease;
+        }
+
+        .image-upload-wrapper:hover {
+            border-color: #0d6efd; /* Bootstrap primary renk */
+        }
+
+        .image-upload-wrapper input[type="file"] {
+            display: none; /* Gizle dosya inputu */
+        }
+
+        .image-upload-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #6c757d;
+            font-weight: 600;
+        }
+
+        .image-upload-label svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 10px;
+            fill: #6c757d;
+            transition: fill 0.3s ease;
+        }
+
+        .image-upload-wrapper:hover .image-upload-label svg {
+            fill: #0d6efd;
+        }
+
+        #imagePreview {
+            margin-top: 15px;
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+            display: none;
+        }
+    </style>
+
+    <script>
+        const imageInput = document.getElementById('imageInput');
+        const imagePreview = document.getElementById('imagePreview');
+
+        imageInput.addEventListener('change', () => {
+            const file = imageInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            } else {
+                imagePreview.src = '';
+                imagePreview.style.display = 'none';
+            }
+        });
+    </script>
+
+    <script>
+        const nameInput = document.querySelector('input[name="name"]');
+        const codeInput = document.querySelector('input[name="code"]');
+
+        function generateCode(name) {
+            if (!name) return '';
+            // İsimden ilk 3 harfi al, büyük harfe çevir, boşluk varsa kaldır
+            const shortName = name.trim().substring(0, 3).toUpperCase().replace(/\s/g, '');
+
+            // Rastgele 3 karakter oluştur (harf ve rakam karışık)
+            const randomStr = Math.random().toString(36).substring(2, 5).toUpperCase();
+
+            // Kısa ve unique kod
+            return shortName + randomStr;
+        }
+
+        // İsim inputuna her değişiklikte kodu otomatik yaz
+        nameInput.addEventListener('input', () => {
+            const generatedCode = generateCode(nameInput.value);
+            codeInput.value = generatedCode;
+        });
+    </script>
 @endsection
 
 

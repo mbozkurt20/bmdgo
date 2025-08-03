@@ -52,24 +52,28 @@ class CourierController extends Controller
 
     public function create(Request $request)
     {
-        $data = $request->validate([
-            'name' => 'required',
-            'phone' => 'required',
-            'password' => 'required',
-            'price' => 'required',
-        ]);
+        if (env('TEST_MODE') && Courier::count() == 0){
+            $data = $request->validate([
+                'name' => 'required',
+                'phone' => 'required',
+                'password' => 'required',
+                'price' => 'required',
+            ]);
 
-        $create = new Courier();
-        $create->restaurant_id =  0;
-        $create->name = $data['name'];
-        $create->phone = $data['phone'];
-        $create->price = $data['price'];
-        $create->password = $data['password'];
-        $create->situation = $request->situation;
-        $create->admin_id = auth()->id();
-        $create->save();
+            $create = new Courier();
+            $create->restaurant_id =  0;
+            $create->name = $data['name'];
+            $create->phone = $data['phone'];
+            $create->price = $data['price'];
+            $create->password = $data['password'];
+            $create->situation = $request->situation;
+            $create->admin_id = auth()->id();
+            $create->save();
 
-        return redirect()->back()->with('message', 'Kurye kaydı tamamlandı.');
+            return redirect()->back()->with('message', 'Kurye Başarıyla Eklendi');
+        }else{
+            return redirect()->back()->with('test', 'Test Modu: Üzgünüz, En Fazla 1 Kayıt Ekleyebilirsiniz');
+        }
     }
 
     public function update(Request $request)
@@ -119,7 +123,7 @@ class CourierController extends Controller
 
     public function auto_order($id)
     {
-        $auto = Admin::where('id', 1)->first();
+        $auto = Admin::where('id', auth()->id())->first();
         $auto->auto_orders = $id;
         $auto->save();
     }

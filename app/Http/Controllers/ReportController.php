@@ -2,32 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Categorie;
 use App\Models\Order;
 use App\Models\Courier;
 use App\Models\CourierOrder;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ReportController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->middleware('auth');
     }
 
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
     public function orders()
     {
         $orders = Order::where('restaurant_id', Auth::user()->id)->where('status', "!=", 'UNSUPPLIED')
@@ -38,20 +27,13 @@ class ReportController extends Controller
 
     public function couriers()
     {
-
         $couriers = Courier::where('restaurant_id', 0)->get();
-
-
-
         return view('restaurant.reports.couriers', compact('couriers'));
     }
-
-
     public function globalFilter(Request $request)
     {
         if ($request->courier > 0) {
-
-            $couriers  = CourierOrder::where('courier_id', $request->courier)->get();
+            $couriers = CourierOrder::where('courier_id', $request->courier)->get();
 
             $getData = [];
             $online = 0;
@@ -60,13 +42,11 @@ class ReportController extends Controller
             $kapida_k_karti = 0;
             $topsiparis = 0;
             foreach ($couriers as $courier) {
-
                 $courierx = Courier::where('id', $courier->courier_id)->first();
 
                 $orders = Order::where('id', $courier->order_id)
                     ->where('restaurant_id', Auth::user()->id)
                     ->where('status', "!=", 'UNSUPPLIED')
-
                     ->whereDate('created_at', '>=', $request->start . " 00:00:00")->whereDate('created_at', '<=', $request->end . " 00:00:00")
                     ->first();
 
@@ -112,11 +92,9 @@ class ReportController extends Controller
         }
 
         if ($request->courier == 0) {
-
             $orderss = Order::where('restaurant_id', Auth::user()->id)
                 ->where('courier_id', '>=', 0)
                 ->where('status', "!=", 'UNSUPPLIED')
-
                 ->whereDate('created_at', '>=', $request->start . " 00:00:00")->whereDate('created_at', '<=', $request->end . " 00:00:00")
                 ->get();
 
@@ -129,10 +107,7 @@ class ReportController extends Controller
             $topsiparis = 0;
 
             foreach ($orderss as $orders) {
-
-
                 if ($orders) {
-
                     $courierx = Courier::where('id', $orders->courier_id)->first();
 
                     if ($courierx) {
@@ -181,10 +156,9 @@ class ReportController extends Controller
             return response()->json(['data' => $getData]);
         }
 
-
         if ($request->courier < 0) {
 
-            $couriers  = CourierOrder::all();
+            $couriers = CourierOrder::all();
 
             $getData = [];
 
@@ -200,13 +174,10 @@ class ReportController extends Controller
                 $orders = Order::where('id', $courier->order_id)
                     ->where('restaurant_id', Auth::user()->id)
                     ->where('status', "!=", 'UNSUPPLIED')
-
                     ->whereDate('created_at', '>=', $request->start . " 00:00:00")->whereDate('created_at', '<=', $request->end . " 00:00:00")
                     ->first();
 
-
                 if ($orders) {
-
                     $topsiparis++;
 
                     if ($orders->payment_method == "Online Kredi/Banka Kartı") {
@@ -246,14 +217,12 @@ class ReportController extends Controller
             return response()->json(['data' => $getData]);
         }
     }
-
-
     public function globalFilterOrder(Request $request)
     {
         // Log request data to check if values are being received
-        \Log::info("Request platform: " . $request->platform);
-        \Log::info("Request start date: " . $request->start);
-        \Log::info("Request end date: " . $request->end);
+        Log::info("Request platform: " . $request->platform);
+        Log::info("Request start date: " . $request->start);
+        Log::info("Request end date: " . $request->end);
 
         $getData = [];  // Initialize $getData before any processing
 
@@ -306,7 +275,6 @@ class ReportController extends Controller
                 array_push($getData, $data);
             }
         } else {
-
             $orders = Order::where('restaurant_id', Auth::user()->id)
                 ->where('status', "!=", 'UNSUPPLIED')
                 ->whereDate('created_at', '>=', $request->start . " 00:00:00")

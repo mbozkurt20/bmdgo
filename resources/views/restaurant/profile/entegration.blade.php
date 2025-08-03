@@ -11,11 +11,17 @@
                 </ol>
             </div>
         </div>
-        @if (session()->has('message'))
-            <div class="alert alert-success alert-dismissible fade show">
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="btn-close">
-                </button>
-                <a href="#"> {{ session()->get('message') }}</a>
+        @if(session()->has('message'))
+            <div class="custom-alert success">
+                <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+                <span class="alert-message">{{ session()->get('message') }}</span>
+            </div>
+        @endif
+
+        @if(session()->has('test') )
+            <div class="custom-alert error">
+                <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+                <span class="alert-message">{{ session()->get('test') }}</span>
             </div>
         @endif
 
@@ -27,7 +33,7 @@
                     <div class="card">
                         <div class="card-header" style="background: #fb0050;color:#fff">
                             <h4 class="card-title"><img src="{{ asset('theme/images/yemeksepeti.png') }}"
-                                    style="border-radius:5px;height: 24px;width: auto"> Entegrasyon Bilgileri</h4>
+                                    style="border-radius:5px;height: 24px;width: auto"> </h4>
                         </div>
                         <div class="card-body">
                             <div class="basic-form">
@@ -53,7 +59,7 @@
                     <div class="card">
                         <div class="card-header" style="background: #fd683e;color:#fff">
                             <h4 class="card-title"><img src="{{ asset('theme/images/trendyolyemek.png') }}"
-                                    style="border-radius:5px;height: 24px;width: auto"> Entegrasyon Bilgileri</h4>
+                                    style="border-radius:5px;height: 24px;width: auto"> </h4>
                         </div>
                         <div class="card-body">
                             <div class="basic-form">
@@ -87,9 +93,9 @@
 
                 <div class="col-xl-4 col-lg-12">
                     <div class="card">
-                        <div class="card-header" style="background: #C92C2C;color:#fff">
-                            <h4 class="card-title"><img src="{{ asset('theme/images/adisyoFull.png') }}"
-                                    style="border-radius:5px;height: 24px;width: auto"> Entegrasyon Bilgileri</h4>
+                        <div class="card-header" style="background: #b3428c;color:#fff">
+                            <h4 class="card-title"> <img alt="" src="{{ asset('theme/images/adisyoFull.png') }}"
+                                    style="border-radius:5px;height: 24px;width: auto"> </h4>
                         </div>
                         <div class="card-body">
                             <div class="basic-form">
@@ -116,7 +122,7 @@
                 </div>
 
             </div>
-            <button type="submit" class="btn btn-primary">Bilgileri Güncelle</button>
+            <button type="submit" class="special-button">Bilgileri Güncelle</button>
         </form>
 
     </div>

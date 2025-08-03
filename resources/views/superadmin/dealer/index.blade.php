@@ -22,7 +22,7 @@
             <div class="d-flex align-items-center flex-wrap">
                 <a href="{{route('superadmin.dealer_create')}}" class="btn btn-primary btn-rounded me-3 mb-2"><i
                         class="fas fa-user me-2"></i>+ Yeni Ekle</a>
-            
+
                 <a href="javascript:void(0);" class="btn btn-secondary btn-rounded mb-2"><i class="fas fa-sync"></i></a>
             </div>
         </div>
@@ -76,8 +76,8 @@
                 text: "Bu işlemi geri alamazsınız!",
                 type: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#007c00',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: '#4927b3',
+                cancelButtonColor: '#e7004d',
                 cancelButtonText: 'Hayır',
                 confirmButtonText: 'Evet, Silmek istiyorum!',
 

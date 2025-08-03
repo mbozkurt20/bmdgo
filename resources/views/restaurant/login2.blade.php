@@ -11,7 +11,7 @@
     <title>Fast Paket - Restaurant Girişi</title>
 
     <!-- FAVICONS ICON -->
-    <link rel="shortcut icon" type="image/png" href="{{asset('theme/login/img/favicon.png')}}">
+    <link rel="shortcut icon" type="image/png" href="{{config('site.logo')}}">
     <link href="{{asset('theme/login/css/bootstrap-select.min.css')}}" rel="stylesheet">
     <link href="{{asset('theme/login/css/style.css')}}" rel="stylesheet">
 
@@ -76,7 +76,7 @@
                                                         </div>
 
                                                     </form>
-                                                     
+
                                                 </div>
                                                 <div class="tab-pane fade" id="nav-forget" role="tabpanel" aria-labelledby="nav-forget-tab">
                                                     <form class="dz-form" >

@@ -18,7 +18,7 @@ class CreateCustomersTable extends Migration
             $table->integer('restaurant_id');
             $table->string('name');
             $table->string('phone');
-            $table->string('mobile');
+            $table->string('mobile')->nullable();
             $table->string('email')->unique();
             $table->enum('status',['active','deactive'])->default('active');
             $table->timestamps();

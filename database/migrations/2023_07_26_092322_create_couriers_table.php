@@ -15,9 +15,12 @@ class CreateCouriersTable extends Migration
     {
         Schema::create('couriers', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger('admin_id');
             $table->integer('restaurant_id');
             $table->string('name');
             $table->string('phone');
+            $table->string('password');
+            $table->string('situation')->default('Aktif');
             $table->decimal('price', 8, 2);
             $table->enum('status',['active','deactive'])->default('active');
             $table->timestamps();

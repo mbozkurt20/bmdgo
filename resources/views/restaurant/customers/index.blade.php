@@ -20,8 +20,8 @@
                 </div>
             </div>
             <div class="d-flex align-items-center flex-wrap">
-                <a href="{{route('restaurant.customers.new')}}" class="btn btn-primary btn-rounded me-3 mb-2"><i
-                        class="fas fa-user-plus me-2"></i>+ Yeni Ekle</a>
+                <a href="{{route('restaurant.customers.new')}}" class="special-button me-3"><i
+                        class="fas fa-user-plus me-2"></i> Yeni Ekle</a>
                 <a href="javascript:void(0);" class="btn bg-white btn-rounded me-2 mb-2 text-black shadow-sm"><i
                         class="fas fa-calendar-times me-3 scale3 text-primary"></i>Filtrele<i
                         class="fas fa-chevron-down ms-3 text-primary"></i></a>
@@ -35,7 +35,7 @@
                         <thead>
                         <tr>
                             <th style="width: 60%">Müşteri Adı</th>
-                            <th style="width: 15%">Telefon Numarası</th> 
+                            <th style="width: 15%">Telefon Numarası</th>
                             <th style="width: 10%">İşlem</th>
                         </tr>
                         </thead>
@@ -43,7 +43,7 @@
                         @foreach($customers as $customer)
                             <tr id="data_{{$customer->id}}">
                                 <td>{{$customer->name}}</td>
-                                <td>{{$customer->phone}}</td> 
+                                <td>{{$customer->phone}}</td>
                                 <td>
                                     <div class="d-flex">
                                         <a href="{{route('restaurant.customers.edit', ['id' => $customer->id])}}" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fas fa-pencil-alt"></i></a>
@@ -53,9 +53,12 @@
                                 </td>
                             </tr>
                         @endforeach
-
                         </tbody>
                     </table>
+
+                   @if(!count($customers))
+                       <h4 class="text-center mt-4">Müşteri Bulunmamaktadır.</h4>
+                   @endif
                 </div>
             </div>
         </div>
@@ -79,8 +82,8 @@
                 text: "Bu işlemi geri alamazsınız!",
                 type: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#007c00',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: '#4927b3',
+                cancelButtonColor: '#e7004d',
                 cancelButtonText: 'Hayır',
                 confirmButtonText: 'Evet, Silmek istiyorum!',
 

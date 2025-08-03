@@ -15,14 +15,21 @@ class CreateOrdersTable extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->integer('platform_id');
-            $table->integer('restaurant_id');
+            $table->string('platform');
+            $table->bigInteger('restaurant_id');
+            $table->bigInteger('tracking_id');
             $table->string('full_name');
-            $table->text('address');
             $table->string('phone');
+            $table->text('address');
+            $table->string('verify_code')->nullable();
+            $table->tinyText('notes')->nullable();
+            $table->string('payment_method');
             $table->decimal('amount', 9, 2);
-            $table->integer('tracking_id');
-            $table->enum('status',['active','deactive'])->default('active');
+            $table->decimal('sub_amount', 9, 2)->nullable();
+            $table->json('items')->nullable();
+            $table->json('promotions')->nullable();
+            $table->json('coupon')->nullable();
+            $table->string('status');
             $table->timestamps();
         });
     }

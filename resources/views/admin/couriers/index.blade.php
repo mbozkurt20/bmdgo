@@ -20,8 +20,9 @@
                 </div>
             </div>
             <div class="d-flex align-items-center flex-wrap">
-                <a href="{{route('admin.couriers.new')}}" class="btn btn-primary btn-rounded me-3 mb-2"><i
-                        class="fas fa-user me-2"></i>+ Yeni Ekle</a>
+                <a href="{{route('admin.couriers.new')}}"
+                   class="special-button me-3 "><i
+                        class="fas fa-user me-2"></i> Yeni Ekle</a>
                 <a href="javascript:void(0);" class="btn bg-white btn-rounded me-2 mb-2 text-black shadow-sm"><i
                         class="fas fa-calendar-times me-3 scale3 text-primary"></i>Filtrele<i
                         class="fas fa-chevron-down ms-3 text-primary"></i></a>
@@ -30,7 +31,7 @@
         </div>
         <div class="row">
             <div class="col-xl-12">
-                <div class="table-responsive">
+                <div class="table-responsive  card card-body">
                     <table id="example3" class="display" style="min-width: 845px">
                         <thead>
                         <tr>
@@ -82,8 +83,9 @@
                 text: "Bu işlemi geri alamazsınız!",
                 type: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#007c00',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: '#4927b3',
+                cancelButtonColor: '#e7004d',
+                cancelButtonBordeRadius: '2rem',
                 cancelButtonText: 'Hayır',
                 confirmButtonText: 'Evet, Silmek istiyorum!',
 

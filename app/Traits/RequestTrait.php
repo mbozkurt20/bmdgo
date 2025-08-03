@@ -15,7 +15,7 @@ trait RequestTrait
     {
         try {
             $headers = ['Content-Type' => 'application/json', 'Accept' => 'application/json'];
-            $response = Http::withHeaders($headers)->withOptions(['verify'=>false])->post('https://kuryenkapinda.com:5000/send-message', [
+            $response = Http::withHeaders($headers)->withOptions(['verify'=>false])->post('https://panel.parskurye.net:5000/send-message', [
                 'data' => $body,
                 'channel' => $channel
             ]);

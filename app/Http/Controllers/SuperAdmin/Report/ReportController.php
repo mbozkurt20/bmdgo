@@ -26,23 +26,23 @@ class ReportController extends Controller
         $sheet->setTitle('Bayii Raporu');
 
         $sheet->mergeCells('A1:B1');
-        $sheet->setCellValue('A1', 'ESNAF EXPRESS');
+        $sheet->setCellValue('A1', env('APP_NAME'));
         $sheet->getStyle('A1')->getFont()->setBold(true);
         $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle('A1')->getFont()->setSize(16); 
-        $sheet->getStyle('A1')->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('c2159d')); 
+        $sheet->getStyle('A1')->getFont()->setSize(16);
+        $sheet->getStyle('A1')->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('c2159d'));
         $sheet->mergeCells('A2:B2');
         $sheet->setCellValue('A2', 'Bayii Satış Raporu');
         $sheet->getStyle('A2')->getFont()->setBold(true);
         $sheet->getStyle('A2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle('A2')->getFont()->setSize(12); 
-        $sheet->getStyle('A2')->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('000000')); 
+        $sheet->getStyle('A2')->getFont()->setSize(12);
+        $sheet->getStyle('A2')->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('000000'));
 
         // Verileri ekle
         $sheet->setCellValue('A3', 'Bayii');
         $sheet->setCellValue('B3', 'Sipariş Sayısı');
         $sheet->getStyle('A3:B3')->getFont()->setBold(true);
-        $sheet->getColumnDimension('A')->setWidth(30); 
+        $sheet->getColumnDimension('A')->setWidth(30);
         $sheet->getColumnDimension('B')->setWidth(20);
 
         $writeIndex = 4;
@@ -64,8 +64,8 @@ class ReportController extends Controller
             $writeIndex++;
         }
         $sheet->setCellValue('A'.$writeIndex, "Toplam");
-        $sheet->setCellValue('B'.$writeIndex, $totalCount); 
-    
+        $sheet->setCellValue('B'.$writeIndex, $totalCount);
+
         $sheet->getStyle('A'.$writeIndex.':B'.$writeIndex)->getFont()->setBold(true);
         // Excel dosyasını indirme işlemi başlat
         $fileName = "report.xlsx";

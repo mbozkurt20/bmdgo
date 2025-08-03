@@ -11,11 +11,17 @@
                 </ol>
             </div>
         </div>
-        @if (session()->has('message'))
-            <div class="alert alert-success alert-dismissible fade show">
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="btn-close">
-                </button>
-                <a href="#"> {{ session()->get('message') }}</a>
+        @if(session()->has('message'))
+            <div class="custom-alert success">
+                <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+                <span class="alert-message">{{ session()->get('message') }}</span>
+            </div>
+        @endif
+
+        @if(session()->has('test') )
+            <div class="custom-alert error">
+                <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+                <span class="alert-message">{{ session()->get('test') }}</span>
             </div>
         @endif
 
@@ -48,10 +54,8 @@
                                     </div>
 
                                 </div>
-
-                                <div class="card-body" style="border-top:1px solid #ddd">
-
-                                    <div>
+                                <hr>
+                                <div class="mt-4">
                                         <!-- Repeater Heading -->
                                         <div class="repeater-heading">
                                             <div class="row">
@@ -59,7 +63,7 @@
                                                     <h5 class="pull-left">Adres Ekle</h5>
                                                 </div>
                                                 <div class="col-lg-2" style="text-align: right">
-                                                    <a class="btn btn-primary repeater-add-btn" data-repeater-create>Ekle
+                                                    <a class="special-ok-button-small btn-xs repeater-add-btn" data-repeater-create>+ Yeni Ekle
                                                     </a>
                                                 </div>
                                             </div>
@@ -73,15 +77,15 @@
                                                 <!-- Repeater Content -->
                                                 <div data-repeater-item class="item-content row"
                                                     style="background: #f4f4f4;margin: 15px 0px  10px;padding:10px 0px;border-radius: 10px">
-                                                    <input type="hidden" name="customer_id" value="{{ $customer->id }}">
+                                                    <input req type="hidden" name="customer_id" value="{{ $customer->id }}">
                                                     <input type="hidden" name="id" value="{{ $adres->id }}">
                                                     <input type="hidden" name="type" value="up">
                                                     <div class="mb-3 col-md-5">
-                                                        <input type="text" class="form-control" name="name"
+                                                        <input type="text" class="form-control" name="name" required
                                                             placeholder="Adres Başlığı" value="{{ $adres->name }}">
                                                     </div>
                                                     <div class="mb-3 col-md-6">
-                                                        <input type="text" class="form-control" name="sokak_cadde"
+                                                        <input type="text" class="form-control" name="sokak_cadde" required
                                                             placeholder="Sokak/Cadde" value="{{ $adres->sokak_cadde }}">
                                                     </div>
                                                     <div class="mb-3 col-md-1">
@@ -93,19 +97,19 @@
                                                         </div>
                                                     </div>
                                                     <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control" name="bina_no"
+                                                        <input type="text" class="form-control" name="bina_no" required
                                                             value="{{ $adres->bina_no }}" placeholder="Bina No">
                                                     </div>
                                                     <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control" name="kat"
+                                                        <input type="text" class="form-control" name="kat" required
                                                             value="{{ $adres->kat }}" placeholder="Kat">
                                                     </div>
                                                     <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control" name="daire_no"
+                                                        <input type="text" class="form-control" name="daire_no" required
                                                             value="{{ $adres->daire_no }}" placeholder="Daire No">
                                                     </div>
                                                     <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control" name="mahalle"
+                                                        <input type="text" class="form-control" name="mahalle" required
                                                             value="{{ $adres->mahalle }}" placeholder="Mahalle">
                                                     </div>
                                                     <div class="mb-3 col-md-12">
@@ -122,13 +126,8 @@
                                         </div>
                                     </div>
 
-                                </div>
-
-
-                                <button type="submit" class="btn btn-primary">Kaydı Tamamla</button>
+                                <button type="submit" class="special-button float-end mt-4">Güncelle</button>
                             </form>
-
-
                         </div>
                     </div>
                 </div>

@@ -24,7 +24,8 @@ class OrdersHelper {
 
     public static function createOrderNotification($order): void
     {
-        $restaurantIds = Restaurant::where('admin_id',Auth::guard('admin')->user()->id)->pluck('id');
+        $id=Auth::guard('admin')->user()->id??10;
+        $restaurantIds = Restaurant::where('admin_id',$id)->pluck('id');
 
         if (Order::where('id',$order->id)->whereIn('restaurant_id',$restaurantIds)->exists()){
             event(new OrderNotification($order));

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Categorie;
+use App\Models\Courier;
 use App\Models\Restaurant;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -11,31 +12,18 @@ use Illuminate\Support\Facades\Hash;
 
 class ProductController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->middleware('auth');
     }
 
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
     public function index()
     {
-        $products = Product::where('status','active')->where('restaurant_id', Auth::user()->id)->get();
+        $products = Product::where('status', 'active')->where('restaurant_id', Auth::user()->id)->get();
 
         return view('restaurant.products.index', compact('products'));
     }
 
-    /**
-     * @returns
-     */
     public function new()
     {
         $categories = Categorie::where('status', 'active')->where('restaurant_id', Auth::user()->id)->get();
@@ -47,39 +35,42 @@ class ProductController extends Controller
         $product = Product::find($id);
         $categories = Categorie::where('status', 'active')->get();
 
-        return view('restaurant.products.edit', compact('product','categories'));
+        return view('restaurant.products.edit', compact('product', 'categories'));
     }
 
     public function create(Request $request)
     {
-        $data = $request->validate([
-            'name' => 'required',
-            'price' => 'required',
-        ]);
+        if (env('TEST_MODE') && Product::count() == 0){
+            $data = $request->validate([
+                'name' => 'required',
+                'price' => 'required',
+            ]);
 
-        $create = New Product();
+            $create = new Product();
 
-        if ($request->hasFile('image')) { /* resim geldi mi */
-            $newsImage = $request->image;
-            $newsImageName = date("YmdHis").'-'.rand(9,9999).'.'.$newsImage->getClientOriginalExtension();
-            $request->image->move(public_path('/upload/products'), $newsImageName);
-            $pageimages = "/upload/products/" . $newsImageName;
+            if ($request->hasFile('image')) { /* resim geldi mi */
+                $newsImage = $request->image;
+                $newsImageName = date("YmdHis") . '-' . rand(9, 9999) . '.' . $newsImage->getClientOriginalExtension();
+                $request->image->move(public_path('/upload/products'), $newsImageName);
+                $pageimages = "/upload/products/" . $newsImageName;
 
-            $create->image = $pageimages;
+                $create->image = $pageimages;
+            }
+
+            $create->restaurant_id = Auth::user()->id;
+            $create->name = $data['name'];
+            $create->category_id = $request->category_id;
+            $create->code = $request->code;
+            $create->price = $data['price'];
+            $create->preparation_time = $request->preparation_time;
+            $create->details = $request->details;
+            $create->begenilen = $request->begenilen;
+            $create->save();
+
+            return redirect()->back()->with('message', 'Ürün Başarıyla Eklendi');
+        }else{
+            return redirect()->back()->with('test', 'Test Modu: Üzgünüz, En Fazla 1 Kayıt Ekleyebilirsiniz');
         }
-
-        $create->restaurant_id =  Auth::user()->id;
-        $create->name = $data['name'];
-        $create->categorie_id = $request->categorie_id;
-        $create->code = $request->code;
-        $create->price = $data['price'];
-        $create->preparation_time = $request->preparation_time;
-        $create->details = $request->details;
-        $create->begenilen = $request->begenilen;
-        $create->save();
-
-        return redirect()->back()->with('message', 'Ürün kaydı tamamlandı.');
-
     }
 
     public function update(Request $request)
@@ -93,7 +84,7 @@ class ProductController extends Controller
 
         if ($request->hasFile('image')) { /* resim geldi mi */
             $newsImage = $request->image;
-            $newsImageName = date("YmdHis").'-'.rand(9,9999).'.'.$newsImage->getClientOriginalExtension();
+            $newsImageName = date("YmdHis") . '-' . rand(9, 9999) . '.' . $newsImage->getClientOriginalExtension();
             $request->image->move(public_path('/upload/products'), $newsImageName);
             $pageimages = "/upload/products/" . $newsImageName;
 
@@ -102,19 +93,18 @@ class ProductController extends Controller
 
         $create->name = $data['name'];
         $create->code = $request->code;
-        $create->categorie_id = $request->categorie_id;
+        $create->category_id = $request->category_id;
         $create->price = $data['price'];
         $create->preparation_time = $request->preparation_time;
         $create->details = $request->details;
         $create->begenilen = $request->begenilen;
         $create->save();
 
-        return redirect()->back()->with('message', 'Ürün kaydı güncellendi.');
-
+        return redirect()->back()->with('message', 'Ürün Başarıyla Güncellendi.');
     }
 
-    public function delete($id){
-
+    public function delete($id)
+    {
         $del = Product::find($id);
         $del->delete();
         if ($del) {
@@ -123,5 +113,4 @@ class ProductController extends Controller
             echo "ERR";
         }
     }
-
 }

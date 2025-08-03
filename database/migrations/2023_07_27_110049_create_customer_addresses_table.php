@@ -15,10 +15,8 @@ class CreateCustomerAddressesTable extends Migration
     {
         Schema::create('customer_addresses', function (Blueprint $table) {
             $table->id();
-            $table->integer('restaurant_id');
-            $table->integer('customer_id');
-            $table->integer('il');
-            $table->integer('ilce');
+            $table->bigInteger('restaurant_id');
+            $table->bigInteger('customer_id');
             $table->string('name');
             $table->string('sokak_cadde');
             $table->string('bina_no');
@@ -26,7 +24,11 @@ class CreateCustomerAddressesTable extends Migration
             $table->string('daire_no');
             $table->string('mahalle');
             $table->text('adres_tarifi')->nullable();
+            $table->enum('status', ['active', 'deactive'])->default('active');
+            $table->unsignedBigInteger('city_id')->nullable();
+            $table->unsignedBigInteger('district_id')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

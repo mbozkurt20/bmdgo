@@ -2,9 +2,9 @@
 
 
 namespace App\Http\Controllers;
- 
+
 use App\Traits\RequestTrait;
-use App\Models\Restaurant; 
+use App\Models\Restaurant;
 use App\Models\Customer;
 use App\Models\CustomerAddress;
 use Illuminate\Http\Request;
@@ -15,9 +15,9 @@ class CallerController extends Controller
 {
 
 use RequestTrait;
- 
 
-    public function login(Request $request) 
+
+    public function login(Request $request)
     {
 
         // Check email
@@ -32,7 +32,7 @@ use RequestTrait;
 	                'message' => 'Bad creds'
 	            ], 401);
 	        }
- 
+
 
 	        $response = [
 	            'userId' => $restaurant->id
@@ -45,9 +45,9 @@ use RequestTrait;
         	return response('ERROR', 401);
         }
 
-       
 
-       
+
+
     }
 
 
@@ -88,13 +88,13 @@ use RequestTrait;
 		        ];
     		}
 
-    		
+
 	        $channel = 'getPhoneNumber_'.$userId;
 
 	        $this->sendSocketIONotification($channel, $data);
 
     	}
-    	
+
 
     	return response(['status' => 'OK']);
     }

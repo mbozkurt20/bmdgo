@@ -1,0 +1,115 @@
+body {
+    background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8cmVzdGF1cmFudHxlbnwwfHwwfHx8MA%3D%3D');
+    background-repeat: no-repeat;
+    background-size: cover;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.input::placeholder{
+    color: white;
+}
+.login-box {
+    background: rgba(237, 223, 223, 0.2); /* Beyaz ve %20 opak */
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    backdrop-filter: blur(10px); /* Cam efekti için */
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.logo {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.logo img {
+    height: 80px;
+}
+
+.form-title {
+    font-size: 24px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #fafafa;
+}
+
+.form-control {
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 16px;
+}
+
+.btn-login {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 8px;
+    background-color: #e7004d;
+    border: none;
+    color: #fff;
+    font-weight: 500;
+}
+
+.btn-login:hover {
+    background-color: #e11b5d;
+    color: white;
+}
+
+.download-button {
+    display: block;
+    margin-top: 30px;
+    font-size: 16px;
+    text-align: center;
+    text-decoration: none;
+    color: #fbfbfb;
+}
+
+.download-button:hover {
+    color: #f8e3e3;
+}
+
+.invalid-feedback {
+    font-size: 14px;
+    color: red;
+}
+
+.user-type-selector {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.selector-label {
+    font-weight: bold;
+    color: white;
+    margin-bottom: 10px;
+}
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+.type-btn {
+    background-color: #0d2646;
+    color: white;
+    border: 2px solid transparent;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 16px;
+}
+.type-btn.active {
+    background-color: #f12c6d;
+    border-color: #e11b5d;
+}
+.type-btn:hover {
+    background-color: #e11b5d;
+}

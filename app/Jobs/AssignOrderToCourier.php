@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\Admin;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -51,57 +52,59 @@ class AssignOrderToCourier implements ShouldQueue
     //   }
     public function handle()
     {
+        if (Admin::where('auto_orders',true)->exists()) {
+            Log::info("Job kuyruğa geldi! Sipariş ID: " . $this->order->id);
 
-        Log::info("Job kuyruğa geldi! Sipariş ID: " . $this->order->id);
+            // Durumu 'Aktif' olan ilk kuryeyi bul
+            $courier = Courier::where('situation', 'Aktif')->where('admin_id', $this->order->restaurant->admin_id)->first();
 
-        // Durumu 'Aktif' olan ilk kuryeyi bul
-        $courier = Courier::where('situation', 'Aktif')->where('admin_id', $this->order->restaurant->admin_id)->first();
+            if ($courier) {
+                // Eğer sipariş daha önce bir kuryeye atanmadıysa
+                $orderCourier = CourierOrder::where('order_id', $this->order->id)->first();
 
-        if ($courier) {
-            // Eğer sipariş daha önce bir kuryeye atanmadıysa
-            $orderCourier = CourierOrder::where('order_id', $this->order->id)->first();
+                if (!$orderCourier) {
+                    // Yeni siparişi kuryeye atama
+                    $newOrderCourier = new CourierOrder();
+                    $newOrderCourier->courier_id = $courier->id;
+                    $newOrderCourier->order_id = $this->order->id;
+                    $newOrderCourier->save();
 
-            if (!$orderCourier) {
-                // Yeni siparişi kuryeye atama
-                $newOrderCourier = new CourierOrder();
-                $newOrderCourier->courier_id = $courier->id;
-                $newOrderCourier->order_id = $this->order->id;
-                $newOrderCourier->save();
-
-                // Kuryenin durumunu 'Serviste' yap
-                $courier->situation = 'Serviste';
-                $courier->save();
-
-                // Sipariş tablosundaki courier_id'yi güncelle
-                $this->order->courier_id = $courier->id;
-                $this->order->save();
-
-                Log::info("Kurye atandı ve durumu Serviste yapıldı. Sipariş ID: " . $this->order->id . " Kurye ID: " . $courier->id);
-            }
-        } else {
-            // Eğer aktif kurye bulunamazsa ve tekrar deneme sayısı 5'ten azsa kuyruğa tekrar ekleyelim
-            if ($this->retryCount < 5) {
-                AssignOrderToCourier::dispatch($this->order, $this->retryCount + 1)
-                    ->onQueue('default')
-                    ->delay(now()->addMinutes(10))->priority(10); //;
-                Log::info("Kurye bulunamadı, tekrar kuyruğa ekleniyor. Deneme sayısı: " . $this->retryCount);
-            }
-        }
-
-        // Sipariş durumu kontrolü
-        if ($this->order->status == 'DELIVERED' || $this->order->status == 'UNSUPPLIED') {
-            // Sipariş kuryesini bul
-            $orderCourier = CourierOrder::where('order_id', $this->order->id)->first();
-
-            if ($orderCourier) {
-                $courier = Courier::find($orderCourier->courier_id);
-
-                if ($courier && $courier->situation == 'Serviste') {
-                    // Eğer sipariş tamamlandı ya da iptal edildiyse kuryeyi aktif yap
-                    $courier->situation = 'Aktif';
+                    // Kuryenin durumunu 'Serviste' yap
+                    $courier->situation = 'Serviste';
                     $courier->save();
 
-                    Log::info("Sipariş durumu değişti, kuryenin durumu Aktif yapıldı. Kurye ID: " . $courier->id);
+                    // Sipariş tablosundaki courier_id'yi güncelle
+                    $this->order->courier_id = $courier->id;
+                    $this->order->save();
+
+                    Log::info("Kurye atandı ve durumu Serviste yapıldı. Sipariş ID: " . $this->order->id . " Kurye ID: " . $courier->id);
+                }
+            } else {
+                // Eğer aktif kurye bulunamazsa ve tekrar deneme sayısı 5'ten azsa kuyruğa tekrar ekleyelim
+                if ($this->retryCount < 5) {
+                    AssignOrderToCourier::dispatch($this->order, $this->retryCount + 1)
+                        ->onQueue('default') // veya high, low vs.
+                        ->delay(now()->addMinutes(10));
+
+                    Log::info("Kurye bulunamadı, tekrar kuyruğa ekleniyor. Deneme sayısı: " . $this->retryCount);
+                }
+            }
+
+            // Sipariş durumu kontrolü
+            if ($this->order->status == 'DELIVERED' || $this->order->status == 'UNSUPPLIED') {
+                // Sipariş kuryesini bul
+                $orderCourier = CourierOrder::where('order_id', $this->order->id)->first();
+
+                if ($orderCourier) {
+                    $courier = Courier::find($orderCourier->courier_id);
+
+                    if ($courier && $courier->situation == 'Serviste') {
+                        // Eğer sipariş tamamlandı ya da iptal edildiyse kuryeyi aktif yap
+                        $courier->situation = 'Aktif';
+                        $courier->save();
+
+                        Log::info("Sipariş durumu değişti, kuryenin durumu Aktif yapıldı. Kurye ID: " . $courier->id);
+                    }
                 }
             }
         }

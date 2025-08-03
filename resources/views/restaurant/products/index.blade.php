@@ -20,8 +20,9 @@
                 </div>
             </div>
             <div class="d-flex align-items-center flex-wrap">
-                <a href="{{route('restaurant.products.new')}}" class="btn btn-primary btn-rounded me-3 mb-2"><i
-                        class="fas fa-shopping-bag me-2"></i>+ Yeni Ekle</a>
+                <a href="{{route('restaurant.products.new')}}" class="special-button me-3"><i
+                        class="fas fa-shopping-bag me-2"></i> Yeni Ekle</a>
+
                 <a href="javascript:void(0);" class="btn bg-white btn-rounded me-2 mb-2 text-black shadow-sm"><i
                         class="fas fa-calendar-times me-3 scale3 text-primary"></i>Filtrele<i
                         class="fas fa-chevron-down ms-3 text-primary"></i></a>
@@ -45,7 +46,7 @@
                         <tbody>
                         @foreach($products as $product)
                             <tr id="data_{{$product->id}}">
-                                <td><img src="https://i.hizliresim.com/oefzi6j.png" style="height: 30px;"></td>
+                                <td><img alt="" src="{{config('site.logo')}}" style="height: 30px;"></td>
                                 <td class="wspace-no">{{$product->code}}</td>
                                 <td>{{$product->name}}</td>
                                 <td class="text-ov">{{$product->price}} ₺</td>
@@ -60,6 +61,12 @@
                         @endforeach
                         </tbody>
                     </table>
+
+                    @if(!count($products))
+                        <div>
+                            <h4 class="text-center mt-4">Ürün Bulunmuyor...</h4>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -84,8 +91,8 @@
                 text: "Bu işlemi geri alamazsınız!",
                 type: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#007c00',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: '#4927b3',
+                cancelButtonColor: '#e7004d',
                 cancelButtonText: 'Hayır',
                 confirmButtonText: 'Evet, Silmek istiyorum!',
 

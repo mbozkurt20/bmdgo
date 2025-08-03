@@ -27,7 +27,7 @@
         </div>
         <div class="row">
             <div class="col-xl-12">
-                <div class="table-responsive">
+                <div class="table-responsive  card card-body">
                     <table id="example3" class="order-table shadow-hover card-table text-black" style="min-width: 845px">
                         <thead>
                             <tr>
@@ -103,7 +103,7 @@
                                     <td>
                                         @php
                                             $courier = \App\Models\Courier::where('id', $order->courier_id)->first();
-                                            echo $courier->name;
+                                            echo $courier? $courier->name: env('APP_NAME');
                                         @endphp
                                     </td>
                                     <td class="text-ov">{{ $order->amount }} TL</td>

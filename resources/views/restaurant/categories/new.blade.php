@@ -1,5 +1,4 @@
 @extends('restaurant.layouts.app')
-
 @section('content')
     <div class="container-fluid">
         <div class="mb-sm-4 d-flex flex-wrap align-items-center text-head">
@@ -12,13 +11,17 @@
             </div>
         </div>
         @if(session()->has('message'))
-
-            <div class="alert alert-success alert-dismissible fade show">
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="btn-close">
-                </button>
-                <a href="#">   {{ session()->get('message') }}</a>
+            <div class="custom-alert success">
+                <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+                <span class="alert-message">{{ session()->get('message') }}</span>
             </div>
+        @endif
 
+        @if(session()->has('test') )
+            <div class="custom-alert error">
+                <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+                <span class="alert-message">{{ session()->get('test') }}</span>
+            </div>
         @endif
 
         <div class="row">
@@ -34,22 +37,21 @@
                                 <div class="row">
                                     <div class="mb-3 col-md-8">
                                         <label class="form-label">Kategori Adı</label>
-                                        <input type="text" class="form-control" name="name" placeholder="Kategori Adı">
+                                        <input required type="text" class="form-control" name="name" placeholder="Kategori Adı">
                                     </div>
                                     <div class="mb-3 col-md-4">
                                         <label class="form-label">POS Sırası</label>
-                                        <input type="number" class="form-control" name="desk" placeholder="Kategorinin POS Ekranındaki Sıralaması">
+                                        <input required type="number" class="form-control" name="desk" placeholder="Kategorinin POS Ekranındaki Sıralaması">
                                     </div>
                                 </div>
 
-                                <button type="submit" class="btn btn-primary">Kaydı Tamamla</button>
+                                <button type="submit" class="special-button float-end mt-4">Kaydet</button>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 @endsection
 

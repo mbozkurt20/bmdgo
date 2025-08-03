@@ -3,22 +3,27 @@
 @section('content')
     <div class="container-fluid">
         <div class="mb-sm-4 d-flex flex-wrap align-items-center text-head">
-            <h2 class="mb-3 me-auto">Kuryeler</h2>
+            <h2 class="mb-3 me-auto">Yeni Kurye Ekle</h2>
             <div>
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Kuryeler</a></li>
+                    <li class="breadcrumb-item"><a href="/admin/couriers">Kuryeler</a></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Yeni</a></li>
                 </ol>
             </div>
         </div>
+
         @if(session()->has('message'))
-
-            <div class="alert alert-success alert-dismissible fade show">
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="btn-close">
-                </button>
-                <a href="#">   {{ session()->get('message') }}</a>
+            <div class="custom-alert success">
+                <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+                <span class="alert-message">{{ session()->get('message') }}</span>
             </div>
+        @endif
 
+        @if(session()->has('test') )
+            <div class="custom-alert error">
+                <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+                <span class="alert-message">{{ session()->get('test') }}</span>
+            </div>
         @endif
 
         <div class="row">
@@ -33,35 +38,35 @@
                                 @csrf
                                 <div class="row">
                                     <div class="mb-3 col-md-4">
-                                        <label class="form-label">Kurye Adı</label>
-                                        <input type="text" class="form-control" name="name" placeholder="Kurye Adı">
+                                        <label class="form-label">Kurye Adı  <small class="text-danger">*</small></label>
+                                        <input required type="text" class="form-control" name="name" placeholder="Kurye Adı">
                                     </div>
                                     <div class="mb-3 col-md-4">
-                                        <label class="form-label">Telefon Numarası</label>
-                                        <input type="text" class="form-control" name="phone"
+                                        <label class="form-label">Telefon Numarası  <small class="text-danger">*</small></label>
+                                        <input required type="text" class="form-control" name="phone"
                                                placeholder="Telefon Numarası">
                                     </div>
                                     <div class="mb-3 col-md-4">
-                                        <label class="form-label">Şifresi</label>
-                                        <input type="text" class="form-control" name="password"
+                                        <label class="form-label">Şifresi  <small class="text-danger">*</small></label>
+                                        <input required type="text" class="form-control" name="password"
                                                placeholder="Kurye Apk Şifresi">
                                     </div>
                                     <div class="mb-3 col-md-4">
-                                        <label class="form-label">Paket Başı Fiyatı</label>
-                                        <input type="text" class="form-control" name="price"
+                                        <label class="form-label">Paket Başı Fiyatı  <small class="text-danger">*</small></label>
+                                        <input required type="text" class="form-control" name="price"
                                                placeholder="Paket Başı Fiyatı">
                                     </div>
 
                                 </div>
 
-                                <button type="submit" class="btn btn-primary">Kaydı Tamamla</button>
+                                <button
+                                    type="submit" class="special-button float-end">Kaydet</button>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 @endsection
 

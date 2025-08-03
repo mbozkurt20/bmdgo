@@ -17,6 +17,7 @@ class CreateCategoriesTable extends Migration
             $table->id();
             $table->integer('restaurant_id');
             $table->string('name');
+            $table->bigInteger('desk')->default(1);
             $table->enum('status',['active','deactive'])->default('active');
             $table->timestamps();
         });

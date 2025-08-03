@@ -18,6 +18,9 @@ class CreateAdminsTable extends Migration
             $table->string('name')->nullable();
             $table->string('email')->unique();
             $table->string('password');
+            $table->boolean('auto_orders')->default(0);
+            $table->string('default_locations_lat')->nullable();
+            $table->string('default_locations_lon')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

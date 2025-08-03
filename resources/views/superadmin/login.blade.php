@@ -9,17 +9,17 @@
     <meta name="author" content="">
     <meta name="robots" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="ParsKurye">
-    <meta property="og:title" content="ParsKurye">
-    <meta property="og:description" content="ParsKurye">
+    <meta name="description" content="{{env('APP_NAME')}}">
+    <meta property="og:title" content="{{env('APP_NAME')}}">
+    <meta property="og:description" content="{{env('APP_NAME')}}">
     <meta property="og:image" content="https://salero.dexignzone.com/xhtml/social-image.png">
     <meta name="format-detection" content="telephone=no">
 
     <!-- PAGE TITLE HERE -->
-    <title>ParsKurye - Süper Admin</title>
+    <title>{{env('APP_NAME')}} - Süper Admin</title>
 
     <!-- FAVICONS ICON -->
-    <link rel="shortcut icon" type="image/png" href="{{asset('theme/login/img/favicon.png')}}">
+    <link rel="shortcut icon" type="image/png" href="{{config('site.logo')}}">
     <link href="{{asset('theme/login/css/bootstrap-select.min.css')}}" rel="stylesheet">
     <link href="{{asset('theme/login/css/style.css')}}" rel="stylesheet">
 
@@ -41,8 +41,8 @@
 
                                 <div class="card-body">
                                     <div class="logo-header">
-                                        <a href="{{route('restaurant.login')}}" class="logo"><img style="height: 110px" src="https://i.hizliresim.com/oefzi6j.png" alt="" class="width-230 light-logo"></a>
-                                        <a href="{{route('restaurant.login')}}" class="logo"><img style="height: 110px" src="https://i.hizliresim.com/oefzi6j.png" alt="" class="width-230 dark-logo"></a>
+                                        <a href="{{route('restaurant.login')}}" class="logo"><img style="height: 110px" src="{{config('site.logo')}}" alt="" class="width-230 light-logo"></a>
+                                        <a href="{{route('restaurant.login')}}" class="logo"><img style="height: 110px" src="{{config('site.logo')}}" alt="" class="width-230 dark-logo"></a>
                                     </div>
 
                                     <nav>
@@ -94,7 +94,7 @@
                                 <div class="card-footer">
                                     <div class=" bottom-footer clearfix m-t10 m-b20 row text-center">
                                         <div class="col-lg-12 text-center">
-												<span> © ParsKurye</span>
+												<span> © {{env('APP_NAME')}}</span>
                                         </div>
                                     </div>
                                 </div>

@@ -21,21 +21,11 @@ use Illuminate\Support\Facades\DB;
 class OrderController extends Controller
 {
     use RequestTrait;
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
+
     public function __construct()
     {
         $this->middleware('auth');
     }
-
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
     public function index($link)
     {
         if ($link == "tumu") {
@@ -53,41 +43,6 @@ class OrderController extends Controller
             }
         }
     }
-
-    // public function sendCourier(Request $request)
-    // {
-
-    //     $orders = $request->input('orders'); // Gönderilen sipariş IDs array
-    //     $courierId = $request->input('courier_id'); // Seçilen kurye ID
-    //     foreach ($orders as $orderId) {
-
-    //         $ordersor = CourierOrder::where('order_id', $orderId)->first();
-
-    //         if ($ordersor) {
-    //             $courierx = Courier::where('id', $ordersor->courier_id)->first();
-    //             $courierx->situation = 'Aktif';
-    //             $courierx->save();
-
-    //             $ordersor->courier_id = $courierId;
-    //             $sav = $ordersor->save();
-
-    //             $couriery = Courier::where('id', $courierId)->first();
-    //             $couriery->situation = 'Serviste';
-    //             $couriery->save();
-    //         } else {
-    //             $order = new CourierOrder();
-    //             $order->courier_id = $courierId;
-    //             $order->order_id = $orderId;
-    //             $sav = $order->save();
-
-    //             $courierx = Courier::where('id', $courierId)->first();
-    //             $courierx->situation = 'Serviste';
-    //             $courierx->save();
-    //         }
-    //     }
-    //     return response()->json('OK');
-    // }
-
     public function sendCourier(Request $request)
     {
         $orders = $request->input('orders');
@@ -155,7 +110,6 @@ class OrderController extends Controller
             return response()->json(['error' => 'Transaction failed: ' . $e->getMessage()], 500);
         }
     }
-
     public function new()
     {
         $couriers = Courier::where('status', 'active')->where('restaurant_id', Auth::user()->id)->get();
@@ -163,7 +117,6 @@ class OrderController extends Controller
         $categories = Categorie::where('status', 'active')->where('restaurant_id', Auth::user()->id)->get();
         return view('restaurant.orders.new', compact('customers', 'couriers', 'categories'));
     }
-
     public function addPOS($id)
     {
         $product = Product::find($id);
@@ -267,16 +220,10 @@ class OrderController extends Controller
         $posTotal = number_format(\Cart::session($userId)->getTotal(), 2, ',', '.') . " TL";
         $total = \Cart::session($userId)->getTotal();
 
-
-
         return response()->json(['posTotalItem' => $posTotalItem, 'posTotal' => $posTotal, 'total' => $total]);
     }
-
-
-
     public function message(Request $request)
     {
-
         $order = Order::where('restaurant_id', Auth::user()->id)->where('tracking_id', $request->tracking_id)->first();
         $order->message = $request->message;
         $s = $order->save();
@@ -291,7 +238,6 @@ class OrderController extends Controller
 
     public function message2(Request $request)
     {
-
         $order = Order::where('restaurant_id', Auth::user()->id)->where('tracking_id', $request->tracking_id)->first();
         $order->message2 = $request->message2;
         $s = $order->save();

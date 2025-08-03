@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Courier;
 use App\Models\Customer;
 use App\Models\CustomerAddress;
 use Illuminate\Http\Request;
@@ -10,130 +11,104 @@ use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->middleware('auth');
     }
 
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
     public function index()
     {
         $customers = Customer::where('status', 'active')->where('restaurant_id', Auth::user()->id)->get();
-
         return view('restaurant.customers.index', compact('customers'));
     }
 
-    /**
-     * @returns
-     */
     public function new()
     {
-        $iller = DB::table('iller')->get();
-        return view('restaurant.customers.new', compact('iller'));
+        $cities = DB::table('cities')->get();
+        return view('restaurant.customers.new', compact('cities'));
     }
 
     public function edit($id)
     {
         $customer = Customer::find($id);
-
         return view('restaurant.customers.edit', compact('customer'));
     }
 
     public function create(Request $request)
     {
-        // Validate customer data
-        $data = $request->validate([
-            'name' => 'required',
-            'phone' => 'required',
-            'mobile' => 'required'
-        ]);
+        if (env('TEST_MODE') && Customer::count() == 0) {
 
-        // Save customer information
-        $create = new Customer();
-        $create->restaurant_id = Auth::user()->id; // Assuming the authenticated user is the restaurant
-        $create->name = $data['name'];
-        $create->phone = $data['phone'];
-        $create->mobile = $data['mobile'];
-        $create->save();
+            // Save customer information
+            $create = new Customer();
+            $create->restaurant_id = Auth::user()->id; // Assuming the authenticated user is the restaurant
+            $create->name = $request->input('name');
+            $create->phone = $request->input('phone');
+            $create->mobile = $request->input('mobile');
+            $create->save();
 
-        // Check if address data is present
-        if ($request->address) {
-            foreach ($request->address as $adres) {
-                // Save each address for the customer
-                $address = new CustomerAddress();
-                $address->customer_id = $create->id; // Associate address with the created customer
-                $address->restaurant_id = Auth::user()->id; // Associate address with the restaurant
-                $address->name = $adres['name']; // Address title
-                $address->sokak_cadde = $adres['sokak_cadde'];
-                $address->bina_no = $adres['bina_no'];
-                $address->kat = $adres['kat'];
-                $address->daire_no = $adres['daire_no'];
-                $address->mahalle = $adres['mahalle'];
-                $address->adres_tarifi = $adres['adres_tarifi'] ?? ''; // Set empty string if not provided
-                $address->save();
+            // Check if address data is present
+            if ($request->address) {
+                foreach ($request->address as $adres) {
+                    // Save each address for the customer
+                    $address = new CustomerAddress();
+                    $address->customer_id = $create->id; // Associate address with the created customer
+                    $address->restaurant_id = Auth::user()->id; // Associate address with the restaurant
+                    $address->name = $adres['name']; // Address title
+                    $address->sokak_cadde = $adres['sokak_cadde'];
+                    $address->bina_no = $adres['bina_no'];
+                    $address->kat = $adres['kat'];
+                    $address->daire_no = $adres['daire_no'];
+                    $address->mahalle = $adres['mahalle'];
+                    $address->adres_tarifi = $adres['adres_tarifi'] ?? ''; // Set empty string if not provided
+                    $address->save();
+                }
             }
-        }
 
-        return redirect()->back()->with('message', 'Müşteri kaydı tamamlandı.');
+            return redirect()->back()->with('message', 'Müşteri Başarıyla Eklendi.');
+        } else {
+            return redirect()->back()->with('test', 'Test Modu: Üzgünüz, En Fazla 1 Kayıt Ekleyebilirsiniz');
+        }
     }
 
     public function update(Request $request)
     {
-        $data = $request->validate([
-            'name' => 'required',
-            'phone' => 'required',
-        ]);
-
-        $create = Customer::find($request->id);
-        $create->name = $request->name;
-        $create->phone = $request->phone;
-        $create->mobile = $request->mobile;
-        $create->save();
+        $customer = Customer::find($request->id);
+        $customer->name = $request->name;
+        $customer->phone = $request->phone;
+        $customer->mobile = $request->mobile;
+        $customer->save();
 
         if ($request->address) {
             foreach ($request->address as $adres) {
-
-                if ($adres->type == "up") {
-
-                    $adreses = CustomerAddress::where('id', $adres->id)->first();
-                    if ($adreses) {
-
-                        $adreses->name = $adres['name'];
-                        $adreses->sokak_cadde = $adres['sokak_cadde'];
-                        $adreses->bina_no = $adres['bina_no'];
-                        $adreses->kat = $adres['kat'];
-                        $adreses->daire_no = $adres['daire_no'];
-                        $adreses->mahalle = $adres['mahalle'];
-                        $adreses->adres_tarifi = $adres['adres_tarifi'];
-                        $adreses->save();
+                if ($adres['type'] == "up") {
+                    $address = CustomerAddress::where('id', $adres['id'])->first();
+                    if ($address) {
+                        $address->name = $adres['name'];
+                        $address->sokak_cadde = $adres['sokak_cadde'];
+                        $address->bina_no = $adres['bina_no'];
+                        $address->kat = $adres['kat'];
+                        $address->daire_no = $adres['daire_no'];
+                        $address->mahalle = $adres['mahalle'];
+                        $address->adres_tarifi = $adres['adres_tarifi'];
+                        $address->save();
                     }
                 } else {
-                    $adreses = new CustomerAddress();
-                    $adreses->restaurant_id =  Auth::user()->id;
-                    $adreses->customer_id = $adres->customer_id;
-                    $adreses->name = $adres['name'];
-                    $adreses->sokak_cadde = $adres['sokak_cadde'];
-                    $adreses->bina_no = $adres['bina_no'];
-                    $adreses->kat = $adres['kat'];
-                    $adreses->daire_no = $adres['daire_no'];
-                    $adreses->mahalle = $adres['mahalle'];
-                    $adreses->adres_tarifi = $adres['adres_tarifi'];
-                    $adreses->save();
+                    $newAddress = new CustomerAddress();
+                    $newAddress->restaurant_id = Auth::user()->id;
+                    $newAddress->customer_id = $customer->id;
+                    $newAddress->name = $adres['name'];
+                    $newAddress->sokak_cadde = $adres['sokak_cadde'];
+                    $newAddress->bina_no = $adres['bina_no'];
+                    $newAddress->kat = $adres['kat'];
+                    $newAddress->daire_no = $adres['daire_no'];
+                    $newAddress->mahalle = $adres['mahalle'];
+                    $newAddress->adres_tarifi = $adres['adres_tarifi'];
+                    $newAddress->save();
                 }
-                $adreses->restaurant_id =  Auth::user()->id;
             }
         }
 
-        return redirect()->back()->with('message', 'Müşteri kaydı güncellendi.');
+        return redirect()->back()->with('message', 'Müşteri Kaydı Başarıyla Güncellendi.');
     }
 
     public function delete($id)
@@ -150,7 +125,6 @@ class CustomerController extends Controller
                 $value->save();
             }
         }
-
 
         if ($customer) {
             echo "OK";

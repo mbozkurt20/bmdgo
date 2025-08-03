@@ -11,7 +11,6 @@ use App\Models\CourierOrder;
 use App\Models\Courier;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
-use App\Events\NewOrderAdded;
 
 class AdisyoController extends Controller
 {
@@ -22,10 +21,9 @@ class AdisyoController extends Controller
 			$this->orders($restaurant);
 		}
 	}
-
 	public function GetOrders()
 	{
-		Http::get('https://panel.esnafexpress.com.tr/api/getPlatformAdisyo');
+		Http::get('https://panel.parskurye.net/api/getPlatformAdisyo');
 		sleep(2);
 		return redirect()->back();
 	}
@@ -145,15 +143,13 @@ class AdisyoController extends Controller
             OrdersHelper::createOrderNotification($order);
 
 			AssignOrderToCourier::dispatch($order)->onQueue('high');
-
-
         }
 	}
 
 	public function updateOrder(Request $request)
 	{
 		// Debugging: Gelen istek verilerini kontrol edin
-		\Log::info('Gelen istek verileri:', ['tracking_id' => $request->input('tracking_id'), 'action' => $request->input('action')]);
+		Log::info('Gelen istek verileri:', ['tracking_id' => $request->input('tracking_id'), 'action' => $request->input('action')]);
 
 		// İstekten gelen veriler
 		$trackingId = $request->input('tracking_id');
@@ -162,7 +158,7 @@ class AdisyoController extends Controller
 		// Siparişi bul
 		$order = Order::where('tracking_id', $trackingId)->first();
 		if (!$order) {
-			\Log::error('Sipariş bulunamadı', ['tracking_id' => $trackingId]);
+			Log::error('Sipariş bulunamadı', ['tracking_id' => $trackingId]);
 			return response()->json(['message' => 'Sipariş bulunamadı'], 404);
 		}
 
@@ -172,7 +168,7 @@ class AdisyoController extends Controller
 		// Sipariş içindeki ürünlerin kontrolü
 		$items = json_decode($order->items, true);
 		if (!isset($items[0]['items'][0]['orderId'])) {
-			\Log::error('OrderId bulunamadı', ['order' => $order->id]);
+			Log::error('OrderId bulunamadı', ['order' => $order->id]);
 			return response()->json(['message' => 'OrderId bulunamadı'], 400);
 		}
 
@@ -181,7 +177,7 @@ class AdisyoController extends Controller
 		// Restoran bilgilerini al
 		$restaurant = Restaurant::where('id', $order->restaurant_id)->first();
 		if (!$restaurant) {
-			\Log::error('Restoran bulunamadı', ['restaurant_id' => $order->restaurant_id]);
+			Log::error('Restoran bulunamadı', ['restaurant_id' => $order->restaurant_id]);
 			return response()->json(['message' => 'Restoran bulunamadı'], 404);
 		}
 
@@ -232,7 +228,7 @@ class AdisyoController extends Controller
 						// Kuryenin durumunu güncelle
 						$courier->situation = 'Aktif';
 						$courier->save();
-						\Log::info('Kurye durumu güncellendi', ['courier_id' => $courier->id]);
+						Log::info('Kurye durumu güncellendi', ['courier_id' => $courier->id]);
 					}
 				}
 				break;
@@ -250,12 +246,12 @@ class AdisyoController extends Controller
 						// Kuryenin durumunu güncelle
 						$courier->situation = 'Aktif';
 						$courier->save();
-						\Log::info('Kurye durumu güncellendi', ['courier_id' => $courier->id]);
+						Log::info('Kurye durumu güncellendi', ['courier_id' => $courier->id]);
 					}
 				}
 				break;
 			default:
-				\Log::error('Geçersiz işlem', ['action' => $action]);
+				Log::error('Geçersiz işlem', ['action' => $action]);
 				return response()->json(['message' => 'Geçersiz işlem'], 400);
 		}
 
@@ -285,7 +281,7 @@ class AdisyoController extends Controller
 		// cURL hatalarını kontrol et
 		if (curl_errno($ch)) {
 			$error_msg = curl_error($ch);
-			\Log::error('cURL hatası:', ['error' => $error_msg]);
+			Log::error('cURL hatası:', ['error' => $error_msg]);
 			curl_close($ch);
 			return response()->json(['error' => $error_msg], 500);
 		}
@@ -294,14 +290,14 @@ class AdisyoController extends Controller
 		curl_close($ch);
 
 		// API yanıtını loglama (dönen veriyi loglayın)
-		\Log::info('API yanıtı:', ['response' => $result]);
+		Log::info('API yanıtı:', ['response' => $result]);
 
 		// API yanıtını çözümle
 		$content = json_decode($result, true);
 
 		// API yanıtı boşsa hata döndür
 		if (!$content) {
-			\Log::error('API yanıtı boş', ['response' => $result]);
+			Log::error('API yanıtı boş', ['response' => $result]);
 			return response()->json(['message' => 'API yanıtı alınamadı'], 500);
 		}
 
@@ -311,7 +307,7 @@ class AdisyoController extends Controller
 		if ($success) {
 			return response()->json(['status' => "OK"], 200);
 		} else {
-			\Log::error('Sipariş durumu güncellenemedi', ['order_id' => $order->id]);
+			Log::error('Sipariş durumu güncellenemedi', ['order_id' => $order->id]);
 			return response()->json(['status' => "ERR"], 400);
 		}
 	}

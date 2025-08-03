@@ -12,13 +12,17 @@
             </div>
         </div>
         @if(session()->has('message'))
-
-            <div class="alert alert-success alert-dismissible fade show">
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="btn-close">
-                </button>
-                <a href="#">   {{ session()->get('message') }}</a>
+            <div class="custom-alert success">
+                <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+                <span class="alert-message">{{ session()->get('message') }}</span>
             </div>
+        @endif
 
+        @if(session()->has('test') )
+            <div class="custom-alert error">
+                <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+                <span class="alert-message">{{ session()->get('test') }}</span>
+            </div>
         @endif
         @if($errors->any())
             {{ implode('', $errors->all('<div>:message</div>')) }}

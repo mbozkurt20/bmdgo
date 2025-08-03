@@ -1,0 +1,20 @@
+.tops {
+    padding: 20px 10px;
+    font-weight: bold;
+    color: #fff;
+}
+
+.tops span {
+    font-size: 15px;
+}
+
+.table thead tr {
+    background: #ddd;
+}
+
+.table thead tr th {
+    color: #000;
+    font-size: 15px;
+    height: 20px;
+    overflow: hidden;
+}

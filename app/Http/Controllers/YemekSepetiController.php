@@ -28,8 +28,6 @@ class YemekSepetiController extends Controller
 
             $this->orders($restaurant->id, $loginData["yemeksepeti_token"]);
         }
-
-
         die;
     }
 
@@ -60,8 +58,6 @@ class YemekSepetiController extends Controller
         $loginData["yemeksepeti_tarih"] = date("Y-m-d");
 
         Restaurant::where('id', $restaurant_id)->update($loginData);
-
-
         return $loginData;
     }
 
@@ -89,8 +85,8 @@ class YemekSepetiController extends Controller
         $url = "https://vendor-api-tr.me.restaurant-partners.com/api/2/deliveries?from=" . $bugun . "T00:00:00.000Z&to=" . $bugun . "T23:59:59.000Z";
 
         $post_params = array(
-            'from'     => $dun . "T00:00:00.000Z",
-            'to'       => $yarin . "T23:59:59.000Z",
+            'from' => $dun . "T00:00:00.000Z",
+            'to' => $yarin . "T23:59:59.000Z",
             'statuses' => "ACCEPTED",
             'statuses' => "PREORDER_ACCEPTED",
         );
@@ -105,9 +101,8 @@ class YemekSepetiController extends Controller
         curl_setopt($ch2, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch2, CURLOPT_FAILONERROR, true);
 
-
         $response = curl_exec($ch2);
-        
+
         if (curl_errno($ch2)) {
             $error_msg = curl_error($ch2);
             echo $error_msg;
@@ -116,92 +111,79 @@ class YemekSepetiController extends Controller
         $content = json_decode($response);
 
         foreach ($content as $row) {
-            
+
             $customer = $row->customer;
             $payments = $row->payment;
 
-            if(isset($row->address)){
-
+            if (isset($row->address)) {
                 $address = $row->address;
 
-           
-
                 $orderAddress = '';
 
-                if(isset($row->address->city)){
-                    $orderAddress.= $row->address->city. " ";
+                if (isset($row->address->city)) {
+                    $orderAddress .= $row->address->city . " ";
                 }
 
-                if(isset($row->address->street)){
-                    $orderAddress.= $row->address->street. " ";
-                }
-                    
-                if(isset($row->address->building)){
-                    $orderAddress.= "Bina No:". $row->address->building." ";
+                if (isset($row->address->street)) {
+                    $orderAddress .= $row->address->street . " ";
                 }
 
-                if(isset($row->address->floor)){
-                    $orderAddress.= "Kat:".$row->address->floor." ";
+                if (isset($row->address->building)) {
+                    $orderAddress .= "Bina No:" . $row->address->building . " ";
                 }
 
-                if(isset($row->address->entrance) ){
-                    $orderAddress.= "Kapı No:". $row->address->entrance." ";
-                }
-                    
-                if(isset($row->address->info)){
-                    $orderAddress.= $row->address->info. " ";
+                if (isset($row->address->floor)) {
+                    $orderAddress .= "Kat:" . $row->address->floor . " ";
                 }
 
-                if(isset($row->address->area)){
-                    $orderAddress.= "Bölge ".$row->address->area;
+                if (isset($row->address->entrance)) {
+                    $orderAddress .= "Kapı No:" . $row->address->entrance . " ";
                 }
 
+                if (isset($row->address->info)) {
+                    $orderAddress .= $row->address->info . " ";
+                }
 
-            }else{
-
+                if (isset($row->address->area)) {
+                    $orderAddress .= "Bölge " . $row->address->area;
+                }
+            } else {
                 $orderAddress = '';
-
             }
-            
-            
+
             if ($payments->total) {
                 $amount = $payments->total;
             } else {
                 $amount = $payments->itemsTotalPrice;
             }
 
-
-            if($payments->paymentMethod == "Nakit"){
+            if ($payments->paymentMethod == "Nakit") {
                 $payment = "Kapıda Nakit ile Ödeme";
-            }elseif($payments->paymentMethod == "Kapıda Kredi/Banka Kartı"){
+            } elseif ($payments->paymentMethod == "Kapıda Kredi/Banka Kartı") {
                 $payment = "Kapıda Kredi Kartı ile Ödeme";
-            }else{
+            } else {
                 $payment = $payments->paymentMethod;
             }
-            
 
-            if(isset($customer->lastName)){
+            if (isset($customer->lastName)) {
                 $last_name = $customer->lastName;
-            }else{
+            } else {
                 $last_name = "";
             }
-          
 
             $orderData = [
-                'platform'       => 'yemeksepeti',
-                'courier_id'     => 0,
-                'restaurant_id'  => $restaurant_id,
-                'tracking_id'    => $row->id,
-                'full_name'      => $customer->firstName . " " . $last_name,
-                'phone'          => $customer->phone,
-                'amount'         => $amount,
-                'status'         => "PENDING",
+                'platform' => 'yemeksepeti',
+                'courier_id' => 0,
+                'restaurant_id' => $restaurant_id,
+                'tracking_id' => $row->id,
+                'full_name' => $customer->firstName . " " . $last_name,
+                'phone' => $customer->phone,
+                'amount' => $amount,
+                'status' => "PENDING",
                 'payment_method' => $payment,
-                'items'          => json_encode($row->items),
-                'address'        => $orderAddress,
+                'items' => json_encode($row->items),
+                'address' => $orderAddress,
             ];
-
-           
 
             $order = Order::where('tracking_id', $row->id)->first();
 

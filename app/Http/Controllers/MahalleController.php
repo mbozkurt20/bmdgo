@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Quarter;
 use Illuminate\Http\Request;
 use App\Models\Mahalle;
 
@@ -9,7 +10,7 @@ class MahalleController extends Controller
 {
     public function create()
     {
-        $mahalleler = Mahalle::where('ilce_id', 538)->pluck('mahalle_adi', 'id');
+        $mahalleler = Quarter::where('district_id', 538)->pluck('name', 'id');
 
         // Veriyi debug etmek için
         dd($mahalleler);
