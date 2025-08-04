@@ -238,21 +238,10 @@ class OrderController extends Controller
 
     public function storeQuick(Request $request)
     {
-        $request->validate([
-            'restaurant_id' => 'required|integer',
-            'tracking_id' => 'required|string',
-            'full_name' => 'required|string',
-            'phone' => 'required|string',
-            'address' => 'required|string',
-            'verify_code' => 'required',
-            'payment_method' => 'required|string',
-            'amount' => 'required|numeric',
-            'items' => 'required|json',
-        ]);
-
         \App\Models\Order::create([
+            'platform' => 'telefonsiparis',
             'restaurant_id' => $request->restaurant_id,
-            'tracking_id' => $request->tracking_id,
+            'tracking_id' => "POS-" . rand(9, 99999),
             'full_name' => $request->full_name,
             'phone' => $request->phone,
             'address' => $request->address,

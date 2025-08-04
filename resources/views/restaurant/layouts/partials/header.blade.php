@@ -19,14 +19,16 @@
                     </a-->
                 </div>
 
-                @include('restaurant.layouts.partials.quick_order_modal')
-
                 <ul class="navbar-nav header-right">
                     <li class="nav-item recipe">
                         <button id="openModalBtn" class="special-button ">
                             Hızlı Sipariş
                         </button>
                     </li>
+
+
+                    @include('restaurant.layouts.partials.quick_order_modal')
+
 
                     <li class="nav-item dropdown header-profile">
                         <a class="nav-link" href="javascript:void(0);" role="button"

@@ -81,8 +81,6 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('/adisyo/updateOrderStatus', [App\Http\Controllers\AdisyoController::class, 'updateOrder']);
         Route::post('/updateCourierStatus', [App\Http\Controllers\OrderController::class, 'updateCourierStatus'])->name('updateCourierStatus2');
         Route::post('/orders/message', [App\Http\Controllers\OrderController::class, 'message']);
-        Route::post('/quick-order', [App\Http\Controllers\OrderController::class, 'storeQuick'])->name('quick.order.store');
-
         /* Restaurants */
 
         Route::get('/restaurants', [\App\Http\Controllers\Admin\RestaurantsController::class, 'index'])->name('admin.restaurants');
@@ -128,6 +126,10 @@ Route::group(['prefix' => 'restaurant'], function () {
     });
 
     Route::group(['middleware' => ['restaurant.auth']], function () {
+
+        Route::post('/quick-order', [App\Http\Controllers\OrderController::class, 'storeQuick'])->name('quick.order.store');
+
+
         Route::get('/', [App\Http\Controllers\RestaurantController::class, 'home'])->name('restaurant.index');
         Route::post('logout', [App\Http\Controllers\RestaurantController::class, 'logout'])->name('restaurant.logout');
         Route::get('/filter-by-date', [App\Http\Controllers\RestaurantController::class, 'filterByDate'])->name('restaurant.filterByDate');

@@ -37,13 +37,13 @@ class CustomerController extends Controller
     public function create(Request $request)
     {
         if (env('TEST_MODE') && Customer::count() == 0) {
-
             // Save customer information
             $create = new Customer();
             $create->restaurant_id = Auth::user()->id; // Assuming the authenticated user is the restaurant
             $create->name = $request->input('name');
             $create->phone = $request->input('phone');
             $create->mobile = $request->input('mobile');
+            $create->email = $request->input('email')??null;
             $create->save();
 
             // Check if address data is present

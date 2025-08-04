@@ -7,6 +7,13 @@
     <title>Sipariş Ekranı - {{env('APP_NAME')}}</title>
 
 
+    <link href="{{asset('pos/assets/css/ui.css')}}" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
+          integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <link href="{{asset('pos/assets/css/OverlayScrollbars.css')}}" type="text/css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+
+
     <style>
         .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
             background: #e7004d;
@@ -1043,3 +1050,7 @@
 </script>
 </body>
 </html>
+
+
+
+

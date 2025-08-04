@@ -102,7 +102,6 @@
         const form = e.target;
         const data = {
             restaurant_id: {{ auth()->user()->id }},
-            tracking_id: Math.random().toString(36).substring(2, 10).toUpperCase(),
             full_name: form.full_name.value,
             phone: form.phone.value,
             address: form.address.value,
@@ -113,9 +112,9 @@
                 {
                     price: "0.000",
                     unitSellingPrice: "0.000",
-                    items: [{ packageItemId: "ahtaPOS" }],
-                    productId: 15,
-                    name: "Hizli Sipariş"
+                    items: [],
+                    productId: 0,
+                    name: "Hızlı Sipariş"
                 }
             ])
         };
@@ -130,13 +129,60 @@
         });
 
         if (response.ok) {
-            alert("Sipariş başarıyla gönderildi.");
             form.reset();
             modal.style.display = 'none';
+
+            // Başarı bildirimi
+            showToast("Siparişiniz Başarıyla Eklendi", "success");
         } else {
-            alert("Sipariş gönderilirken bir hata oluştu.");
+            // Hata bildirimi
+            showToast("Bir hata meydana geldi", "error");
+        }
+
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`; // Örn: toast success veya toast error
+            toast.textContent = message;
+
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 100);
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 3000);
         }
     });
 </script>
+
+<style>
+    .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 25px;
+        border-radius: 12px;
+        color: white;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 1000;
+    }
+
+    .toast.show {
+        opacity: 1;
+    }
+
+    .toast.success {
+        background-color: #58ba5b;
+    }
+
+    .toast.error {
+        background-color: #f44336;
+    }
+
+</style>
 
 

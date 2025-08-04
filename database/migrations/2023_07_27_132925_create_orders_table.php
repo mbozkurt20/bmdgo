@@ -18,7 +18,7 @@ class CreateOrdersTable extends Migration
             $table->string('platform');
             $table->bigInteger('restaurant_id');
             $table->bigInteger('courier_id')->nullable();
-            $table->bigInteger('tracking_id');
+            $table->string('tracking_id');
             $table->string('full_name');
             $table->string('phone');
             $table->text('address');

@@ -19,7 +19,7 @@ class CreateCustomersTable extends Migration
             $table->string('name');
             $table->string('phone');
             $table->string('mobile')->nullable();
-            $table->string('email')->unique();
+            $table->string('email')->nullable()->unique();
             $table->enum('status',['active','deactive'])->default('active');
             $table->timestamps();
         });
