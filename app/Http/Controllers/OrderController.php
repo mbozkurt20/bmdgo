@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Jobs\AssignOrderToCourier;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
@@ -235,6 +236,34 @@ class OrderController extends Controller
         }
     }
 
+    public function storeQuick(Request $request)
+    {
+        $request->validate([
+            'restaurant_id' => 'required|integer',
+            'tracking_id' => 'required|string',
+            'full_name' => 'required|string',
+            'phone' => 'required|string',
+            'address' => 'required|string',
+            'verify_code' => 'required',
+            'payment_method' => 'required|string',
+            'amount' => 'required|numeric',
+            'items' => 'required|json',
+        ]);
+
+        \App\Models\Order::create([
+            'restaurant_id' => $request->restaurant_id,
+            'tracking_id' => $request->tracking_id,
+            'full_name' => $request->full_name,
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'verify_code' => $request->verify_code,
+            'payment_method' => $request->payment_method,
+            'amount' => $request->amount,
+            'items' => $request->items,
+        ]);
+
+        return response()->json(['message' => 'Sipariş başarıyla kaydedildi.']);
+    }
 
     public function message2(Request $request)
     {
@@ -400,7 +429,7 @@ class OrderController extends Controller
         try {
             $order->save();
         } catch (\Exception $e) {
-            \Log::error('Order creation error: ' . $e->getMessage());
+            Log::error('Order creation error: ' . $e->getMessage());
             return response()->json(['status' => "ERR", 'message' => 'Sipariş kaydedilirken bir hata oluştu.']);
         }
 

@@ -20,6 +20,13 @@
 
     @include('restaurant.layouts.partials.sidebar')
 
+    <button onclick="toggleDrawer()" class="special-ok-button"
+            style="position: fixed; top: 50%; right: 20px; transform: translateY(-50%); z-index: 60;">
+        + Sipariş Ekle
+    </button>
+
+    @include('restaurant.orders.new')
+
 
     <div class="content-body" >
         @yield('content')

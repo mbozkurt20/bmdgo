@@ -6,6 +6,8 @@
             </div>
         </div>
     @endif
+
+
     <div class="header-content">
         <nav class="navbar navbar-expand">
             <div class="collapse navbar-collapse justify-content-between">
@@ -17,13 +19,13 @@
                     </a-->
                 </div>
 
+                @include('restaurant.layouts.partials.quick_order_modal')
+
                 <ul class="navbar-nav header-right">
                     <li class="nav-item recipe">
-                        <div class="button-container">
-                            <form action="/restaurant/orders/new/" method="get">
-                                <button type="submit" class="special-button">Yeni Sipariş Ekle</button>
-                            </form>
-                        </div>
+                        <button id="openModalBtn" class="special-button ">
+                            Hızlı Sipariş
+                        </button>
                     </li>
 
                     <li class="nav-item dropdown header-profile">

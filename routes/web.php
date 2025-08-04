@@ -81,6 +81,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('/adisyo/updateOrderStatus', [App\Http\Controllers\AdisyoController::class, 'updateOrder']);
         Route::post('/updateCourierStatus', [App\Http\Controllers\OrderController::class, 'updateCourierStatus'])->name('updateCourierStatus2');
         Route::post('/orders/message', [App\Http\Controllers\OrderController::class, 'message']);
+        Route::post('/quick-order', [App\Http\Controllers\OrderController::class, 'storeQuick'])->name('quick.order.store');
+
         /* Restaurants */
 
         Route::get('/restaurants', [\App\Http\Controllers\Admin\RestaurantsController::class, 'index'])->name('admin.restaurants');
@@ -169,6 +171,7 @@ Route::group(['prefix' => 'restaurant'], function () {
 
         /* Orders */
         Route::post('/orders/message', [App\Http\Controllers\OrderController::class, 'message']);
+
         Route::post('/orders/message2', [App\Http\Controllers\OrderController::class, 'message2']);
         Route::get('/orders/new', [App\Http\Controllers\OrderController::class, 'new'])->name('restaurant.orders.new');
         Route::get('/orders/removePOS', [App\Http\Controllers\OrderController::class, 'removePOS'])->name('restaurant.removePOS');
