@@ -976,7 +976,7 @@
             </div>
             {{-- Yeni Customer Modal End --}}
 
-            <div class="col-xl-12 col-xxl-12">
+            <div class="col-xl-12 col-xxl-12 mt-5">
                 <div class="card">
                     <div class="card-body">
                         <div class="table-responsive">
@@ -1026,7 +1026,6 @@
                                                        class="btn btn-primary btn-rounded"><img
                                                             src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/aff9ed163620751.6556613f80c21.png"
                                                             style="height: 25px;"> </a>
-                                                    <!-- TODO : Adisyo Platform Order-->
                                                 @endif
 
                                                 @if ($order->platform == 'adisyo' || $order->platform == 'Adisyo')

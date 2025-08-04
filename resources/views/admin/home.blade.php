@@ -850,7 +850,6 @@
                                                     </div>
                                                 </div>
                                             </div>
-
                                         </td>
 
 
@@ -879,12 +878,6 @@
                                             <input type="text" class="form-control" style="width: 150px;"
                                                    id="message_{{ $order->id }}" value="{{ $order->message }}"
                                                    placeholder="Mesafe">
-
-                                            <!--input type="text" class="form-control" style="width: 150px;"
-                                                    id="message2_{{ $order->id }}" value="{{ $order->message2 }}"
-                                                    placeholder="Kredi Kartı">
-                                            </td-->
-
                                         <td>
                                             <input type="hidden" id="tracking_{{ $order->id }}"
                                                    value="{{ $order->tracking_id }}">
@@ -1364,7 +1357,6 @@
 
                                                 </a>
                                             </div>
-
                                         </td>
                                         <script>
                                             $(document).ready(function() {

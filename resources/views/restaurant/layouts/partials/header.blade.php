@@ -10,11 +10,11 @@
         <nav class="navbar navbar-expand">
             <div class="collapse navbar-collapse justify-content-between">
                 <div class="header-left">
-                    <a href="{{ route('getOrders') }}"
+                    <!--a href="{{ route('getOrders') }}"
                        style="font-family: 'Poppins', sans-serif;margin-left:15px;"
                        class="btn btn-primary btn-rounded">
                         {{ Auth::user()->restaurant_name }}
-                    </a>
+                    </a-->
                 </div>
 
                 <ul class="navbar-nav header-right">

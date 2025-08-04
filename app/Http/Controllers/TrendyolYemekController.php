@@ -61,7 +61,6 @@ class TrendyolYemekController extends Controller
         }
 
         foreach ($content->content as $row) {
-
             Log::info(json_encode($row));
 
             $order = Order::where('tracking_id', $row->orderId)->first();
@@ -93,11 +92,13 @@ class TrendyolYemekController extends Controller
                 'tracking_id'    => $row->orderId,
                 'full_name'      => $address->firstName . " " . $address->lastName,
                 'phone'          => $address->phone . '/' . substr($row->orderId, -11 ,11),
-                'payment_method' => $row->payment->paymentType,
+                'payment_method' => $row->payment->paymentType == 'PAY_WITH_CARD'
+                    ? 'Kredi Kart ile Ödeme'
+                    : ($row->payment->paymentType == 'PAY_WITH_ON_DELIVERY' ? 'Kapıda Ödeme' : $row->payment->paymentType),
                 'items'          => json_encode($row->lines),
                 'address'        => $orderAddress,
-   				'promotions'     => isset($row->promotions) ? json_encode($row->promotions) : [],
-                'coupon'         => isset($row->coupon) ? json_encode($row->coupon) : [],
+   				'promotions'     => isset($row->promotions) ? json_encode($row->promotions) : json_encode([]),
+                'coupon'         => isset($row->coupon) ? json_encode($row->coupon) : json_encode([]),
                 'sub_amount'     => $row->totalPrice,
                 'amount'         => (float) $row->totalPrice - $couponAmount - $promotionsAmount,
                 'notes'          => $row->customerNote

@@ -1,9 +1,10 @@
-<div class="nav-header" style="background: #0d2646">
+<div class="nav-header bg-white" >
     <a href="{{ url('/restaurant') }}" class="brand-logo">
-        <div class="logo-abbr" style="width: 56px; height:56px"><img src="" style="height: 40px">
+        <div class="logo-abbr" style="width: 56px; height:56px">
+            <img alt="" src="" style="height: 40px">
         </div>
-        <div class="brand-title" style="width: 185px; height:45px"><img
-                src="{{config('site.logo')}}" style="height: 75px">
+        <div class="brand-title">
+            <img src="{{config('site.logo')}}" style="height: 100px" alt="">
         </div>
     </a>
     <div class="nav-control">
@@ -16,13 +17,13 @@
 <div class="deznav" style="background:  #0d2646">
     <div class="deznav-scroll">
         <ul class="metismenu" id="menu">
-            <li><a class="ai-icon" class="text-white" href="{{ url('/restaurant') }}" aria-expanded="false">
+            <li><a class="ai-icon text-white" href="{{ url('/restaurant') }}" aria-expanded="false">
                     <i class="flaticon-381-news text-white"></i>
                     <span class="nav-text text-white">Anasayfa</span>
                 </a>
             </li>
 
-            <li><a class="has-arrow ai-icon" href="javascript:void()" aria-expanded="false">
+            <li><a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
                     <i class="flaticon-381-user-9 text-white"></i>
                     <span class="nav-text text-white">Müşteriler</span>
                 </a>
@@ -31,7 +32,7 @@
                 </ul>
             </li>
 
-            <li><a class="has-arrow ai-icon" href="javascript:void()" aria-expanded="false">
+            <li><a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
                     <i class="flaticon-381-tab text-white"></i>
                     <span class="nav-text text-white">Menüler</span>
                 </a>
@@ -44,7 +45,7 @@
 
 
             {{-- Siparisler --}}
-            <li><a class="has-arrow" href="javascript:void()" aria-expanded="false">
+            <li><a class="has-arrow" href="javascript:void(0)" aria-expanded="false">
                     <i class="fa-solid fa-utensils text-white"></i>
                     <span class="nav-text text-white">Siparişler</span>
                 </a>
@@ -54,7 +55,7 @@
                 </ul>
             </li>
 
-            <li><a class="has-arrow ai-icon" href="javascript:void()" aria-expanded="false">
+            <li><a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
                     <i class="flaticon-041-graph text-white"></i>
                     <span class="nav-text text-white">Raporlar</span>
                 </a>
@@ -64,7 +65,7 @@
                 </ul>
             </li>
 
-            <li><a class="has-arrow ai-icon" href="javascript:void()" aria-expanded="false">
+            <li><a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
                     <i class="flaticon-381-settings-5 text-white"></i>
                     <span class="nav-text text-white">Ayarlar</span>
                 </a>

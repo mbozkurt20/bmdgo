@@ -21,7 +21,7 @@
     @include('restaurant.layouts.partials.sidebar')
 
 
-    <div class="content-body">
+    <div class="content-body" >
         @yield('content')
     </div>
 

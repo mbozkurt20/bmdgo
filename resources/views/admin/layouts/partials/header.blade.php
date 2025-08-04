@@ -1,7 +1,7 @@
-<div class="nav-header" style="background: #0d2646">
+<div class="nav-header bg-white" >
 <a href="{{ url('/admin') }}" class="d-flex justify-content-center align-items-center mt-3">
-        <div class="brand-title" style="width: 185px; height:45px">
-            <img src="{{ config('site.logo') }}" alt="Logo" style="height: 75px;">
+        <div class="brand-title" style="width: 185px; height:50px">
+            <img src="{{ config('site.logo') }}" alt="Logo" style="height: 100px;">
         </div>
     </a>
     <!--div class="nav-control">
