@@ -1,4 +1,4 @@
-<div class="nav-header bg-white" >
+<div class="nav-header" style="background:  #0d2646">
     <a href="{{ url('/restaurant') }}" class="brand-logo">
         <div class="logo-abbr" style="width: 56px; height:56px">
             <img alt="" src="" style="height: 40px">

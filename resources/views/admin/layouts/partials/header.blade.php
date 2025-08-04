@@ -1,4 +1,4 @@
-<div class="nav-header bg-white" >
+<div class="nav-header " style="background:  #0d2646">
 <a href="{{ url('/admin') }}" class="d-flex justify-content-center align-items-center mt-3">
         <div class="brand-title" style="width: 185px; height:50px">
             <img src="{{ config('site.logo') }}" alt="Logo" style="height: 100px;">

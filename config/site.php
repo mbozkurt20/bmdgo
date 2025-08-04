@@ -1,5 +1,5 @@
 <?php
 
 return [
-  'logo' => '/theme/images/bmdGo.png'
+  'logo' => '/theme/images/logo.jpeg'
 ];
