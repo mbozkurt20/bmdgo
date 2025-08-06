@@ -998,7 +998,6 @@
                                                                                 {{ $order->notes }}</p>
                                                                         </div>
                                                                         <div class="mb-3 col-md-12">
-                                                                            @php $items = json_decode($order->items); @endphp
                                                                             <table class="table table-responsive-sm"
                                                                                    style="min-width: 28rem !important;">
                                                                                 <thead>
@@ -1015,12 +1014,10 @@
                                                                                 </tr>
                                                                                 </thead>
                                                                                 <tbody>
-                                                                                @foreach ($items as $item)
-                                                                                    @php $name = $item->name; @endphp
-
+                                                                                @foreach (json_decode($order->items) as $item)
                                                                                     <tr>
                                                                                         <th class="orderProde">
-                                                                                            {{ $name }}
+                                                                                            {{ $item->name->tr }}
                                                                                         </th>
                                                                                         <th class="orderProde">
                                                                                             {{ $item->count }}
