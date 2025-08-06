@@ -1116,7 +1116,7 @@
                                                                                     </thead>
                                                                                     <tbody>
 
-                                                                                    @foreach (json_decode($order>items) as $item)
+                                                                                    @foreach (json_decode($order->items) as $item)
                                                                                         <tr>
                                                                                             <th class="orderProde">
                                                                                                 {{ $item->name->tr }}
