@@ -1,55 +1,70 @@
 /**
- * First we will load all of this project's JavaScript dependencies which
- * includes Vue and other libraries. It is a great starting point when
- * building robust, powerful web applications using Vue and Laravel.
+ * Projenin JS bağımlılıklarını yükle
  */
-
 require('./bootstrap');
-
 window.Vue = require('vue');
 
-/**
- * The following block of code may be used to automatically register your
- * Vue components. It will recursively scan this directory for the Vue
- * components and automatically register them with their "basename".
- *
- * Eg. ./components/ExampleComponent.vue -> <example-component></example-component>
- */
+// SweetAlert2'yi import et
+import Swal from 'sweetalert2';
+window.Swal = Swal;
 
-// const files = require.context('./', true, /\.vue$/i)
-// files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
-
-Vue.component('example-component', require('./components/ExampleComponent.vue').default);
+// ------------------------------------------------------------
 
 /**
- * Next, we will create a fresh Vue application instance and attach it to
- * the page. Then, you may begin adding components to this application
- * or customize the JavaScript scaffolding to fit your unique needs.
+ * Vue Bileşenlerini Kayıt Et
  */
 
+// Manuel bileşen kaydı
+Vue.component('create-screen', require('./components/orders/create-screen.vue').default);
+
+// Otomatik tarama istersen, şu satırların yorumunu kaldır:
+// const files = require.context('./components', true, /\.vue$/i);
+// files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default));
+
+// ------------------------------------------------------------
+
+/**
+ * Vue Instance oluştur
+ */
 const app = new Vue({
     el: '#app',
 });
 
-import Echo from "laravel-echo";
-window.Pusher = require("pusher-js");
+// ------------------------------------------------------------
+
+/**
+ * Laravel Echo & Pusher Kurulumu
+ */
+import Echo from 'laravel-echo';
+window.Pusher = require('pusher-js');
 
 window.Echo = new Echo({
-    broadcaster: "pusher",
+    broadcaster: 'pusher',
     key: process.env.MIX_PUSHER_APP_KEY,
     cluster: process.env.MIX_PUSHER_APP_CLUSTER,
     forceTLS: true
 });
 
-window.Echo.channel("order-assigned")
-    .listen(".order.assigned", (e) => {
-        console.log("Yeni sipariş atandı: ", e.order);
+// ------------------------------------------------------------
 
-        // Zil sesi çalınır
-        var audio = new Audio("/pos/audio/bell_small_002.mp3");
+/**
+ * Gerçek zamanlı "order-assigned" kanalını dinle
+ */
+window.Echo.channel('order-assigned')
+    .listen('.order.assigned', (e) => {
+        console.log('Yeni sipariş atandı: ', e.order);
+
+        // Zil sesi çal
+        const audio = new Audio('/pos/audio/bell_small_002.mp3');
         audio.play().catch(error => {
-            console.error("Ses çalarken hata oluştu:", error);
+            console.error('Ses çalarken hata oluştu:', error);
         });
-        
-        Swal.fire("Yeni sipariş kuryeye atandı!");
+
+        // Bildirim göster
+        Swal.fire({
+            title: 'Yeni Sipariş!',
+            text: 'Yeni sipariş kuryeye atandı.',
+            icon: 'info',
+            confirmButtonText: 'Tamam'
+        });
     });

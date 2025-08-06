@@ -7,7 +7,7 @@
             <div>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Entegrasyonlar</a></li>
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Yeni</a></li>
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Güncelle</a></li>
                 </ol>
             </div>
         </div>
@@ -28,7 +28,6 @@
         <form method="post" class="repeater" action="{{ route('restaurant.entegrations.entegrastion_update') }}">
             @csrf
             <div class="row">
-
                 <div class="col-xl-4 col-lg-12">
                     <div class="card">
                         <div class="card-header" style="background: #fb0050;color:#fff">
@@ -54,7 +53,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="col-xl-4 col-lg-12">
                     <div class="card">
                         <div class="card-header" style="background: #fd683e;color:#fff">
@@ -89,8 +87,35 @@
                         </div>
                     </div>
                 </div>
-                <!-- TODO : Burda Bir UI Eklemem Gerekiyor-->
-
+                <div class="col-xl-4 col-lg-12">
+                    <div class="card">
+                        <div class="card-header" style="background: #4244b3;color:#fff">
+                            <h4 class="card-title"> <img alt="" src="{{ asset('theme/images/GetirYemek_Logo.png') }}"
+                                    style="border-radius:5px;height: 24px;width: auto"> </h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="basic-form">
+                                <div class="row">
+                                    <div class="mb-3 col-md-12">
+                                        <label class="form-label">Restaurant Id</label>
+                                        <input type="text" class="form-control" name="getir_restaurant_id"
+                                            placeholder="Restaurant Id" value="{{ $restaurant->getir_restaurant_id }}">
+                                    </div>
+                                    <div class="mb-3 col-md-12">
+                                        <label class="form-label">App Secret Key</label>
+                                        <input type="text" class="form-control" name="getir_app_secret_key"
+                                            placeholder="App Secret Key" value="{{ $restaurant->getir_app_secret_key }}">
+                                    </div>
+                                    <div class="mb-3 col-md-12">
+                                        <label class="form-label">Restaurant Secret Key</label>
+                                        <input type="text" class="form-control" name="getir_restaurant_secret_key"
+                                            placeholder="Restaurant Secret Key" value="{{ $restaurant->getir_restaurant_secret_key }}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="col-xl-4 col-lg-12">
                     <div class="card">
                         <div class="card-header" style="background: #b3428c;color:#fff">
@@ -120,7 +145,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
             <button type="submit" class="special-button">Bilgileri Güncelle</button>
         </form>

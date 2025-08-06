@@ -21,7 +21,7 @@
 
     @include('admin.layouts.partials.sidebar')
 
-    <div class="content-body">
+    <div id="app" class="content-body">
         @yield('content')
     </div>
 

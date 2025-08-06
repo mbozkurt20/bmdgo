@@ -18,8 +18,9 @@ class MyController extends Controller
         $restaurant = Restaurant::find(Auth::user()->id);
         $restaurant->yemeksepeti_email = $request->yemeksepeti_email;
         $restaurant->yemeksepeti_password = $request->yemeksepeti_password;
-        //$restaurant->getir_app_secret_key = $request->getir_app_secret_key;
-        //$restaurant->getir_restaurant_secret_key = $request->getir_restaurant_secret_key;
+        $restaurant->getir_restaurant_id = $request->getir_restaurant_id;
+        $restaurant->getir_app_secret_key = $request->getir_app_secret_key;
+        $restaurant->getir_restaurant_secret_key = $request->getir_restaurant_secret_key;
         $restaurant->trendyol_satici_id = $request->trendyol_satici_id;
         $restaurant->trendyol_sube_id = $request->trendyol_sube_id;
         $restaurant->trendyol_api_key = $request->trendyol_api_key;
@@ -29,6 +30,6 @@ class MyController extends Controller
         $restaurant->adisyo_consumer_adi = $request->adisyo_consumer_adi;
         $restaurant->save();
 
-        return redirect()->back()->with('message', 'Entegrasyon güncellenmesi tamamlandı.');
+        return redirect()->back()->with('message', 'Entegrasyon Güncellenmesi Tamamlandı.');
     }
 }

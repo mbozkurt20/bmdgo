@@ -126,7 +126,6 @@ class OrderController extends Controller
         $pos = \Cart::session($userId)->getContent();
 
         if (count($pos) > 0) {
-
             \Cart::session($userId)->add(array(
                 'id' => $product->id,
                 'name' => $product->name,
@@ -162,7 +161,6 @@ class OrderController extends Controller
                 $durum = "yok";
             }
         } else {
-
             \Cart::session($userId)->add(array(
                 'id' => $product->id,
                 'name' => $product->name,
@@ -195,14 +193,9 @@ class OrderController extends Controller
                 </div> ';
         }
 
-
-
-
         $posTotalItem = \Cart::session($userId)->getTotalQuantity();
         $posTotal = number_format(\Cart::session($userId)->getTotal(), 2, ',', '.') . " TL";
         $total = \Cart::session($userId)->getTotal();
-
-
 
         return response()->json(['items' => $items, 'posTotalItem' => $posTotalItem, 'posTotal' => $posTotal, 'durum' => $durum, 'total' => $total]);
     }
@@ -240,6 +233,7 @@ class OrderController extends Controller
     {
         \App\Models\Order::create([
             'platform' => 'telefonsiparis',
+            'courier_id' => $request->courier_id??-1,
             'restaurant_id' => $request->restaurant_id,
             'tracking_id' => "POS-" . rand(9, 99999),
             'full_name' => $request->full_name,
@@ -270,7 +264,6 @@ class OrderController extends Controller
 
     public function updateMinusPOS($id, $qty)
     {
-
         $userId = Auth::user()->id;
 
         if ($qty <= 1) {
@@ -285,13 +278,11 @@ class OrderController extends Controller
         $posTotal = number_format(\Cart::session($userId)->getTotal(), 2, ',', '.') . " TL";
         $total = \Cart::session($userId)->getTotal();
 
-
         return response()->json(['posTotalItem' => $posTotalItem, 'posTotal' => $posTotal, 'total' => $total]);
     }
 
     public function removePOS()
     {
-
         $userId = Auth::user()->id;
         \Cart::session($userId)->clear();
         $TotalQuantity = 0;
@@ -325,8 +316,6 @@ class OrderController extends Controller
 
     public function customeradd(Request $request)
     {
-
-
         $data = $request->validate([
             'name' => 'required',
             'phone' => 'required'
@@ -362,7 +351,6 @@ class OrderController extends Controller
             }
 
             $customer = '<h2 class="logo-text">' . $data['name'] . '</h2> ' . $data['phone'] . ' <br><span>' . $request->mahalle . ' Mah.' . $request->sokak_cadde . '.No:' . $request->bina_no . ' Kat:' . $request->kat . ' Daire:' . $request->daire_no . '</span>';
-
             return response()->json(['customer' => $customer, 'customerid' => $create->id]);
         }
     }
@@ -437,23 +425,6 @@ class OrderController extends Controller
 
         return view('invoice-template', compact('order', 'date'))->render();  // Fatura görünümü burada oluşturulacak
     }
-
-    ////////////////////////////////// Old Update Order Status Function //////////////////////////////////
-
-    // public function updateOrderStatus(Request $request)
-    // {
-    //     $order = Order::where('tracking_id', $request->tracking_id)->first();
-
-    //     $order->status = $request->action;
-    //     $order->message = $request->message;
-    //     $s = $order->save();
-
-    //     if ($s) {
-    //         return response()->json(['status' => "OK"]);
-    //     } else {
-    //         return response()->json(['status' => "ERR"]);
-    //     }
-    // }
 
     public function updateOrderStatus(Request $request)
     {
@@ -649,7 +620,7 @@ class OrderController extends Controller
                           <br>
                           <center>
                           <br>
-                          <b>- EsnafExpress Bizi Tercih Ettiğiniz İçin Teşekkür Ederiz.</b>
+                          <b>- '.env('APP_NAME').' Bizi Tercih Ettiğiniz İçin Teşekkür Ederiz.</b>
                           </center>
 
 

@@ -33,11 +33,10 @@ class CreateRestaurantsTable extends Migration
             $table->string('adisyo_api_key')->nullable();
             $table->string('adisyo_secret_key')->nullable();
             $table->string('adisyo_consumer_adi')->nullable();
-            $table->string('getir_client_id')->nullable();
-            $table->string('getir_client_secret')->nullable();
             $table->string('getir_restaurant_id')->nullable();
+            $table->string('getir_app_secret_key')->nullable();
+            $table->string('getir_restaurant_secret_key')->nullable();
             $table->string('getir_token')->nullable();
-            $table->string('getir_tarih')->nullable();
             $table->string('trendyol_satici_id')->nullable();
             $table->string('trendyol_sube_id')->nullable();
             $table->string('trendyol_api_key')->nullable();

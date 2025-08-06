@@ -10,7 +10,9 @@
     <link href="{{ asset('theme/css/jquery.dataTables.min.css') }}" rel="stylesheet">
     <link href="{{ asset('theme/css/nice-select.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('theme/css/select2.min.css') }}">
-    <!-- Style css -->
+
+    @vite('resources/js/app.js')
+
     <link href="{{ asset('theme/css/style.css') }}" rel="stylesheet">
     <!-- Add The FontAwesome Icons CDN-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"

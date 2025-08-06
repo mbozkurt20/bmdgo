@@ -11,9 +11,11 @@
     <meta property="og:description" content="{{env('APP_NAME')}} :  Admin Ekranı">
     <meta property="og:image" content="images/social-image.png">
     <meta name="format-detection" content="telephone=no">
-    <!-- PAGE TITLE HERE -->
+
     <title>Yönetici - {{env('APP_NAME')}}</title>
-    <!-- FAVICONS ICON -->
+
+    @vite('resources/js/app.js')
+
     <link rel="shortcut icon" type="image/png" href="{{config('site.logo')}}">
     <link rel="stylesheet" href="{{ asset('theme/css/chartist.min.css') }}">
     <link href="{{ asset('theme/css/jquery.dataTables.min.css') }}" rel="stylesheet">

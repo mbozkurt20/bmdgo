@@ -299,6 +299,8 @@
         .drawer-body {
             padding: 20px;
         }
+
+
     </style>
 </head>
 <body>
@@ -346,7 +348,6 @@
             </div>
         </section>
 
-
         <section class="header-main" style="background: #e6e4ea">
             <div class="container-fluid">
                 <div class="row justify-content-center">
@@ -369,7 +370,7 @@
         </section>
 
         <section class="section-content padding-y-sm bg-default ">
-            <form method="" name="formPos">
+            <form method="POST" action="javascript:void(0);" name="formPos">
                 <div class="container-fluid">
                     <div class="row">
                         <input type="hidden" name="payment_control" id="payment_control" value="0">
@@ -378,62 +379,17 @@
                         <input type="hidden" name="total" id="totalPrice" value="">
                         <div class="col-md-9 card padding-y-sm card"
                              style="border-radius: 10px; background-color: #fdfdfd; padding: 20px;">
-                            <div class="tabs">
-                                @php $s = 0; @endphp
-                                @foreach($categories as $cat)
-                                    @php $s++; @endphp
-                                    <input type="radio" name="tabs" id="tabProduct_{{$cat->id}}"
-                                           @if($s == 1) checked="checked" @endif>
-                                    <label for="tabProduct_{{$cat->id}}">{{$cat->name}}</label>
 
-                                    <div class="tab mt-4 border-top border-danger">
-                                        <div class="row">
-                                            @foreach(\App\Models\Product::where('category_id', $cat->id)->where('status','active')->where('restaurant_id',\Illuminate\Support\Facades\Auth::user()->id)->get() as $pro)
-                                                <div class="col-md-2"
-                                                     style="max-width: 16.3%;border-radius:5px; margin:4px 2px;padding: 0px;height:150px;">
-                                                    <a onclick="productAdd({{$pro->id}})" style="cursor: pointer">
-                                                        <figure class="card card-product" style="background:#e7004d">
-                                                            <figcaption class="info-wrap" style="padding:3px 5px">
-                                                                <div class="row">
-                                                                    <div class="col-lg-12"
-                                                                         style="height:90px; text-align: center;padding: 13px 10px;">
-                                                                        <span class="title">{{$pro->name}}</span>
-                                                                    </div>
-                                                                    <div class="col-lg-12 text-center"
-                                                                         style="height:40px;padding-bottom:10px">
-                                                                        <span class="price-new">{{number_format($pro->price, 2, ',', '.')}} ₺</span>
-                                                                    </div>
-                                                                </div>
-                                                            </figcaption>
-                                                        </figure>
-                                                    </a>
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
                         </div>
-
 
                         <!-- SAĞ SEPET -->
                         <div class="col-md-3">
                             <div class="card" style="border-radius: 10px">
                                 <div id="sepetim" class="row">
-                                    <!--div class="col-lg-6 text-left">
-                                <div class="sepet" style="padding: 10px 30px;">
-                                    <div style="font-size: 22px">
-                                        <i class="fa fa-shopping-bag"></i>
-                                        <span style="font-size: 15px"
-                                              id="posTotalItem">{{\Cart::session(\Illuminate\Support\Facades\Auth::user()->id)->getTotalQuantity()}} </span>
-                                    </div>
-                                </div>
-                            </div-->
-
                                     <div class="col-lg-6 text-right">
-                                        <div class="toplusil" style="padding: 10px 30px;">
+                                        <div class="toplusil" >
                                             <a class="special-ok-button-small text-white mt-2 float-end float-right"
-                                               onclick="removePos(1)" style="font-size: 16px;cursor:pointer;"><i
+                                               onclick="removePos(1)" ><i
                                                     class="fa fa-trash-alt"></i> Sepeti Temizle </a>
                                         </div>
                                     </div>
@@ -541,6 +497,7 @@
         </section>
 
 
+
         <div class="modal fade" id="kuryeAta" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -571,35 +528,41 @@
             </div>
         </div>
 
-        <div class="modal fade" id="musteriAta" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
+        <div class="modal fade" id="musteriAta" tabindex="-1" role="dialog" aria-labelledby="musteriAtaLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
+
+                    <!-- Modal Header -->
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Müşteri Seçiniz</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <h5 class="modal-title" id="musteriAtaLabel">Müşteri Seçiniz</h5>
+                        <button style="    font-size: 1.2rem; /* or 1rem for even smaller */
+    padding: 0.25rem 0.5rem;background: white;border: none;
+    line-height: 1;"  type="button" class="close" data-dismiss="modal" aria-label="Kapat">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
+
+                    <!-- Modal Body -->
                     <div class="modal-body">
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <select class="js-example-basic-single" onchange="customerSelect(event)"
-                                        style="height: 60px;width: 100%;">
-                                    <option value="0">Müşteri Seçiniz</option>
-                                    @foreach($customers as $customer)
-                                        <option value="{{$customer->id}}">{{$customer->name}}
-                                            - {{$customer->phone}} </option>
-                                    @endforeach
-                                </select>
-                            </div>
+                        <div class="form-group">
+                            <label for="customerSelect">Müşteri Listesi</label>
+                            <select id="customerSelect" class="form-control js-example-basic-single" onchange="customerSelect(event)">
+                                <option value="0">Müşteri Seçiniz</option>
+                                @foreach($customers as $customer)
+                                    <option value="{{ $customer->id }}">{{ $customer->name }} - {{ $customer->phone }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" data-toggle="modal" data-target="#yeniMusteri" class="special-button"><i
-                                class="fas fa-plus"></i> Müşteri Ekle
+
+                    <!-- Modal Footer -->
+                    <div class="modal-footer d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#yeniMusteri">
+                            <i class="fas fa-plus"></i> Müşteri Ekle
                         </button>
-                        <button type="button" class="special-ok-button" data-dismiss="modal">Tamam</button>
+                        <button type="button" class="btn btn-success" data-dismiss="modal">Tamam</button>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -610,7 +573,9 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Müşteri Ekle</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <button style="    font-size: 1.2rem; /* or 1rem for even smaller */
+    padding: 0.25rem 0.5rem;background: white;border: none;
+    line-height: 1;" type="button" class="close small-close-btn" data-dismiss="modal" aria-label="Kapat">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -653,7 +618,6 @@
                                             <div class="mb-3 col-md-6">
                                                 <input type="text" class="form-control" id="adres_name"
                                                        name="adres_name"
-                                                       value="Adres" value="Adres"
                                                        placeholder="Adres Başlğı">
                                             </div>
                                             <div class="mb-3 col-md-6">
@@ -725,6 +689,11 @@
             drawer.classList.remove('open');
         }
     });
+
+    $('form[name="formPos"]').on('submit', function(e) {
+        e.preventDefault(); // Sayfa yenilenmesin
+        CreateOrder(); // Siparişi oluştur
+    });
 </script>
 <script>
     function toggleDrawer() {
@@ -742,6 +711,7 @@
 </script>
 
 <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+
 <script type="text/javascript">
     $(document).ready(function () {
         $('.js-example-basic-single').select2({
@@ -871,8 +841,6 @@
                 $('.customer').html('<div style="text-align: center;padding: 15px">Müşteri Seçin</div>');
                 $('#posTotalItem').html("0");
                 $('#posTotal').html("0,00 TL");
-                location.reload();
-
             },
             error: function () {
                 console.log(data);
@@ -1019,7 +987,6 @@
 
                                         Swal.fire('Sipariş Tamamlandı.');
                                         this.disabled = false;
-                                        location.reload();
                                     },
                                     error: function () {
                                         console.log(data);

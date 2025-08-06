@@ -671,217 +671,7 @@
                     </div>
                 </div>
             </div>
-            {{-- Modal For New Order --}}
-            <div class="modal fade" id="Orders" tabindex="-1" aria-labelledby="exampleModalLabel"
-                 aria-hidden="true" data-bs-backdrop="false">
-                <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 80%;">
-                    <div class="modal-content">
-                        <div class="modal-header" id="modal-header-newOrde" style="padding: 0.1rem 1.5rem">
-                            <h5 class="modal-title">Yeni Sipariş Ekle</h5>
-                            <div class="select-container">
-                                <select class="custom-select" onchange="customerSelect(event)">
-                                    <option value="0">Müşteri Seçiniz</option>
-                                    @foreach ($customers as $customer)
-                                        <option name="" value="{{ $customer->id }}">{{ $customer->name }} -
-                                            {{ $customer->phone }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <button type="button" style="font-family: 'Poppins', sans-serif;"
-                                    class="btn btn-secondary btn-rounded" data-bs-toggle="modal"
-                                    data-bs-target="#yeniMusteri">
-                                <i class="fas fa-cash-register"></i> Müşteri Ekle
-                            </button>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body" style="padding: 0">
-                            <section class="section-content bg-default">
-                                <form method="post" id="formPos">
-                                    <div class="container-fluid" style="padding-top: 10px">
-                                        <div class="row">
-                                            <input type="hidden" name="payment_control" id="payment_control"
-                                                   value="0">
-                                            <input type="hidden" name="customer_id" id="customer_id" value="">
-                                            <input type="hidden" name="courier_id" id="courier_id" value="">
-                                            <input type="hidden" name="total" id="totalPrice" value="">
-                                            <div class="col-md-9 card padding-y-sm card" style="border-radius: 10px">
-                                                <!-- Tab and Product Details -->
-                                                <div class="tabs">
-                                                    @php $s = 0; @endphp
-                                                    @foreach ($categories as $cat)
-                                                        @php $s++; @endphp
-                                                        <input type="radio" name="tabs"
-                                                               id="tabProduct_{{ $cat->id }}"
-                                                               @if ($s == 1) checked="checked" @endif>
-                                                        <label
-                                                            for="tabProduct_{{ $cat->id }}">{{ $cat->name }}</label>
-                                                        <div class="tab">
-                                                            <div class="row">
-                                                                @foreach (\App\Models\Product::where('category_id', $cat->id)->where('status', 'active')->where('restaurant_id', \Illuminate\Support\Facades\Auth::user()->id)->get() as $pro)
-                                                                    <div class="col-md-2"
-                                                                         style="max-width: 16.3%;border-radius:5px; margin:4px 2px;padding: 0px;height:200px;color:#fff">
-                                                                        <a onclick="productAdd({{ $pro->id }})"
-                                                                           style="cursor: pointer">
-                                                                            <figure class="card card-product"
-                                                                                    style="background:#fd673e">
-                                                                                <figcaption class="info-wrap"
-                                                                                            style="padding:3px 5px">
-                                                                                    <div class="row">
-                                                                                        <div class="col-lg-12"
-                                                                                             style="height:90px; text-align: center;padding: 13px 10px;">
-                                                                                            <span
-                                                                                                style="font-size: 24px;color:#fff;font-weight: 500;"
-                                                                                                class="title">{{ $pro->name }}</span>
-                                                                                        </div>
-                                                                                        <div
-                                                                                            class="col-lg-12 text-center"
-                                                                                            style="height:40px;padding-bottom:10px">
 
-                                                                                            <span
-                                                                                                style="font-size: 30px;font-weight:bold"
-                                                                                                class="price-new">{{ number_format($pro->price, 2, ',', '.') }}₺</span>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </figcaption>
-                                                                            </figure>
-                                                                        </a>
-                                                                    </div>
-                                                                @endforeach
-                                                            </div>
-                                                        </div>
-                                                    @endforeach
-                                                </div>
-                                            </div>
-
-                                            <!-- Right Cart Section -->
-                                            <div class="col-md-3">
-                                                <div class="card" style="border-radius: 10px">
-                                                    <div id="sepetim" class="row">
-                                                        <div class="col-lg-6 text-left">
-                                                            <div class="sepet" style="padding: 10px 30px;">
-                                                                <div style="font-size: 22px">
-                                                                    <i class="fa fa-shopping-bag"></i>
-                                                                    <span style="font-size: 15px"
-                                                                          id="posTotalItem">{{ \Cart::session(\Illuminate\Support\Facades\Auth::user()->id)->getTotalQuantity() }}</span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-lg-6 text-right">
-                                                            <div class="toplusil" style="padding: 10px 30px;">
-                                                                <a onclick="removePos(1)"
-                                                                   style="font-size: 20px;cursor:pointer;"><i
-                                                                        class="fa fa-trash-alt"></i></a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="productItems row" style="min-height: 500px;">
-                                                        <div class="col-lg-12" id="productItemListp"
-                                                             style="padding: 20px;height: 460px;">
-                                                            @foreach (\Cart::session(\Illuminate\Support\Facades\Auth::user()->id)->getContent() as $basket)
-                                                                <div id="posItem_{{ $basket->id }}"
-                                                                     class="item select-none mb-3 bg-blue-gray-50 rounded-lg w-full text-blue-gray-700 py-2 px-2 flex justify-center"
-                                                                     style="background: #e7e7e7;border-radius: 10px">
-                                                                    <div class="row">
-                                                                        <input type="hidden" name="product_id[]"
-                                                                               value="{{ $basket->id }}">
-                                                                        <div class="col-md-2">
-                                                                            <img
-                                                                                src="{{ asset($basket->associatedModel['image']) }}"
-                                                                                style="height: 45px;width:65px;border-radius: 10px">
-                                                                        </div>
-                                                                        <div class="col-md-6 text-left"
-                                                                             style="width: 100%;">
-                                                                            <span
-                                                                                style="width: 100%;">{{ $basket->name }}</span>
-                                                                            <br>
-                                                                            <input type="hidden" name="price[]"
-                                                                                   value="{{ $basket->price }}">
-                                                                            <span
-                                                                                style="width: 100%;">{{ number_format($basket->price, 2, ',', '.') }}</span>
-                                                                        </div>
-                                                                        <div class="col-md-4 text-right">
-                                                                            <div
-                                                                                class="m-btn-group m-btn-group--pill btn-group mr-2"
-                                                                                role="group" aria-label="..."
-                                                                                style="padding: 3px">
-                                                                                <button type="button"
-                                                                                        onclick="updateMinus({{ $basket->id }})"
-                                                                                        class="m-btn btn btn-default"
-                                                                                        style="background: #5c5c5c;color:#fff">
-                                                                                    <i
-                                                                                        class="fa fa-minus"></i>
-                                                                                </button>
-                                                                                <input type="button"
-                                                                                       class="m-btn btn btn-default"
-                                                                                       name="quantity[]"
-                                                                                       id="quantity_{{ $basket->id }}"
-                                                                                       value="{{ $basket->quantity }}"
-                                                                                       style="background: #fff;color:#000;font-weight: bold"
-                                                                                       disabled>
-                                                                                <button type="button"
-                                                                                        onclick="updatePlus({{ $basket->id }})"
-                                                                                        class="m-btn btn btn-default"
-                                                                                        style="background: #5c5c5c;color:#fff">
-                                                                                    <i
-                                                                                        class="fa fa-plus"></i></button>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            @endforeach
-                                                        </div>
-                                                    </div>
-                                                    <div style="padding: 1rem 1.2rem;" class="">
-                                                        <dl class="dlist-align">
-                                                            <dt>Toplam:</dt>
-                                                            <dd class="text-right h4 b" id="posTotal">
-                                                                {{ number_format(\Cart::session(\Illuminate\Support\Facades\Auth::user()->id)->getTotal(), 2, ',', '.') }}
-                                                                TL
-                                                            </dd>
-                                                        </dl>
-
-                                                        <div class="row" style="margin:0px;">
-                                                            <div class="col-md-4" style="padding: 10px 0px">
-                                                                <div class="paymentRol nakit"
-                                                                     onclick="PaymentMethodSave('Kapıda Nakit ile Ödeme')"
-                                                                     style="font-size: 14px;">
-                                                                    <i class="fas fa-lira-sign"></i><br> Nakit
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-4" style="padding: 10px 0px">
-                                                                <div class="paymentRol kkarti"
-                                                                     onclick="PaymentMethodSave('Kapıda Ticket ile Ödeme')"
-                                                                     style="font-size: 14px;">
-                                                                    <i class="fas fa-credit-card"></i><br> Ticket
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-4" style="padding: 10px 0px">
-                                                                <div class="paymentRol kkkarti"
-                                                                     onclick="PaymentMethodSave('Kapıda Kredi Kartı ile Ödeme')"
-                                                                     style="font-size: 14px;">
-                                                                    <i class="fas fa-credit-card"></i><br> Kredi Kartı
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-12" style="padding: 10px 0px">
-                                                                <div class="paymentRol kayit" onclick="CreateOrder()">
-                                                                    <i class="fas fa-check"></i> Kaydet
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <!-- End Cart Section -->
-                                        </div>
-                                    </div>
-                                </form>
-                            </section>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {{-- Modal For New Order End --}}
 
             {{-- Yeni Customer Modal Start --}}
             <div class="modal fade" id="yeniMusteri" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
@@ -1305,7 +1095,6 @@
                                                                                     {{ $order->address }}</p>
                                                                             </div>
                                                                             <div class="mb-3 col-md-12">
-                                                                                @php $items = json_decode($order->items); @endphp
                                                                                 <table
                                                                                     class="table table-responsive-sm"
                                                                                     style="min-width: 28rem !important;">
@@ -1327,12 +1116,10 @@
                                                                                     </thead>
                                                                                     <tbody>
 
-                                                                                    @foreach ($items as $item)
-                                                                                        @php $name = $item->name; @endphp
-
+                                                                                    @foreach (json_decode($order>$items) as $item)
                                                                                         <tr>
                                                                                             <th class="orderProde">
-                                                                                                {{ $name }}
+                                                                                                {{ $item->name->tr }}
                                                                                             </th>
                                                                                             <th class="orderProde">
                                                                                                 {{ $item->count }}
@@ -1788,7 +1575,7 @@
                                                                 icon: 'success',
                                                                 confirmButtonText: 'OK'
                                                             }).then(function () {
-                                                                location.reload();
+
                                                             });
                                                             $('#cancelModal').modal('hide');
                                                         },
@@ -1987,17 +1774,6 @@
                     $('#totalPrice').val(data.total);
 
                     $('#loader').css('display', 'none');
-
-                    Swal.fire({
-                        title: 'Başarılı!',
-                        text: 'Ürün başarılı bir şekilde eklendi.',
-                        icon: 'success',
-                        confirmButtonText: 'Tamam'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.href = window.location.pathname + "?showModal=Orders";
-                        }
-                    });
                 },
                 error: function () {
                     console.log("Product addition error.");
@@ -2245,7 +2021,7 @@
 
                             setTimeout(function () {
                                 mywindow.close();
-                                window.location.reload();
+
                             }, 1000);
                         } else {
                             Swal.fire(response.message);
