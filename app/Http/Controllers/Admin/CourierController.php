@@ -66,7 +66,7 @@ class CourierController extends Controller
             $create->phone = $data['phone'];
             $create->price = $data['price'];
             $create->password = $data['password'];
-            $create->situation = $request->situation;
+            $create->situation = $request->situation??'Aktif';
             $create->admin_id = auth()->id();
             $create->save();
 
