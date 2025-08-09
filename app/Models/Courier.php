@@ -16,6 +16,8 @@ class Courier extends Model
         'phone',
         'email',
         'status',
+        'latitude',
+        'longitude',
         'situation',
         'price_type',
         'price', //paket başı

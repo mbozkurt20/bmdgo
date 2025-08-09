@@ -25,6 +25,9 @@ class CreateCouriersTable extends Migration
             $table->decimal('price', 8, 2)->default('0.00');
             $table->decimal('fixed_price', 8, 2)->nullable();
             $table->decimal('km_price', 8, 2)->nullable();
+            $table->string('latitude',)->nullable();
+            $table->string('longitude',)->nullable();
+            $table->boolean('online')->nullable()->default(1);
             $table->enum('status',['active','deactive'])->default('active');
             $table->timestamps();
         });

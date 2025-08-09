@@ -52,25 +52,25 @@
                                 <div class="row">
                                     <div class="mb-3 col-md-12">
                                         <label class="form-label">Customer (45***)</label>
-                                        <input type="text" class="form-control" name="vatan_sms_customer"
+                                        <input required type="text" class="form-control" name="vatan_sms_customer"
                                                placeholder="Müşteri Giriniz"
                                                value="{{ $restaurant->vatan_sms_customer }}">
                                     </div>
                                     <div class="mb-3 col-md-12">
                                         <label class="form-label">Username (905***5**8**)</label>
-                                        <input type="text" class="form-control" name="vatan_sms_username"
+                                        <input required type="text" class="form-control" name="vatan_sms_username"
                                                placeholder="Kullanıcı Adı Giriniz"
                                                value="{{ $restaurant->vatan_sms_username }}">
                                     </div>
                                     <div class="mb-3 col-md-12">
                                         <label class="form-label">Password</label>
-                                        <input type="text" class="form-control" name="vatan_sms_password"
+                                        <input required type="text" class="form-control" name="vatan_sms_password"
                                                placeholder="Şifre Giriniz"
                                                value="{{ $restaurant->vatan_sms_password }}">
                                     </div>
                                     <div class="mb-3 col-md-12">
                                         <label class="form-label">Orginator (8*0**3*3**)</label>
-                                        <input type="text" class="form-control" name="vatan_sms_orginator"
+                                        <input required type="text" class="form-control" name="vatan_sms_orginator"
                                                placeholder="Başlatıcı Giriniz"
                                                value="{{ $restaurant->vatan_sms_orginator }}">
                                     </div>
