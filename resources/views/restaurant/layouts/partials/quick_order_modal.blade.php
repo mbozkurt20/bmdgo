@@ -103,7 +103,7 @@
         transition: border-color 0.2s, box-shadow 0.2s;
     }
     .custom-select:focus {
-        border-color: #f6246a;
+        border-color: #86b7fe;
         box-shadow: 0 0 0 0.25rem rgb(231, 0, 77);
         outline: none;
     }
@@ -142,7 +142,7 @@
     const openBtn = document.getElementById('openModalBtn');
     const closeBtn = document.getElementById('closeModalBtn');
 
-    openBtn.addEventListener('click', () => modal.style.display = 'block');
+    openBtn.addEventListener('click', () => modal.style.display = 'flex');
     closeBtn.addEventListener('click', () => modal.style.display = 'none');
 
     window.addEventListener('click', (e) => {
