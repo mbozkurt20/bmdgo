@@ -59,10 +59,6 @@
                         @endforeach
                         </tbody>
                     </table>
-
-                    @if($customers->isEmpty())
-                        <h4 class="text-center mt-4">Müşteri Bulunmamaktadır.</h4>
-                    @endif
                 </div>
             </div>
         </div>
