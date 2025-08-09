@@ -17,6 +17,14 @@ class Courier extends Model
         'email',
         'status',
         'situation',
-        'price',
+        'price_type',
+        'price', //paket başı
+        'km_price',
+        'fixed_price',
     ];
+
+    public function payments()
+    {
+        return $this->morphMany(ProgressPaymentRecord::class, 'payable');
+    }
 }

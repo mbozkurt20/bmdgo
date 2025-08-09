@@ -75,118 +75,6 @@
             border-bottom-right-radius: 2px;
         }
 
-        .red-box::after {
-            background-color: #ff0a0a;
-        }
-
-        .purple-box::after {
-            background-color: #624FD1;
-        }
-
-        .avatar {
-            vertical-align: middle;
-            width: 35px;
-            height: 35px;
-            border-radius: 0%;
-        }
-
-        .bg-default,
-        .btn-default {
-            background-color: #f2f3f8;
-        }
-
-        .btn-error {
-            color: #ef5f5f;
-        }
-
-        .tabs {
-            display: flex;
-            flex-wrap: wrap;
-        / / make sure it wraps
-        }
-
-        .tabs label {
-            order: 1;
-            display: block;
-            padding: 1rem 2rem;
-            margin-right: 0.2rem;
-            cursor: pointer;
-            background: #5c5c5c;
-            font-weight: bold;
-            transition: background ease 0.2s;
-            color: #fff;
-        }
-
-        .tabs .tab {
-            order: 99;
-            flex-grow: 1;
-            width: 100%;
-            display: none;
-            padding: 1rem;
-            background: #fff;
-        }
-
-        .tabs input[type="radio"] {
-            display: none;
-        }
-
-        .tabs input[type="radio"]:checked + label {
-            background: #edeff1;
-            color: #000;
-        }
-
-        .tabs input[type="radio"]:checked + label + .tab {
-            display: block;
-        }
-
-        @media (max-width: 45em) {
-
-            .tabs .tab,
-            .tabs label {
-                order: initial;
-            }
-
-            .tabs label {
-                width: 100%;
-                margin-right: 0;
-                margin-top: 0.8rem;
-            }
-        }
-
-        .toplusil a i:hover {
-            color: red;
-        }
-
-        .paymentRol {
-            padding: 12px;
-            font-size: 18px;
-            color: #fff;
-            text-align: center;
-            font-weight: bold;
-            height: 80px;
-            border-radius: 10px;
-            margin: 0px 2px;
-            cursor: pointer;
-        }
-
-        .nakit {
-            background: #008002;
-        }
-
-        .kkkarti {
-            background: #f72b50;
-        }
-
-        .kkarti {
-            background: #624FD1;
-        }
-
-        .kayit {
-            background: #fd673e;
-            padding: 25px;
-            font-size: 22px;
-        }
-
         .customer {
             padding: 0px 10px;
             border-left: 3px solid #5c5c5c;
@@ -194,10 +82,6 @@
             border-radius: 10px;
             border-right: 3px solid #5c5c5c;
             text-align: left;
-        }
-
-        .rightbtn {
-            padding: 0 !important;
         }
 
         .rightbtn a {
@@ -520,7 +404,7 @@
                             <input type="date" class="form-control custom-input" id="end_date" name="end_date" required>
                         </div>
                         <div class="d-flex align-items-end">
-                            <button style="background: #fd683e;color:#fff;font-size: 0.8rem" type="submit"
+                            <button style="background: #e7004d;color:#fff;font-size: 0.8rem" type="submit"
                                     class="btn custom-btn">
                                 <i class="fas fa-calendar-day" style="padding-right:5px"></i>
                                 Filtrele
@@ -530,28 +414,28 @@
                     <div class="date-filters d-flex align-items-center gap-1 ">
                         <a style="font-size:0.8rem;font-weight: 300"
                            href="{{ route('orders.filter', ['date' => 'today']) }}" class="date-filter custom-link">
-                            <i class="fas fa-calendar-day"></i>
+                            <i class="fas fa-calendar-day text-danger"></i>
                             <span>Bugün</span>
                         </a>
                         <a style="font-size:0.8rem;font-weight: 300"
                            href="{{ route('orders.filter', ['date' => 'yesterday']) }}" class="date-filter custom-link">
-                            <i class="fas fa-calendar-day"></i>
+                            <i class="fas fa-calendar-day text-danger"></i>
                             <span>Dün</span>
                         </a>
                         <a style="font-size:0.8rem;font-weight: 300"
                            href="{{ route('orders.filter', ['date' => 'this_week']) }}" class="date-filter custom-link">
-                            <i class="fas fa-calendar-week"></i>
+                            <i class="fas fa-calendar-week text-danger"></i>
                             <span>Bu Hafta</span>
                         </a>
                         <a style="font-size:0.8rem;font-weight: 300"
                            href="{{ route('orders.filter', ['date' => 'last_week']) }}" class="date-filter custom-link">
-                            <i class="fas fa-calendar-week"></i>
+                            <i class="fas fa-calendar-week text-danger"></i>
                             <span>Geçen Hafta</span>
                         </a>
                         <a style="font-size:0.8rem;font-weight: 300"
                            href="{{ route('orders.filter', ['date' => 'last_month']) }}"
                            class="date-filter custom-link">
-                            <i class="fas fa-calendar-week"></i>
+                            <i class="fas fa-calendar-week text-danger"></i>
                             <span>Geçen Ay</span>
                         </a>
                     </div>
@@ -565,42 +449,42 @@
                     </div>
                 </div>
             </div>
+
             <div class="col-lg-6">
-                <div class="orders-section">
+                <div class="orders-section" style="margin-bottom: 10px">
                     <h4>Siparişler</h4>
                     <div class="row g-3">
                         <!-- All Orders Button -->
                         <div class="col-md-6">
                             <button
-                                class="order-card btn-group-custom bg-warning order-btn d-flex justify-content-between align-items-center w-100">
+                                class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100" style="background: #e7004d">
 
-                                <span>
-                                    <i class="fa-solid fa-box"
-                                       style="color: #fff;font-size:18px;padding-right:10px"></i>
+                                <span class="fw-bold">
+                                    <i class="fa-solid fa-box" style="color: #fffdfd;font-size:18px;padding-right:10px"></i>
                                     Tüm Siparişler</span>
-                                <span class="badge bg-light text-dark order-number">{{ count($tumu) }}</span>
+                                <span class="badge bg-white text-dark order-number">{{ count($tumu) }}</span>
                             </button>
                         </div>
                         <!-- Getir Orders -->
                         <div class="col-md-6">
                             <button
-                                class="order-card btn-group-custom bg-secondary order-btn d-flex justify-content-between align-items-center w-100">
+                                class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100" style="background: #4927b3">
                                 <img src="{{ asset('theme/images/GetirYemek_Logo.png') }}"
                                      style="background-repeat: no-repeat; background-position:center" width="77px"
                                      height="14px" alt="">
-                                <span>Getir Siparişleri</span>
-                                <span class="badge bg-light text-dark order-number">{{ count($getiryemek) }}</span>
+                                <span class="fw-bold">Getir Siparişleri</span>
+                                <span class="badge bg-white text-dark order-number">{{ count($getiryemek) }}</span>
                             </button>
                         </div>
                         <!-- Trendyol Orders -->
                         <div class="col-md-6">
                             <button
-                                class="order-card btn-group-custom bg-primary order-btn d-flex justify-content-between align-items-center w-100">
+                                class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100" style="background: orangered">
                                 <img src="{{ asset('theme/images/trendyolyemek.png') }}"
                                      style="background-repeat: no-repeat; background-position:center" width="71px"
                                      height="14px" alt="">
-                                <span>Trendyol Yemek Siparişleri</span>
-                                <span class="badge bg-light text-dark order-number">{{ count($trendyol) }}</span>
+                                <span class="fw-bold">Trendyol Siparişleri</span>
+                                <span class="badge bg-white text-dark order-number">{{ count($trendyol) }}</span>
                             </button>
                         </div>
 
@@ -612,8 +496,8 @@
                                 <img src="{{ asset('theme/images/Yemeksepeti_Logo.png') }}"
                                      style="background-repeat: no-repeat; background-position:center" width="79px"
                                      height="15px" alt="">
-                                <span>Yemeksepeti Siparişleri</span>
-                                <span class="badge bg-light text-dark order-number">{{ count($yemeksepeti) }}</span>
+                                <span class="fw-bold">Yemeksepeti Siparişleri</span>
+                                <span class="badge bg-white text-dark order-number">{{ count($yemeksepeti) }}</span>
                             </button>
                         </div>
                         <!-- Migros Orders -->
@@ -624,18 +508,18 @@
                                 <img src="{{ asset('theme/images/MigrosYemek_logo.png') }}"
                                      style="background-repeat: no-repeat; background-position:center" width="69px"
                                      height="28px" alt="">
-                                <span>Migros Yemek Siparişleri</span>
-                                <span class="badge bg-light text-dark order-number">{{ $migros }}</span>
+                                <span class="fw-bold">Migros Yemek Siparişleri</span>
+                                <span class="badge bg-white text-dark order-number">{{ $migros }}</span>
                             </button>
                         </div>
                         <!-- Phone Orders -->
                         <div class="col-md-6">
                             <button
                                 class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100"
-                                style="background: #1da713">
+                                style="background: #0d2646">
                                 <i class="fa-solid fa-phone" style="color: #fff;font-size:18px;padding-left:10px"></i>
-                                <span>Telefonla Gelen Sipariş</span>
-                                <span class="badge bg-light text-dark order-number">{{ count($telefonsiparis) }}</span>
+                                <span class="fw-bold">Telefonla Gelen Sipariş</span>
+                                <span class="badge bg-white text-dark order-number">{{ count($telefonsiparis) }}</span>
                             </button>
                         </div>
                     </div>
@@ -649,29 +533,30 @@
                     <div class="row g-3">
                         <!-- Revenue Card -->
                         <div class="col-4">
-                            <div class="order-card bg-primary text-white">
-                                <p>Ciro</p>
+                            <div class="order-card text-white" style="background: #0d2646">
+                                <p class="fw-bold">Ciro</p>
                                 <span class="order-number">{{ $formattedExpense }} TL</span>
                             </div>
                         </div>
                         <!-- Orders Count Card -->
                         <div class="col-4">
-                            <div class="order-card bg-secondary text-white">
-                                <p>Sipariş Sayısı</p>
+                            <div class="order-card text-white" style="background: #e7004d">
+                                <p class="fw-bold">Sipariş Sayısı</p>
                                 <span class="order-number">{{ count($tumu) }} Adet</span>
                             </div>
                         </div>
                         <!-- Average Order Amount Card -->
                         <div class="col-4">
-                            <div class="order-card bg-warning text-white">
-                                <p>Ortalama Sipariş Tutarı</p>
+                            <div class="order-card text-white" style="background: #0d2646">
+                                <p class="fw-bold">Ortalama Sipariş Tutarı</p>
                                 <span class="order-number">{{ $formattedAverageExpense }} TL</span>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
+
+            </div>
 
             {{-- Yeni Customer Modal Start --}}
             <div class="modal fade" id="yeniMusteri" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
@@ -779,7 +664,6 @@
                                     <th>Müşteri</th>
                                     <th>Telefon</th>
                                     <th style="width: 280px;">Kurye</th>
-
                                     <th>İndirim</th>
                                     <th>Tutar</th>
                                     <th style="width:12%;">Paket Mesafesi</th>
@@ -825,15 +709,14 @@
                                                             style="height: 25px;"> </a>
                                                 @endif
                                                 @if ($order->platform == 'telefonsiparis')
-                                                    <a class="btn btn-warning btn-rounded"
-                                                       style="wdith:100%;font-weight: bold;padding:10px 15px;font-size:14px;">
+                                                    <a class="special-ok-button btn-rounded"
+                                                       style="width:100%;font-weight: bold;padding:10px 15px;font-size:14px;">
                                                         POS</a>
                                                 @endif
 
 
                                                 <input type="hidden" value="{{ $order->tracking_id }}"
                                                        id="tracking_{{ $order->tracking_id }}">
-
 
                                             </td>
                                             <td style="text-align: center">{{ $order->tracking_id }}</td>
@@ -885,7 +768,7 @@
                                                     <a data-bs-toggle="modal"
                                                        data-bs-target="#Courier{{ $order->id }}"
                                                        style="padding:10px 15px;height: 50px;"
-                                                       class="btn btn-secondary sharp me-1">
+                                                       class="special-ok-button sharp me-1">
                                                         <i class="fas fa-truck"></i>
                                                     </a>
 
@@ -953,37 +836,27 @@
                                                 }
                                             @endphp
 
-
                                             <td class="text-ov">{{ number_format($total, 2) }} ₺</td>
                                             <td class="text-ov">{{ number_format($order->amount - $total, 2) }} ₺</td>
-                                            </td>
-
-                                            <td class="text-ov"><input type="text"
-                                                                       class="form-control" style="width: 150px;"
-                                                                       id="message_{{ $order->id }}"
-                                                                       value="{{ $order->message }}"
-                                                                       placeholder="Mesafe">
-
-
+                                            <td class="text-ov">
+                                                <input type="text"
+                                                       class="form-control" style="width: 150px;"
+                                                       id="message_{{ $order->id }}"
+                                                       value="{{ $order->message }}"
+                                                       placeholder="Mesafe">
                                             </td>
                                             <td>
-
                                                 {{ $order->payment_method }}
-
                                             </td>
                                             <td>
-
-
                                                 <input type="hidden" id="tracking_{{ $order->id }}"
                                                        value="{{ $order->tracking_id }}">
                                                 <input type="hidden" id="platform_{{ $order->id }}"
                                                        value="{{ $order->platform }}">
 
-
                                                 <select class="default-select  form-control wide"
                                                         onchange="StatusOrderChange(event, {{ $order->id }})"
                                                         @if ($order->status == 'DELIVERED') disabled @endif>
-
 
                                                     <option value="PENDING"
                                                             @if ($order->status == 'PENDING') selected @endif>
@@ -1499,7 +1372,6 @@
                                                     });
                                                 });
 
-
                                                 $(document).ready(function () {
 
                                                     $("#message2_" + {{ $order->id }}).change(function () {
@@ -1672,7 +1544,6 @@
 
 
                                                 function printDiv(orderid) {
-
                                                     $.ajax({
                                                         type: 'GET', //THIS NEEDS TO BE GET
                                                         url: '/restaurant/orders/printed/' + orderid,
@@ -1697,8 +1568,7 @@
 
                                                 }
                                             </script>
-                                            <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
-                                            <!--TODO : Pusher Data-->
+
                                             <script>
                                                 // Pusher'ı başlat
                                                 var pusher = new Pusher('c68579a24eeaebfd6487', {
@@ -1743,196 +1613,6 @@
 
         });
 
-        function productAdd(e) {
-            let quant = $('#quantity_' + e).val();
-
-            $('#loader').css('display', 'block');
-
-            $.ajax({
-                type: 'GET',
-                url: '/restaurant/orders/addPOS/' + e,
-                success: function (data) {
-                    let src = '{{ url('pos/audio/dot.mp3') }}';
-                    let audio = new Audio(src);
-                    audio.play();
-
-                    $('#productItemListp').css('display', 'none');
-                    $('#productItemLista').css('display', 'block');
-
-
-                    if (data.durum === "yok") {
-                        $('#productItemLista').append(data.items);
-                    } else {
-                        let newquant = parseInt(quant) + 1;
-                        $('#quantity_' + e).val(newquant);
-                    }
-
-                    $('#posTotalItem').html(data.posTotalItem);
-
-                    $('#posTotal').html(data.posTotal);
-
-                    $('#totalPrice').val(data.total);
-
-                    $('#loader').css('display', 'none');
-                },
-                error: function () {
-                    console.log("Product addition error.");
-                }
-            });
-        }
-
-
-        function updatePlus(id) {
-
-            $('#loader').css('display', 'block');
-
-            let quant = $('#quantity_' + id).val();
-
-            $.ajax({
-                type: 'GET', //THIS NEEDS TO BE GET
-                url: '/restaurant/orders/updatePlusPOS/' + id,
-                success: function (data) {
-                    let src = '{{ url('pos/audio/dot.mp3') }}';
-                    let audio = new Audio(src);
-                    audio.play();
-
-                    let newquant = parseInt(quant) + 1;
-                    $('#quantity_' + id).val(newquant);
-
-                    $('#posTotalItem').html(data.posTotalItem);
-                    $('#posTotal').html(data.posTotal);
-                    $('#totalPrice').val(data.total);
-
-                    $('#loader').css('display', 'none');
-
-
-                },
-                error: function () {
-                    console.log(data);
-                }
-            });
-
-
-        }
-
-        function updateMinus(id) {
-
-            $('#loader').css('display', 'block');
-
-            let qty = document.getElementById("quantity_" + id).value;
-
-            $.ajax({
-                type: 'GET', //THIS NEEDS TO BE GET
-                url: '/restaurant/orders/updateMinusPOS/' + id + '/' + qty,
-                success: function (data) {
-                    let src = '{{ url('pos/audio/dot.mp3') }}';
-                    let audio = new Audio(src);
-                    audio.play();
-
-                    if (qty <= 1) {
-                        $("#posItem_" + id).remove();
-                        $('#posTotalItem').html(data.posTotalItem);
-                        $('#posTotal').html(data.posTotal);
-                        $('#totalPrice').val(data.total);
-                    } else {
-                        let newquant = parseInt(qty) - 1;
-                        $('#quantity_' + id).val(newquant);
-                        $('#posTotalItem').html(data.posTotalItem);
-                        $('#posTotal').html(data.posTotal);
-                        $('#totalPrice').val(data.total);
-                    }
-
-                    $('#loader').css('display', 'none');
-
-
-                },
-                error: function () {
-                    console.log(data);
-                }
-            });
-
-
-        }
-
-        function removePos(e) {
-            $.ajax({
-                type: 'GET', //THIS NEEDS TO BE GET
-                url: '/restaurant/orders/removePOS',
-                success: function (data) {
-                    let src = '{{ url('pos/audio/trash.mp3') }}';
-                    let audio = new Audio(src);
-                    audio.play();
-                    $('#productItemListp').html("");
-                    $('#productItemLista').html("");
-                    $('.customer').html('<div style="text-align: center;padding: 15px">Müşteri Seçin</div>');
-                    $('#posTotalItem').html("0");
-                    $('#posTotal').html("0,00 TL");
-                    window.location.href = window.location.pathname + "?showModal=Orders";
-                },
-                error: function () {
-                    console.log(data);
-                }
-            });
-        }
-
-        function PaymentMethodSave(e) {
-            $('#payment_control').val(e);
-
-            if (e === "Kapıda Nakit ile Ödeme") {
-                let src = '{{ url('pos/audio/beep.mp3') }}';
-                let audio = new Audio(src);
-                audio.play();
-                $('.nakit').css('background', '#5c5c5c');
-                $('.kkarti').css('background', '#624FD1');
-                $('.kkkarti').css('background', '#f72b50');
-            }
-            if (e === "Kapıda Ticket ile Ödeme") {
-                let src = '{{ url('pos/audio/beep.mp3') }}';
-                let audio = new Audio(src);
-                audio.play();
-                $('.nakit').css('background', '#008002');
-                $('.kkarti').css('background', '#5c5c5c');
-                $('.kkkarti').css('background', '#f72b50');
-            }
-            if (e === "Kapıda Kredi Kartı ile Ödeme") {
-                let src = '{{ url('pos/audio/beep.mp3') }}';
-                let audio = new Audio(src);
-                audio.play();
-                $('.nakit').css('background', '#008002');
-                $('.kkarti').css('background', '#624FD1');
-                $('.kkkarti').css('background', '#5c5c5c');
-            }
-        }
-
-        function CourierSet(e) {
-            $('#courier_id').val(e.target.value);
-            $('#kuryeAta').modal('hide');
-
-        }
-
-        function ExitPos() {
-
-            window.location.href = 'https://panel.parskurye.net';
-
-        }
-
-        function customerSelect(e) {
-            let customerId = e.target.value;
-            console.log("Seçilen Müşteri ID'si:", customerId); // ID'yi kontrol et
-            $.ajax({
-                type: 'GET',
-                url: '/restaurant/orders/customerpos/' + customerId,
-                success: function (data) {
-                    $('#musteriAta').modal('hide');
-                    $('.customer').html(data.customer);
-                    $('#customer_id').val(customerId); // Doğru şekilde ID'yi saklıyoruz
-                },
-                error: function () {
-                    console.log("Customer selection error");
-                }
-            });
-        }
-
         function CreateCustomer() {
             $.ajax({
                 type: 'POST',
@@ -1967,76 +1647,6 @@
                 }
             });
         }
-
-        function CreateOrder() {
-            console.log("Kaydet butonuna basıldı!");
-
-            var payment_control = $('#payment_control').val();
-            var customer_id = $('#customer_id').val(); // Eğer modalda müşteri eklendiyse, burayı kontrol et
-            var courier_id = $('#courier_id').val();
-            let products = [];
-            let total = 0;
-
-            // Ürünleri toplama ve toplam tutarı hesaplama işlemi
-            $('.item').each(function () {
-                let product_id = $(this).find('input[name="product_id[]"]').val();
-                let quantity = $(this).find('input[name="quantity[]"]').val();
-                let price = $(this).find('input[name="price[]"]').val();
-                console.log("Fiyat: ", price);
-                if (product_id && quantity && price) {
-                    products.push({
-                        product_id: product_id,
-                        quantity: quantity
-                    });
-                    total += price * parseInt(quantity);
-                }
-            });
-
-            $('#totalPrice').val(total.toFixed(2));
-
-            // Yeni eklenen müşteri ID'sini kontrol et
-            if (payment_control != 0 && customer_id > 0 && products.length > 0) {
-                $.ajax({
-                    type: 'POST',
-                    url: '/restaurant/orders/addOrder?_token=' + '{{ csrf_token() }}',
-                    data: {
-                        customer_id: customer_id,
-                        payment_method: payment_control,
-                        courier_id: courier_id,
-                        products: products,
-                        amount: total
-                    },
-                    success: function (response) {
-                        console.log("Sipariş başarıyla gönderildi:", response);
-                        if (response.status === "OK") {
-                            var divToPrint = response.printed;
-                            var mywindow = window.open('', 'PRINT', 'height=600,width=800');
-                            mywindow.document.write('<html><head><title>' + document.title + '</title>');
-                            mywindow.document.write('</head><body >');
-                            mywindow.document.write(divToPrint);
-                            mywindow.document.write('</body></html>');
-                            mywindow.document.close();
-                            mywindow.focus();
-                            mywindow.print();
-
-                            setTimeout(function () {
-                                mywindow.close();
-
-                            }, 1000);
-                        } else {
-                            Swal.fire(response.message);
-                        }
-                    },
-                    error: function (response) {
-                        console.log("Sipariş gönderme hatası:", response);
-                        Swal.fire('Bir hata oluştu, lütfen tekrar deneyin.');
-                    }
-                });
-            } else {
-                Swal.fire('Müşteri, ödeme yöntemi veya ürün bilgilerini kontrol edin!');
-            }
-        }
-
 
         // Sayfa yeniden yüklendiğinde URL'deki parametreye göre yeniMusteri modalını açar
         $(document).ready(function () {
@@ -2083,37 +1693,4 @@
             }
         });
     </script>
-    <!--
-<script>
-function fetchData() {
-            $.ajax({
-                url: 'https://panel.parskurye.net/restaurant/getAdisyoOrders', // Replace with the actual API URL
-                method: 'GET',
-                success: function(textStatus, jqXHR) {
-
-                    if (jqXHR.status === 200) {
-                        $.ajax({
-                            url: '{{ route("getOrders") }}', // Define this route in web.php
-                            method: 'GET',
-
-                            success: function(response) {
-
-                                console.log('Backend operation successful:', response);
-                            },
-                            error: function(jqXHR, textStatus, errorThrown) {
-                                console.error('Backend operation failed:', textStatus, errorThrown);
-                            }
-                        });
-                    }
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    console.error('Failed to fetch data:', textStatus, errorThrown);
-                }
-            });
-        }
-
-        // Run the fetchData function every 2 seconds
-        setInterval(fetchData, 2000);
-</script>
--->
 @endsection

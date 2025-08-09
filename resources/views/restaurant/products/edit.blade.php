@@ -6,7 +6,7 @@
             <h2 class="mb-3 me-auto">Restaurant Ürünleri</h2>
             <div>
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Restaurant Ürünleri</a></li>
+                    <li class="breadcrumb-item"><a href="/restaurant/products">Ürünler</a></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Düzenle</a></li>
                 </ol>
             </div>

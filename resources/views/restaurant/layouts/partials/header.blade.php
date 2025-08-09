@@ -26,14 +26,12 @@
                         </button>
                     </li>
 
-
                     @include('restaurant.layouts.partials.quick_order_modal')
-
 
                     <li class="nav-item dropdown header-profile">
                         <a class="nav-link" href="javascript:void(0);" role="button"
                            data-bs-toggle="dropdown">
-                            <img src="https://cdn-icons-png.flaticon.com/512/433/433087.png">
+                            <img class="img-fluid" src="{{asset('/theme/images/resLogo.png')}}">
                         </a>
                         <div class="dropdown-menu dropdown-menu-end">
                             <a href="https://download.anydesk.com/AnyDesk.exe" class="dropdown-item ai-icon">

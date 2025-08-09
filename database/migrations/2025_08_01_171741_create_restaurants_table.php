@@ -45,6 +45,12 @@ class CreateRestaurantsTable extends Migration
             $table->string('entegra_token')->nullable();
             $table->string('remember_token')->nullable();
             $table->boolean('email_verified_at')->nullable();
+            $table->boolean('auto_orders')->default(0);
+            $table->string('vatan_sms_customer')->nullable();
+            $table->string('vatan_sms_username')->nullable();
+            $table->string('vatan_sms_password')->nullable();
+            $table->string('vatan_sms_orginator')->nullable();
+            $table->boolean('is_sms')->default(0);
             $table->enum('status',['active','deactive'])->default('active');
             $table->timestamps();
         });

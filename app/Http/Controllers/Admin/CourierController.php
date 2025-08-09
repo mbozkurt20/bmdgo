@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Categorie;
 use App\Models\Courier;
 use App\Models\Admin;
 use App\Models\Order;
@@ -30,9 +31,12 @@ class CourierController extends Controller
      */
     public function index()
     {
-        $couriers = Courier::where('status', 'active')->where('restaurant_id', 0)->where('admin_id', auth()->id())->get();
+        $courierss = Courier::where('status', 'active')
+            ->where('restaurant_id', 0)
+            ->where('admin_id', auth()->id())
+            ->get();
 
-        return view('admin.couriers.index', compact('couriers'));
+        return view('admin.couriers.index', compact('courierss'));
     }
 
     /**
@@ -52,28 +56,32 @@ class CourierController extends Controller
 
     public function create(Request $request)
     {
-        if (env('TEST_MODE') && Courier::count() == 0){
-            $data = $request->validate([
-                'name' => 'required',
-                'phone' => 'required',
-                'password' => 'required',
-                'price' => 'required',
-            ]);
+        $testMode = env('TEST_MODE');
 
-            $create = new Courier();
-            $create->restaurant_id =  0;
-            $create->name = $data['name'];
-            $create->phone = $data['phone'];
-            $create->price = $data['price'];
-            $create->password = $data['password'];
-            $create->situation = $request->situation??'Aktif';
-            $create->admin_id = auth()->id();
-            $create->save();
-
-            return redirect()->back()->with('message', 'Kurye Başarıyla Eklendi');
-        }else{
-            return redirect()->back()->with('test', 'Test Modu: Üzgünüz, En Fazla 1 Kayıt Ekleyebilirsiniz');
+        if ($testMode) {
+            if (Courier::count() > env('TEST_MODE_LIMIT')) {
+                return redirect()->back()->with('test', 'Test Modu: Üzgünüz, En Fazla '.env('TEST_MODE_LIMIT').' Kayıt Ekleyebilirsiniz');
+            }
         }
+
+        $data = $request->validate([
+            'name' => 'required',
+            'phone' => 'required',
+            'password' => 'required',
+            'price' => 'required',
+        ]);
+
+        $create = new Courier();
+        $create->restaurant_id =  0;
+        $create->name = $data['name'];
+        $create->phone = $data['phone'];
+        $create->price = $data['price'];
+        $create->password = $data['password'];
+        $create->situation = $request->situation??'Aktif';
+        $create->admin_id = auth()->id();
+        $create->save();
+
+        return redirect()->back()->with('message', 'Kurye Başarıyla Eklendi');
     }
 
     public function update(Request $request)

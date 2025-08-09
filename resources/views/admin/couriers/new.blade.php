@@ -49,7 +49,7 @@
                                     <div class="mb-3 col-md-4">
                                         <label class="form-label">Şifresi  <small class="text-danger">*</small></label>
                                         <input required type="text" class="form-control" name="password"
-                                               placeholder="Kurye Apk Şifresi">
+                                               placeholder="Kurye Mobil Şifresi">
                                     </div>
                                     <div class="mb-3 col-md-4">
                                         <label class="form-label">Paket Başı Fiyatı  <small class="text-danger">*</small></label>

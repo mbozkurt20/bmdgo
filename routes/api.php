@@ -33,7 +33,7 @@ Route::get('/getCourierOrder', [App\Http\Controllers\ApiController::class, 'getC
 
 
 //Kurye App
-
+Route::post('/verify/order-code', [App\Http\Controllers\ApiController::class, 'verifyOrderCode']);
 Route::post('/courier/login', [App\Http\Controllers\ApiController::class, 'login']);
 Route::get('/courier/orders/{token}/{id}', [App\Http\Controllers\ApiController::class, 'orders']);
 Route::post('/courier/location/', [App\Http\Controllers\ApiController::class, 'location']);

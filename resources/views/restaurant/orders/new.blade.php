@@ -6,13 +6,11 @@
     <meta name="author" content="Bootstrap-ecommerce by Vosidiy">
     <title>Sipariş Ekranı - {{env('APP_NAME')}}</title>
 
-
     <link href="{{asset('pos/assets/css/ui.css')}}" rel="stylesheet" type="text/css"/>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
           integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
     <link href="{{asset('pos/assets/css/OverlayScrollbars.css')}}" type="text/css" rel="stylesheet"/>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
-
 
     <style>
         .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
@@ -179,7 +177,7 @@
         }
 
         .nakit {
-            background: #fb9d03;
+            background: #243d7a;
         }
 
         .kkkarti {
@@ -191,7 +189,7 @@
         }
 
         .kayit {
-            background: #e7004d;
+            background: #1fde74;
             padding: 25px;
             font-size: 22px;
         }
@@ -304,12 +302,12 @@
     </style>
 </head>
 <body>
+
 <div id="loader" style=" display: none;">
     <div>
         <img src="https://wpamelia.com/wp-content/uploads/2018/11/ezgif-2-6d0b072c3d3f.gif" style="height:100px">
     </div>
 </div>
-
 
 <div id="drawer" class="drawer">
     <div class="drawer-header">
@@ -317,7 +315,6 @@
         <button onclick="toggleDrawer()" class="drawer-close"><i class="fas fa-times"></i></button>
     </div>
     <div class="drawer-body">
-
         <section class="header-main" style="background:#0d2646">
             <div class="container-fluid">
                 <div class="row align-items-center">
@@ -348,28 +345,7 @@
             </div>
         </section>
 
-        <section class="header-main" style="background: #e6e4ea">
-            <div class="container-fluid">
-                <div class="row justify-content-center">
-                    <div class="col-md-4 col-sm-6 text-left">
-                        <form action="#" class="search-wrap" style="border: 1px solid #e7004d">
-                            <div class="input-group">
-                                <input type="text" class="in bg-transparent text-dark form-control"
-                                       placeholder="Ürün ara..."
-                                       style="height: 50px">
-                                <div class="input-group-append">
-                                    <button class="btn " type="submit" style="color:#e7004d;">
-                                        <i class="fa fa-search"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="section-content padding-y-sm bg-default ">
+        <section class="section-content padding-y-sm">
             <form method="POST" action="javascript:void(0);" name="formPos">
                 <div class="container-fluid">
                     <div class="row">
@@ -378,63 +354,120 @@
                         <input type="hidden" name="courier_id" id="courier_id" value="">
                         <input type="hidden" name="total" id="totalPrice" value="">
                         <div class="col-md-9 card padding-y-sm card"
-                             style="border-radius: 10px; background-color: #fdfdfd; padding: 20px;">
+                             style="border-radius: 10px; background-color: #fdfdfd; padding: 20px;min-height: 70vh">
 
+                            @php $checked = 0; @endphp
+
+                            {{-- Kategori Sekmeleri --}}
+                            <div class="nav nav-tabs mb-4" id="categoryTabs">
+                                @foreach($categories as $cat)
+                                    @php $checked++; @endphp
+                                    <button
+                                        class="size-3 nav-link {{ $checked == 1 ? 'active  text-dark' : '' }}"
+                                        id="tabProduct_{{$cat->id}}_tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#tabProduct_{{$cat->id}}"
+                                        type="button"
+                                        role="tab"
+                                    >
+                                        {{ $cat->name }}
+                                    </button>
+                                @endforeach
+                            </div>
+
+                            {{-- Ürün Kartları --}}
+                            <div class="tab-content mt-4">
+                                @forelse($categories as $cat)
+                                    <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}"
+                                         id="tabProduct_{{$cat->id}}"
+                                         role="tabpanel">
+
+                                        <div class="row">
+                                            @foreach(\App\Models\Product::where('category_id', $cat->id)
+                                                    ->where('status','active')
+                                                    ->where('restaurant_id',auth()->id())
+                                                    ->get() as $pro)
+
+                                                <div class="col-md-3 mb-4" onclick="productAdd({{$pro->id}})"
+                                                     style="cursor: pointer">
+                                                    <div class="card text-white" style="background:#e7004d">
+                                                        <div class="card-body text-center">
+                                                            <h5 class="card-title text-white"
+                                                                style="font-size: 24px">{{$pro->name}}</h5>
+                                                            <p class="card-text"
+                                                               style="font-size: 20px;font-weight: bold">
+                                                                {{ number_format($pro->price, 2, ',', '.') }} ₺
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @empty
+                                    <h3>Kategori Bulunmuyor...</h3>
+                                @endforelse
+                            </div>
                         </div>
 
                         <!-- SAĞ SEPET -->
-                        <div class="col-md-3">
-                            <div class="card" style="border-radius: 10px">
-                                <div id="sepetim" class="row">
-                                    <div class="col-lg-6 text-right">
-                                        <div class="toplusil" >
-                                            <a class="special-ok-button-small text-white mt-2 float-end float-right"
-                                               onclick="removePos(1)" ><i
-                                                    class="fa fa-trash-alt"></i> Sepeti Temizle </a>
-                                        </div>
+                        <div class="col-md-3 ">
+                            <div class="card shadow-lg" style="border-radius: 10px;">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h4 class="size-3 px-3 mt-2">Sepetim </h4>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <a class="special-ok-button-small text-white mt-2 float-end float-right"
+                                           onclick="removePos(1)"><i
+                                                class="fa fa-trash-alt"></i> Sepeti Temizle </a>
                                     </div>
                                 </div>
+
+                                <hr>
+
                                 <div class="productItems row" style="min-height: 500px;">
                                     <div class="col-lg-12" id="productItemListp"
                                          style="padding: 20px;height: 460px;overflow-y: scroll">
                                         @foreach(\Cart::session(\Illuminate\Support\Facades\Auth::user()->id)->getContent() as $basket)
                                             <div id="posItem_{{$basket->id}}"
-                                                 class="item select-none mb-3 bg-blue-gray-50 rounded-lg w-full text-blue-gray-700 py-2 px-2 flex justify-center"
-                                                 style="background: #e7e7e7;border-radius: 10px">
-                                                <div class="row">
+                                                 style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+                background-color: #f1f1f1; border-radius: 10px; padding: 12px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+
+                                                <!-- Ürün Görseli -->
+                                                <div style="flex: 0 0 auto; margin-right: 12px;">
+                                                    <img src="{{$basket->associatedModel->image}}" alt="Ürün Görseli"
+                                                         style="height: 60px; width: 60px; object-fit: cover; border-radius: 6px;">
                                                     <input type="hidden" name="product_id[]" value="{{$basket->id}}">
-                                                    <div class="col-md-1">
-                                                        <img src="{{$basket->associatedModel->image}}" alt=""
-                                                             style="height: 50px;;">
-                                                    </div>
-                                                    <div class="col-md-6 text-left" style="width: 100%;">
-                                                <span class="text-dark fw-bold"
-                                                      style="width: 100%;"> {{$basket->name}}</span><br>
-                                                        <span
-                                                            style="width: 100%;">{{number_format($basket->price, 2, ',', '.')}} </span>
-                                                    </div>
-                                                    <div class="col-md-4 text-right">
-                                                        <div class="m-btn-group m-btn-group--pill btn-group mr-2"
-                                                             role="group"
-                                                             aria-label="..." style="padding: 3px">
-                                                            <button type="button" onclick="updateMinus({{$basket->id}})"
-                                                                    class="m-btn btn btn-default"
-                                                                    style="background: #e7004d;color:#fff"><i
-                                                                    class="fa fa-minus"></i></button>
-                                                            <input type="button" class="m-btn btn btn-default"
-                                                                   name="quantity[]"
-                                                                   id="quantity_{{$basket->id}}"
-                                                                   value="{{$basket->quantity}}"
-                                                                   style="background: #fff;color:#000;font-weight: bold"
-                                                                   disabled>
-                                                            <button type="button" onclick="updatePlus({{$basket->id}})"
-                                                                    class="m-btn btn btn-default"
-                                                                    style="background: #0d2646;color:#fff"><i
-                                                                    class="fa fa-plus"></i></button>
-                                                        </div>
+                                                </div>
+
+                                                <!-- Ürün Bilgileri -->
+                                                <div style="flex: 1 1 auto; min-width: 150px;">
+                                                    <div
+                                                        style="font-weight: bold; font-size: 14px; color: #333;">{{$basket->name}}</div>
+                                                    <div
+                                                        style="color: #555; font-size: 13px;">{{number_format($basket->price, 2, ',', '.')}}
+                                                        ₺
                                                     </div>
                                                 </div>
 
+                                                <!-- Adet Butonları -->
+                                                <div
+                                                    style="flex: 0 0 auto; display: flex; align-items: center; gap: 6px; margin-top: 8px;">
+                                                    <button type="button" onclick="updateMinus({{$basket->id}})"
+                                                            style="background-color: #dc3545; border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer;">
+                                                        <i class="fa fa-minus"></i>
+                                                    </button>
+
+                                                    <input type="text" name="quantity[]" id="quantity_{{$basket->id}}"
+                                                           value="{{$basket->quantity}}" disabled
+                                                           style="width: 40px; height: 30px; text-align: center; font-weight: bold; font-size: 13px; border: 1px solid #ccc; border-radius: 4px; background-color: white;">
+
+                                                    <button type="button" onclick="updatePlus({{$basket->id}})"
+                                                            style="background-color: #0d2646; border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer;">
+                                                        <i class="fa fa-plus"></i>
+                                                    </button>
+                                                </div>
                                             </div>
                                         @endforeach
                                     </div>
@@ -487,16 +520,11 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- card.// -->
-
-                            <!-- box.// -->
                         </div>
                     </div>
                 </div>
             </form>
         </section>
-
-
 
         <div class="modal fade" id="kuryeAta" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -528,7 +556,8 @@
             </div>
         </div>
 
-        <div class="modal fade" id="musteriAta" tabindex="-1" role="dialog" aria-labelledby="musteriAtaLabel" aria-hidden="true">
+        <div class="modal fade" id="musteriAta" tabindex="-1" role="dialog" aria-labelledby="musteriAtaLabel"
+             aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
 
@@ -537,7 +566,7 @@
                         <h5 class="modal-title" id="musteriAtaLabel">Müşteri Seçiniz</h5>
                         <button style="    font-size: 1.2rem; /* or 1rem for even smaller */
     padding: 0.25rem 0.5rem;background: white;border: none;
-    line-height: 1;"  type="button" class="close" data-dismiss="modal" aria-label="Kapat">
+    line-height: 1;" type="button" class="close" data-dismiss="modal" aria-label="Kapat">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -546,10 +575,12 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="customerSelect">Müşteri Listesi</label>
-                            <select id="customerSelect" class="form-control js-example-basic-single" onchange="customerSelect(event)">
+                            <select id="customerSelect" class="js-example-basic-single py-2"
+                                    onchange="customerSelect(event)">
                                 <option value="0">Müşteri Seçiniz</option>
                                 @foreach($customers as $customer)
-                                    <option value="{{ $customer->id }}">{{ $customer->name }} - {{ $customer->phone }}</option>
+                                    <option value="{{ $customer->id }}">{{ $customer->name }}
+                                        - {{ $customer->phone }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -557,7 +588,8 @@
 
                     <!-- Modal Footer -->
                     <div class="modal-footer d-flex justify-content-between">
-                        <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#yeniMusteri">
+                        <button type="button" class="btn btn-outline-primary" data-toggle="modal"
+                                data-target="#yeniMusteri">
                             <i class="fas fa-plus"></i> Müşteri Ekle
                         </button>
                         <button type="button" class="btn btn-success" data-dismiss="modal">Tamam</button>
@@ -580,7 +612,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <div class="row" style="padding: 20px">
+                        <div class="row">
                             <div class="basic-form">
                                 <form method="post" id="customerForm">
                                     <div class="row">
@@ -616,44 +648,49 @@
                                         <div class="item-content row"
                                              style="background: #f4f4f4;margin: 15px 0px  10px;padding:10px 0px;border-radius: 10px">
                                             <div class="mb-3 col-md-6">
-                                                <input type="text" class="form-control" id="adres_name"
+                                                <input required type="text" class="form-control" id="adres_name"
                                                        name="adres_name"
                                                        placeholder="Adres Başlğı">
                                             </div>
                                             <div class="mb-3 col-md-6">
-                                                <input type="text" class="form-control" id="sokak_cadde"
+                                                <input required type="text" class="form-control" id="sokak_cadde"
                                                        name="sokak_cadde"
                                                        value=""
                                                        placeholder="Sokak/Cadde">
                                             </div>
 
                                             <div class="mb-3 col-md-6">
-                                                <input type="text" class="form-control" id="bina_no" name="bina_no"
+                                                <input required type="text" class="form-control" id="bina_no"
+                                                       name="bina_no"
                                                        value=""
                                                        placeholder="Bina No">
                                             </div>
                                             <div class="mb-3 col-md-6">
-                                                <input type="text" class="form-control" id="kat" name="kat" value=""
+                                                <input required type="text" class="form-control" id="kat" name="kat"
+                                                       value=""
                                                        placeholder="Kat">
                                             </div>
                                             <div class="mb-3 col-md-6">
-                                                <input type="text" class="form-control" id="daire_no" name="daire_no"
+                                                <input required type="text" class="form-control" id="daire_no"
+                                                       name="daire_no"
                                                        value=""
                                                        placeholder="Daire No">
                                             </div>
                                             <div class="mb-3 col-md-6">
-                                                <input type="text" class="form-control" id="mahalle" name="mahalle"
+                                                <input required type="text" class="form-control" id="mahalle"
+                                                       name="mahalle"
                                                        value=""
                                                        placeholder="Mahalle">
                                             </div>
 
 
                                             <div class="mb-3 col-md-12">
-                                                <input type="text" name="adres_tarifi" id="adres_tarifi"
-                                                       class="form-control"
-                                                       placeholder="Adres Tarifi">
-                                            </div>
+                                                <textarea placeholder="Adres Tarifi" required name="adres_tarifi"
+                                                          class="form-control" id="adres_tarifi">
 
+                                                </textarea>
+
+                                            </div>
                                         </div>
                                     </div>
                                 </form>
@@ -671,7 +708,6 @@
     </div>
 </div>
 
-
 <script src="{{asset('pos/assets/js/jquery-2.0.0.min.js')}}" type="text/javascript"></script>
 <script src="{{asset('pos/assets/js/bootstrap.bundle.min.js')}}" type="text/javascript"></script>
 <script src="{{asset('pos/assets/js/OverlayScrollbars.js')}}" type="text/javascript"></script>
@@ -679,18 +715,7 @@
 <script src="https://panel.parskurye.net/theme/js/sweetalert2.all.min.js"></script>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const drawer = document.getElementById('drawer');
-        const savedState = localStorage.getItem('drawerState');
-
-        if (savedState === 'open') {
-            drawer.classList.add('open');
-        } else {
-            drawer.classList.remove('open');
-        }
-    });
-
-    $('form[name="formPos"]').on('submit', function(e) {
+    $('form[name="formPos"]').on('submit', function (e) {
         e.preventDefault(); // Sayfa yenilenmesin
         CreateOrder(); // Siparişi oluştur
     });
@@ -710,15 +735,42 @@
     }
 </script>
 
-<script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
-
 <script type="text/javascript">
+
     $(document).ready(function () {
-        $('.js-example-basic-single').select2({
-            selectionCssClass: 'selectiki',
-            placeholder: 'Müşteri Arayınız..',
+        const drawer = document.getElementById('drawer');
+        const savedState = localStorage.getItem('drawerState');
+
+        if (savedState === 'open') {
+            drawer.classList.add('open');
+        } else {
+            drawer.classList.remove('open');
+        }
+
+        $(document).ready(function () {
+            $('.js-example-basic-single').select2({
+                selectionCssClass: 'selectiki',
+                placeholder: 'Müşteri Arayınız..',
+                allowClear: true // placeholder için önerilir
+            });
         });
 
+
+        $.ajax({
+            type: 'GET',
+            url: '/restaurant/get-pos-items',
+            success: function (data) {
+                console.log({girdi: data})
+                $('#productItemLista').append(data.items);
+
+                $('#posTotalItem').html(data.posTotalItem);
+                $('#posTotal').html(data.posTotal);
+                $('#totalPrice').val(data.total);
+            },
+            error: function () {
+                console.log("Sepet yüklenirken hata oluştu.");
+            }
+        });
     });
 
     function productAdd(e) {
@@ -734,25 +786,22 @@
                 let audio = new Audio(src);
                 audio.play();
 
-
                 $('#productItemListp').css('display', 'none');
                 $('#productItemLista').css('display', 'block');
 
                 if (data.durum === "yok") {
+                    console.log({data: data})
                     $('#productItemLista').append(data.items);
                 } else {
                     let newquant = parseInt(quant) + 1;
                     $('#quantity_' + e).val(newquant);
                 }
 
-
                 $('#posTotalItem').html(data.posTotalItem);
                 $('#posTotal').html(data.posTotal);
                 $('#totalPrice').val(data.total);
 
                 $('#loader').css('display', 'none');
-
-
             },
             error: function () {
                 console.log(data);
@@ -855,32 +904,31 @@
             let src = '{{url('pos/audio/beep.mp3')}}';
             let audio = new Audio(src);
             audio.play();
-            $('.nakit').css('background', 'rgba(42,179,114,0.43)');
-            $('.kkarti').css('background', '#624FD1');
-            $('.kkkarti').css('background', '#f72b50');
+            $('.nakit').css('background', '#e7004d');
+            $('.kkarti').css('background', '#0077b8');
+            $('.kkkarti').css('background', '#183785');
         }
         if (e === "Kapıda Ticket ile Ödeme") {
             let src = '{{url('pos/audio/beep.mp3')}}';
             let audio = new Audio(src);
             audio.play();
-            $('.nakit').css('background', '#479348');
-            $('.kkarti').css('background', '#a36868');
-            $('.kkkarti').css('background', '#f72b50');
+            $('.nakit').css('background', '#1f49d3');
+            $('.kkarti').css('background', '#e7004d');
+            $('.kkkarti').css('background', '#183785');
         }
         if (e === "Kapıda Kredi Kartı ile Ödeme") {
             let src = '{{url('pos/audio/beep.mp3')}}';
             let audio = new Audio(src);
             audio.play();
-            $('.nakit').css('background', '#479348');
-            $('.kkarti').css('background', '#624FD1');
-            $('.kkkarti').css('background', '#977373');
+            $('.nakit').css('background', '#1f49d3');
+            $('.kkarti').css('background', '#0077b8');
+            $('.kkkarti').css('background', '#e7004d');
         }
     }
 
     function CourierSet(e) {
         $('#courier_id').val(e.target.value);
         $('#kuryeAta').modal('hide');
-
     }
 
     function ExitPos() {
@@ -938,9 +986,11 @@
             })
         })
 
-        if (payment_control != 0) {
-            if (customer_id > 0) {
+        console.log({payment_control: payment_control})
+        console.log({products: products})
 
+        if (payment_control !== 0) {
+            if (customer_id > 0) {
                 if (products.length > 0) {
 
                     //İşlemleriburada yapacağız
@@ -952,11 +1002,57 @@
                             payment_method: payment_control,
                             courier_id: courier_id,
                             products: products,
-                            total: total
+                            amount: total
                         },
                         success: function (response) {
-                            if (response.status == "OK") {
+                            console.log({sgf:response})
+                            if (response.status === 'BalanceError') {
+                                Swal.fire({
+                                    title: response.message,
+                                    text: 'Üzgünüz, Kontör Bakiyeniz Yetersiz Olduğundan Ürün Eklenemiyor !',
+                                    icon: 'warning',
+                                    confirmButtonText: 'Tamam',
+                                    background: '#ffffff', // senin rengin
+                                    color: '#fff',
+                                    iconColor: '#e7004d', // modern yeşil
+                                    confirmButtonColor: '#e7004d', // modern yeşil düğme
+                                    customClass: {
+                                        popup: 'rounded-xl shadow-2xl',
+                                        confirmButton: 'px-6 py-3 text-lg font-semibold',
+                                    },
+                                    showClass: {
+                                        popup: 'animate__animated animate__fadeInDown',
+                                    },
+                                    hideClass: {
+                                        popup: 'animate__animated animate__fadeOutUp',
+                                    }
+                                })
+                            }
 
+                            if (response.status === 'ERR') {
+                                Swal.fire({
+                                    title: response.message,
+                                    text: '',
+                                    icon: 'warning',
+                                    confirmButtonText: 'Tamam',
+                                    background: '#ffffff', // senin rengin
+                                    color: '#fff',
+                                    iconColor: '#e7004d', // modern yeşil
+                                    confirmButtonColor: '#e7004d', // modern yeşil düğme
+                                    customClass: {
+                                        popup: 'rounded-xl shadow-2xl',
+                                        confirmButton: 'px-6 py-3 text-lg font-semibold',
+                                    },
+                                    showClass: {
+                                        popup: 'animate__animated animate__fadeInDown',
+                                    },
+                                    hideClass: {
+                                        popup: 'animate__animated animate__fadeOutUp',
+                                    }
+                                })
+                            }
+
+                            if (response.status === "OK") {
                                 var divToPrint = response.printed;
                                 var mywindow = window.open('', 'PRINT', 'height=600,width=800');
                                 mywindow.document.write('<html><head><title>' + document.title + '</title>');
@@ -971,7 +1067,6 @@
                                     type: 'GET', //THIS NEEDS TO BE GET
                                     url: '/restaurant/orders/removePOS',
                                     success: function (data) {
-
                                         let src = '{{url('pos/audio/trash.mp3')}}';
                                         let audio = new Audio(src);
                                         audio.play();
@@ -981,43 +1076,111 @@
                                         $('.customer').html('<div style="text-align: center;padding: 15px">Müşteri Seçin</div>');
                                         $('#posTotal').html("0,00 TL");
 
-                                        $('.nakit').css('background', '#008002');
-                                        $('.kkarti').css('background', '#624FD1');
-                                        $('.kkkarti').css('background', '#f72b50');
+                                        $('.nakit').css('background', '#1f49d3');
+                                        $('.kkarti').css('background', '#0077b8');
+                                        $('.kkkarti').css('background', '#183785');
 
-                                        Swal.fire('Sipariş Tamamlandı.');
+                                        Swal.fire({
+                                            title: 'Sipariş Tamamlandı',
+                                            text: 'Siparişiniz başarıyla alındı!',
+                                            icon: 'success',
+                                            confirmButtonText: 'Tamam',
+                                            background: '#ffffff', // senin rengin
+                                            color: '#fff',
+                                            iconColor: '#30d760', // modern yeşil
+                                            confirmButtonColor: '#1fde74', // modern yeşil düğme
+                                            customClass: {
+                                                popup: 'rounded-xl shadow-2xl',
+                                                confirmButton: 'px-6 py-3 text-lg font-semibold',
+                                            },
+                                            showClass: {
+                                                popup: 'animate__animated animate__fadeInDown',
+                                            },
+                                            hideClass: {
+                                                popup: 'animate__animated animate__fadeOutUp',
+                                            }
+                                        })
                                         this.disabled = false;
                                     },
                                     error: function () {
                                         console.log(data);
                                     }
                                 });
-
-
                             }
                         },
                         error: function (response) {
-
+                            console.log({response: response})
                         }
                     });
 
                 } else {
-                    Swal.fire('Ürün eklemeden sipariş oluşturamazsınız!!')
+                    Swal.fire({
+                        title: 'Sepetinizde ürün Bulunmuyor!!',
+                        text: '',
+                        icon: 'warning',
+                        confirmButtonText: 'Tamam',
+                        background: '#ffffff', // senin rengin
+                        color: '#fff',
+                        iconColor: '#e7004d', // modern yeşil
+                        confirmButtonColor: '#e7004d', // modern yeşil düğme
+                        customClass: {
+                            popup: 'rounded-xl shadow-2xl',
+                            confirmButton: 'px-6 py-3 text-lg font-semibold',
+                        },
+                        showClass: {
+                            popup: 'animate__animated animate__fadeInDown',
+                        },
+                        hideClass: {
+                            popup: 'animate__animated animate__fadeOutUp',
+                        }
+                    })
                 }
-
             } else {
-                Swal.fire('Müşteri seçmeden devam edemezsiniz!!')
+                Swal.fire({
+                    title: 'Lütfen Bir Müşteri Seçiniz',
+                    text: '',
+                    icon: 'warning',
+                    confirmButtonText: 'Tamam',
+                    background: '#ffffff', // senin rengin
+                    color: '#fff',
+                    iconColor: '#e7004d', // modern yeşil
+                    confirmButtonColor: '#e7004d', // modern yeşil düğme
+                    customClass: {
+                        popup: 'rounded-xl shadow-2xl',
+                        confirmButton: 'px-6 py-3 text-lg font-semibold',
+                    },
+                    showClass: {
+                        popup: 'animate__animated animate__fadeInDown',
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__fadeOutUp',
+                    }
+                })
                 $('#musteriAta').modal('show');
             }
-
         } else {
-            Swal.fire('Ödeme Methodu seçmelisiniz!!')
+            Swal.fire({
+                title: 'Lütfen Bir Ödeme Methodu Seçiniz',
+                text: '',
+                icon: 'warning',
+                confirmButtonText: 'Tamam',
+                background: '#ffffff', // senin rengin
+                color: '#fff',
+                iconColor: '#e7004d', // modern yeşil
+                confirmButtonColor: '#e7004d', // modern yeşil düğme
+                customClass: {
+                    popup: 'rounded-xl shadow-2xl',
+                    confirmButton: 'px-6 py-3 text-lg font-semibold',
+                },
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown',
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp',
+                }
+            })
         }
     }
 </script>
 </body>
 </html>
-
-
-
-

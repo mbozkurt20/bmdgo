@@ -21,6 +21,7 @@ class CreateAdminsTable extends Migration
             $table->boolean('auto_orders')->default(0);
             $table->string('default_locations_lat')->nullable();
             $table->string('default_locations_lon')->nullable();
+            $table->string('top_up_balance')->default(0);
             $table->rememberToken();
             $table->timestamps();
         });

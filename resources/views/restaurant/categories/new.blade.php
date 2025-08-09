@@ -5,7 +5,7 @@
             <h2 class="mb-3 me-auto">Kategoriler</h2>
             <div>
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Kategoriler</a></li>
+                    <li class="breadcrumb-item"><a href="/restaurant/categories">Kategoriler</a></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Yeni</a></li>
                 </ol>
             </div>
@@ -41,7 +41,7 @@
                                     </div>
                                     <div class="mb-3 col-md-4">
                                         <label class="form-label">POS Sırası</label>
-                                        <input required type="number" class="form-control" name="desk" placeholder="Kategorinin POS Ekranındaki Sıralaması">
+                                        <input type="number" class="form-control" name="desk" placeholder="Kategorinin POS Ekranındaki Sıralaması">
                                     </div>
                                 </div>
 

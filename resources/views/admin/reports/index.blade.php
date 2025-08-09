@@ -38,7 +38,7 @@
                 </div>
 
                 <div class="col-lg-4">
-                    <button class="btn btn-primary" onclick="ReportFilter()"> <i class="fa fa-filter"></i> Raporla</button>
+                    <button class="special-button" onclick="ReportFilter()"> <i class="fa fa-filter"></i> Raporla</button>
                 </div>
             </div>
             <div>
@@ -69,7 +69,7 @@
                 </div>
 
                 <div class="container-fluid">
-                    <div class="row mt-3 pt-3 border-top text-white" style="background: #fd683e;">
+                    <div class="row mt-3 pt-3 border-top text-white" style="background: #e7004d;">
                         <div class="col-md-2 tops">
                             Sipariş Sayısı: <span id="topsiparis"></span>
                         </div>

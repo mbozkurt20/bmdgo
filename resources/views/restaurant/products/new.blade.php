@@ -6,7 +6,7 @@
             <h2 class="mb-3 me-auto">Restaurant Ürünleri</h2>
             <div>
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Restaurant Ürünleri</a></li>
+                    <li class="breadcrumb-item"><a href="/restaurant/products">Ürünler</a></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Yeni</a></li>
                 </ol>
             </div>
@@ -64,13 +64,12 @@
 
                                     <div class="mb-3 col-md-4 mb-5">
                                         <label class="form-label text-dark fw-bold">Ürün Adı</label>
-                                        <input type="text" class="form-control" name="name" placeholder="Ürün Adı" required>
+                                        <input type="text" id="productName" class="form-control" name="name" placeholder="Ürün Adı" required>
                                     </div>
-
 
                                     <div class="mb-3 col-md-4 mb-5">
                                         <label class="form-label text-dark fw-bold">Ürün Kodu</label>
-                                        <input type="text" class="form-control" name="code" placeholder="Ürün Kodu" required>
+                                        <input type="text" id="productCode" class="form-control" name="code" placeholder="Ürün Kodu" required>
                                     </div>
 
                                     <div class="mb-3 col-md-4 mb-5">
@@ -93,8 +92,7 @@
 
                                     <div class="mb-3 col-md-8">
                                         <label class="form-label text-dark fw-bold">Ürün Detayları</label>
-                                        <textarea cols="15" class="form-control border border-dark"
-                                                  name="details" rows="15" ></textarea>
+                                        <textarea cols="15" class="form-control border border-dark" name="details" rows="15" ></textarea>
                                     </div>
                                 </div>
 
@@ -105,7 +103,6 @@
             </div>
         </div>
     </div>
-
 
     <style>
         .image-upload-wrapper {
@@ -157,6 +154,7 @@
         }
     </style>
 
+
     <script>
         const imageInput = document.getElementById('imageInput');
         const imagePreview = document.getElementById('imagePreview');
@@ -178,27 +176,30 @@
     </script>
 
     <script>
-        const nameInput = document.querySelector('input[name="name"]');
-        const codeInput = document.querySelector('input[name="code"]');
+        document.addEventListener("DOMContentLoaded", function () {
+            const nameInput = document.getElementById('productName');
+            const codeInput = document.getElementById('productCode');
 
-        function generateCode(name) {
-            if (!name) return '';
-            // İsimden ilk 3 harfi al, büyük harfe çevir, boşluk varsa kaldır
-            const shortName = name.trim().substring(0, 3).toUpperCase().replace(/\s/g, '');
+            function generateProductCode(name) {
+                if (!name) return '';
 
-            // Rastgele 3 karakter oluştur (harf ve rakam karışık)
-            const randomStr = Math.random().toString(36).substring(2, 5).toUpperCase();
+                const namePart = name.trim().substring(0, 3).toUpperCase().replace(/\s/g, '');
+                const chars = 'ABCDEFGHIKLMNOPQRSTUVWXYZ0123456789';
+                let randomPart = '';
+                for (let i = 0; i < 5; i++) {
+                    randomPart += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
 
-            // Kısa ve unique kod
-            return shortName + randomStr;
-        }
+                return namePart + randomPart;
+            }
 
-        // İsim inputuna her değişiklikte kodu otomatik yaz
-        nameInput.addEventListener('input', () => {
-            const generatedCode = generateCode(nameInput.value);
-            codeInput.value = generatedCode;
+            nameInput.addEventListener('input', () => {
+                const code = generateProductCode(nameInput.value);
+                codeInput.value = code;
+            });
         });
     </script>
+
 @endsection
 
 

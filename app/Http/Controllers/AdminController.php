@@ -19,7 +19,6 @@ class AdminController extends Controller
     {
         return redirect()->route('admin.index');
     }
-
     public function logout(Request $request)
     {
         $this->guard()->logout();
@@ -43,6 +42,11 @@ class AdminController extends Controller
     protected function guard()
     {
         return Auth::guard('admin');
+    }
+
+    public function balance()
+    {
+        return view('admin.balance.index');
     }
     public function home()
     {

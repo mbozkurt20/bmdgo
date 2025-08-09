@@ -16,6 +16,7 @@ class ReportController extends Controller
     {
         $this->middleware('auth');
     }
+
     public function index()
     {
         $couriers = Courier::where('status', 'active')->where('restaurant_id', 0)->where('admin_id', auth()->id())->get();

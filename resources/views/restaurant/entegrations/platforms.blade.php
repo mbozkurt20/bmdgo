@@ -1,5 +1,4 @@
 @extends('restaurant.layouts.app')
-
 @section('content')
     <div class="container-fluid">
         <div class="mb-sm-4 d-flex flex-wrap align-items-center text-head">
@@ -27,6 +26,12 @@
 
         <form method="post" class="repeater" action="{{ route('restaurant.entegrations.entegrastion_update') }}">
             @csrf
+
+            <br>
+            <div class="row mb-4 mx-auto text-center">
+                <button type="submit" class="size-2 special-button mx-auto text-center  w-50">Bilgileri Güncelle</button>
+            </div>
+            <br>
             <div class="row">
                 <div class="col-xl-4 col-lg-12">
                     <div class="card">
@@ -146,7 +151,6 @@
                     </div>
                 </div>
             </div>
-            <button type="submit" class="special-button">Bilgileri Güncelle</button>
         </form>
 
     </div>

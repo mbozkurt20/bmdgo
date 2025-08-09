@@ -6,7 +6,7 @@
             <h2 class="mb-3 me-auto">Kategoriler</h2>
             <div>
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Kategoriler</a></li>
+                    <li class="breadcrumb-item"><a href="/restaurant/categories">Kategoriler</a></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Düzenle</a></li>
                 </ol>
             </div>
@@ -49,8 +49,7 @@
                                     </div>
                                 </div>
 
-                                <button type="submit" class="btn btn-primary">Kaydı Güncelle</button>
-                            </form>
+                                <button type="submit" class="special-button float-end mt-4">Kaydı Güncelle</button                            </form>
                         </div>
                     </div>
                 </div>

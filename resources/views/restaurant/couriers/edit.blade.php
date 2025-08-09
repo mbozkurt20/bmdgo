@@ -50,7 +50,7 @@
                                     <div class="mb-3 col-md-4">
                                         <label class="form-label">Şifresi</label>
                                         <input type="text" class="form-control" name="password"
-                                            value="{{ $courier->password }}" placeholder="Kurye Apk Şifresi">
+                                            value="{{ $courier->password }}" placeholder="Kurye Mobil Şifresi">
                                     </div>
                                     <div class="mb-3 col-md-4">
                                         <label class="form-label">Paket Başı Fiyatı</label>

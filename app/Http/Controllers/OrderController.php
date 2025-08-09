@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\OrdersHelper;
+use App\Models\Expenses;
+use App\Models\Topup;
 use App\Traits\RequestTrait;
 use App\Models\Admin;
 use App\Models\Categorie;
@@ -135,25 +137,40 @@ class OrderController extends Controller
                 'associatedModel' => $product
             ));
 
-            $items = '<div id="posItem_' . $product->id . '" class="item select-none mb-3 bg-blue-gray-50 rounded-lg w-full text-blue-gray-700 py-2 px-2 flex justify-center" style="background: #e7e7e7;border-radius: 10px">
-                    <div class="row">
-                        <div class="col-md-2" >
-                            <img src="' . asset($product->image) . '" style="height: 45px;width:65px;border-radius: 10px">
-                        </div>
-                        <div class="col-md-6 text-left" style="width: 100%;">
-                            <span style="width: 100%;">  ' . $product->name . '</span><br>
-                            <span style="width: 100%;">' . number_format($product->price, 2, ',', '.') . ' ₺</span>
-                        </div>
-                        <div class="col-md-4 text-right">
-                            <div class="m-btn-group m-btn-group--pill btn-group mr-2" role="group" aria-label="..." style="padding: 3px">
-                            <input type="hidden" name="product_id" value="' . $product->id . '">
-                                <button type="button" onclick="updateMinus(' . $product->id . ')" class="m-btn btn btn-default" style="background: #5c5c5c;color:#fff"><i class="fa fa-minus"></i></button>
-                                <input type="button" class="m-btn btn btn-default" name="quantity" id="quantity_' . $product->id . '" value="1" style="background: #fff;color:#000;font-weight: bold" disabled>
-                                <button type="button"  onclick="updatePlus(' . $product->id . ')" class="m-btn btn btn-default" style="background: #5c5c5c;color:#fff"><i class="fa fa-plus"></i></button>
-                            </div>
-                        </div>
-                    </div>
-                </div> ';
+            $items = '<div id="posItem_' . $product->id . '"
+                class="item select-none"
+              style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+                     background-color: #f1f1f1; border-radius: 10px; padding: 12px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+
+            <!-- Ürün Görseli -->
+            <div style="flex: 0 0 auto; margin-right: 12px;">
+                <img src="' . asset($product->image) . '" alt="Ürün Görseli"
+                     style="height: 60px; width: 60px; object-fit: cover; border-radius: 6px;">
+                <input type="hidden" name="product_id" value="' . $product->id . '">
+            </div>
+
+            <!-- Ürün Bilgileri -->
+            <div style="flex: 1 1 auto; min-width: 150px;">
+                <div style="font-weight: bold; font-size: 14px; color: #333;">' . $product->name . '</div>
+                <div style="color: #555; font-size: 13px;">' . number_format($product->price, 2, ',', '.') . ' ₺</div>
+            </div>
+
+            <!-- Adet Butonları -->
+            <div style="flex: 0 0 auto; display: flex; align-items: center; gap: 6px; margin-top: 8px;">
+                <button type="button" onclick="updateMinus(' . $product->id . ')"
+                        style="background-color: #dc3545; border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer;">
+                    <i class="fa fa-minus"></i>
+                </button>
+
+                <input type="text" name="quantity" id="quantity_' . $product->id . '" value="1" disabled
+                       style="width: 40px; height: 30px; text-align: center; font-weight: bold; font-size: 13px; border: 1px solid #ccc; border-radius: 4px; background-color: white;">
+
+                <button type="button" onclick="updatePlus(' . $product->id . ')"
+                        style="background-color: #0d2646; border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer;">
+                    <i class="fa fa-plus"></i>
+                </button>
+            </div>
+        </div>';
 
             if (\Cart::session($userId)->get($id)->quantity > 1) {
                 $durum = "var";
@@ -172,25 +189,40 @@ class OrderController extends Controller
 
             $durum = "yok";
 
-            $items = '<div id="posItem_' . $product->id . '" class="item select-none mb-3 bg-blue-gray-50 rounded-lg w-full text-blue-gray-700 py-2 px-2 flex justify-center" style="background: #e7e7e7;border-radius: 10px">
-                    <div class="row">
-                        <div class="col-md-2" >
-                            <img src="' . asset($product->image) . '" style="height: 45px;width:65px;border-radius: 10px">
-                        </div>
-                        <div class="col-md-6 text-left" style="width: 100%;">
-                            <span style="width: 100%;">  ' . $product->name . '</span><br>
-                            <span style="width: 100%;">' . number_format($product->price, 2, ',', '.') . ' ₺</span>
-                        </div>
-                        <div class="col-md-4 text-right">
-                            <div class="m-btn-group m-btn-group--pill btn-group mr-2" role="group" aria-label="..." style="padding: 3px">
-                               <input type="hidden" name="product_id" value="' . $product->id . '">
-                                <button type="button" onclick="updateMinus(' . $product->id . ')" class="m-btn btn btn-default" style="background: #5c5c5c;color:#fff"><i class="fa fa-minus"></i></button>
-                                <input type="button" class="m-btn btn btn-default" name="quantity" id="quantity_' . $product->id . '" value="1" style="background: #fff;color:#000;font-weight: bold" disabled>
-                                <button type="button"  onclick="updatePlus(' . $product->id . ')" class="m-btn btn btn-default" style="background: #5c5c5c;color:#fff"><i class="fa fa-plus"></i></button>
-                            </div>
-                        </div>
-                    </div>
-                </div> ';
+            $items = '<div id="posItem_' . $product->id . '"
+                class="item select-none"
+              style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+                     background-color: #f1f1f1; border-radius: 10px; padding: 12px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+
+            <!-- Ürün Görseli -->
+            <div style="flex: 0 0 auto; margin-right: 12px;">
+                <img src="' . asset($product->image) . '" alt="Ürün Görseli"
+                     style="height: 60px; width: 60px; object-fit: cover; border-radius: 6px;">
+                <input type="hidden" name="product_id" value="' . $product->id . '">
+            </div>
+
+            <!-- Ürün Bilgileri -->
+            <div style="flex: 1 1 auto; min-width: 150px;">
+                <div style="font-weight: bold; font-size: 14px; color: #333;">' . $product->name . '</div>
+                <div style="color: #555; font-size: 13px;">' . number_format($product->price, 2, ',', '.') . ' ₺</div>
+            </div>
+
+            <!-- Adet Butonları -->
+            <div style="flex: 0 0 auto; display: flex; align-items: center; gap: 6px; margin-top: 8px;">
+                <button type="button" onclick="updateMinus(' . $product->id . ')"
+                        style="background-color: #dc3545; border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer;">
+                    <i class="fa fa-minus"></i>
+                </button>
+
+                <input type="text" name="quantity" id="quantity_' . $product->id . '" value="1" disabled
+                       style="width: 40px; height: 30px; text-align: center; font-weight: bold; font-size: 13px; border: 1px solid #ccc; border-radius: 4px; background-color: white;">
+
+                <button type="button" onclick="updatePlus(' . $product->id . ')"
+                        style="background-color: #0d2646; border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer;">
+                    <i class="fa fa-plus"></i>
+                </button>
+            </div>
+        </div>';
         }
 
         $posTotalItem = \Cart::session($userId)->getTotalQuantity();
@@ -199,22 +231,69 @@ class OrderController extends Controller
 
         return response()->json(['items' => $items, 'posTotalItem' => $posTotalItem, 'posTotal' => $posTotal, 'durum' => $durum, 'total' => $total]);
     }
-
     public function updatePlusPOS($id)
     {
-
         $userId = Auth::user()->id;
 
         \Cart::session($userId)->update($id, array(
             'quantity' => +1,
         ));
 
-
         $posTotalItem = \Cart::session($userId)->getTotalQuantity();
         $posTotal = number_format(\Cart::session($userId)->getTotal(), 2, ',', '.') . " TL";
         $total = \Cart::session($userId)->getTotal();
 
         return response()->json(['posTotalItem' => $posTotalItem, 'posTotal' => $posTotal, 'total' => $total]);
+    }
+    public function getPosItems()
+    {
+        $userId = Auth::user()->id;
+        $cart = \Cart::session($userId)->getContent();
+
+        $items  = '';
+
+        foreach ($cart as $item) {
+            $product = $item->associatedModel;
+            $quantity = $item->quantity;
+
+            $items .= '<div id="posItem_' . $product->id . '" class="item select-none" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; background-color: #f1f1f1; border-radius: 10px; padding: 12px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+            <div style="flex: 0 0 auto; margin-right: 12px;">
+                <img src="' . asset($product->image) . '" alt="Ürün Görseli"
+                     style="height: 60px; width: 60px; object-fit: cover; border-radius: 6px;">
+                <input type="hidden" name="product_id" value="' . $product->id . '">
+            </div>
+            <div style="flex: 1 1 auto; min-width: 150px;">
+                <div style="font-weight: bold; font-size: 14px; color: #333;">' . $product->name . '</div>
+                <div style="color: #555; font-size: 13px;">' . number_format($product->price, 2, ',', '.') . ' ₺</div>
+            </div>
+            <div style="flex: 0 0 auto; display: flex; align-items: center; gap: 6px; margin-top: 8px;">
+                <button type="button" onclick="updateMinus(' . $product->id . ')"
+                        style="background-color: #dc3545; border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer;">
+                    <i class="fa fa-minus"></i>
+                </button>
+
+                <input type="text" name="quantity" id="quantity_' . $product->id . '" value="' . $quantity . '" disabled
+                       style="width: 40px; height: 30px; text-align: center; font-weight: bold; font-size: 13px; border: 1px solid #ccc; border-radius: 4px; background-color: white;">
+
+                <button type="button" onclick="updatePlus(' . $product->id . ')"
+                        style="background-color: #0d2646; border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer;">
+                    <i class="fa fa-plus"></i>
+                </button>
+            </div>
+        </div>';
+        }
+
+        $posTotalItem = \Cart::session($userId)->getTotalQuantity();
+        $posTotal = number_format(\Cart::session($userId)->getTotal(), 2, ',', '.') . " TL";
+        $total = \Cart::session($userId)->getTotal();
+
+        return response()->json([
+            'items' => $items,
+            'posTotalItem' => $posTotalItem,
+            'posTotal' => $posTotal,
+            'total' => $total,
+           ' durum' => 'var',
+        ]);
     }
     public function message(Request $request)
     {
@@ -228,7 +307,6 @@ class OrderController extends Controller
             return response()->json(['status' => "ERR"]);
         }
     }
-
     public function storeQuick(Request $request)
     {
         \App\Models\Order::create([
@@ -247,7 +325,6 @@ class OrderController extends Controller
 
         return response()->json(['message' => 'Sipariş başarıyla kaydedildi.']);
     }
-
     public function message2(Request $request)
     {
         $order = Order::where('restaurant_id', Auth::user()->id)->where('tracking_id', $request->tracking_id)->first();
@@ -260,8 +337,6 @@ class OrderController extends Controller
             return response()->json(['status' => "ERR"]);
         }
     }
-
-
     public function updateMinusPOS($id, $qty)
     {
         $userId = Auth::user()->id;
@@ -280,7 +355,6 @@ class OrderController extends Controller
 
         return response()->json(['posTotalItem' => $posTotalItem, 'posTotal' => $posTotal, 'total' => $total]);
     }
-
     public function removePOS()
     {
         $userId = Auth::user()->id;
@@ -290,7 +364,6 @@ class OrderController extends Controller
 
         return response()->json(['TotalQuantity' => $TotalQuantity, 'TotalMoney' => $TotalMoney]);
     }
-
     public function customerpos($id)
     {
         // Müşteri bulunuyor mu kontrol et
@@ -305,17 +378,24 @@ class OrderController extends Controller
 
         // Müşteri adresi bulunamazsa alternatif bir mesaj göster
         if (!$adres) {
-            $customer = '<h2 class="logo-text">' . $custom->name . '</h2> ' . $custom->phone . ' <br><span>Adres bulunamadı</span>';
+            $customer = '<p class="text-white mr-2 logo-text">' . $custom->name . '</p> ' .  '<span class="ml-2 text-white"> - '. $custom->phone.'</span>'  . ' <br><span>Adres bulunamadı</span>';
         } else {
             // Müşteri ve adres bilgilerini birleştir
-            $customer = '<h2 class="logo-text">' . $custom->name . '</h2> ' . $custom->phone . ' <br><span>' . $adres->mahalle . ' Mah.' . $adres->sokak_cadde . '.No:' . $adres->bina_no . ' Kat:' . $adres->kat . ' Daire:' . $adres->daire_no . '</span>';
+            $customer = '<p class="text-white mr-2 logo-text">' . $custom->name . '</p> ' . '<span class=" ml-2 text-white"> - '. $custom->phone.'</span>'. ' <br><span>' . $adres->mahalle . ' Mah.' . $adres->sokak_cadde . '.No:' . $adres->bina_no . ' Kat:' . $adres->kat . ' Daire:' . $adres->daire_no . '</span>';
         }
 
         return response()->json(['customer' => $customer]);
     }
-
     public function customeradd(Request $request)
     {
+        $testMode = env('TEST_MODE');
+
+        if ($testMode) {
+            if (Customer::count() > env('TEST_MODE_LIMIT')) {
+                return redirect()->back()->with('test', 'Test Modu: Üzgünüz, En Fazla '.env('TEST_MODE_LIMIT').' Kayıt Ekleyebilirsiniz');
+            }
+        }
+
         $data = $request->validate([
             'name' => 'required',
             'phone' => 'required'
@@ -325,7 +405,7 @@ class OrderController extends Controller
 
         if ($custom) {
             $adres = CustomerAddress::where('customer_id', $custom->id)->first();
-            $customer = '<h2 class="logo-text">' . $custom->name . '</h2> ' . $adres->phone . ' <br><span>' . $adres->mahalle . ' Mah.' . $adres->sokak_cadde . '.No:' . $request->bina_no . ' Kat:' . $request->kat . ' Daire:' . $request->daire_no . '</span>';
+            $customer = '<p class="logo-text text-white mr-2">' . $custom->name . '</p> ' .  '<span class="ml-2 text-white"> - '. $adres->phone.'</span>' . ' <br><span>' . $adres->mahalle . ' Mah.' . $adres->sokak_cadde . '.No:' . $request->bina_no . ' Kat:' . $request->kat . ' Daire:' . $request->daire_no . '</span>';
 
             return response()->json(['customer' => $customer, 'customerid' => $custom->id]);
         } else {
@@ -350,12 +430,16 @@ class OrderController extends Controller
                 $adreses->save();
             }
 
-            $customer = '<h2 class="logo-text">' . $data['name'] . '</h2> ' . $data['phone'] . ' <br><span>' . $request->mahalle . ' Mah.' . $request->sokak_cadde . '.No:' . $request->bina_no . ' Kat:' . $request->kat . ' Daire:' . $request->daire_no . '</span>';
+            $customer = '<p class="logo-text mr-2 text-white">' . $data['name'] . '</p> ' . '<span class="ml-2 text-white"> - '.$data['phone'].'</span>' . ' <br><span>' . $request->mahalle . ' Mah.' . $request->sokak_cadde . '.No:' . $request->bina_no . ' Kat:' . $request->kat . ' Daire:' . $request->daire_no . '</span>';
             return response()->json(['customer' => $customer, 'customerid' => $create->id]);
         }
     }
     public function addOrder(Request $request)
     {
+        if (!OrdersHelper::isTopup(null,Auth::user()->id)){
+            return response()->json(['status' => "BalanceError", 'message' => 'Yetersiz Kontör Bakiyesi']);
+        }
+
         $customer = Customer::where('id', $request->customer_id)
             ->where('restaurant_id', Auth::user()->id)
             ->first();
@@ -366,7 +450,7 @@ class OrderController extends Controller
 
         $customer_address = CustomerAddress::where('customer_id', $request->customer_id)->first();
         if (!$customer_address) {
-            return response()->json(['status' => "ERR", 'message' => 'Müşteri adresi bulunamadı']);
+            return response()->json(['status' => "ERR", 'message' => 'Müşteri Adresi Bulunamadı']);
         }
 
         if (!is_array($request->products) || count($request->products) === 0) {
@@ -466,7 +550,6 @@ class OrderController extends Controller
             return response()->json(['status' => "ERR"]);
         }
     }
-
 
     public function printed($id)
     {
@@ -635,8 +718,9 @@ class OrderController extends Controller
 
     public function deleteOrder($id)
     {
-        $order = Order::where('id', $id) - delete();
+        $order = Order::where('id', $id)->first();
 
+        $order->delete();
 
         if ($order) {
             return response()->json(['status' => "OK"]);

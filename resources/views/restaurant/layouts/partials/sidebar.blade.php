@@ -43,7 +43,6 @@
             </li>
 
 
-
             {{-- Siparisler --}}
             <li><a class="has-arrow" href="javascript:void(0)" aria-expanded="false">
                     <i class="fa-solid fa-utensils text-white"></i>
@@ -67,12 +66,20 @@
 
             <li><a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
                     <i class="flaticon-381-settings-5 text-white"></i>
-                    <span class="nav-text text-white">Ayarlar</span>
+                    <span class="nav-text text-white">Entegrasyonlar</span>
                 </a>
                 <ul aria-expanded="false">
 
-                    <li><a class="text-white" href="{{ route('restaurant.entegrations') }}">Entegrasyonlar</a></li>
-                    <!--li><a href="https://panel.ParsKurye.net/download/printer.exe">Printer IO</a></li-->
+                    <li><a class="text-white" href="{{ route('restaurant.entegrations') }}">Platformlar</a></li>
+                    <li><a  class="text-white" href="{{ route('restaurant.sms.entegrations') }}">Sms</a></li>
+                </ul>
+            </li>
+
+            <li><a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
+                    <i class="flaticon-381-settings-5 text-white"></i>
+                    <span class="nav-text text-white">Ayarlar</span>
+                </a>
+                <ul aria-expanded="false">
                     <li><a  class="text-white" href="https://download.anydesk.com/AnyDesk.exe">Teknik Destek</a></li>
                 </ul>
             </li>

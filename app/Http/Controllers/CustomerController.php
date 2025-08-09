@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Categorie;
 use App\Models\Courier;
 use App\Models\Customer;
 use App\Models\CustomerAddress;
+use App\Models\Expenses;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -36,38 +38,42 @@ class CustomerController extends Controller
 
     public function create(Request $request)
     {
-        if (env('TEST_MODE') && Customer::count() == 0) {
-            // Save customer information
-            $create = new Customer();
-            $create->restaurant_id = Auth::user()->id; // Assuming the authenticated user is the restaurant
-            $create->name = $request->input('name');
-            $create->phone = $request->input('phone');
-            $create->mobile = $request->input('mobile');
-            $create->email = $request->input('email')??null;
-            $create->save();
+        $testMode = env('TEST_MODE');
 
-            // Check if address data is present
-            if ($request->address) {
-                foreach ($request->address as $adres) {
-                    // Save each address for the customer
-                    $address = new CustomerAddress();
-                    $address->customer_id = $create->id; // Associate address with the created customer
-                    $address->restaurant_id = Auth::user()->id; // Associate address with the restaurant
-                    $address->name = $adres['name']; // Address title
-                    $address->sokak_cadde = $adres['sokak_cadde'];
-                    $address->bina_no = $adres['bina_no'];
-                    $address->kat = $adres['kat'];
-                    $address->daire_no = $adres['daire_no'];
-                    $address->mahalle = $adres['mahalle'];
-                    $address->adres_tarifi = $adres['adres_tarifi'] ?? ''; // Set empty string if not provided
-                    $address->save();
-                }
+        if ($testMode) {
+            if (Customer::count() > env('TEST_MODE_LIMIT')) {
+                return redirect()->back()->with('test', 'Test Modu: Üzgünüz, En Fazla '.env('TEST_MODE_LIMIT').' Kayıt Ekleyebilirsiniz');
             }
-
-            return redirect()->back()->with('message', 'Müşteri Başarıyla Eklendi.');
-        } else {
-            return redirect()->back()->with('test', 'Test Modu: Üzgünüz, En Fazla 1 Kayıt Ekleyebilirsiniz');
         }
+
+        // Save customer information
+        $create = new Customer();
+        $create->restaurant_id = Auth::user()->id; // Assuming the authenticated user is the restaurant
+        $create->name = $request->input('name');
+        $create->phone = $request->input('phone');
+        $create->mobile = $request->input('mobile');
+        $create->email = $request->input('email')??null;
+        $create->save();
+
+        // Check if address data is present
+        if ($request->address) {
+            foreach ($request->address as $adres) {
+                // Save each address for the customer
+                $address = new CustomerAddress();
+                $address->customer_id = $create->id; // Associate address with the created customer
+                $address->restaurant_id = Auth::user()->id; // Associate address with the restaurant
+                $address->name = $adres['name']; // Address title
+                $address->sokak_cadde = $adres['sokak_cadde'];
+                $address->bina_no = $adres['bina_no'];
+                $address->kat = $adres['kat'];
+                $address->daire_no = $adres['daire_no'];
+                $address->mahalle = $adres['mahalle'];
+                $address->adres_tarifi = $adres['adres_tarifi'] ?? ''; // Set empty string if not provided
+                $address->save();
+            }
+        }
+
+        return redirect()->back()->with('message', 'Müşteri Başarıyla Eklendi.');
     }
 
     public function update(Request $request)

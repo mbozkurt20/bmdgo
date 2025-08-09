@@ -19,7 +19,7 @@
 <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
 
 <script type="text/javascript">
-    const socket = io('https://kuryenkapinda.com:5000');
+   /* const socket = io('https://kuryenkapinda.com:5000');
 
     socket.on('orderCourierNotification', (data) => {
 
@@ -32,7 +32,7 @@
             let audio = new Audio(src);
             audio.play();
         }
-    });
+    }); */
 
     function AutoOrders(e) {
         const durum = document.getElementById('auto_order').checked;

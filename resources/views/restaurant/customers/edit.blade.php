@@ -6,7 +6,7 @@
             <h2 class="mb-3 me-auto">Müşteriler</h2>
             <div>
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Müşteriler</a></li>
+                    <li class="breadcrumb-item"><a href="/restaurant/customers">Müşteriler</a></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Düzenle</a></li>
                 </ol>
             </div>

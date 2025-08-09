@@ -4,114 +4,124 @@
     <div class="container-fluid">
         <div class="mb-sm-4 d-flex flex-wrap align-items-center text-head">
             <h2 class="mb-3 me-auto">Müşteriler</h2>
-            <div>
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Müşteriler</a></li>
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Liste</a></li>
-                </ol>
-            </div>
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="#">Müşteriler</a></li>
+                <li class="breadcrumb-item active">Liste</li>
+            </ol>
         </div>
+
         <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
-            <div class="customer-search mb-sm-0 mb-3">
+            <div class="customer-search">
                 <div class="input-group search-area">
                     <input type="text" id="custom-filter" class="form-control" placeholder="Müşteri ara..">
-                    <span class="input-group-text"><a href="javascript:void(0)"><i
-                                class="flaticon-381-search-2"></i></a></span>
+                    <span class="input-group-text"><i class="flaticon-381-search-2"></i></span>
                 </div>
             </div>
             <div class="d-flex align-items-center flex-wrap">
-                <a href="{{route('restaurant.customers.new')}}" class="special-button me-3"><i
-                        class="fas fa-user-plus me-2"></i> Yeni Ekle</a>
-                <a href="javascript:void(0);" class="btn bg-white btn-rounded me-2 mb-2 text-black shadow-sm"><i
-                        class="fas fa-calendar-times me-3 scale3 text-primary"></i>Filtrele<i
-                        class="fas fa-chevron-down ms-3 text-primary"></i></a>
-                <a href="javascript:void(0);" class="btn btn-secondary btn-rounded mb-2"><i class="fas fa-sync"></i></a>
+                <a href="{{ route('restaurant.customers.new') }}" class="special-button me-3">
+                    <i class="fas fa-user-plus me-2"></i> Yeni Ekle
+                </a>
+                <a href="javascript:void(0);" onclick="location.reload();" class="special-ok-button  mb-2">
+                    <i class="fas fa-sync"></i>
+                </a>
             </div>
         </div>
-        <div class="row card">
-            <div class="col-xl-12 card-body">
-               <div class="table-responsive">
-                    <table id="example3" class="order-table shadow-hover card-table text-black" style="min-width: 845px">
+
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="customerTable" class="table table-striped">
                         <thead>
                         <tr>
-                            <th style="width: 60%">Müşteri Adı</th>
-                            <th style="width: 15%">Telefon Numarası</th>
-                            <th style="width: 10%">İşlem</th>
+                            <th>Müşteri Adı <i class="fa fa-angle-down"></i></th>
+                            <th>Telefon Numarası <i class="fa fa-angle-down"></i></th>
+                            <th>Oluşturulma Tarihi <i class="fa fa-angle-down"></i></th>
+                            <th>İşlem</th>
                         </tr>
                         </thead>
                         <tbody>
                         @foreach($customers as $customer)
-                            <tr id="data_{{$customer->id}}">
-                                <td>{{$customer->name}}</td>
-                                <td>{{$customer->phone}}</td>
+                            <tr id="data_{{ $customer->id }}">
+                                <td>{{ $customer->name }}</td>
+                                <td>{{ $customer->phone }}</td>
+                                <td>{{ $customer->created_at->format('d.m.Y H:i') }}</td>
                                 <td>
                                     <div class="d-flex">
-                                        <a href="{{route('restaurant.customers.edit', ['id' => $customer->id])}}" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fas fa-pencil-alt"></i></a>
-                                        <a onclick="DeleteFunction({{$customer->id}})" class="btn btn-danger shadow btn-xs sharp"><i class="fa fa-trash"></i></a>
+                                        <a href="{{ route('restaurant.customers.edit', $customer->id) }}" class="btn btn-primary btn-sm me-1">
+                                            <i class="fas fa-pencil-alt"></i>
+                                        </a>
+                                        <button onclick="DeleteFunction({{ $customer->id }})" class="btn btn-danger btn-sm">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
                                     </div>
-
                                 </td>
                             </tr>
                         @endforeach
                         </tbody>
                     </table>
 
-                   @if(!count($customers))
-                       <h4 class="text-center mt-4">Müşteri Bulunmamaktadır.</h4>
-                   @endif
+                    @if($customers->isEmpty())
+                        <h4 class="text-center mt-4">Müşteri Bulunmamaktadır.</h4>
+                    @endif
                 </div>
             </div>
         </div>
-
     </div>
 
+    <!-- DataTables + SweetAlert -->
     <script type="text/javascript">
-        $(document).ready(function(){
-            var table = $('#example3').DataTable();
-            //DataTable custom search field
-            $('#custom-filter').keyup( function() {
-                table.search( this.value ).draw();
-            } );
+        $(document).ready(function () {
+            var table = $('#customerTable').DataTable({
+                order: [[2, "desc"]], // created_at sütununa göre sıralama
+                language: {
+                    search: "Ara:",
+                    url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/tr.json",
+                    lengthMenu: "Sayfa başına _MENU_ kayıt",
+                    info: "_TOTAL_ kayıttan _START_ - _END_ arası gösteriliyor",
+                    infoEmpty: "Gösterilecek kayıt yok",
+                    paginate: {
+                        next: "Sonraki",
+                        previous: "Önceki"
+                    }
+                }
+            });
+
+            $('#custom-filter').on('keyup', function () {
+                table.search(this.value).draw();
+            });
         });
 
-        function DeleteFunction(event) {
-
-
+        function DeleteFunction(id) {
             Swal.fire({
-                title: 'Silmek istediğinizden emin misiniz ?',
+                title: 'Silmek istediğinizden emin misiniz?',
                 text: "Bu işlemi geri alamazsınız!",
-                type: 'warning',
+                icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#4927b3',
+                confirmButtonColor: '#0d2646',
                 cancelButtonColor: '#e7004d',
                 cancelButtonText: 'Hayır',
-                confirmButtonText: 'Evet, Silmek istiyorum!',
-
-            }).then(function (isConfirm) {
-                if (isConfirm.value) {
+                confirmButtonText: 'Evet, Silmek istiyorum!'
+            }).then((result) => {
+                if (result.isConfirmed) {
                     $.ajax({
-                        type: 'GET', //THIS NEEDS TO BE GET
-                        url: '/restaurant/customers/delete/' + event,
+                        type: 'GET',
+                        url: '/restaurant/customers/delete/' + id,
                         success: function (data) {
-                            if (data == "OK") {
-                                isConfirm.value && Swal.fire("Silindi!", "Silme işlemi başarılı.", "success");
-                                $("#data_" + event).fadeOut($("#data_" + event).remove());
+                            if (data === "OK") {
+                                $('#data_' + id).fadeOut(300, function () {
+                                    $(this).remove();
+                                });
+                                Swal.fire("Silindi!", "Silme işlemi başarılı.", "success");
+                            } else {
+                                Swal.fire("Uyarı!", "Bu müşteriyi silemezsiniz.", "warning");
                             }
-                            if (data == "NO") {
-                                isConfirm.value && Swal.fire("Uyarı !!", "Bu Kuryeyi silemezsiniz..", "warning");
-                            }
-
                         },
                         error: function () {
-                            console.log(data);
+                            Swal.fire("Hata!", "Bir hata oluştu, lütfen tekrar deneyin.", "error");
                         }
                     });
                 }
-
-
-            })
-
-
+            });
         }
     </script>
 @endsection

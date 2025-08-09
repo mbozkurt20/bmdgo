@@ -21,6 +21,7 @@ class Admin extends Authenticatable
         'email',
         'password',
         'auto_orders',
+        'top_up_balance',
         'default_locations_lat',
         'default_locations_lon',
     ];

@@ -45,6 +45,84 @@
 
 
     <style>
+        .text-head {
+            background: linear-gradient(135deg, rgba(13, 38, 70, 0.9), rgba(241, 44, 109, 0.85));
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            padding: 14px 24px;
+            border-radius: 14px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        .text-head h2 {
+            color: white;
+            margin: 0;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .breadcrumb {
+            margin: 0;
+            background: transparent;
+            padding: 0;
+        }
+
+        .breadcrumb-item {
+            font-size: 0.95rem;
+            color: white;
+            position: relative;
+            padding-right: 14px;
+            transition: color 0.3s ease;
+        }
+
+        .breadcrumb-item + .breadcrumb-item::before {
+            content: "›";
+            color: #f12c6d;
+            font-weight: bold;
+            padding-right: 10px;
+            font-size: 1rem;
+        }
+
+        .breadcrumb-item a {
+            text-decoration: none;
+            color: #ffe6f0;
+            font-size: 16px;
+            font-weight: bold;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+        }
+
+        .breadcrumb-item a:hover {
+            color: #e4c2c2;
+            text-shadow: 0 0 8px rgba(241, 44, 109, 0.9);
+        }
+
+        .breadcrumb-item.active {
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+
+        .dataTables_wrapper .dataTables_paginate {
+            text-align: left !important;
+            float: left !important;
+            margin-top: 5px;
+        }
+
+        /* Önceki / Sonraki butonlarının genişliği ve boşluğu */
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            padding: 6px 14px; /* buton boyutu */
+            margin-right: 6px; /* butonlar arası boşluk */
+            min-width: 70px; /* yazılar sığsın diye minimum genişlik */
+            box-sizing: border-box;
+        }
+
         .special-ok-button-small {
             background-color: #e7004d; /* Indigo-600 */
             color: white;

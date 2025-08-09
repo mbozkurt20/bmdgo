@@ -64,7 +64,17 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('login', [App\Http\Controllers\AdminController::class, 'login'])->name('admin.auth');
     });
     Route::group(['middleware' => ['admin.auth']], function () {
+        Route::prefix('expenses')->group(function () {
+            Route::get('/',[\App\Http\Controllers\Admin\ExpensesController::class, 'index'])->name('admin.expenses.index');
+            Route::get('/new',[\App\Http\Controllers\Admin\ExpensesController::class, 'create'])->name('admin.expenses.new');
+            Route::get('/edit/{id}',[\App\Http\Controllers\Admin\ExpensesController::class, 'edit'])->name('admin.expenses.edit');
+            Route::post('/update/{id}',[\App\Http\Controllers\Admin\ExpensesController::class, 'update'])->name('admin.expenses.update');
+            Route::post('/',[\App\Http\Controllers\Admin\ExpensesController::class, 'store'])->name('admin.expenses.store');
+            Route::get('/delete/{id}',[\App\Http\Controllers\Admin\ExpensesController::class, 'destroy'])->name('admin.expenses.destroy');
+        });
+
         Route::get('/', [App\Http\Controllers\AdminController::class, 'home'])->name('admin.index');
+        Route::get('/top-up-balance', [App\Http\Controllers\AdminController::class, 'balance'])->name('admin.balance');
         Route::get('/tt', [App\Http\Controllers\AdminController::class, 'tt']);
         Route::post('logout', [App\Http\Controllers\AdminController::class, 'logout'])->name('admin.logout');
         Route::get('/filter-by-date', [App\Http\Controllers\AdminController::class, 'filterByDate'])->name('admin.filterByDate');
@@ -95,6 +105,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/progress-payment/restaurant', [\App\Http\Controllers\Admin\ProgressPaymentController::class, 'restaurant'])->name('admin.progress_payment.restaurant');
         Route::get('/progress-payment/courier', [\App\Http\Controllers\Admin\ProgressPaymentController::class, 'courier'])->name('admin.progress_payment.courier');
 
+        Route::post('/progress-payment/records', [\App\Http\Controllers\Admin\ProgressPaymentController::class, 'storeRecords'])->name('admin.progress.payments.store');
+
         /* Couriers */
         Route::get('/couriers', [\App\Http\Controllers\Admin\CourierController::class, 'index'])->name('admin.couriers');
         Route::get('/couriers/maps', [\App\Http\Controllers\Admin\CourierController::class, 'maps'])->name('admin.couriers.maps');
@@ -111,6 +123,7 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::post('/progress-payment/restaurant', [\App\Http\Controllers\Admin\ProgressPaymentController::class, 'restaurantFilter']);
         Route::post('/progress-payment/courier', [\App\Http\Controllers\Admin\ProgressPaymentController::class, 'courierFilter']);
+        Route::get('/progress-payment/record/delete/{recordId}', [\App\Http\Controllers\Admin\ProgressPaymentController::class, 'deleteRecords']);
 
         Route::get('orders/delete/{id}', [App\Http\Controllers\OrderController::class, 'deleteOrder']);
     });
@@ -126,9 +139,7 @@ Route::group(['prefix' => 'restaurant'], function () {
     });
 
     Route::group(['middleware' => ['restaurant.auth']], function () {
-
         Route::post('/quick-order', [App\Http\Controllers\OrderController::class, 'storeQuick'])->name('quick.order.store');
-
 
         Route::get('/', [App\Http\Controllers\RestaurantController::class, 'home'])->name('restaurant.index');
         Route::post('logout', [App\Http\Controllers\RestaurantController::class, 'logout'])->name('restaurant.logout');
@@ -183,6 +194,8 @@ Route::group(['prefix' => 'restaurant'], function () {
         //Route::get('/orders/sendCourier/{orderid}/{courier}', [App\Http\Controllers\OrderController::class, 'sendCourier'])->name('restaurant.orders.sendCourier');
         Route::post('/orders/sendCourier', [App\Http\Controllers\OrderController::class, 'sendCourier'])->name('restaurant.orders.sendCourier');
         Route::get('/orders/addPOS/{id}', [App\Http\Controllers\OrderController::class, 'addPOS'])->name('restaurant.addPOS');
+        Route::get('/get-pos-items', [App\Http\Controllers\OrderController::class, 'getPosItems']);
+
         Route::get('/restaurant/orders/cartItems', function () {
             return view('restaurant.orders._cart-items');
         });
@@ -206,7 +219,11 @@ Route::group(['prefix' => 'restaurant'], function () {
 
         /* Settings */
         Route::get('/entegrations', [App\Http\Controllers\MyController::class, 'entegrations'])->name('restaurant.entegrations');
+        Route::get('/sms/entegrations', [App\Http\Controllers\MyController::class, 'smsEntegrations'])->name('restaurant.sms.entegrations');
         Route::post('/entegrations/update', [App\Http\Controllers\MyController::class, 'entegrastion_update'])->name('restaurant.entegrations.entegrastion_update');
+        Route::post('/sms/entegrations/update', [App\Http\Controllers\MyController::class, 'smsEntegrastionUpdate'])->name('restaurant.sms.entegrations.update');
+        Route::post('/sms/entegrations/test', [App\Http\Controllers\MyController::class, 'smsEntegrastionTest'])->name('restaurant.sms.entegrations.test');
+        Route::get('/update/entegrations/status', [App\Http\Controllers\MyController::class, 'smsEntegrastionStatus'])->name('restaurant.sms.entegrations.status');
 
         //Raporlar
         Route::post('/reports/globalFilter', [App\Http\Controllers\ReportController::class, 'globalFilter']);

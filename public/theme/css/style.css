@@ -9917,7 +9917,7 @@ svg.pulse-svg {
       z-index: -1;
       margin: -0.1875rem;
       border-radius: inherit;
-      background: linear-gradient(to right, #FD683E, rgba(253, 163, 62, 0.75)); }
+      background: linear-gradient(to right, #e7004d, rgb(231, 0, 77)); }
   .navbar-expand .header-profile:after {
     content: "";
     height: 3.5rem;
@@ -12815,7 +12815,7 @@ Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Comp
       transition: all 0.5s; }
   [data-sidebar-style="full"][data-layout="vertical"] .deznav .metismenu > li.mm-active > a i, [data-sidebar-style="full"][data-layout="vertical"] .deznav .metismenu > li:hover > a i {
     font-weight: 300;
-    background: var(--primary);
+    background: #e7004d;
     color: #fff;
     box-shadow: 0 0.5625rem 0.5625rem var(--rgba-primary-3);
     margin-right: 10px; }

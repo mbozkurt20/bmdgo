@@ -6,7 +6,7 @@
             <h2 class="mb-3 me-auto">Kuryeler</h2>
             <div>
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Kuryeler</a></li>
+                    <li class="breadcrumb-item"><a href="/admin/couriers">Kuryeler</a></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Düzenle</a></li>
                 </ol>
             </div>
@@ -50,7 +50,7 @@
                                     <div class="mb-3 col-md-4">
                                         <label class="form-label">Şifresi</label>
                                         <input type="text" class="form-control" name="password"
-                                            value="{{ $courier->password }}" placeholder="Kurye Apk Şifresi">
+                                            value="{{ $courier->password }}" placeholder="Kurye Mobil Şifresi">
                                     </div>
                                     <div class="mb-3 col-md-4">
                                         <label class="form-label">Paket Başı Fiyatı</label>

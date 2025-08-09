@@ -248,6 +248,10 @@
 
                         </tbody>
                     </table>
+
+                    @if(!count($orders))
+                        <h4 class="text-center mt-4">Sipariş Bulunmamaktadır.</h4>
+                    @endif
                 </div>
             </div>
         </div>

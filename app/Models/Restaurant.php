@@ -49,6 +49,11 @@ class Restaurant extends Authenticatable
         'entegra_id',
         'entegra_token',
         'package_price',
+        'vatan_sms_customer',
+        'vatan_sms_username',
+        'vatan_sms_password',
+        'vatan_sms_orginator',
+        'is_sms', //sms ile doğrulama
     ];
 
     /**
@@ -72,5 +77,10 @@ class Restaurant extends Authenticatable
 
     public function orders(): HasMany{
         return $this->hasMany(Order::class, 'restaurant_id');
+    }
+
+    public function payments()
+    {
+        return $this->morphMany(ProgressPaymentRecord::class, 'payable');
     }
 }

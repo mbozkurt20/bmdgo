@@ -15,13 +15,16 @@ class CreateCouriersTable extends Migration
     {
         Schema::create('couriers', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('admin_id');
-            $table->integer('restaurant_id');
+            $table->unsignedBigInteger('admin_id');
+            $table->unsignedBigInteger('restaurant_id');
             $table->string('name');
-            $table->string('phone');
+            $table->string('phone')->unique();
             $table->string('password');
             $table->string('situation')->default('Aktif');
-            $table->decimal('price', 8, 2);
+            $table->string('price_type')->default('package');
+            $table->decimal('price', 8, 2)->default('0.00');
+            $table->decimal('fixed_price', 8, 2)->nullable();
+            $table->decimal('km_price', 8, 2)->nullable();
             $table->enum('status',['active','deactive'])->default('active');
             $table->timestamps();
         });

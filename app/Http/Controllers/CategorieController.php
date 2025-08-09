@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Categorie;
 use App\Models\Courier;
+use App\Models\Expenses;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -37,22 +38,27 @@ class CategorieController extends Controller
 
     public function create(Request $request)
     {
-        if (env('TEST_MODE') && Categorie::count() == 0){
-            $data = $request->validate([
-                'name' => 'required',
-                'desk' => 'required'
-            ]);
+        $testMode = env('TEST_MODE');
 
-            $create = New Categorie();
-            $create->restaurant_id =  Auth::user()->id;
-            $create->name = $data['name'];
-            $create->desk = $request->desk;
-            $create->save();
-
-            return redirect()->back()->with('message', 'Kategori Başarıyla Eklendi.');
-        }else{
-            return redirect()->back()->with('test', 'Test Modu: Üzgünüz, En Fazla 1 Kayıt Ekleyebilirsiniz');
+        if ($testMode) {
+            if (Categorie::count() > env('TEST_MODE_LIMIT')) {
+                return redirect()->back()->with('test', 'Test Modu: Üzgünüz, En Fazla '.env('TEST_MODE_LIMIT').' Kayıt Ekleyebilirsiniz');
+            }
         }
+
+        $data = $request->validate([
+            'name' => 'required',
+        ]);
+
+        $lastCategory = Categorie::where('restaurant_id', Auth::user()->id)->orderByDesc('id')->first();
+        $desk = $data['desk'] ?? $lastCategory ? $lastCategory->id+1 : 1; ;
+        $create = new Categorie();
+        $create->restaurant_id = Auth::user()->id;
+        $create->name = $data['name'];
+        $create->desk = $desk;
+        $create->save();
+
+        return redirect()->back()->with('message', 'Kategori Başarıyla Eklendi.');
     }
 
     public function update(Request $request)

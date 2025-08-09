@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateLocationsTable extends Migration
+class CreateSmsMessageSettingsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,11 @@ class CreateLocationsTable extends Migration
      */
     public function up()
     {
-        Schema::create('locations', function (Blueprint $table) {
+        Schema::create('sms_message_settings', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('courier_id');
-            $table->string('latitude');
-            $table->string('longitude');
-            $table->boolean('status')->default(1);
+            $table->unsignedBigInteger('admin_id');
+            $table->string('key')->nullable();
+            $table->string('value')->nullable();
             $table->timestamps();
         });
     }
@@ -30,6 +29,6 @@ class CreateLocationsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('locations');
+        Schema::dropIfExists('sms_message_settings');
     }
 }

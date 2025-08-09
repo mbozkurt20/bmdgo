@@ -169,24 +169,6 @@
             cursor: pointer;
         }
 
-        .nakit {
-            background: #008002;
-        }
-
-        .kkkarti {
-            background: #f72b50;
-        }
-
-        .kkarti {
-            background: #624FD1;
-        }
-
-        .kayit {
-            background: #fd673e;
-            padding: 25px;
-            font-size: 22px;
-        }
-
         .customer {
             padding: 0px 10px;
             border-left: 3px solid #5c5c5c;
@@ -524,7 +506,7 @@
                             <input type="date" class="form-control custom-input" id="end_date" name="end_date" required>
                         </div>
                         <div class="d-flex align-items-end">
-                            <button style="background: #fd683e;color:#fff;font-size: 0.8rem" type="submit"
+                            <button style="background: #e7004d;color:#fff;font-size: 0.8rem" type="submit"
                                     class="btn custom-btn">
                                 <i class="fas fa-calendar-day" style="padding-right:5px"></i>
                                 Filtrele</button>
@@ -533,27 +515,27 @@
                     <div class="date-filters d-flex align-items-center gap-1 ">
                         <a style="font-size:0.8rem;font-weight: 300" href="{{ route('admin.filter', ['date' => 'today']) }}"
                            class="date-filter custom-link">
-                            <i class="fas fa-calendar-day"></i>
+                            <i class="fas fa-calendar-day text-danger"></i>
                             <span>Bugün</span>
                         </a>
                         <a style="font-size:0.8rem;font-weight: 300"
                            href="{{ route('admin.filter', ['date' => 'yesterday']) }}" class="date-filter custom-link">
-                            <i class="fas fa-calendar-day"></i>
+                            <i class="fas fa-calendar-day text-danger"></i>
                             <span>Dün</span>
                         </a>
                         <a style="font-size:0.8rem;font-weight: 300"
                            href="{{ route('admin.filter', ['date' => 'this_week']) }}" class="date-filter custom-link">
-                            <i class="fas fa-calendar-week"></i>
+                            <i class="fas fa-calendar-week text-danger"></i>
                             <span>Bu Hafta</span>
                         </a>
                         <a style="font-size:0.8rem;font-weight: 300"
                            href="{{ route('admin.filter', ['date' => 'last_week']) }}" class="date-filter custom-link">
-                            <i class="fas fa-calendar-week"></i>
+                            <i class="fas fa-calendar-week text-danger"></i>
                             <span>Geçen Hafta</span>
                         </a>
                         <a style="font-size:0.8rem;font-weight: 300"
                            href="{{ route('admin.filter', ['date' => 'last_month']) }}" class="date-filter custom-link">
-                            <i class="fas fa-calendar-week"></i>
+                            <i class="fas fa-calendar-week text-danger"></i>
                             <span>Geçen Ay</span>
                         </a>
                     </div>
@@ -575,34 +557,34 @@
                         <!-- All Orders Button -->
                         <div class="col-md-6">
                             <button
-                                class="order-card btn-group-custom bg-warning order-btn d-flex justify-content-between align-items-center w-100">
+                                class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100" style="background: #e7004d">
 
-                                <span>
-                                    <i class="fa-solid fa-box" style="color: #fff;font-size:18px;padding-right:10px"></i>
+                                <span class="fw-bold">
+                                    <i class="fa-solid fa-box" style="color: #fffdfd;font-size:18px;padding-right:10px"></i>
                                     Tüm Siparişler</span>
-                                <span class="badge bg-light text-dark order-number">{{ count($tumu) }}</span>
+                                <span class="badge bg-white text-dark order-number">{{ count($tumu) }}</span>
                             </button>
                         </div>
                         <!-- Getir Orders -->
                         <div class="col-md-6">
                             <button
-                                class="order-card btn-group-custom bg-secondary order-btn d-flex justify-content-between align-items-center w-100">
+                                class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100" style="background: #4927b3">
                                 <img src="{{ asset('theme/images/GetirYemek_Logo.png') }}"
                                      style="background-repeat: no-repeat; background-position:center" width="77px"
                                      height="14px" alt="">
-                                <span>Getir Siparişleri</span>
-                                <span class="badge bg-light text-dark order-number">{{ count($getiryemek) }}</span>
+                                <span class="fw-bold">Getir Siparişleri</span>
+                                <span class="badge bg-white text-dark order-number">{{ count($getiryemek) }}</span>
                             </button>
                         </div>
                         <!-- Trendyol Orders -->
                         <div class="col-md-6">
                             <button
-                                class="order-card btn-group-custom bg-primary order-btn d-flex justify-content-between align-items-center w-100">
+                                class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100" style="background: orangered">
                                 <img src="{{ asset('theme/images/trendyolyemek.png') }}"
                                      style="background-repeat: no-repeat; background-position:center" width="71px"
                                      height="14px" alt="">
-                                <span>Trendyol Siparişleri</span>
-                                <span class="badge bg-light text-dark order-number">{{ count($trendyol) }}</span>
+                                <span class="fw-bold">Trendyol Siparişleri</span>
+                                <span class="badge bg-white text-dark order-number">{{ count($trendyol) }}</span>
                             </button>
                         </div>
 
@@ -614,8 +596,8 @@
                                 <img src="{{ asset('theme/images/Yemeksepeti_Logo.png') }}"
                                      style="background-repeat: no-repeat; background-position:center" width="79px"
                                      height="15px" alt="">
-                                <span>Yemeksepeti Siparişleri</span>
-                                <span class="badge bg-light text-dark order-number">{{ count($yemeksepeti) }}</span>
+                                <span class="fw-bold">Yemeksepeti Siparişleri</span>
+                                <span class="badge bg-white text-dark order-number">{{ count($yemeksepeti) }}</span>
                             </button>
                         </div>
                         <!-- Migros Orders -->
@@ -626,18 +608,18 @@
                                 <img src="{{ asset('theme/images/MigrosYemek_logo.png') }}"
                                      style="background-repeat: no-repeat; background-position:center" width="69px"
                                      height="28px" alt="">
-                                <span>Migros Yemek Siparişleri</span>
-                                <span class="badge bg-light text-dark order-number">{{ $migros }}</span>
+                                <span class="fw-bold">Migros Yemek Siparişleri</span>
+                                <span class="badge bg-white text-dark order-number">{{ $migros }}</span>
                             </button>
                         </div>
                         <!-- Phone Orders -->
                         <div class="col-md-6">
                             <button
                                 class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100"
-                                style="background: #1da713">
+                                style="background: #0d2646">
                                 <i class="fa-solid fa-phone" style="color: #fff;font-size:18px;padding-left:10px"></i>
-                                <span>Telefonla Gelen Sipariş</span>
-                                <span class="badge bg-light text-dark order-number">{{ count($telefonsiparis) }}</span>
+                                <span class="fw-bold">Telefonla Gelen Sipariş</span>
+                                <span class="badge bg-white text-dark order-number">{{ count($telefonsiparis) }}</span>
                             </button>
                         </div>
                     </div>
@@ -651,22 +633,22 @@
                     <div class="row g-3">
                         <!-- Revenue Card -->
                         <div class="col-4">
-                            <div class="order-card bg-primary text-white">
-                                <p>Ciro</p>
+                            <div class="order-card text-white" style="background: #0d2646">
+                                <p class="fw-bold">Ciro</p>
                                 <span class="order-number">{{ $formattedExpense }} TL</span>
                             </div>
                         </div>
                         <!-- Orders Count Card -->
                         <div class="col-4">
-                            <div class="order-card bg-secondary text-white">
-                                <p>Sipariş Sayısı</p>
+                            <div class="order-card text-white" style="background: #e7004d">
+                                <p class="fw-bold">Sipariş Sayısı</p>
                                 <span class="order-number">{{ count($tumu) }} Adet</span>
                             </div>
                         </div>
                         <!-- Average Order Amount Card -->
                         <div class="col-4">
-                            <div class="order-card bg-warning text-white">
-                                <p>Ortalama Sipariş Tutarı</p>
+                            <div class="order-card text-white" style="background: #0d2646">
+                                <p class="fw-bold">Ortalama Sipariş Tutarı</p>
                                 <span class="order-number">{{ $formattedAverageExpense }} TL</span>
                             </div>
                         </div>
@@ -678,23 +660,23 @@
                     <div class="row g-3">
                         <!-- Revenue Card -->
                         <div class="col-4">
-                            <div class="order-card bg-primary text-white">
-                                <p>Kurye Sayısı</p>
-                                <span class="order-number">{{ $totalCouriers }}</span>
+                            <div class="order-card text-white" style="background: #0d2646">
+                                <p class="fw-bold">Kurye Sayısı</p>
+                                <span class="order-number">{{ $totalCouriers }} Kişi</span>
                             </div>
                         </div>
                         <!-- Orders Count Card -->
                         <div class="col-4">
-                            <div class="order-card bg-secondary text-white">
-                                <p>Boş Kurye</p>
-                                <span class="order-number">{{ $idleCouriers }}</span>
+                            <div class="order-card text-white" style="background: #e7004d">
+                                <p class="fw-bold">Boş Kurye</p>
+                                <span class="order-number">{{ $idleCouriers }} Kişi</span>
                             </div>
                         </div>
                         <!-- Average Order Amount Card -->
                         <div class="col-4">
-                            <div class="order-card bg-warning text-white">
-                                <p>Molada Kurye</p>
-                                <span class="order-number">{{ $breakCouriers }}</span>
+                            <div class="order-card text-white" style="background: #0d2646">
+                                <p class="fw-bold">Molada Kurye</p>
+                                <span class="order-number">{{ $breakCouriers }} Kişi</span>
                             </div>
                         </div>
                     </div>
@@ -765,13 +747,11 @@
                                                          style="height: 25px;"> </a>
                                             @endif
                                             @if ($order->platform == 'telefonsiparis')
-                                                <a class="btn btn-warning btn-rounded"
-                                                   style="wdith:100%;font-weight: bold;padding:10px 15px;font-size:14px;">
+                                                <a class="special-ok-button btn-rounded"
+                                                   style="width:100%;font-weight: bold;padding:10px 15px;font-size:14px;">
                                                     {{ $restaurant->restaurant_name }} /
                                                     POS</a>
                                             @endif
-
-
 
                                             <input type="hidden" value="{{ $order->tracking_id }}"
                                                    id="tracking_{{ $order->tracking_id }}">
@@ -813,8 +793,8 @@
                                             @else
                                                 <a data-bs-toggle="modal"
                                                    data-bs-target="#Courier{{ $order->id }}"
-                                                   class="btn btn-secondary sharp me-1">
-                                                    <i class="fas fa-truck"></i> Kurye Ata
+                                                   class="special-ok-button sharp size-6 px-3 fw-bold">
+                                                    <i class="fas fa-truck mr-1"></i> <small>Kurye Ata</small>
                                                 </a>
                                             @endif
                                             <div class="modal fade" id="Courier{{ $order->id }}">

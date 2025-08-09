@@ -76,7 +76,7 @@
                 text: "Bu işlemi geri alamazsınız!",
                 type: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#4927b3',
+                confirmButtonColor: '#0d2646',
                 cancelButtonColor: '#e7004d',
                 cancelButtonText: 'Hayır',
                 confirmButtonText: 'Evet, Silmek istiyorum!',

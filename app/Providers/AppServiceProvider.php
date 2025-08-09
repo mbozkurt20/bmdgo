@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\Models\Categorie;
 use App\Models\Courier;
 use App\Models\Customer;
+use App\Models\Order;
+use App\Observers\OrderObserver;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -28,6 +30,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        Order::observe(OrderObserver::class);
+
         View::composer('*', function ($view) {
             if (Auth::check()) {
                 $restaurantId = Auth::user()->id;

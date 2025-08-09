@@ -38,6 +38,11 @@
             <!-- Yeni Sipariş Uyarısı -->
             <div class="text-success fw-bold d-none" id="new-order">Yeni Bir Siparişiniz Var !!!</div>
 
+            <p class="{{ \Illuminate\Support\Facades\Auth::guard('admin')->user()->top_up_balance > 0 ? 'special-button ' : 'special-ok-button'}}">
+                Kalan Kontör:
+
+                <strong>{{\Illuminate\Support\Facades\Auth::guard('admin')->user()->top_up_balance}}</strong>
+            </p>
             <!-- Profil -->
             <div class="dropdown">
                 <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" data-bs-toggle="dropdown">

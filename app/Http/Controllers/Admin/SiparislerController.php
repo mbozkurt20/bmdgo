@@ -18,20 +18,21 @@ class SiparislerController extends Controller
     public function deletedOrders()
     {
         $orders = Order::where('status', 'UNSUPPLIED')
-            ->whereHas('restaurant', function($query){
+            ->whereHas('restaurant', function ($query) {
                 return $query->where('admin_id', auth()->id());
             })
             ->whereDate('created_at', Carbon::today())->orderBy('created_at', 'desc')->get();
-        return view('admin.Orders.deletedOrders', compact('orders'));
+        return view('admin.orders.deletedOrders', compact('orders'));
     }
+
     public function deliveredOrders()
     {
         $couriers = Courier::where('status', 'active')->where('restaurant_id', Auth::user()->id)->get();
         $orders = Order::where('status', 'DELIVERED')
-            ->whereHas('restaurant', function($query){
+            ->whereHas('restaurant', function ($query) {
                 return $query->where('admin_id', auth()->id());
             })
             ->whereDate('created_at', Carbon::today())->orderBy('created_at', 'desc')->get();
-        return view('admin.Orders.deliveredOrders', compact('orders', 'couriers'));
+        return view('admin.orders.deliveredOrders', compact('orders', 'couriers'));
     }
 }

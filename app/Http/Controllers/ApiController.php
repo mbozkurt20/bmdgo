@@ -14,6 +14,54 @@ use Illuminate\Http\Request;
 
 class ApiController extends Controller
 {
+    public function verifyOrderCode(Request $request): JsonResponse
+    {
+        $vtoken = "3b44111837d8e28e846f4dc9dbac986cb0010e3e";
+
+        $trackingId = $request->trackingId;
+        $rToken = $request->token;
+        $code = $request->code;
+        $courierId = $request->courierId;
+
+        if($rToken == $vtoken) {
+            $order = Order::where('tracking_id',$trackingId)->first();
+
+            if (!$order){
+                return response()->json(['message' => 'Sipariş Bulunamadı'], 404);
+            }
+
+            if (Order::where('verify_code', $code)->where('id',$order->id)->exists()) {
+                $courier = Courier::where('id', $courierId)->first();
+
+                if ($courier){
+                    $courier->situation = "Aktif";
+                    $courier->save();
+                }
+
+                $auto = Admin::find(1);
+
+                if($auto->auto_orders == 1){
+                    if ($order){
+                        $atama = new CourierOrder();
+                        $atama->courier_id = $courierId;
+                        $atama->order_id = $order->id;
+                        $atama->save();
+                    }
+                }
+
+                $order->status = 'DELIVERED';
+                $order->verify_code = null;
+                $order->save();
+
+                return response()->json(['message' => 'Sipariş Başarıyla Doğrulandı'], 200);
+            }else {
+                return response()->json(['message' => 'Doğrulama Kodu Eşleşmiyor'], 404);
+            }
+        }
+
+        return response()->json(['message' => 'Token Geçersiz',401]);
+    }
+
     public function orders($token, $id): JsonResponse
     {
         $vtoken = "3b44111837d8e28e846f4dc9dbac986cb0010e3e";
