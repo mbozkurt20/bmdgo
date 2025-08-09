@@ -1,5 +1,5 @@
 <!-- Hızlı Sipariş Modal -->
-<div id="quickOrderModal" class="custom-modal">
+<div id="quickOrderModal" class="custom-modal" style="display: none;">
     <div class="custom-modal-content shadow-lg">
         <span class="close-btn" id="closeModalBtn">&times;</span>
         <form id="quickOrderForm" class="modal-content p-4">
@@ -56,7 +56,6 @@
         height: 100%;
         background-color: rgba(0,0,0,0.6);
         backdrop-filter: blur(4px);
-        display: flex;
         justify-content: center;
         align-items: center;
     }
@@ -88,7 +87,6 @@
         color: #000;
     }
 
-    /* Select kutusu tasarımı */
     .custom-select-wrapper {
         position: relative;
     }
@@ -117,7 +115,6 @@
         color: #6c757d;
     }
 
-    /* Toast Tasarımı */
     .toast {
         position: fixed;
         top: 20px;
@@ -135,18 +132,28 @@
     .toast.error { background-color: #f44336; }
 </style>
 
-
-
 <script>
     const modal = document.getElementById('quickOrderModal');
     const openBtn = document.getElementById('openModalBtn');
     const closeBtn = document.getElementById('closeModalBtn');
 
-    openBtn.addEventListener('click', () => modal.style.display = 'flex');
-    closeBtn.addEventListener('click', () => modal.style.display = 'none');
+    // Modal başlangıçta kapalı kalsın
+    modal.style.display = 'none';
+
+    if (openBtn) {
+        openBtn.addEventListener('click', () => {
+            modal.style.display = 'flex';
+        });
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+    }
 
     window.addEventListener('click', (e) => {
-        if (e.target == modal) {
+        if (e.target === modal) {
             modal.style.display = 'none';
         }
     });
@@ -186,29 +193,26 @@
         if (response.ok) {
             form.reset();
             modal.style.display = 'none';
-
-            // Başarı bildirimi
             showToast("Siparişiniz Başarıyla Eklendi", "success");
         } else {
-            // Hata bildirimi
             showToast("Bir hata meydana geldi", "error");
         }
-
-        function showToast(message, type) {
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`; // Örn: toast success veya toast error
-            toast.textContent = message;
-
-            document.body.appendChild(toast);
-
-            setTimeout(() => {
-                toast.classList.add('show');
-            }, 100);
-
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => document.body.removeChild(toast), 300);
-            }, 3000);
-        }
     });
+
+    function showToast(message, type) {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 100);
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => document.body.removeChild(toast), 300);
+        }, 3000);
+    }
 </script>
