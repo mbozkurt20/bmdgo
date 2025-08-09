@@ -25742,7 +25742,7 @@ table.dataTable tfoot th {
         line-height: 3.125rem; } }
     .dataTables_wrapper .dataTables_paginate span .paginate_button.current, .dataTables_wrapper .dataTables_paginate span .paginate_button:hover {
       color: #fff !important;
-      background: var(--primary); }
+      background: #0d2646 }
       .dataTables_wrapper .dataTables_paginate span .paginate_button.current:hover, .dataTables_wrapper .dataTables_paginate span .paginate_button:hover:hover {
         color: #fff !important;
         background: var(--primary) !important; }
