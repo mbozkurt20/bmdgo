@@ -92,8 +92,8 @@
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
-        var existingLat = {{ auth()->user()->latitude ?? 'null' }};
-        var existingLng = {{ auth()->user()->longitude ?? 'null' }};
+        var existingLat = {{ auth()->user()->latitude ?? '37.15026069044849' }};
+        var existingLng = {{ auth()->user()->longitude ?? '38.77905463205474' }};
         var map;
 
         if (existingLat && existingLng) {
