@@ -4,10 +4,15 @@ namespace App\Helpers;
 
 use App\Events\OrderNotification;
 use App\Models\Admin;
+use App\Models\Categorie;
+use App\Models\Courier;
+use App\Models\CourierOrder;
+use App\Models\Customer;
 use App\Models\Notification;
 use App\Models\Order;
 use App\Models\Restaurant;
 use App\Models\Topup;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class OrdersHelper
@@ -83,4 +88,24 @@ class OrdersHelper
             return false;
         }
     }
+
+
+    static function haversineDistance($lat1, $lon1, $lat2, $lon2, $earthRadius = 6371)
+    {
+        // Dereceleri radyana çevir
+        $lat1 = deg2rad($lat1);
+        $lon1 = deg2rad($lon1);
+        $lat2 = deg2rad($lat2);
+        $lon2 = deg2rad($lon2);
+
+        // Haversine formülü
+        $latDelta = $lat2 - $lat1;
+        $lonDelta = $lon2 - $lon1;
+
+        $angle = 2 * asin(sqrt(pow(sin($latDelta / 2), 2) +
+                cos($lat1) * cos($lat2) * pow(sin($lonDelta / 2), 2)));
+
+        return $angle * $earthRadius;
+    }
+
 }

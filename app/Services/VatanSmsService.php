@@ -2,21 +2,22 @@
 
 namespace App\Services;
 
+use App\Models\Admin;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class VatanSmsService
 {
-    public function sendSms($phone, $message)
+    public function sendSms($phone, $message,$adminId)
     {
-        $restaurant = Auth::guard('restaurant')->user();
+        $admin = Admin::find($adminId);
 
         header('Content-Type: text/html; charset=utf-8');
         $postUrl = 'http://panel.vatansms.com/panel/smsgonder1Npost.php';
-        $customerNo = $restaurant->vatan_sms_customer;
-        $username = $restaurant->vatan_sms_username;
-        $password = $restaurant->vatan_sms_password;
-        $orginator = $restaurant->vatan_sms_orginator;
+        $customerNo = $admin->vatan_sms_customer;
+        $username = $admin->vatan_sms_username;
+        $password = $admin->vatan_sms_password;
+        $orginator = $admin->vatan_sms_orginator;
 
         $TUR = 'Turkce';  // Normal yada Turkce
         $time = date('Y-m-d H:i:s', strtotime(Carbon::now()));

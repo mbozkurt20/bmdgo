@@ -69,9 +69,7 @@
                     <span class="nav-text text-white">Entegrasyonlar</span>
                 </a>
                 <ul aria-expanded="false">
-
                     <li><a class="text-white" href="{{ route('restaurant.entegrations') }}">Platformlar</a></li>
-                    <li><a  class="text-white" href="{{ route('restaurant.sms.entegrations') }}">Sms</a></li>
                 </ul>
             </li>
 

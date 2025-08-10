@@ -21,6 +21,8 @@ class Restaurant extends Authenticatable
         'restaurant_code',
         'restaurant_name',
         'name',
+        'latitude',
+        'longitude',
         'email',
         'phone',
         'email_verified_at',
@@ -49,11 +51,6 @@ class Restaurant extends Authenticatable
         'entegra_id',
         'entegra_token',
         'package_price',
-        'vatan_sms_customer',
-        'vatan_sms_username',
-        'vatan_sms_password',
-        'vatan_sms_orginator',
-        'is_sms', //sms ile doğrulama
     ];
 
     /**

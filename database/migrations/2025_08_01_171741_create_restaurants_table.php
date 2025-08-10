@@ -20,7 +20,9 @@ class CreateRestaurantsTable extends Migration
             $table->string('restaurant_name');
             $table->string('name');
             $table->string('email')->nullable();
-            $table->string('phone');
+            $table->string('phone')->nullable();
+            $table->string('latitude')->nullable();
+            $table->string('longitude')->nullable();
             $table->string('password');
             $table->string('package_price');
             $table->tinyText('address')->nullable();
@@ -46,11 +48,6 @@ class CreateRestaurantsTable extends Migration
             $table->string('remember_token')->nullable();
             $table->boolean('email_verified_at')->nullable();
             $table->boolean('auto_orders')->default(0);
-            $table->string('vatan_sms_customer')->nullable();
-            $table->string('vatan_sms_username')->nullable();
-            $table->string('vatan_sms_password')->nullable();
-            $table->string('vatan_sms_orginator')->nullable();
-            $table->boolean('is_sms')->default(0);
             $table->enum('status',['active','deactive'])->default('active');
             $table->timestamps();
         });

@@ -22,11 +22,13 @@ class CreateCouriersTable extends Migration
             $table->string('password');
             $table->string('situation')->default('Aktif');
             $table->string('price_type')->default('package');
-            $table->decimal('price', 8, 2)->default('0.00');
+            $table->decimal('price', 8, 2)->nullable();
             $table->decimal('fixed_price', 8, 2)->nullable();
             $table->decimal('km_price', 8, 2)->nullable();
             $table->string('latitude',)->nullable();
             $table->string('longitude',)->nullable();
+            $table->string('birthday',)->nullable();
+            $table->string('code',)->nullable();
             $table->boolean('online')->nullable()->default(1);
             $table->enum('status',['active','deactive'])->default('active');
             $table->timestamps();

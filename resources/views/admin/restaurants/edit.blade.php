@@ -6,7 +6,7 @@
             <h2 class="mb-3 me-auto">Restaurantlar</h2>
             <div>
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Restaurantlar</a></li>
+                    <li class="breadcrumb-item"><a href="/admin/restaurants">Restaurantlar</a></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">{{ $restaurant->name }}</a></li>
                 </ol>
             </div>
@@ -105,7 +105,7 @@
                                     </div>
                                 </div>
 
-                                <button type="submit" class="btn btn-primary">Kaydı Güncelle</button>
+                                <button type="submit" class="special-button"> Güncelle</button>
                             </form>
                         </div>
                     </div>

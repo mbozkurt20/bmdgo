@@ -22,8 +22,8 @@
                 </a>
                 <ul aria-expanded="false">
                     <li><a class="text-white" href="{{ route('admin.couriers') }}">Kuryeler</a></li>
-                    <li><a class="text-white" href="{{ route('admin.couriers.maps') }}">Kurye Takip</a></li>
                     <li><a class="text-white" href="{{ route('admin.couriers.new') }}"> Kurye Ekle</a></li>
+                    <li><a class="text-white" href="{{ route('admin.couriers.maps') }}">Kurye Takip</a></li>
                 </ul>
             </li>
 
@@ -52,6 +52,15 @@
                     <i class="flaticon-041-graph text-white"></i>
                     <span class="nav-text text-white">Raporlar</span>
                 </a>
+            </li>
+
+            <li><a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
+                    <i class="flaticon-381-settings-5 text-white"></i>
+                    <span class="nav-text text-white">Entegrasyonlar</span>
+                </a>
+                <ul aria-expanded="false">
+                    <li><a  class="text-white" href="{{ route('admin.sms.entegrations') }}">Sms</a></li>
+                </ul>
             </li>
 
             <li><a href="{{ route('admin.balance') }}" class="ai-icon" aria-expanded="false">

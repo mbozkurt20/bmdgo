@@ -2,33 +2,26 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\OrdersHelper;
+use App\Helpers\Pusher;
 use App\Http\Controllers\Controller;
-use App\Models\Categorie;
 use App\Models\Courier;
 use App\Models\Admin;
 use App\Models\Order;
 use App\Models\CourierOrder;
+use App\Models\TenantModel;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class CourierController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->middleware('auth');
     }
-
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
     public function index()
     {
         $courierss = Courier::where('status', 'active')
@@ -38,22 +31,15 @@ class CourierController extends Controller
 
         return view('admin.couriers.index', compact('courierss'));
     }
-
-    /**
-     * @returns
-     */
     public function new()
     {
         return view('admin.couriers.new');
     }
-
     public function edit($id)
     {
         $courier = Courier::find($id);
-
         return view('admin.couriers.edit', compact('courier'));
     }
-
     public function create(Request $request)
     {
         $testMode = env('TEST_MODE');
@@ -64,49 +50,100 @@ class CourierController extends Controller
             }
         }
 
-        $data = $request->validate([
-            'name' => 'required',
-            'phone' => 'required',
-            'password' => 'required',
-            'price' => 'required',
+        if (Courier::where('phone',$request->input('phone'))->exists()) {
+            return redirect()->back()->with('message', 'Bu numaraya ait kurye bulunmaktadır !!');
+        }
+
+        Courier::create([
+            'name' => $request->input('name'),
+            'phone' => $request->input('phone'),
+            'password' => $request->input('password'),
+            'price_type' => $request->input('price_type'),
+            'price' => $request->input('price'),
+            'km_price' => $request->input('km_price'),
+            'fixed_price' => $request->input('fixed_price'),
+            'situation' => 'passive',
+            'latitude' => $request->input('latitude'),
+            'longitude' => $request->input('longitude'),
+            'code' => $this->generateCode(),
+            'admin_id' => Auth::guard('admin')->user()->id,
         ]);
 
-        $create = new Courier();
-        $create->restaurant_id =  0;
-        $create->name = $data['name'];
-        $create->phone = $data['phone'];
-        $create->price = $data['price'];
-        $create->password = $data['password'];
-        $create->situation = $request->situation??'Aktif';
-        $create->admin_id = auth()->id();
-        $create->save();
+        return redirect()->back()->with('message', 'Kurye Başarıyla Kaydedildi.');
+    }
 
-        return redirect()->back()->with('message', 'Kurye Başarıyla Eklendi');
+    public function generateCode()
+    {
+        $code = rand(100000, 999999);
+
+        if (Courier::where('code', $code)->exists()) {
+            $code = rand(100000, 999999);
+        }
+
+        return $code;
     }
 
     public function update(Request $request)
     {
-        $data = $request->validate([
+        $requestData = Validator::make($request->all(), [
+            'id' => 'required',
             'name' => 'required',
-            'phone' => 'required',
-            'password' => 'required',
-            'price' => 'required',
+            'phone' => 'required'
         ]);
 
-        $create = Courier::find($request->id);
-        $create->name = $data['name'];
-        $create->phone = $data['phone'];
-        $create->price = $data['price'];
-        $create->password = $data['password'];
-		$create->situation = $request->situation;
-        $create->save();
+        if ($requestData->fails()) {
+            return redirect()->back()->with('message', 'Tüm alanları doldurunuz.');
+        }
 
-        return redirect()->back()->with('message', 'Kurye kaydı güncellendi.');
+        if (!empty($request->input('password'))) {
+            Courier::whereId($request->get('id'))->update([
+                'password' => $request->input('password')
+            ]);
+        }
+
+        Courier::whereId($request->input('id'))->update([
+            'name' => $request->input('name'),
+            'phone' => $request->input('phone'),
+            'latitude' => $request->input('latitude'),
+            'longitude' => $request->input('longitude'),
+            'price_type' => $request->input('price_type'),
+            'price' => $request->input('price'),
+            'km_price' => $request->input('km_price'),
+            'fixed_price' => $request->input('fixed_price'),
+            'situation' => $request->input('situation'),
+        ]);
+
+        $courierss = Courier::where('status',1)
+            ->where('situation','active')
+            ->get();
+
+
+        $admin = Admin::where('id', auth()->id())->select(['latitude','longitude'])->first();
+
+        $courierss = $courierss->map(function($courier) use ($admin) {
+            $distanceKm = $this->haversineDistance(
+                $admin->latitude,
+                $admin->longitude,
+                $courier->latitude,
+                $courier->longitude
+            );
+
+            if ($distanceKm < 1) {
+                $courier->distance = round($distanceKm * 1000) . ' metre';
+            } else {
+                $courier->distance = round($distanceKm, 2) . ' km';
+            }
+
+            return $courier;
+        });
+
+        Pusher::trigger('courier-channel', 'courier-'.$admin->id, $courierss);
+
+        return redirect()->back()->with('message', 'Kurye güncelleme işlemi başarıyla gerçekleşti.');
     }
 
     public function delete($id)
     {
-
         $del = Courier::find($id);
         $del->delete();
         if ($del) {
@@ -118,7 +155,6 @@ class CourierController extends Controller
 
     public function report($id)
     {
-
         $courier = Courier::where('id', $id)->first();
         $orders = Order::where('restaurant_id', Auth::user()->id)->where('courier_id', $id)->whereDate('created_at', Carbon::today())->get();
         return view('admin.couriers.report', compact('courier', 'orders'));
@@ -126,7 +162,32 @@ class CourierController extends Controller
 
     public function maps()
     {
-        return view('admin.couriers.maps');
+        $couriers = Courier::where('status', 'active')
+            ->where('restaurant_id', 0)
+            ->where('admin_id', auth()->id())
+            ->get();
+
+        $admin = Admin::where('id', \auth()->id())->select(['latitude','longitude'])->first();
+
+
+        $courierss = $couriers->map(function($courier) use ($admin) {
+            $distanceKm =  OrdersHelper::haversineDistance(
+                $admin->latitude,
+                $admin->longitude,
+                $courier->latitude,
+                $courier->longitude
+            );
+
+            if ($distanceKm < 1) {
+                $courier->distance = round($distanceKm * 1000) . ' metre';
+            } else {
+                $courier->distance = round($distanceKm, 2) . ' km';
+            }
+
+            return $courier;
+        });
+
+        return view('admin.couriers.new-maps',compact('courierss'));
     }
 
     public function auto_order($id)
@@ -138,7 +199,6 @@ class CourierController extends Controller
 
     public function sendCourier($orderid, $courier)
     {
-
         $ordersor = CourierOrder::where('order_id', $orderid)->first();
 
         if ($ordersor) {
@@ -153,11 +213,6 @@ class CourierController extends Controller
             $couriery = Courier::where('id', $courier)->first();
             $couriery->situation = 'Serviste';
             $couriery->save();
-
-
-
-
-
 
             if ($sav) {
                 echo "OK";

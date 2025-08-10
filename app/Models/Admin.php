@@ -20,10 +20,16 @@ class Admin extends Authenticatable
         'name',
         'email',
         'password',
+        'phone',
         'auto_orders',
         'top_up_balance',
-        'default_locations_lat',
-        'default_locations_lon',
+        'latitude',
+        'longitude',
+        'vatan_sms_customer',
+        'vatan_sms_username',
+        'vatan_sms_password',
+        'vatan_sms_orginator',
+        'is_sms', //sms ile doğrulama
     ];
 
     /**

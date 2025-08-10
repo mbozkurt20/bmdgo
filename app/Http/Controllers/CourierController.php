@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Admin\AdminCourier;
 use App\Models\Categorie;
 use App\Models\Courier;
 use App\Models\Expenses;
@@ -12,6 +13,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class CourierController extends Controller
 {
@@ -77,39 +79,64 @@ class CourierController extends Controller
             }
         }
 
-        $data = $request->validate([
-            'name' => 'required',
-            'phone' => 'required',
-            'price' => 'required',
+        Courier::create([
+            'name' => $request->input('name'),
+            'phone' => $request->input('phone'),
+            'password' => $request->input('password'),
+            'price_type' => $request->input('price_type'),
+            'price' => $request->input('price'),
+            'km_price' => $request->input('km_price'),
+            'fixed_price' => $request->input('fixed_price'),
+            'situation' => 'passive',
+            'latitude' => $request->input('latitude'),
+            'longitude' => $request->input('longitude'),
+            'code' => $this->generateCode(),
+            'admin_id' => Auth::guard('admin')->user()->id,
         ]);
 
-        $create = new Courier();
-        $create->restaurant_id =  Auth::user()->id;
-        $create->name = $data['name'];
-        $create->phone = $data['phone'];
-        $create->price = $data['price'];
-        $create->situation = 'Aktif';
-        $create->admin_id = auth()->id();
-        $create->save();
+        return redirect()->back()->with('message', 'Kurye Başarıyla Kaydedildi.');
+    }
+    public function generateCode()
+    {
+        $code = rand(100000, 999999);
 
-        return redirect()->back()->with('message', 'Kurye kaydı tamamlandı.');
+        if (Courier::where('code', $code)->exists()) {
+            $code = rand(100000, 999999);
+        }
+
+        return $code;
     }
     public function update(Request $request)
     {
-        $data = $request->validate([
+        $requestData = Validator::make($request->all(), [
+            'id' => 'required',
             'name' => 'required',
-            'phone' => 'required',
-            'price' => 'required',
+            'phone' => 'required'
         ]);
 
-        $create = Courier::find($request->id);
-        $create->name = $data['name'];
-        $create->phone = $data['phone'];
-        $create->price = $data['price'];
-        $create->situation = $request->situation;
-        $create->save();
+        if ($requestData->fails()) {
+            return redirect()->back()->with('message', 'Tüm alanları doldurunuz.');
+        }
 
-        return redirect()->back()->with('message', 'Kurye kaydı güncellendi.');
+        if (!empty($request->input('password'))) {
+            Courier::whereId($request->get('id'))->update([
+                'password' => $request->input('password')
+            ]);
+        }
+
+         Courier::whereId($request->input('id'))->update([
+            'name' => $request->input('name'),
+            'phone' => $request->input('phone'),
+            'latitude' => $request->input('latitude'),
+            'longitude' => $request->input('longitude'),
+            'price_type' => $request->input('price_type'),
+            'price' => $request->input('price'),
+            'km_price' => $request->input('km_price'),
+            'fixed_price' => $request->input('fixed_price'),
+            'situation' => $request->input('situation'),
+        ]);
+
+        return redirect()->back()->with('message', 'Kurye güncelleme işlemi başarıyla gerçekleşti.');
     }
     public function delete($id)
     {

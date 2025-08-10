@@ -32,8 +32,8 @@
 
      </div>
      <script>
-		 let defaultLat = '{{auth()->user()->default_locations_lat}}';
-		 let defaultLon = '{{auth()->user()->default_locations_lon}}';
+		 let defaultLat = '{{auth()->user()->latitude}}';
+		 let defaultLon = '{{auth()->user()->longitude}}';
 		 var map = L.map('map').setView([defaultLat, defaultLon], 14);
          L.tileLayer('https://mt1.google.com/vt/lyrs=r&x={x}&y={y}&z={z}', {
              attribution: '&copy; <a href="#">{{env('APP_NAME')}}</a> Kurye Takip Otomasyonu'

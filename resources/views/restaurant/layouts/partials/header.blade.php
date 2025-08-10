@@ -22,7 +22,7 @@
                 <ul class="navbar-nav header-right">
                     <li class="nav-item recipe">
                         <button id="openModalBtn" class="special-button ">
-                            Hızlı Sipariş
+                            Hızlı Sipariş Ver
                         </button>
                     </li>
 
@@ -34,6 +34,10 @@
                             <img class="img-fluid" src="{{asset('/theme/images/resLogo.png')}}">
                         </a>
                         <div class="dropdown-menu dropdown-menu-end">
+                            <a class="dropdown-item" href="{{route('restaurant.profile')}}">
+                                <i class="bi bi-person-circle text-primary me-2"></i> Profil
+                            </a>
+
                             <a href="https://download.anydesk.com/AnyDesk.exe" class="dropdown-item ai-icon">
                                 <svg id="icon-user1" xmlns="http://www.w3.org/2000/svg" class="text-primary"
                                      width="18" height="18" viewbox="0 0 24 24" fill="none"
@@ -44,6 +48,7 @@
                                 </svg>
                                 <span class="ms-2">Teknik Destek</span>
                             </a>
+
 
                             <a class="dropdown-item ai-icon" href="{{ route('restaurant.logout') }}"
                                onclick="event.preventDefault();

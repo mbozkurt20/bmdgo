@@ -10,6 +10,7 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use App\Models\Admin;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
 {
@@ -44,6 +45,28 @@ class AdminController extends Controller
         return Auth::guard('admin');
     }
 
+    public function profile()
+    {
+        return view('admin.profile');
+    }
+
+
+    public function profileUpdate(Request $request)
+    {
+        $auth = Auth::guard('admin')->user();
+
+        if ($request->password){
+            $auth->password = Hash::make($request->password);
+        }
+
+        $auth->latitude = $request->input('latitude');
+        $auth->longitude = $request->input('longitude');
+        $auth->name = $request->input('name');
+        $auth->phone = $request->input('phone');
+        $auth->save();
+
+        return redirect()->back()->with('message', 'Bilgileriniz Güncellenmiştir.');
+    }
     public function balance()
     {
         return view('admin.balance.index');

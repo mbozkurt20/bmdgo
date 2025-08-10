@@ -64,8 +64,8 @@ class DashboardController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-			'default_locations_lat' => $request->input('lat'),
-			'default_locations_lon' => $request->input('lon'),
+			'latitude' => $request->input('lat'),
+			'longitude' => $request->input('lon'),
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -102,8 +102,8 @@ class DashboardController extends Controller
         $updateData = [
             'name' => $request->name,
             'email' => $request->email,
-			'default_locations_lat' => $request->input('lat'),
-			'default_locations_lon' => $request->input('lon'),
+			'latitude' => $request->input('lat'),
+			'longitude' => $request->input('lon'),
             'updated_at' => now(),
         ];
 

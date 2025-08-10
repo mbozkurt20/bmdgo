@@ -14,7 +14,6 @@ class Courier extends Model
         'restaurant_id',
         'name',
         'phone',
-        'email',
         'status',
         'latitude',
         'longitude',
@@ -23,6 +22,8 @@ class Courier extends Model
         'price', //paket başı
         'km_price',
         'fixed_price',
+        'code',
+        'birthday',
     ];
 
     public function payments()

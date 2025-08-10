@@ -56,11 +56,11 @@
                                     </div>
                                     <div class="mb-3 col-md-4">
                                         <label class="form-label">Lokasyon (Latitude)</label>
-                                        <input type="text" class="form-control" name="lat" placeholder="546932" value="{{ $dealer->default_locations_lat }}" >
+                                        <input type="text" class="form-control" name="lat" placeholder="546932" value="{{ $dealer->latitude }}" >
                                     </div>
 									<div class="mb-3 col-md-4">
                                         <label class="form-label">Lokasyon (Longitude)</label>
-                                        <input type="text" class="form-control" name="lon" placeholder="546932" value="{{ $dealer->default_locations_lon }}">
+                                        <input type="text" class="form-control" name="lon" placeholder="546932" value="{{ $dealer->longitude }}">
                                     </div>
                                 </div>
 

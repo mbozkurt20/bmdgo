@@ -31,6 +31,7 @@ Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home.dashboard');
 
+
 Route::group(['prefix' => 'superadmin'], function(){
     Route::view('login', "superadmin.login")->name('superadmin.login');
     Route::post('login', [SuperAdmin::class, 'login'])->name('superadmin.auth');
@@ -60,10 +61,13 @@ Route::view('login', 'auth.login')->name('admin.login');
 
 Route::group(['prefix' => 'admin'], function () {
     Route::group(['middleware' => ['guest.admin']], function () {
-
         Route::post('login', [App\Http\Controllers\AdminController::class, 'login'])->name('admin.auth');
     });
+
     Route::group(['middleware' => ['admin.auth']], function () {
+        Route::get('profile', [App\Http\Controllers\AdminController::class, 'profile'])->name('admin.profile');
+        Route::post('/profile', [App\Http\Controllers\AdminController::class, 'profileUpdate'])->name('admin.profile.update');
+
         Route::prefix('expenses')->group(function () {
             Route::get('/',[\App\Http\Controllers\Admin\ExpensesController::class, 'index'])->name('admin.expenses.index');
             Route::get('/new',[\App\Http\Controllers\Admin\ExpensesController::class, 'create'])->name('admin.expenses.new');
@@ -72,6 +76,12 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('/',[\App\Http\Controllers\Admin\ExpensesController::class, 'store'])->name('admin.expenses.store');
             Route::get('/delete/{id}',[\App\Http\Controllers\Admin\ExpensesController::class, 'destroy'])->name('admin.expenses.destroy');
         });
+
+        Route::get('/sms/entegrations', [App\Http\Controllers\MyController::class, 'smsEntegrations'])->name('admin.sms.entegrations');
+        Route::post('/sms/entegrations/update', [App\Http\Controllers\MyController::class, 'smsEntegrastionUpdate'])->name('admin.sms.entegrations.update');
+        Route::post('/sms/entegrations/test', [App\Http\Controllers\MyController::class, 'smsEntegrastionTest'])->name('admin.sms.entegrations.test');
+        Route::get('/update/entegrations/status', [App\Http\Controllers\MyController::class, 'smsEntegrastionStatus'])->name('admin.sms.entegrations.status');
+
 
         Route::get('/', [App\Http\Controllers\AdminController::class, 'home'])->name('admin.index');
         Route::get('/top-up-balance', [App\Http\Controllers\AdminController::class, 'balance'])->name('admin.balance');
@@ -139,6 +149,10 @@ Route::group(['prefix' => 'restaurant'], function () {
     });
 
     Route::group(['middleware' => ['restaurant.auth']], function () {
+        Route::get('profile', [App\Http\Controllers\MyController::class, 'profile'])->name('restaurant.profile');
+        Route::post('/profile', [App\Http\Controllers\MyController::class, 'profileUpdate'])->name('restaurant.profile.update');
+
+
         Route::post('/quick-order', [App\Http\Controllers\OrderController::class, 'storeQuick'])->name('quick.order.store');
 
         Route::get('/', [App\Http\Controllers\RestaurantController::class, 'home'])->name('restaurant.index');
@@ -219,11 +233,7 @@ Route::group(['prefix' => 'restaurant'], function () {
 
         /* Settings */
         Route::get('/entegrations', [App\Http\Controllers\MyController::class, 'entegrations'])->name('restaurant.entegrations');
-        Route::get('/sms/entegrations', [App\Http\Controllers\MyController::class, 'smsEntegrations'])->name('restaurant.sms.entegrations');
         Route::post('/entegrations/update', [App\Http\Controllers\MyController::class, 'entegrastion_update'])->name('restaurant.entegrations.entegrastion_update');
-        Route::post('/sms/entegrations/update', [App\Http\Controllers\MyController::class, 'smsEntegrastionUpdate'])->name('restaurant.sms.entegrations.update');
-        Route::post('/sms/entegrations/test', [App\Http\Controllers\MyController::class, 'smsEntegrastionTest'])->name('restaurant.sms.entegrations.test');
-        Route::get('/update/entegrations/status', [App\Http\Controllers\MyController::class, 'smsEntegrastionStatus'])->name('restaurant.sms.entegrations.status');
 
         //Raporlar
         Route::post('/reports/globalFilter', [App\Http\Controllers\ReportController::class, 'globalFilter']);

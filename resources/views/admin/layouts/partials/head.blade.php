@@ -90,7 +90,8 @@
         .breadcrumb-item a {
             text-decoration: none;
             color: #ffe6f0;
-            font-weight: 500;
+            font-size: 16px;
+            font-weight: bold;
             transition: color 0.3s ease, text-shadow 0.3s ease;
         }
 

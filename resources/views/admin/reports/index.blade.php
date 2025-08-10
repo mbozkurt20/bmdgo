@@ -45,21 +45,23 @@
                 <button class="btn btn-danger">PDF</button>
             </div>
         </div>
-        <div class="row">
+
+        <br>
+        <div class="row mt-4" >
             <div class="col-xl-12" id="reportList">
                 <div class="table-responsive">
-                    <table class="table table-responsive-sm">
+                    <table class="table table-responsive-sm" >
                         <thead>
-                            <tr>
-                                <th style="width:15%">Platform</th>
-                                <th>Siparis No</th>
-                                <th>Kurye Adi</th>
-                                <th>Müsteri Adi</th>
-                                <th>Telefon</th>
-                                <th>Ödeme Yön.</th>
-                                <th>Tutar</th>
-                                <th>Tarih</th>
-                                <th>Mesafe Hesaplama</th>
+                            <tr class="text-white" style="background: #0d2646;">
+                                <th class="text-white" style="width:15%">Platform</th>
+                                <th class="text-white">Siparis No</th>
+                                <th class="text-white">Kurye Adi</th>
+                                <th class="text-white">Müsteri Adi</th>
+                                <th class="text-white">Telefon</th>
+                                <th class="text-white">Ödeme Yön.</th>
+                                <th class="text-white">Tutar</th>
+                                <th class="text-white">Tarih</th>
+                                <th class="text-white">Mesafe Hesaplama</th>
                             </tr>
                         </thead>
                         <tbody id="report">
@@ -68,26 +70,24 @@
                     </table>
                 </div>
 
-                <div class="container-fluid">
-                    <div class="row mt-3 pt-3 border-top text-white" style="background: #e7004d;">
-                        <div class="col-md-2 tops">
-                            Sipariş Sayısı: <span id="topsiparis"></span>
-                        </div>
-                        <div class="col-md-2 tops">
-                            Top. Nakit: <span id="topnakit"></span>
-                        </div>
-                        <div class="col-md-2 tops">
-                            Top. Kredi Kartı: <span id="topkkarti"></span>
-                        </div>
-                        <div class="col-md-2 tops">
-                            Top. Ticket: <span id="topticket"></span>
-                        </div>
-                        <div class="col-md-2 tops">
-                            Top. Online : <span id="toponline"></span>
-                        </div>
-                        <div class="col-md-2 tops">
-                            Top. Ciro : <span id="topciro"></span>
-                        </div>
+                <div class="row mt-3 px-3 pt-3 border-top text-white" style="background: #e7004d;">
+                    <div class="col-md-2 tops">
+                        Sipariş Sayısı: <span id="topsiparis"></span>
+                    </div>
+                    <div class="col-md-2 tops">
+                        Top. Nakit: <span id="topnakit"></span>
+                    </div>
+                    <div class="col-md-2 tops">
+                        Top. Kredi Kartı: <span id="topkkarti"></span>
+                    </div>
+                    <div class="col-md-2 tops">
+                        Top. Ticket: <span id="topticket"></span>
+                    </div>
+                    <div class="col-md-2 tops">
+                        Top. Online : <span id="toponline"></span>
+                    </div>
+                    <div class="col-md-2 tops">
+                        Top. Ciro : <span id="topciro"></span>
                     </div>
                 </div>
             </div>
@@ -96,15 +96,12 @@
     </div>
 @endsection
 
+
 <script type="text/javascript">
+    // PDF oluşturma
     function generatePDF() {
-        const {
-            jsPDF
-        } = window.jspdf;
-
+        const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-
-        doc.setFont('Roboto');
 
         doc.autoTable({
             html: '#reportList table',
@@ -129,33 +126,32 @@
         doc.save('admin_raporlari.pdf');
     }
 
+    // PDF butonuna tıklama
     document.querySelector(".btn-danger").addEventListener("click", generatePDF);
-</script>
 
-<script>
-    // Pusher'ı başlat
-    var pusher = new Pusher('c68579a24eeaebfd6487', {
-        cluster: 'eu'
-    });
-
-    // 'orders' kanalını dinle
-    var channel = pusher.subscribe('sweet-garden-70');
-    channel.bind('App\\Events\\NewOrderAdded', function(data) {
-        // Yeni sipariş geldiğinde ekrana verileri ekle
-        console.log('Yeni sipariş:', data.order);
-        // Burada DOM manipülasyonu yaparak yeni siparişi sayfaya ekleyebilirsiniz.
-    });
-</script>
-<script type="text/javascript">
+    // Rapor filtreleme
     function ReportFilter() {
         var courier = $('#courier').val();
         var restaurant = $('#restaurant').val();
         var start = $('#start_date').val();
         var end = $('#end_date').val();
 
+        // Kurye veya restoran seçilmemişse uyarı ver
+        if (courier == 0 || restaurant == 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Eksik Seçim!',
+                text: 'Lütfen hem kurye hem de restoran seçiniz.',
+                confirmButtonColor: '#e7004d',
+                confirmButtonText: 'Tamam'
+            });
+            return;
+        }
+
+        // AJAX ile filtre verilerini gönder
         $.ajax({
             type: 'POST',
-            url: '/admin/reports/globalFilter' + '?_token=' + '{{ csrf_token() }}',
+            url: '/admin/reports/globalFilter?_token={{ csrf_token() }}',
             data: {
                 courier: courier,
                 restaurant: restaurant,
@@ -163,16 +159,21 @@
                 end: end
             },
             success: function(response) {
-
-                const total = 0;
-
                 $('#report').html("");
 
                 response.data.forEach((element) => {
-
-
                     $('#report').append(
-                        `<tr><td>${element.platform}</td><td>${element.tracking_id}</td><td>${element.courier}</td><td>${element.full_name}</td><td>${element.phone}</td><td>${element.payment}</td><td>${element.amount}</td><td>${element.time}</td><td>${(element.message == null ? "Belirtilmemiş" : element.message)}<br>Km</td></tr>`
+                        `<tr>
+                            <td>${element.platform}</td>
+                            <td>${element.tracking_id}</td>
+                            <td>${element.courier}</td>
+                            <td>${element.full_name}</td>
+                            <td>${element.phone}</td>
+                            <td>${element.payment}</td>
+                            <td>${element.amount}</td>
+                            <td>${element.time}</td>
+                            <td>${element.message == null ? "Belirtilmemiş" : element.message} Km</td>
+                        </tr>`
                     );
 
                     $('#topnakit').html(element.kapida_nakit);
@@ -180,30 +181,43 @@
                     $('#topticket').html(element.kapida_ticket);
                     $('#toponline').html(element.online);
                     $('#topsiparis').html(element.topsiparis);
-
                 });
-                // HTML elementlerinden içerikleri al
+
                 var nakit = parseFloat($('#topnakit').html()) || 0;
                 var kkarti = parseFloat($('#topkkarti').html()) || 0;
                 var ticket = parseFloat($('#topticket').html()) || 0;
                 var online = parseFloat($('#toponline').html()) || 0;
-
-                // Toplamı hesapla
                 var topciro = nakit + kkarti + ticket + online;
+                $('#topciro').html(topciro.toFixed(2));
 
-                // Hesaplanan toplamı yeni bir elemente yazdır
-                $('#topciro').html(topciro.toFixed(
-                    2
-                )); // İsteğe bağlı olarak iki ondalık basamak göstermek için toFixed(2) kullanabilirsiniz
-
-
-
-
+                // Başarılı filtreleme mesajı
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Filtreleme Başarılı',
+                    text: 'Rapor başarıyla yüklendi.',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
             },
             error: function() {
-                console.log(response);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hata!',
+                    text: 'Veriler alınırken bir hata oluştu.',
+                    confirmButtonColor: '#e7004d'
+                });
             }
         });
-
     }
+
+    // Pusher kurulumu
+    var pusher = new Pusher('c68579a24eeaebfd6487', {
+        cluster: 'eu'
+    });
+
+    var channel = pusher.subscribe('sweet-garden-70');
+    channel.bind('App\\Events\\NewOrderAdded', function(data) {
+        console.log('Yeni sipariş:', data.order);
+        // İsterseniz DOM'a yeni siparişi ekleyebilirsiniz
+    });
 </script>

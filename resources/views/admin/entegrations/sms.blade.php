@@ -1,4 +1,4 @@
-@extends('restaurant.layouts.app')
+@extends('admin.layouts.app')
 @section('content')
     <style>
         #phone-input {
@@ -45,7 +45,7 @@
                         <h4 class="card-title text-white">Vatan Sms Bilgileri</h4>
                     </div>
                     <div class="card-body">
-                        <form method="post" class="repeater" action="{{ route('restaurant.sms.entegrations.update') }}">
+                        <form method="post" class="repeater" action="{{ route('admin.sms.entegrations.update') }}">
                             @csrf
 
                             <div class="basic-form">
@@ -54,25 +54,25 @@
                                         <label class="form-label">Customer (45***)</label>
                                         <input required type="text" class="form-control" name="vatan_sms_customer"
                                                placeholder="Müşteri Giriniz"
-                                               value="{{ $restaurant->vatan_sms_customer }}">
+                                               value="{{ $admin->vatan_sms_customer }}">
                                     </div>
                                     <div class="mb-3 col-md-12">
                                         <label class="form-label">Username (905***5**8**)</label>
                                         <input required type="text" class="form-control" name="vatan_sms_username"
                                                placeholder="Kullanıcı Adı Giriniz"
-                                               value="{{ $restaurant->vatan_sms_username }}">
+                                               value="{{ $admin->vatan_sms_username }}">
                                     </div>
                                     <div class="mb-3 col-md-12">
                                         <label class="form-label">Password</label>
                                         <input required type="text" class="form-control" name="vatan_sms_password"
                                                placeholder="Şifre Giriniz"
-                                               value="{{ $restaurant->vatan_sms_password }}">
+                                               value="{{ $admin->vatan_sms_password }}">
                                     </div>
                                     <div class="mb-3 col-md-12">
                                         <label class="form-label">Orginator (8*0**3*3**)</label>
                                         <input required type="text" class="form-control" name="vatan_sms_orginator"
                                                placeholder="Başlatıcı Giriniz"
-                                               value="{{ $restaurant->vatan_sms_orginator }}">
+                                               value="{{ $admin->vatan_sms_orginator }}">
                                     </div>
                                 </div>
                             </div>
@@ -94,22 +94,22 @@
                                 <p>Doğru olduğunu düşünüyorsanız Telefon No girip test messajı gönderiniz.</p>
 
                                 <p class="bg-danger-light text-danger">Uyarı:: Test mesajı size ulaşmadan sms aktif etmeyiniz!!!</p>
-                                <form method="post" action="{{route('restaurant.sms.entegrations.test')}}">
+                                <form method="post" action="{{route('admin.sms.entegrations.test')}}">
                                     @csrf
                                     <input required name="phone" type="tel" id="phone-input" maxlength="10" placeholder="5xx xxx xx xx">
                                     <button class="special-button" type="submit">Gönder</button>
                                 </form>
 
 
-                                <div class="absolute bottom-0 mb-4">
+                                <div class="absolute bottom-0 mt-5">
                                     <p class="size-3 py-2  text-dark fw-bold rounded-xl">
-                                        Test mesajımız size iletildi ise Aktif Et diyerek siparişlerinizin kurye teslimini sms doğrulama ile yapabilirsiniz...</p>
+                                        Test mesajımız size iletildi ise <strong class="text-success">Aktif Et</strong> diyerek siparişlerinizin kurye teslimini sms doğrulama ile yapabilirsiniz...</p>
 
                                     <a id="toggle-button"
                                        onclick="DeleteFunction()"
-                                       class="{{ \Illuminate\Support\Facades\Auth::guard('restaurant')->user()->is_sms ? 'special-ok-button' : 'special-button' }}"
-                                       data-status="{{ \Illuminate\Support\Facades\Auth::guard('restaurant')->user()->is_sms ? 'active' : 'passive' }}">
-                                        {{ \Illuminate\Support\Facades\Auth::guard('restaurant')->user()->is_sms ? 'Pasif Et' : 'Aktif Et' }}
+                                       class="{{ \Illuminate\Support\Facades\Auth::guard('admin')->user()->is_sms ? 'special-ok-button' : 'special-button' }}"
+                                       data-status="{{ \Illuminate\Support\Facades\Auth::guard('admin')->user()->is_sms ? 'active' : 'passive' }}">
+                                        {{ \Illuminate\Support\Facades\Auth::guard('admin')->user()->is_sms ? 'Pasif Et' : 'Aktif Et' }}
                                     </a>
                                 </div>
                             </div>
@@ -142,7 +142,7 @@
                 if (result.value) {
                     $.ajax({
                         type: 'GET',
-                        url: '/restaurant/update/entegrations/status',
+                        url: '/admin/update/entegrations/status',
                         success: function (data) {
                             if (data === "OK") {
                                 Swal.fire("Güncellendi!", "Güncelleme İşlemi Başarılı.", "success");

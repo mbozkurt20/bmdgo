@@ -20,4 +20,6 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://panel.parskurye.net/theme/js/sweetalert2.all.min.js"></script>
 --}}
-<script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+
+<script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
+

@@ -20,7 +20,7 @@
                     <label for="address" class="form-label fw-semibold">Adres</label>
                     <textarea name="address" id="address" rows="3" class="form-control rounded-4" required></textarea>
                 </div>
-                <div class="mb-3">
+                <div class="mb-3 mt-3">
                     <label for="payment_method" class="form-label fw-semibold">Ödeme Yöntemi</label>
                     <div class="custom-select-wrapper">
                         <select name="payment_method" id="payment_method" class="form-select custom-select" required>
@@ -37,7 +37,7 @@
                 </div>
             </div>
             <div class="modal-footer border-0 pt-0">
-                <button type="submit" class="btn btn-success w-100 rounded-pill py-2 fw-bold">
+                <button type="submit" class="special-button w-100 rounded-pill py-2 fw-bold">
                     Siparişi Gönder
                 </button>
             </div>
@@ -101,7 +101,7 @@
         transition: border-color 0.2s, box-shadow 0.2s;
     }
     .custom-select:focus {
-        border-color: #86b7fe;
+        border-color: #e7004d;
         box-shadow: 0 0 0 0.25rem rgb(231, 0, 77);
         outline: none;
     }

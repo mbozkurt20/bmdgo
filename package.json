@@ -20,6 +20,8 @@
         "sass-loader": "^8.0.0"
     },
     "dependencies": {
+        "laravel-echo": "^2.2.0",
+        "pusher-js": "^8.4.0",
         "sweetalert2": "^11.22.2",
         "vue": "^3.5.18"
     }
