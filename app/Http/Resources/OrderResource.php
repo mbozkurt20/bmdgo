@@ -26,7 +26,8 @@ class OrderResource extends JsonResource
             'notes' => $this->notes,
             'status' => $this->status,
             'created_at' => date('d-m-Y h:i:s',strtotime($this->created_at)),
-            'products' => json_decode($this->items )//OrderItemResource::collection($this->whenLoaded('order_items'))
+            'products' => json_decode($this->items ), //OrderItemResource::collection($this->whenLoaded('order_items'))
+            'is_sms' => $this->restaurant->admin->is_sms,
         ];
     }
 }
