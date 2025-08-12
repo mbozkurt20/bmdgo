@@ -29,22 +29,28 @@
 
         <div class="card">
             <div class="card-body table-responsive">
-                <table id="courierTable" class="table table-striped table-hover text-black">
+                <table id="courierTable" class="t table-hover text-black">
                     <thead>
                     <tr>
                         <th>Kurye Adı</th>
                         <th>Telefon Numarası</th>
-                        <th>Paket Başı Fiyat</th>
+                        <th>Çalışma Şekli</th>
+                        <th>Paket Başı Ücret</th>
+                        <th>Sabit Ücret</th>
+                        <th>1 Km Ücreti</th>
                         <th>Oluşturulma</th>
                         <th>İşlem</th>
                     </tr>
                     </thead>
                     <tbody>
-                    @foreach($courierss as $courier)
+                    @foreach($couriers as $courier)
                         <tr id="data_{{ $courier->id }}">
                             <td>{{ $courier->name }}</td>
                             <td>{{ $courier->phone }}</td>
+                            <td class="text-danger">{{ $courier->price_type == 'package' ? 'Paket Başı' : 'Sabit + Km' }}</td>
                             <td>{{ number_format($courier->price, 2) }} ₺</td>
+                            <td>{{ number_format($courier->fixed_price, 2) }} ₺</td>
+                            <td>{{ number_format($courier->km_price, 2) }} ₺</td>
                             <td>{{ $courier->created_at->format('d.m.Y H:i') }}</td>
                             <td>
                                 <div class="d-flex">

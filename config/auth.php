@@ -44,6 +44,11 @@ return [
             'driver' => 'session',
             'provider' => 'admins',
         ],
+        'courier' => [
+            'driver' => 'jwt',
+            'provider' => 'couriers',
+            'hash' => false,
+        ],
         'superadmin' => [
             'driver' => 'session',
             'provider' => 'super_admin',
@@ -102,7 +107,10 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\Reseller::class,
         ],
-
+        'couriers' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Courier::class,
+        ],
 
         // 'users' => [
         //     'driver' => 'database',

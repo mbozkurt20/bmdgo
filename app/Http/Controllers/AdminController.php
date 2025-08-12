@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\CourierStatus;
 use App\Models\Courier;
 use App\Models\Order;
 use Carbon\Carbon;
@@ -11,6 +12,7 @@ use App\Models\Admin;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use function Symfony\Component\VarDumper\Dumper\esc;
 
 class AdminController extends Controller
 {
@@ -112,21 +114,26 @@ class AdminController extends Controller
 
         // Kurye Sayısı - Total number of couriers
         $totalCouriers = Courier::where('admin_id', auth()->id())->count();
-        // Boş Kurye - Count of couriers with "Boş" situation
-        $idleCouriers = Courier::where('situation', 'Aktif')->where('admin_id', auth()->id())->count();
-        // Molada Kurye - Count of couriers with "Molada" situation
-        $breakCouriers = Courier::where('situation', 'Molada')->where('admin_id', auth()->id())->count();
+        // Boş Kurye - Count of couriers with "Boş" status
+        $idleCouriers = Courier::where('status', CourierStatus::active)->where('admin_id', auth()->id())->count();
+        // Molada Kurye - Count of couriers with "Molada" status
+        $breakCouriers = Courier::where('status', CourierStatus::break)->where('admin_id', auth()->id())->count();
+        $serviceCouriers = Courier::where('status', CourierStatus::service)->count();
 
-        return view('admin.home', compact('totalCouriers', 'idleCouriers', 'breakCouriers', 'totalExpense', 'formattedExpense', 'averageExpense', 'formattedAverageExpense', 'telefonsiparis', 'tumu', 'yemeksepeti', 'getiryemek', 'trendyol', 'couriers', 'migros', 'teslimEdilenSiparisler'));
+        return view('admin.home', compact('totalCouriers','serviceCouriers', 'idleCouriers', 'breakCouriers', 'totalExpense', 'formattedExpense', 'averageExpense', 'formattedAverageExpense', 'telefonsiparis', 'tumu', 'yemeksepeti', 'getiryemek', 'trendyol', 'couriers', 'migros', 'teslimEdilenSiparisler'));
     }
 
     public function auto_order($status)
     {
-        $change = Admin::find(2);
-        $change->auto_orders = $status;
-        $change->save();
+        $auto = Admin::where('id', Auth::guard('admin')->user()->id)->first();
+        $auto->auto_orders = $status;
+        $auto->update();
 
-        return response()->json(['status' => "OK"]);
+        if ($auto->auto_orders ){
+            echo "Active";
+        }else{
+            echo "Passive";
+        }
     }
 
     public function filterByDate(Request $request)
@@ -144,17 +151,18 @@ class AdminController extends Controller
         $migros = Order::where('platform', 'migros')->whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at', 'desc')->count();
         // Kurye Sayısı - Total number of couriers
         $totalCouriers = Courier::count();
-        // Boş Kurye - Count of couriers with "Boş" situation
-        $idleCouriers = Courier::where('situation', 'Aktif')->count();
-        // Molada Kurye - Count of couriers with "Molada" situation
-        $breakCouriers = Courier::where('situation', 'Molada')->count();
+        // Boş Kurye - Count of couriers with "Boş" status
+        $idleCouriers = Courier::where('status', CourierStatus::active)->count();
+        // Molada Kurye - Count of couriers with "Molada" status
+        $breakCouriers = Courier::where('status', CourierStatus::break)->count();
+        $serviceCouriers = Courier::where('status', CourierStatus::service)->count();
 
         $totalExpense = Order::whereBetween('created_at', [$startDate, $endDate])->sum('amount');
         $formattedExpense = number_format($totalExpense, 2, '.', ',');
         $averageExpense = Order::whereBetween('created_at', [$startDate, $endDate])->avg('amount');
         $formattedAverageExpense = number_format($averageExpense, 2, '.', ',');
 
-        return view('admin.home', compact('totalCouriers', 'idleCouriers', 'breakCouriers', 'totalExpense', 'formattedExpense', 'averageExpense', 'formattedAverageExpense', 'telefonsiparis', 'tumu', 'yemeksepeti', 'getiryemek', 'trendyol', 'couriers', 'migros'));
+        return view('admin.home', compact('totalCouriers', 'idleCouriers', 'breakCouriers', 'totalExpense', 'formattedExpense', 'averageExpense', 'formattedAverageExpense', 'telefonsiparis', 'tumu', 'yemeksepeti', 'getiryemek', 'trendyol', 'couriers', 'migros','serviceCouriers'));
     }
     public function filterOrders(Request $request)
     {
@@ -205,12 +213,13 @@ class AdminController extends Controller
         $orders = Order::whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at', 'desc')->get();
         // Kurye Sayısı - Total number of couriers
         $totalCouriers = Courier::count();
-        // Boş Kurye - Count of couriers with "Boş" situation
-        $idleCouriers = Courier::where('situation', 'Aktif')->count();
-        // Molada Kurye - Count of couriers with "Molada" situation
-        $breakCouriers = Courier::where('situation', 'Molada')->count();
+        // Boş Kurye - Count of couriers with "Boş" status
+        $idleCouriers = Courier::where('status', CourierStatus::active)->count();
+        // Molada Kurye - Count of couriers with "Molada" status
+        $breakCouriers = Courier::where('status', CourierStatus::break)->count();
+        $serviceCouriers = Courier::where('status', CourierStatus::service)->count();
 
         // Gerekli diğer veriler ve siparişler ile birlikte view döndürülür
-        return view('admin.home', compact('totalCouriers', 'idleCouriers', 'breakCouriers', 'totalExpense', 'orders', 'formattedExpense', 'averageExpense', 'formattedAverageExpense', 'telefonsiparis', 'tumu', 'yemeksepeti', 'getiryemek', 'trendyol', 'couriers', 'migros'));
+        return view('admin.home', compact('totalCouriers', 'idleCouriers', 'breakCouriers', 'totalExpense', 'orders', 'formattedExpense', 'averageExpense', 'formattedAverageExpense', 'telefonsiparis', 'tumu', 'yemeksepeti', 'getiryemek', 'trendyol', 'couriers', 'migros','serviceCouriers'));
     }
 }

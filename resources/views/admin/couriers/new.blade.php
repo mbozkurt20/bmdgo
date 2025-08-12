@@ -1,6 +1,16 @@
 @extends('admin.layouts.app')
-
 @section('content')
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map {
+            border: #0d2646 solid 2px;
+            height: 500px; /* ya da istediğin başka bir yükseklik */
+            width: 100%;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+    </style>
+
     <div class="container-fluid">
         <div class="mb-sm-4 d-flex flex-wrap align-items-center text-head">
             <h2 class="mb-3 me-auto">Yeni Kurye Ekle</h2>
@@ -76,16 +86,19 @@
                                         <input required type="text" class="form-control" name="price" placeholder="10,00">
                                     </div>
 
-
-                                    <div class="col-lg-6 mb-3 mt-4">
-                                        <label for="form-password" class="form-label fs-14 text-dark">Enlem</label>
-                                        <input required type="text" class="form-control" name="latitude" id="form-text"
-                                               placeholder="Enlem Giriniz">
+                                    <div class="mt-5 mb-3">
+                                        <p class="text-danger fw-bold">Lütfen haritadan konum işaratlemesi yapınız.</p>
+                                        <div id="map"></div>
                                     </div>
-                                    <div class="col-lg-6 mb-3 mt-4">
-                                        <label for="form-password" class="form-label fs-14 text-dark">Boylam</label>
-                                        <input required type="text" class="form-control" name="longitude" id="form-text"
-                                               placeholder="Boylam Giriniz">
+
+                                    <div class="col-md-6 mb-3">
+                                        <label class="text-dark" for="latitude">Enlem (Latitude)</label>
+                                        <input required type="text" name="latitude" id="lat" class="form-control">
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label class="text-dark" for="longitude">Boylam (Longitude)</label>
+                                        <input required type="text" name="longitude" id="lng" class="form-control">
                                     </div>
                                 </div>
 
@@ -143,6 +156,39 @@
             // Sayfa ilk yüklendiğinde çalıştır
             toggleFields();
         });
+    </script>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        var existingLat = {{ auth()->user()->latitude ?? '37.15026069044849' }};
+        var existingLng = {{ auth()->user()->longitude ?? '38.77905463205474' }};
+        var map;
+
+        if (existingLat && existingLng) {
+            map = L.map('map').setView([existingLat, existingLng], 13);
+            marker = L.marker([existingLat, existingLng]).addTo(map);
+        } else {
+            map = L.map('map').setView([39.9208, 32.8541], 6); // Türkiye geneli
+        }
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        map.on('click', function(e) {
+            var lat = e.latlng.lat;
+            var lng = e.latlng.lng;
+
+            if (marker) {
+                map.removeLayer(marker);
+            }
+
+            marker = L.marker([lat, lng]).addTo(map);
+
+            document.getElementById('lat').value = lat;
+            document.getElementById('lng').value = lng;
+        });
+
     </script>
 @endsection
 

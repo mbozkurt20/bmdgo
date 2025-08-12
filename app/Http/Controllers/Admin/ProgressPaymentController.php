@@ -26,7 +26,7 @@ class ProgressPaymentController extends Controller
     public function courier(){
         $records = ProgressPaymentRecord::where('payable_type','courier')->get();
 
-        $courierss = Courier::where('status','active')->where('admin_id', auth()->id())->where('restaurant_id', 0)->get();
+        $courierss = Courier::where('admin_id', auth()->id())->where('restaurant_id', 0)->get();
         $restaurants = Restaurant::where('status','active')->where('admin_id', auth()->id())->get();
 
         return view('admin.progressPayment.courier', compact('courierss','restaurants','records'));
@@ -66,7 +66,6 @@ class ProgressPaymentController extends Controller
             echo "ERR";
         }
     }
-
 
     public function restaurantFilter(Request $request){
         $restaurant = Restaurant::find($request->restaurant);

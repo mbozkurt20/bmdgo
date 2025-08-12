@@ -1,14 +1,14 @@
-<div class="nav-header " style="background:  #0d2646">
+<div class="nav-header" style="background:  #0d2646">
 <a href="{{ url('/admin') }}" class="d-flex justify-content-center align-items-center mt-3">
-        <div class="brand-title" style="width: 185px; height:50px">
-            <img src="{{ config('site.logo') }}" alt="Logo" style="height: 100px;">
-        </div>
+    <div class="brand-title" style="width: 185px; height:50px">
+        <img src="{{ config('site.logo') }}" alt="Logo" style="height: 100px;">
+    </div>
     </a>
-    <!--div class="nav-control">
+    <div class="nav-control">
         <div class="hamburger">
             <span class="line"></span><span class="line"></span><span class="line"></span>
         </div>
-    </div-->
+    </div>
 </div>
 
 <div class="header">
@@ -23,6 +23,8 @@
     <div class="container-fluid py-2 px-3">
         <div class="d-flex flex-wrap justify-content-between align-items-center">
 
+            <div></div>
+
             <!-- Otomatik Kurye Atama -->
             <div class="form-check form-switch me-3">
                 @php
@@ -30,7 +32,7 @@
                 @endphp
 
                 <label class="form-check-label text-dark fw-bold px-3 mt-3" for="auto_order">Otomatik Kurye Atama</label>
-                <input class="form-check-input" type="checkbox" id="auto_order" onclick="AutoOrders()"
+                <input class="form-check-input" type="checkbox" id="auto_order" onclick="autoOrders(event)"
                        role="switch" style="height: 40px; width: 80px;"
                        @if($admin->auto_orders == 1) checked @endif>
             </div>
@@ -38,7 +40,7 @@
             <!-- Yeni Sipariş Uyarısı -->
             <div class="text-success fw-bold d-none" id="new-order">Yeni Bir Siparişiniz Var !!!</div>
 
-            <p class="{{ \Illuminate\Support\Facades\Auth::guard('admin')->user()->top_up_balance > 0 ? 'special-button ' : 'special-ok-button'}}">
+            <p class="size-6 {{ \Illuminate\Support\Facades\Auth::guard('admin')->user()->top_up_balance > 0 ? 'special-button ' : 'special-ok-button'}}">
                 Kalan Kontör:
 
                 <strong>{{\Illuminate\Support\Facades\Auth::guard('admin')->user()->top_up_balance}}</strong>
@@ -74,3 +76,52 @@
         Tarayıcınız ses öğesini desteklemiyor.
     </audio>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    function autoOrders(e) {
+        const durum = document.getElementById('auto_order').checked;
+        const status = durum ? 1 : 0;
+
+        console.log(status);
+
+        $.ajax({
+            type: 'GET',
+            url: '/admin/order/auto_order/' + status,
+            success: function(data) {
+                let message = '';
+                if (data == "Active") {
+                    message = 'Otomatik Sipariş Aktif!';
+                } else if (data == "Passive") {
+                    message = 'Otomatik Sipariş Kapalı!';
+                } else {
+                    message = 'Bilinmeyen Durum!';
+                }
+
+                Swal.fire({
+                    title: message,
+                    icon: 'success',
+                    text: 'Atama durumu başarıyla güncellendi.',
+                    confirmButtonText: 'Tamam',
+                    background: '#ffffff',
+                    color: '#fff',
+                    iconColor: '#e7004d',
+                    confirmButtonColor: '#e7004d',
+                    customClass: {
+                        popup: 'rounded-xl shadow-2xl',
+                        confirmButton: 'px-6 py-3 text-lg font-semibold',
+                    },
+                    showClass: {
+                        popup: 'animate__animated animate__fadeInDown',
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__fadeOutUp',
+                    }
+                });
+            },
+            error: function(xhr) {
+                console.log(xhr.responseText);
+            }
+        });
+    }
+</script>

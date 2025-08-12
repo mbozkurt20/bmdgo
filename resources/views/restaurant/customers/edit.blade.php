@@ -1,6 +1,16 @@
 @extends('restaurant.layouts.app')
-
 @section('content')
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        .map-container {
+            border: #0d2646 solid 2px;
+            height: 300px;
+            width: 100%;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+    </style>
+
     <div class="container-fluid">
         <div class="mb-sm-4 d-flex flex-wrap align-items-center text-head">
             <h2 class="mb-3 me-auto">Müşteriler</h2>
@@ -118,6 +128,21 @@
                                                             placeholder="Adres Tarifi">
                                                     </div>
 
+                                                    <div class="col-md-12">
+                                                        <div class="map-container" id="map-{{ uniqid() }}"></div>
+                                                    </div>
+
+                                                    <!-- Enlem/Boylam -->
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="text-dark">Enlem (Latitude)</label>
+                                                        <input required type="text" value="{{ $adres->latitude }}" name="latitude" class="form-control lat-input">
+                                                    </div>
+
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="text-dark">Boylam (Longitude)</label>
+                                                        <input required type="text"   value="{{ $adres->longitude }}" name="longitude" class="form-control lng-input">
+                                                    </div>
+
                                                 </div>
                                                 <!-- Repeater Remove Btn -->
 
@@ -133,6 +158,86 @@
                 </div>
             </div>
         </div>
-
     </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            const initializedMaps = new Set();
+
+            function initMap(mapId, latInput, lngInput) {
+                if (initializedMaps.has(mapId)) return; // Eğer zaten başlatıldıysa atla
+                initializedMaps.add(mapId);
+
+                const defaultLat = parseFloat(latInput.val()) || 37.15026069044849;  // Varsayılan koordinat
+                const defaultLng = parseFloat(lngInput.val()) || 38.77905463205474;
+
+                const map = L.map(mapId).setView([defaultLat, defaultLng], 13);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap'
+                }).addTo(map);
+
+                let marker;
+
+                if (latInput.val() && lngInput.val()) {
+                    const lat = parseFloat(latInput.val());
+                    const lng = parseFloat(lngInput.val());
+                    marker = L.marker([lat, lng]).addTo(map);
+                    map.setView([lat, lng], 15);
+                }
+
+                map.on('click', function (e) {
+                    const lat = e.latlng.lat.toFixed(6);
+                    const lng = e.latlng.lng.toFixed(6);
+
+                    if (marker) {
+                        map.removeLayer(marker);
+                    }
+
+                    marker = L.marker([lat, lng]).addTo(map);
+
+                    latInput.val(lat);
+                    lngInput.val(lng);
+                });
+            }
+
+            // Sayfa açıldığında mevcut map-container'ları başlat
+            $('.map-container').each(function () {
+                const mapId = $(this).attr('id');
+                if (!mapId) return;
+
+                const container = $(this).closest('[data-repeater-item]');
+                const latInput = container.find('input.lat-input');
+                const lngInput = container.find('input.lng-input');
+
+                initMap(mapId, latInput, lngInput);
+            });
+
+            // Repeater plugin için
+            $('.repeater').repeater({
+                show: function () {
+                    const $this = $(this);
+                    $this.slideDown(400, function () {
+                        const mapContainer = $this.find('.map-container');
+
+                        if (!mapContainer.attr('id')) {
+                            const newId = 'map-' + Math.random().toString(36).substr(2, 9);
+                            mapContainer.attr('id', newId);
+                        }
+
+                        const latInput = $this.find('input.lat-input');
+                        const lngInput = $this.find('input.lng-input');
+
+                        initMap(mapContainer.attr('id'), latInput, lngInput);
+                    });
+                },
+                hide: function (deleteElement) {
+                    $(this).slideUp(deleteElement);
+                }
+            });
+        });
+    </script>
+
 @endsection

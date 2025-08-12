@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="author" content="Bootstrap-ecommerce by Vosidiy">
+    <meta name="author" content="{{env('APP_NAME')}}">
     <title>Sipariş Ekranı - {{env('APP_NAME')}}</title>
 
     <link href="{{asset('pos/assets/css/ui.css')}}" rel="stylesheet" type="text/css"/>
@@ -11,6 +11,7 @@
           integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
     <link href="{{asset('pos/assets/css/OverlayScrollbars.css')}}" type="text/css" rel="stylesheet"/>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 
     <style>
         .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
@@ -309,7 +310,7 @@
     </div>
 </div>
 
-<div id="drawer" class="drawer">
+<div id="drawer" class="drawer" style="z-index: 1050">
     <div class="drawer-header">
         <h4 class="m-0">Sepet</h4>
         <button onclick="toggleDrawer()" class="drawer-close"><i class="fas fa-times"></i></button>
@@ -542,7 +543,7 @@
                                         style="width: 100%;">
                                     <option value="0">Kurye Ata</option>
                                     <option value="-1">{{env('APP_NAME')}} Kuryesi</option>
-                                    @foreach($couriers as $courier)
+                                    @foreach($courierses as $courier)
                                         <option value="{{$courier->id}}">{{$courier->name}}</option>
                                     @endforeach
                                 </select>
@@ -556,17 +557,19 @@
             </div>
         </div>
 
-        <div class="modal fade" id="musteriAta" tabindex="-1" role="dialog" aria-labelledby="musteriAtaLabel"
-             aria-hidden="true">
+        <div class="modal fade" id="musteriAta" tabindex="-1" role="dialog" aria-labelledby="musteriAtaLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
 
                     <!-- Modal Header -->
                     <div class="modal-header">
                         <h5 class="modal-title" id="musteriAtaLabel">Müşteri Seçiniz</h5>
-                        <button style="    font-size: 1.2rem; /* or 1rem for even smaller */
-    padding: 0.25rem 0.5rem;background: white;border: none;
-    line-height: 1;" type="button" class="close" data-dismiss="modal" aria-label="Kapat">
+                        <button
+                            type="button"
+                            class="close"
+                            data-dismiss="modal"
+                            aria-label="Kapat"
+                            style="font-size: 1.2rem; padding: 0.25rem 0.5rem; background: white; border: none; line-height: 1;">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -575,12 +578,10 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="customerSelect">Müşteri Listesi</label>
-                            <select id="customerSelect" class="js-example-basic-single py-2"
-                                    onchange="customerSelect(event)">
+                            <select id="customerSelect" class="form-control js-example-basic-single" onchange="customerSelect(event)">
                                 <option value="0">Müşteri Seçiniz</option>
                                 @foreach($customers as $customer)
-                                    <option value="{{ $customer->id }}">{{ $customer->name }}
-                                        - {{ $customer->phone }}</option>
+                                    <option value="{{ $customer->id }}">{{ $customer->name }} - {{ $customer->phone }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -588,17 +589,29 @@
 
                     <!-- Modal Footer -->
                     <div class="modal-footer d-flex justify-content-between">
-                        <button type="button" class="btn btn-outline-primary" data-toggle="modal"
-                                data-target="#yeniMusteri">
+                        <button type="button" class="special-ok-button" data-toggle="modal" data-target="#yeniMusteri">
                             <i class="fas fa-plus"></i> Müşteri Ekle
                         </button>
-                        <button type="button" class="btn btn-success" data-dismiss="modal">Tamam</button>
+                        <button type="button" class="special-button" data-dismiss="modal">Tamam</button>
                     </div>
 
                 </div>
             </div>
         </div>
 
+        <!-- Select2 Script -->
+        <script>
+            $(document).ready(function() {
+                $('#customerSelect').select2({
+                    dropdownParent: $('#musteriAta'),
+                    width: '100%',
+                    placeholder: 'Müşteri Seçiniz'
+                });
+            });
+        </script>
+
+
+        <!-- Yeni müşteri ekle -->
         <div class="modal fade" id="yeniMusteri" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
              aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -703,16 +716,18 @@
                 </div>
             </div>
         </div>
+        <!-- Yeni müşteri ekle -->
 
         <input type="hidden" value="{{Auth::user()->id}}" id="restaurant">
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{asset('pos/assets/js/jquery-2.0.0.min.js')}}" type="text/javascript"></script>
 <script src="{{asset('pos/assets/js/bootstrap.bundle.min.js')}}" type="text/javascript"></script>
 <script src="{{asset('pos/assets/js/OverlayScrollbars.js')}}" type="text/javascript"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script src="https://panel.parskurye.net/theme/js/sweetalert2.all.min.js"></script>
+
 
 <script>
     $('form[name="formPos"]').on('submit', function (e) {
@@ -747,12 +762,10 @@
             drawer.classList.remove('open');
         }
 
-        $(document).ready(function () {
-            $('.js-example-basic-single').select2({
-                selectionCssClass: 'selectiki',
-                placeholder: 'Müşteri Arayınız..',
-                allowClear: true // placeholder için önerilir
-            });
+        $('.js-example-basic-single').select2({
+            selectionCssClass: 'selectiki',
+            placeholder: 'Müşteri Arayınız..',
+            allowClear: true // placeholder için önerilir
         });
 
 
@@ -810,7 +823,6 @@
     }
 
     function updatePlus(id) {
-
         $('#loader').css('display', 'block');
 
         let quant = $('#quantity_' + id).val();
@@ -931,10 +943,6 @@
         $('#kuryeAta').modal('hide');
     }
 
-    function ExitPos() {
-        window.location.href = 'https://panel.parskurye.net';
-    }
-
     function customerSelect(e) {
         let customerId = e.target.value;
         $.ajax({
@@ -989,7 +997,7 @@
         console.log({payment_control: payment_control})
         console.log({products: products})
 
-        if (payment_control !== 0) {
+        if (payment_control != 0) {
             if (customer_id > 0) {
                 if (products.length > 0) {
 
@@ -1006,7 +1014,8 @@
                         },
                         success: function (response) {
                             console.log({sgf:response})
-                            if (response.status === 'BalanceError') {
+                            if (response.status === "BalanceError") {
+                                console.log('balance girdi')
                                 Swal.fire({
                                     title: response.message,
                                     text: 'Üzgünüz, Kontör Bakiyeniz Yetersiz Olduğundan Ürün Eklenemiyor !',
@@ -1062,6 +1071,13 @@
                                 mywindow.document.close(); // necessary for IE >= 10
                                 mywindow.focus(); // necessary for IE >= 10*/
                                 mywindow.print();
+
+                                // Seçili müşteriyi sıfırla
+                                $('#customerSelect').val('0').trigger('change');
+
+                                // Müşteri bilgilerini temizle
+                                $('.customer').html('');
+                                $('#customer_id').val('');
 
                                 $.ajax({
                                     type: 'GET', //THIS NEEDS TO BE GET

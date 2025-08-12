@@ -29,12 +29,15 @@
 
         <div class="card">
             <div class="card-body table-responsive">
-                <table id="courierTable" class="table table-striped table-hover text-black">
+                <table id="courierTable" class="t table-hover text-black">
                     <thead>
                     <tr>
                         <th>Kurye Adı</th>
                         <th>Telefon Numarası</th>
-                        <th>Paket Başı Fiyat</th>
+                        <th>Çalışma Şekli</th>
+                        <th>Paket Başı Ücret</th>
+                        <th>Sabit Ücret</th>
+                        <th>1 Km Ücreti</th>
                         <th>Oluşturulma</th>
                         <th>İşlem</th>
                     </tr>
@@ -44,17 +47,20 @@
                         <tr id="data_{{ $courier->id }}">
                             <td>{{ $courier->name }}</td>
                             <td>{{ $courier->phone }}</td>
+                            <td class="text-danger">{{ $courier->price_type == 'package' ? 'Paket Başı' : 'Sabit + Km' }}</td>
                             <td>{{ number_format($courier->price, 2) }} ₺</td>
+                            <td>{{ number_format($courier->fixed_price, 2) }} ₺</td>
+                            <td>{{ number_format($courier->km_price, 2) }} ₺</td>
                             <td>{{ $courier->created_at->format('d.m.Y H:i') }}</td>
                             <td>
                                 <div class="d-flex">
-                                    <a href="{{ route('restaurant.couriers.report', $courier->id) }}" class="btn btn-secondary btn-sm me-1">
+                                    <a href="{{ route('restaurant.couriers.report', $courier->id) }}" class="btn btn-secondary btn-xs me-1">
                                         <i class="fas fa-file-pdf"></i>
                                     </a>
-                                    <a href="{{ route('restaurant.couriers.edit', $courier->id) }}" class="btn btn-primary btn-sm me-1">
+                                    <a href="{{ route('restaurant.couriers.edit', $courier->id) }}" class="btn btn-primary btn-xs me-1">
                                         <i class="fas fa-pencil-alt"></i>
                                     </a>
-                                    <button onclick="DeleteFunction({{ $courier->id }})" class="btn btn-danger btn-sm">
+                                    <button onclick="DeleteFunction({{ $courier->id }})" class="btn btn-danger btn-xs">
                                         <i class="fa fa-trash"></i>
                                     </button>
                                 </div>

@@ -32,7 +32,8 @@
                 </ul>
             </li>
 
-            <li><a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
+            <li>
+                <a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
                     <i class="flaticon-381-tab text-white"></i>
                     <span class="nav-text text-white">Menüler</span>
                 </a>

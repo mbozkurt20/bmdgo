@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\CourierStatus;
 use App\Helpers\OrdersHelper;
 use App\Models\Expenses;
 use App\Models\Topup;
@@ -96,7 +97,7 @@ class OrderController extends Controller
                         }
                     }
 
-                    $newCourier->situation = 'Serviste';
+                    $newCourier->status = CourierStatus::service;
                     $newCourier->save();
                 } else {
                     \Log::error('Order ID ' . $orderId . ' not found in orders table');
@@ -537,7 +538,7 @@ class OrderController extends Controller
                 // Kuryeyi bul ve durumunu aktif olarak güncelle
                 $courier = Courier::find($courierOrder->courier_id);
                 if ($courier) {
-                    $courier->situation = 'Aktif';
+                    $courier->status = CourierStatus::active;
                     $courier->save();
                 }
             }

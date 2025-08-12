@@ -36,7 +36,7 @@ class AppServiceProvider extends ServiceProvider
             if (Auth::check()) {
                 $restaurantId = Auth::user()->id;
 
-                $couriers = Courier::where('status', 'active')
+                $courierses = Courier::where('status', 'active')
                     ->where('restaurant_id', $restaurantId)
                     ->get();
 
@@ -49,7 +49,7 @@ class AppServiceProvider extends ServiceProvider
                     ->get();
 
                 $view->with([
-                    'couriers' => $couriers,
+                    'courierses' => $courierses,
                     'customers' => $customers,
                     'categories' => $categories,
                 ]);

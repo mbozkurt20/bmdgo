@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\CourierStatus;
 use App\Helpers\OrdersHelper;
+use App\Helpers\OrderStatus;
 use App\Helpers\Pusher;
 use App\Http\Controllers\Controller;
 use App\Models\Courier;
@@ -14,6 +16,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class CourierController extends Controller
@@ -24,12 +27,11 @@ class CourierController extends Controller
     }
     public function index()
     {
-        $courierss = Courier::where('status', 'active')
-            ->where('restaurant_id', 0)
+        $couriers = Courier::where('restaurant_id', 0)
             ->where('admin_id', auth()->id())
             ->get();
 
-        return view('admin.couriers.index', compact('courierss'));
+        return view('admin.couriers.index', compact('couriers'));
     }
     public function new()
     {
@@ -51,18 +53,18 @@ class CourierController extends Controller
         }
 
         if (Courier::where('phone',$request->input('phone'))->exists()) {
-            return redirect()->back()->with('message', 'Bu numaraya ait kurye bulunmaktadır !!');
+            return redirect()->back()->with('test', 'Bu numaraya ait kurye bulunmaktadır !!');
         }
 
         Courier::create([
             'name' => $request->input('name'),
             'phone' => $request->input('phone'),
-            'password' => $request->input('password'),
+            'password' => Hash::make($request->input('password')),
             'price_type' => $request->input('price_type'),
             'price' => $request->input('price'),
             'km_price' => $request->input('km_price'),
             'fixed_price' => $request->input('fixed_price'),
-            'situation' => 'passive',
+            'status' => CourierStatus::active,
             'latitude' => $request->input('latitude'),
             'longitude' => $request->input('longitude'),
             'code' => $this->generateCode(),
@@ -110,11 +112,12 @@ class CourierController extends Controller
             'price' => $request->input('price'),
             'km_price' => $request->input('km_price'),
             'fixed_price' => $request->input('fixed_price'),
-            'situation' => $request->input('situation'),
+            'status' => $request->input('status'),
+            'password' => Hash::make($request->input('password')),
         ]);
 
         $courierss = Courier::where('status',1)
-            ->where('situation','active')
+            ->where('status', CourierStatus::active)
             ->get();
 
 
@@ -156,20 +159,38 @@ class CourierController extends Controller
     public function report($id)
     {
         $courier = Courier::where('id', $id)->first();
-        $orders = Order::where('restaurant_id', Auth::user()->id)->where('courier_id', $id)->whereDate('created_at', Carbon::today())->get();
+
+        $orders = Order::where('courier_id', $id)->whereDate('created_at', Carbon::today())->get();
         return view('admin.couriers.report', compact('courier', 'orders'));
     }
 
     public function maps()
     {
-        $couriers = Courier::where('status', 'active')
+        $data = [
+            'active' => Courier::where('status', CourierStatus::active)
+                ->where('restaurant_id', 0)
+                ->where('admin_id', auth()->id())
+                ->count(),
+            'passive' => Courier::where('status', CourierStatus::passive)
+                ->where('restaurant_id', 0)
+                ->where('admin_id', auth()->id())
+                ->count(),
+            'service' => Courier::where('status', CourierStatus::service)
+                ->where('restaurant_id', 0)
+                ->where('admin_id', auth()->id())
+                ->count(),
+            'break' => Courier::where('status', CourierStatus::break)
+                ->where('restaurant_id', 0)
+                ->where('admin_id', auth()->id())
+                ->count()
+        ];
+
+        $couriers = Courier::whereIn('status', [CourierStatus::active,CourierStatus::service])
             ->where('restaurant_id', 0)
             ->where('admin_id', auth()->id())
             ->get();
 
         $admin = Admin::where('id', \auth()->id())->select(['latitude','longitude'])->first();
-
-
         $courierss = $couriers->map(function($courier) use ($admin) {
             $distanceKm =  OrdersHelper::haversineDistance(
                 $admin->latitude,
@@ -187,7 +208,7 @@ class CourierController extends Controller
             return $courier;
         });
 
-        return view('admin.couriers.new-maps',compact('courierss'));
+        return view('admin.couriers.new-maps',compact('courierss','data'));
     }
 
     public function auto_order($id)
@@ -204,14 +225,14 @@ class CourierController extends Controller
         if ($ordersor) {
 
             $courierx = Courier::where('id', $ordersor->courier_id)->first();
-            $courierx->situation = 'Aktif';
+            $courierx->status =  CourierStatus::active;;
             $courierx->save();
 
             $ordersor->courier_id = $courier;
             $sav = $ordersor->save();
 
             $couriery = Courier::where('id', $courier)->first();
-            $couriery->situation = 'Serviste';
+            $couriery->status = CourierStatus::service;
             $couriery->save();
 
             if ($sav) {
@@ -227,7 +248,7 @@ class CourierController extends Controller
             $sav = $order->save();
 
             $courierx = Courier::where('id', $courier)->first();
-            $courierx->situation = 'Serviste';
+            $courierx->status = CourierStatus::service;
             $courierx->save();
 
             if ($sav) {

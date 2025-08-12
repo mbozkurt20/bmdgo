@@ -23,6 +23,8 @@ class CreateCustomerAddressesTable extends Migration
             $table->string('kat');
             $table->string('daire_no');
             $table->string('mahalle');
+            $table->string('latitude')->nullable();
+            $table->string('longitude')->nullable();
             $table->text('adres_tarifi')->nullable();
             $table->enum('status', ['active', 'deactive'])->default('active');
             $table->unsignedBigInteger('city_id')->nullable();

@@ -35,17 +35,6 @@
           integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
           crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-
-    @if ($_SERVER['REQUEST_URI'] == '/admin')
-        <script type="text/javascript">
-            $(document).ready(function() {
-                setTimeout(function() {
-                    location.reload();
-                }, 60000)
-            });
-        </script>
-    @endif
-
     <style>
         .text-head {
             background: linear-gradient(135deg, rgba(13, 38, 70, 0.9), rgba(241, 44, 109, 0.85));

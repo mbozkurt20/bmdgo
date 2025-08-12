@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\CourierStatus;
 use App\Helpers\OrdersHelper;
 use App\Jobs\AssignOrderToCourier;
 use Illuminate\Http\Request;
@@ -226,7 +227,7 @@ class AdisyoController extends Controller
 					$courier = Courier::find($courierOrder->courier_id);
 					if ($courier) {
 						// Kuryenin durumunu güncelle
-						$courier->situation = 'Aktif';
+						$courier->status = CourierStatus::active;;
 						$courier->save();
 						Log::info('Kurye durumu güncellendi', ['courier_id' => $courier->id]);
 					}
@@ -244,7 +245,7 @@ class AdisyoController extends Controller
 					$courier = Courier::find($courierOrder->courier_id);
 					if ($courier) {
 						// Kuryenin durumunu güncelle
-						$courier->situation = 'Aktif';
+						$courier->status = CourierStatus::active;;
 						$courier->save();
 						Log::info('Kurye durumu güncellendi', ['courier_id' => $courier->id]);
 					}

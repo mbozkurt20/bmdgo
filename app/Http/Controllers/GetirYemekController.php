@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\CourierStatus;
 use App\Models\Courier;
 use App\Models\CourierOrder;
 use App\Models\Restaurant;
@@ -139,14 +140,14 @@ class GetirYemekController extends Controller
 
             $auto = Admin::find(1);
             if ($auto && $auto->auto_orders == 1) {
-                $courie = Courier::where('restaurant_id', 0)->where('situation', 'Aktif')->first();
+                $courie = Courier::where('restaurant_id', 0)->where('status', CourierStatus::active)->first();
                 if ($courie) {
                     CourierOrder::create([
                         'courier_id' => $courie->id,
                         'order_id' => $order->id
                     ]);
 
-                    $courie->situation = "Serviste";
+                    $courie->status = CourierStatus::service;;
                     $courie->save();
                 }
             }

@@ -66,6 +66,8 @@ class CustomerController extends Controller
                 $address->sokak_cadde = $adres['sokak_cadde'];
                 $address->bina_no = $adres['bina_no'];
                 $address->kat = $adres['kat'];
+                $address->latitude = $adres['latitude'];
+                $address->longitude = $adres['longitude'];
                 $address->daire_no = $adres['daire_no'];
                 $address->mahalle = $adres['mahalle'];
                 $address->adres_tarifi = $adres['adres_tarifi'] ?? ''; // Set empty string if not provided
@@ -96,6 +98,8 @@ class CustomerController extends Controller
                         $address->daire_no = $adres['daire_no'];
                         $address->mahalle = $adres['mahalle'];
                         $address->adres_tarifi = $adres['adres_tarifi'];
+                        $address->latitude = $adres['latitude'];
+                        $address->longitude = $adres['longitude'];
                         $address->save();
                     }
                 } else {
@@ -109,6 +113,8 @@ class CustomerController extends Controller
                     $newAddress->daire_no = $adres['daire_no'];
                     $newAddress->mahalle = $adres['mahalle'];
                     $newAddress->adres_tarifi = $adres['adres_tarifi'];
+                    $address->latitude = $adres['latitude'];
+                    $address->longitude = $adres['longitude'];
                     $newAddress->save();
                 }
             }

@@ -33,6 +33,7 @@ Route::get('/getCourierOrder', [App\Http\Controllers\ApiController::class, 'getC
 
 
 //Kurye App
+/*
 Route::post('/verify/order-code', [App\Http\Controllers\ApiController::class, 'verifyOrderCode']);
 Route::post('/courier/login', [App\Http\Controllers\ApiController::class, 'login']);
 Route::get('/courier/orders/{token}/{id}', [App\Http\Controllers\ApiController::class, 'orders']);
@@ -41,13 +42,14 @@ Route::post('/courier/location/', [App\Http\Controllers\ApiController::class, 'l
 
 Route::get('/getLocations', [App\Http\Controllers\ApiController::class, 'getLocations']);
 Route::get('/courier/status/{token}/{user_id}/{status}', [App\Http\Controllers\ApiController::class, 'status']);
-Route::get('/courier/situation/{token}/{user_id}', [App\Http\Controllers\ApiController::class, 'situation']);
+Route::get('/courier/status/{token}/{user_id}', [App\Http\Controllers\ApiController::class, 'status']);
 Route::post('/courier/order_status', [App\Http\Controllers\ApiController::class, 'order_status']);
 Route::post('/courier/reports/', [App\Http\Controllers\ApiController::class, 'reports']);
+*/
 
+include __DIR__."/api/courier/v2.php";
 
 //Caller App
-
 Route::post('/caller/login', [App\Http\Controllers\CallerController::class, 'login']);
 Route::get('/caller/phoneNumber/{userId}/{phone}', [App\Http\Controllers\CallerController::class, 'getphoneNumber']);
 

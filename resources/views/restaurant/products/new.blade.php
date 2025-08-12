@@ -38,9 +38,9 @@
                                 <div class="row">
                                     <div class="mb-3 col-md-4 mb-5">
                                         <label class="form-label text-dark fw-bold" for="imageInput">Görsel</label>
-                                        <div class="image-upload-wrapper" onclick="document.getElementById('imageInput').click();">
-                                            <label for="imageInput" class="image-upload-label">
-                                                <!-- Basit resim ikon svg'si -->
+                                        <div class="image-upload-wrapper" id="imageUploadWrapper">
+                                            <label for="imageInput" class="image-upload-label" id="uploadLabel">
+                                                <!-- SVG simgesi burada -->
                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                                     <path d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 12.5l2.5 3.01L14.5 11l4.5 6H5l3.5-4.5z"/>
                                                 </svg>
@@ -48,7 +48,9 @@
                                             </label>
                                             <input type="file" id="imageInput" name="image" accept="image/*" required>
                                             <img id="imagePreview" alt="Seçilen Resim">
+                                            <button type="button" id="changeImageBtn" style="display:none; margin-top:10px;" class="btn btn-secondary btn-sm">Görseli Değiştir</button>
                                         </div>
+
                                     </div>
                                 </div>
 
@@ -121,7 +123,14 @@
         }
 
         .image-upload-wrapper input[type="file"] {
-            display: none; /* Gizle dosya inputu */
+            opacity: 0;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            cursor: pointer;
+            z-index: 2;
         }
 
         .image-upload-label {
@@ -158,6 +167,9 @@
     <script>
         const imageInput = document.getElementById('imageInput');
         const imagePreview = document.getElementById('imagePreview');
+        const uploadLabel = document.getElementById('uploadLabel');
+        const changeImageBtn = document.getElementById('changeImageBtn');
+        const wrapper = document.getElementById('imageUploadWrapper');
 
         imageInput.addEventListener('change', () => {
             const file = imageInput.files[0];
@@ -166,12 +178,15 @@
                 reader.onload = function(e) {
                     imagePreview.src = e.target.result;
                     imagePreview.style.display = 'block';
-                }
+                    uploadLabel.style.display = 'none';
+                    changeImageBtn.style.display = 'inline-block';
+                };
                 reader.readAsDataURL(file);
-            } else {
-                imagePreview.src = '';
-                imagePreview.style.display = 'none';
             }
+        });
+
+        changeImageBtn.addEventListener('click', () => {
+            imageInput.click();
         });
     </script>
 

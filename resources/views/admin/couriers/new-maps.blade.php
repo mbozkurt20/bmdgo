@@ -3,14 +3,26 @@
 
     <div class="row ">
         <div class="col-md-6">
-            <div class="card card-body bg-success-gradient">
-                <h5> Çevrimiçi: {{$courierss->where('online',true)->count()}} Kurye</h5>
+            <div class="card card-body bg-success">
+                <h5 class="text-white fw-bold"> Müsait: {{$data['active']}} Kurye</h5>
             </div>
 
         </div>
         <div class="col-md-6">
-            <div class="card card-body bg-danger-gradient">
-                <h5> Çevrimdışı: {{$courierss->where('online',false)->count()}} Kurye</h5>
+            <div class="card card-body bg-secondary">
+                <h5 class="text-white fw-bold"> Molada: {{$data['break']}} Kurye</h5>
+            </div>
+
+        </div>
+        <div class="col-md-6">
+            <div class="card card-body bg-warning">
+                <h5 class="text-white fw-bold"> Serviste: {{$data['service']}} Kurye</h5>
+            </div>
+
+        </div>
+        <div class="col-md-6">
+            <div class="card card-body bg-danger">
+                <h5 class="text-white fw-bold"> Kapalı: {{$data['passive']}} Kurye</h5>
             </div>
         </div>
     </div>
@@ -60,12 +72,50 @@
                 var marker = L.marker([location.latitude, location.longitude], {icon: icon}).addTo(map);
                 marker.bindPopup('<b>' + location.name + '</b><br>' + location.price);
 
-                marker.bindTooltip(location.name + ' - Tel: ' + location.phone +
-                    '<br> Paket Başı: ' + location.price + '₺' +
-                    '<br> Uzaklık: ' + location.distance, {
-                    permanent: false,
-                    direction: 'top'
-                });
+
+                if (location.price_type === 'package'){
+                    marker.bindTooltip(
+                        location.status === 'service'
+                            ? `<span class="text-warning">Serviste</span>`
+                            : `<span class="text-success">Müsait</span>`,
+                        {
+                            permanent: false,
+                            direction: 'top'
+                        }
+                    );
+
+                    const tooltipContent = `
+    ${location.status === 'service'
+                        ? `<span class="fw-bold text-warning">Serviste</span>`
+                        : `<span class="fw-bold text-success">Müsait</span>`}
+    <br> ${location.name} - Tel: ${location.phone}
+    <br> Paket Başı: ${location.price}₺
+    <br> Uzaklık: ${location.distance}
+`;
+
+                    marker.bindTooltip(tooltipContent, {
+                        permanent: false,
+                        direction: 'top'
+                    });
+                }else {
+                    const statusHtml = `${location.status === 'service'
+                        ? `<span class="fw-bold text-warning">Serviste</span>`
+                        : `<span class="fw-bold text-success">Müsait</span>`}`;
+
+                    const tooltipContent = `${statusHtml}
+    <br>  ${location.name} - Tel: ${location.phone}
+
+    <br> Sabit Ücret: ${location.fixed_price}₺
+    <br> Km Ücret: ${location.km_price}₺
+    <br> Uzaklık: ${location.distance}
+`;
+
+                    marker.bindTooltip(tooltipContent, {
+                        permanent: false,
+                        direction: 'top'
+                    });
+                }
+
 
                 markers.push(marker); // Yeni marker'ı diziye ekle
             });

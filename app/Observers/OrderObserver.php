@@ -4,6 +4,9 @@ namespace App\Observers;
 
 use App\Helpers\OrdersHelper;
 use App\Helpers\SendSms;
+use App\Jobs\AssignOrderToCourier;
+use App\Models\Admin;
+use App\Models\Courier;
 use App\Models\Order;
 use App\Models\Restaurant;
 use Illuminate\Support\Facades\Log;
@@ -26,7 +29,6 @@ class OrderObserver
         SendSms::send($order->phone,'Sayın '.$order->full_name.', '. $order->tracking_id. ' numaralı siparişiniz alınmıştır.'. '\n \n '.
             $order->verify_code.' doğrulama kodu ile siparişinizi teslim alabilirsiniz.', $restaurant->admin_id);
 
-
         $options = array (
             'cluster' => 'mt1',
             'useTLS' => true
@@ -38,7 +40,8 @@ class OrderObserver
             env('PUSHER_APP_ID'),
             $options
         );
-
+        
+        $order = Order::where('id',$order->id)->with('restaurant')->first();
         $pusher->trigger('my-channel', 'orders', ['order' => $order]);
     }
 
@@ -59,5 +62,50 @@ class OrderObserver
         if ($order->status == 'DELIVERED') {
             SendSms::send($order->phone,'Sayın '.$order->full_name.', '. $order->tracking_id. ' numaralı siparişiniz teslim edilmiştir. \n \n Bizi tercih ettiğiniz için teşekkür ederiz.', $restaurant->admin_id);
         }
+
+        if (Admin::where('id', $restaurant->admin_id)->first()->auto_orders) {
+            if ($order) {
+                dispatch(new AssignOrderToCourier($order));
+            }
+        }
+
+        $options = array (
+            'cluster' => 'mt1',
+            'useTLS' => true
+        );
+
+        $pusher = new Pusher (
+            env('PUSHER_APP_KEY'),
+            env('PUSHER_APP_SECRET'),
+            env('PUSHER_APP_ID'),
+            $options
+        );
+
+        $order = Order::where('id',$order->id)->with('restaurant')->first();
+        $pusher->trigger('my-channel', 'orders', ['order' => $order]);
+    }
+
+    /**
+     * Handle the Courier "deleted" event.
+     *
+     * @param  \App\Models\Order  $order
+     * @return void
+     */
+    public function deleted(Order $order)
+    {
+        $options = array (
+            'cluster' => 'mt1',
+            'useTLS' => true
+        );
+
+        $pusher = new Pusher (
+            env('PUSHER_APP_KEY'),
+            env('PUSHER_APP_SECRET'),
+            env('PUSHER_APP_ID'),
+            $options
+        );
+
+        $order = Order::where('id',$order->id)->with('restaurant')->first();
+        $pusher->trigger('my-channel', 'orders', ['order' => $order]);
     }
 }

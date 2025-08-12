@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\CourierStatus;
 use App\Models\Courier;
 use App\Models\Order;
 use App\Models\Restaurant;
@@ -28,13 +29,11 @@ class RestaurantController extends Controller
     {
         $userId = Auth::user()->id;
 
-        $ResActiveCouriers = Courier::where('status', 'active')
-            ->where('situation', 'Aktif')
+        $ResActiveCouriers = Courier::where('status', CourierStatus::active)
             ->where('restaurant_id', $userId)
             ->get();
 
-        $AcitegenelCouriers = Courier::where('status', 'active')
-            ->where('situation', 'Aktif')
+        $AcitegenelCouriers = Courier::where('status', CourierStatus::active)
             ->where('restaurant_id', 0)
             ->get();
 
@@ -57,8 +56,8 @@ class RestaurantController extends Controller
             'formattedExpense' => number_format(Order::where('restaurant_id', $userId)->whereBetween('created_at', [$startDate, $endDate])->sum('amount'), 2, '.', ','),
             'formattedAverageExpense' => number_format(Order::where('restaurant_id', $userId)->whereBetween('created_at', [$startDate, $endDate])->avg('amount'), 2, '.', ','),
             'totalCouriers' => Courier::count(),
-            'idleCouriers' => Courier::where('situation', 'Aktif')->count(),
-            'breakCouriers' => Courier::where('situation', 'Molada')->count(),
+            'idleCouriers' => Courier::where('status', CourierStatus::active)->count(),
+            'breakCouriers' => Courier::where('status', CourierStatus::break)->count(),
         ];
     }
 

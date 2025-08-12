@@ -20,7 +20,6 @@ class CreateCouriersTable extends Migration
             $table->string('name');
             $table->string('phone')->unique();
             $table->string('password');
-            $table->string('situation')->default('Aktif');
             $table->string('price_type')->default('package');
             $table->decimal('price', 8, 2)->nullable();
             $table->decimal('fixed_price', 8, 2)->nullable();
@@ -29,9 +28,11 @@ class CreateCouriersTable extends Migration
             $table->string('longitude',)->nullable();
             $table->string('birthday',)->nullable();
             $table->string('code',)->nullable();
+            $table->string('last_assigned_at',)->nullable();
             $table->boolean('online')->nullable()->default(1);
-            $table->enum('status',['active','deactive'])->default('active');
+            $table->string('status')->default('active');
             $table->timestamps();
+             $table->softDeletes();
         });
     }
 

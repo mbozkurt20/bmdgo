@@ -19,7 +19,7 @@ class ReportController extends Controller
 
     public function index()
     {
-        $couriers = Courier::where('status', 'active')->where('restaurant_id', 0)->where('admin_id', auth()->id())->get();
+        $couriers = Courier::where('restaurant_id', 0)->where('admin_id', auth()->id())->get();
         $restaurants = Restaurant::where('status', 'active')->where('admin_id', auth()->id())->get();
 
         return view('admin.reports.index', compact('couriers', 'restaurants'));

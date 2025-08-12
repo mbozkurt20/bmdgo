@@ -38,7 +38,7 @@
         <div class="row">
             <div class="col-xl-8 col-lg-12">
                 <div class="">
-                    <p class="text-danger fw-bold mb-3">Lütfen konumunu bulup haritaya tıklayarak konumunuzu güncelleyiniz...</p>
+                    <p class=" text-primary fw-bold mb-3">Konumunuzu bulup haritaya tıklayarak konumunuzu güncelleyebilirsiniz.</p>
                     <div id="map"></div>
                 </div>
 

@@ -3,7 +3,7 @@
 @section('content')
     <div class="container-fluid">
         <div class="mb-sm-4 d-flex flex-wrap align-items-center text-head">
-            <h2 class="mb-3 me-auto">Kurye Rapor</h2>
+            <h2 class="mb-3 me-auto">Bugün için Kurye Raporu</h2>
             <div>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Kuryeler</a></li>
@@ -21,6 +21,7 @@
                 </div>
             </div>
             <div class="row">
+                <p>Kurye detaylı rapor için <a target="_blank" class="text-primary" href="/admin/reports">raporlarıma</a> gidiniz</p>
                 <div class="col-xl-12">
                     <div class="table-responsive">
                         <table class="table table-responsive-sm text-dark">
@@ -92,7 +93,7 @@
                                 <td style="font-size: 15px;font-weight: bold">({{$top_kkarti}}) Adet K.Kartı Adeti</td>
                                 <td style="font-size: 15px;font-weight: bold">({{$top_kkkarti}}) Adet Kap K.Kartı</td>
                             </tr>
-                            <tr style="background: #0d2646;color: white">
+                            <tr style="background: #e7004d;color: white">
                                 <th scope="row">Ödemeler</th>
                                 <td></td>
                                 <td></td>

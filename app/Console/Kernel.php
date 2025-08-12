@@ -3,6 +3,7 @@
 namespace App\Console;
 
 use App\Http\Controllers\TrendyolYemekController;
+use App\Jobs\AssignPendingOrders;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -27,6 +28,8 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         // $schedule->command('adisyo:getOrders')->everyMinute();
+
+        $schedule->job(new AssignPendingOrders)->everyMinute();
 
         $schedule->call(function () {
             $tyc = app(TrendyolYemekController::class);

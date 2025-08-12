@@ -1,0 +1,444 @@
+/* ========= GENEL STİLLER ========= */
+th {
+    font-weight: bold;
+}
+
+/* Başlıklar */
+.orderTitle {
+    font-size: 14px;
+    font-weight: 600;
+    border-bottom: 1px solid #ddd;
+}
+
+.orderProde {
+    font-size: 13px;
+    font-weight: 500;
+}
+
+/* ========= KURYE LİSTESİ ========= */
+.courier-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.courier-item {
+    flex: 1 1 200px;
+    min-width: 200px;
+}
+
+.courier-box {
+    padding: 15px;
+    position: relative;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.courier-box p {
+    margin: 0;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.btn-assign {
+    padding: 5px 15px;
+    font-size: 12px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-assign:hover {
+    background-color: #218838;
+}
+
+.courier-box::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 10px;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+}
+
+.red-box::after {
+    background-color: #ff0a0a;
+}
+
+.purple-box::after {
+    background-color: #624FD1;
+}
+
+.avatar {
+    vertical-align: middle;
+    width: 35px;
+    height: 35px;
+    border-radius: 0%;
+}
+
+/* ========= BUTON VE RENKLER ========= */
+.bg-default,
+.btn-default {
+    background-color: #f2f3f8;
+}
+
+.btn-error {
+    color: #ef5f5f;
+}
+
+/* ========= TABS ========= */
+.tabs {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.tabs label {
+    order: 1;
+    display: block;
+    padding: 1rem 2rem;
+    margin-right: 0.2rem;
+    cursor: pointer;
+    background: #5c5c5c;
+    font-weight: bold;
+    transition: background ease 0.2s;
+    color: #fff;
+}
+
+.tabs .tab {
+    order: 99;
+    flex-grow: 1;
+    width: 100%;
+    display: none;
+    padding: 1rem;
+    background: #fff;
+}
+
+.tabs input[type="radio"] {
+    display: none;
+}
+
+.tabs input[type="radio"]:checked+label {
+    background: #edeff1;
+    color: #000;
+}
+
+.tabs input[type="radio"]:checked+label+.tab {
+    display: block;
+}
+
+@media (max-width: 45em) {
+    .tabs .tab,
+    .tabs label {
+        order: initial;
+    }
+
+    .tabs label {
+        width: 100%;
+        margin-right: 0;
+        margin-top: 0.8rem;
+    }
+}
+
+/* ========= LINK & İKON ========= */
+.toplusil a i:hover {
+    color: red;
+}
+
+/* ========= PAYMENT CARD ========= */
+.paymentRol {
+    padding: 12px;
+    font-size: 18px;
+    color: #fff;
+    text-align: center;
+    font-weight: bold;
+    height: 80px;
+    border-radius: 10px;
+    margin: 0px 2px;
+    cursor: pointer;
+}
+
+/* ========= CUSTOMER ========= */
+.customer {
+    padding: 0px 10px;
+    border-left: 3px solid #5c5c5c;
+    border-right: 3px solid #5c5c5c;
+    width: 100%;
+    border-radius: 10px;
+    text-align: left;
+}
+
+/* ========= BUTTONS ========= */
+.rightbtn {
+    padding: 0 !important;
+}
+
+.rightbtn a {
+    padding: 10px 15px;
+    height: 50px;
+    font-size: 18px;
+    color: #fff !important;
+    background: #5c5c5c;
+}
+
+/* ========= SELECT ========= */
+.selectiki {
+    height: 50px !important;
+    padding: 10px;
+}
+
+.select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
+    line-height: 40px;
+}
+
+.select2-container--default .select2-results__option--selected {
+    background-color: #e7e7e7;
+    line-height: 40px;
+}
+
+.select2-results__option--selectable {
+    cursor: pointer;
+    line-height: 40px;
+}
+
+/* ========= LOADER ========= */
+#loader {
+    position: absolute;
+    width: 100%;
+    height: 100vh;
+    text-align: center;
+    background: #fff;
+    z-index: 999;
+}
+
+#loader2 {
+    position: absolute;
+    top: 50%;
+    display: table-cell;
+    vertical-align: middle;
+}
+
+#loader img {
+    position: relative;
+    top: 50%;
+}
+
+/* ========= CUSTOM SELECT ========= */
+.select-container {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 10px;
+    margin: 0 25px 0 200px;
+}
+
+.custom-select {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #495057 !important;
+    border: 2px solid #ced4da;
+    border-radius: 8px;
+    background-color: #ffffff;
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+    appearance: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"%3E%3Cpath fill="%23999" d="M2 0L0 2h4z"/%3E%3C/svg%3E') !important;
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 12px;
+}
+
+.custom-select:focus {
+    border-color: #80bdff !important;
+    background-color: #f0f8ff !important;
+    outline: none !important;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5) !important;
+}
+
+.custom-select:hover {
+    border-color: #5a6268;
+    background-color: #e9ecef;
+}
+
+.custom-select option {
+    padding: 10px;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.custom-select option:hover {
+    background-color: #e7004d !important;
+    color: white;
+}
+
+.custom-select option:checked {
+    background-color: #e7004d !important;
+    color: white;
+}
+
+.select-container::after {
+    content: '⏷';
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: #999;
+    pointer-events: none;
+}
+
+/* ========= ORDER CARD ========= */
+.order-card {
+    border-radius: 10px;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.order-card span {
+    font-size: 1rem;
+}
+
+.order-btn {
+    font-size: 0.9rem;
+}
+
+/* ========= SECTION ========= */
+.orders-section,
+.performance-section {
+    background-color: #efefef;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.order-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* ========= DATE FILTER ========= */
+.btn-group-custom {
+    border-radius: 10px;
+    padding: 10px 20px;
+}
+
+.date-filter span {
+    font-size: 14px;
+}
+
+.date-filter:hover {
+    background-color: #e7004d;
+    border-radius: 15px;
+    transition: .5s all;
+    color: #fff !important;
+}
+
+.date-filter:hover span {
+    padding-left: 5px;
+}
+
+.date-filter:hover .fas {
+    color: #fff !important;
+    transition: .8s all;
+}
+
+/* ========= INPUT ========= */
+.custom-input {
+    border-radius: 12px;
+    padding: 8px 12px;
+    font-size: .8rem;
+    border: 2px solid #ddd;
+    transition: all 0.3s ease;
+    width: 200px;
+    background-color: #f9f9f9;
+}
+
+.custom-input:focus {
+    border-color: #e7004d;
+    box-shadow: 0 0 8px rgba(231, 0, 77, 0.4);
+    background-color: white;
+}
+
+.custom-input::placeholder {
+    color: #b0b0b0;
+    font-style: italic;
+}
+
+/* ========= LINK ========= */
+.custom-link {
+    display: flex;
+    align-items: center;
+    color: #000;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    transition: .3s all;
+}
+
+.custom-link i {
+    margin-right: 8px;
+    color: #e7004d;
+}
+
+.custom-link:hover {
+    background-color: #e7004d;
+    color: white;
+    box-shadow: 0 4px 8px rgba(231, 0, 77, 0.3);
+}
+
+/* ========= RESPONSIVE ========= */
+.grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+}
+
+@media (max-width: 768px) {
+    .container-fluid {
+        padding: 10px;
+    }
+
+    .order-card {
+        flex-direction: column;
+        text-align: center;
+        font-size: 0.85rem;
+    }
+
+    .date-filters {
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    .customer-search .form-control {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .order-card span {
+        font-size: 0.85rem;
+    }
+
+    .orders-section,
+    .performance-section {
+        padding: 15px;
+    }
+}

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\CourierStatus;
 use App\Models\Order;
 use App\Models\Courier;
 use App\Models\CourierOrder;
@@ -34,7 +35,7 @@ class ApiController extends Controller
                 $courier = Courier::where('id', $courierId)->first();
 
                 if ($courier){
-                    $courier->situation = "Aktif";
+                    $courier->status = CourierStatus::active;
                     $courier->save();
                 }
 
@@ -127,59 +128,6 @@ class ApiController extends Controller
         }
     }
 
-    public function login(Request $request): JsonResponse
-    {
-        $vtoken = "3b44111837d8e28e846f4dc9dbac986cb0010e3e";
-        if ($request->token == $vtoken) {
-            $courier = Courier::where('phone', $request->phone)->where('password', $request->password)->first();
-
-            return response()->json(['courier' => $courier]);
-        } else {
-            return response()->json(['status' => 'ERROR', 'message' => 'Token uyuşmazlığı.']);
-        }
-    }
-
-    public function location(Request $request): JsonResponse
-    {
-        $vtoken = "3b44111837d8e28e846f4dc9dbac986cb0010e3e";
-        if ($request->token == $vtoken) {
-            $local = Location::where('courier_id', $request->courier_id)->first();
-            $kuryen = CourierOrder::where('courier_id', $request->courier_id)->whereDate('created_at', Carbon::today())->get();
-
-            $total_orders = 0;
-
-            foreach ($kuryen as $key => $value) {
-                $order = Order::where('id', $value->order_id)->where('status', '!=', 'HANDOVER')->where('status', '!=', 'DELIVERED')->where('okundu', 0)->first();
-                if ($order) {
-
-                    $total_orders++;
-                    $order->okundu = 1;
-                    $order->save();
-
-                }
-            }
-
-            //$total_orders = count($kuryen);
-
-            if ($local) {
-                $local->latitude = $request->latitude;
-                $local->longitude = $request->longitude;
-                $local->save();
-            } else {
-
-                $location = new Location();
-                $location->courier_id = $request->courier_id;
-                $location->latitude = $request->latitude;
-                $location->longitude = $request->longitude;
-                $location->save();
-            }
-
-            return response()->json(['status' => 'OK', 'new_orders' => $total_orders]);
-        } else {
-            return response()->json(['status' => 'ERROR', 'message' => 'Token uyuşmazlığı.']);
-        }
-    }
-
     public function order_status(Request $request): JsonResponse
     {
         $vtoken = "3b44111837d8e28e846f4dc9dbac986cb0010e3e";
@@ -192,7 +140,7 @@ class ApiController extends Controller
             $courier = Courier::where('id', $request->courier_id)->first();
 
             if ($request->status == "DELIVERED") {
-                $courier->situation = "Aktif";
+                $courier->status = CourierStatus::active;
                 $courier->save();
                 $auto = Admin::find(1);
 
@@ -206,7 +154,7 @@ class ApiController extends Controller
                 }
             }
             if ($request->status == "HANDOVER") {
-                $courier->situation = "Serviste";
+                $courier->status = CourierStatus::service;
                 $courier->save();
             }
 
@@ -216,7 +164,7 @@ class ApiController extends Controller
             return response()->json(['status' => 'ERROR', 'message' => 'Token uyuşmazlığı.']);
         }
     }
-    public function situation($token, $id): JsonResponse
+    public function status($token, $id): JsonResponse
     {
         $vtoken = "3b44111837d8e28e846f4dc9dbac986cb0010e3e";
         if ($token == $vtoken) {
@@ -251,26 +199,26 @@ class ApiController extends Controller
                 "credit_cart" => number_format($credit_cart, 2) . " TL",
             ];
 
-            return response()->json(['situation' => $data]);
+            return response()->json(['status' => $data]);
         } else {
             return response()->json(['status' => 'ERROR', 'message' => 'Token uyuşmazlığı.']);
         }
     }
 
-    public function status($token, $id, $status): JsonResponse
+   /* public function status($token, $id, $status): JsonResponse
     {
         $vtoken = "3b44111837d8e28e846f4dc9dbac986cb0010e3e";
         if ($token == $vtoken) {
 
             $courier = Courier::where('id', $id)->first();
-            $courier->situation = $status;
+            $courier->status = $status;
             $courier->save();
 
             return response()->json(['status' => "OK"]);
         } else {
             return response()->json(['status' => 'ERROR', 'message' => 'Token uyuşmazlığı.']);
         }
-    }
+    } */
 
     public function getLocations(): JsonResponse
     {
@@ -279,7 +227,7 @@ class ApiController extends Controller
 
         foreach ($locations as $location) {
 
-            $courier = Courier::where('id', $location->courier_id)->where('restaurant_id', 0)->where('situation', '!=', null)->first();
+            $courier = Courier::where('id', $location->courier_id)->where('restaurant_id', 0)->where('status', '!=', null)->first();
 
             if ($courier) {
                 $data = [
@@ -287,7 +235,7 @@ class ApiController extends Controller
                     "name" => $courier->name,
                     "lat" => (float)$location->latitude,
                     "lng" => (float)$location->longitude,
-                    "description" => $courier->situation
+                    "description" => $courier->status
                 ];
 
                 array_push($getData, $data);
@@ -301,7 +249,7 @@ class ApiController extends Controller
     {
         $admin = Admin::find(1);
         if ($admin->auto_orders == 7) {
-            $courier = Courier::where('situation', 'Aktif')->first();
+            $courier = Courier::where('status', CourierStatus::active)->first();
 
             if ($courier) {
                 $order = Order::where('courier_id', -1)->where('status', 'PREPARED')->where('okundu', 0)->latest()->first();
@@ -314,7 +262,7 @@ class ApiController extends Controller
                         $new->order_id = $order->id;
                         $new->save();
 
-                        $courier->situation = "Serviste";
+                        $courier->status = CourierStatus::service;
                         $courier->save();
                     }
                 }

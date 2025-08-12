@@ -23,5 +23,7 @@ class CustomerAddress extends Model
         'status',
         'city_id',
         'district_id',
+        'latitude',
+        'longitude',
     ];
 }

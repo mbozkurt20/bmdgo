@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\SuperAdmin;
 
+use App\Helpers\CourierStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\Courier;
@@ -151,10 +152,10 @@ class DashboardController extends Controller
 
         // Kurye Sayısı - Total number of couriers
         $totalCouriers = Courier::count();
-        // Boş Kurye - Count of couriers with "Boş" situation
-        $idleCouriers = Courier::where('situation', 'Aktif')->count();
-        // Molada Kurye - Count of couriers with "Molada" situation
-        $breakCouriers = Courier::where('situation', 'Molada')->count();
+        // Boş Kurye - Count of couriers with "Boş" status
+        $idleCouriers = Courier::where('status', CourierStatus::active)->count();
+        // Molada Kurye - Count of couriers with "Molada" status
+        $breakCouriers = Courier::where('status', CourierStatus::break)->count();
 
         return view('superadmin.orders.index', compact('totalCouriers', 'idleCouriers', 'breakCouriers', 'totalExpense', 'formattedExpense', 'averageExpense', 'formattedAverageExpense', 'telefonsiparis', 'tumu', 'yemeksepeti', 'getiryemek', 'trendyol', 'couriers', 'migros', 'teslimEdilenSiparisler'));
     }
@@ -178,10 +179,10 @@ class DashboardController extends Controller
         $migros = Order::where('platform', 'migros')->whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at', 'desc')->count();
         // Kurye Sayısı - Total number of couriers
         $totalCouriers = Courier::count();
-        // Boş Kurye - Count of couriers with "Boş" situation
-        $idleCouriers = Courier::where('situation', 'Aktif')->count();
-        // Molada Kurye - Count of couriers with "Molada" situation
-        $breakCouriers = Courier::where('situation', 'Molada')->count();
+        // Boş Kurye - Count of couriers with "Boş" status
+        $idleCouriers = Courier::where('status', CourierStatus::active)->count();
+        // Molada Kurye - Count of couriers with "Molada" status
+        $breakCouriers = Courier::where('status', CourierStatus::break)->count();
 
         $totalExpense = Order::whereBetween('created_at', [$startDate, $endDate])->sum('amount');
         $formattedExpense = number_format($totalExpense, 2, '.', ',');
@@ -239,10 +240,10 @@ class DashboardController extends Controller
         $orders = Order::whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at', 'desc')->get();
         // Kurye Sayısı - Total number of couriers
         $totalCouriers = Courier::count();
-        // Boş Kurye - Count of couriers with "Boş" situation
-        $idleCouriers = Courier::where('situation', 'Aktif')->count();
-        // Molada Kurye - Count of couriers with "Molada" situation
-        $breakCouriers = Courier::where('situation', 'Molada')->count();
+        // Boş Kurye - Count of couriers with "Boş" status
+        $idleCouriers = Courier::where('status', CourierStatus::active)->count();
+        // Molada Kurye - Count of couriers with "Molada" status
+        $breakCouriers = Courier::where('status', CourierStatus::break)->count();
 
         // Gerekli diğer veriler ve siparişler ile birlikte view döndürülür
         return view('superadmin.home', compact('totalCouriers', 'idleCouriers', 'breakCouriers', 'totalExpense', 'orders', 'formattedExpense', 'averageExpense', 'formattedAverageExpense', 'telefonsiparis', 'tumu', 'yemeksepeti', 'getiryemek', 'trendyol', 'couriers', 'migros'));

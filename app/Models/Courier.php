@@ -4,8 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class Courier extends Model
+class Courier extends Authenticatable implements JWTSubject
 {
     use HasFactory;
 
@@ -15,9 +18,10 @@ class Courier extends Model
         'name',
         'phone',
         'status',
+        'password',
+        'last_assigned_at',
         'latitude',
         'longitude',
-        'situation',
         'price_type',
         'price', //paket başı
         'km_price',
@@ -29,5 +33,15 @@ class Courier extends Model
     public function payments()
     {
         return $this->morphMany(ProgressPaymentRecord::class, 'payable');
+    }
+
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
     }
 }

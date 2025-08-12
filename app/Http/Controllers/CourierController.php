@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\CourierStatus;
 use App\Models\Admin\AdminCourier;
 use App\Models\Categorie;
 use App\Models\Courier;
@@ -30,11 +31,8 @@ class CourierController extends Controller
     public function maps()
     {
         $couriers = Courier::on('tenant')
-            ->where('status',1)
-            ->where('situation','active')
+            ->where('status','active')
             ->get();
-
-
 
         $restaurant = Restaurant::where('id', auth()->id())->select(['latitude','longitude'])->first();
 
@@ -87,7 +85,7 @@ class CourierController extends Controller
             'price' => $request->input('price'),
             'km_price' => $request->input('km_price'),
             'fixed_price' => $request->input('fixed_price'),
-            'situation' => 'passive',
+            'status' => CourierStatus::passive,
             'latitude' => $request->input('latitude'),
             'longitude' => $request->input('longitude'),
             'code' => $this->generateCode(),
@@ -133,7 +131,7 @@ class CourierController extends Controller
             'price' => $request->input('price'),
             'km_price' => $request->input('km_price'),
             'fixed_price' => $request->input('fixed_price'),
-            'situation' => $request->input('situation'),
+            'status' => $request->input('status'),
         ]);
 
         return redirect()->back()->with('message', 'Kurye güncelleme işlemi başarıyla gerçekleşti.');
