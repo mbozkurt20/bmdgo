@@ -1,8 +1,8 @@
 <div class="nav-header" style="background:  #0d2646">
-<a href="{{ url('/admin') }}" class="d-flex justify-content-center align-items-center mt-3">
-    <div class="brand-title" style="width: 185px; height:50px">
-        <img src="{{ config('site.logo') }}" alt="Logo" style="height: 100px;">
-    </div>
+    <a href="{{ url('/admin') }}" class="d-flex justify-content-center align-items-center mt-3">
+        <div class="brand-title" style="width: 185px; height:50px">
+            <img src="{{ config('site.logo') }}" alt="Logo" style="height: 100px;">
+        </div>
     </a>
     <div class="nav-control">
         <div class="hamburger">
@@ -14,41 +14,80 @@
 <div class="header">
     @if(env('TEST_MODE') === true)
         <div class="row" style="background-color: #f3eded; color: #e7004d;">
-            <div class="text-center fw-bold py-2" >
+            <div class="text-center fw-bold py-2">
                 <strong>BmdGo</strong> Test Modu Hesabı Kullanmaktasınız.
             </div>
         </div>
     @endif
 
     <div class="container-fluid py-2 px-3">
-        <div class="d-flex flex-wrap justify-content-between align-items-center">
+        <div class="d-flex align-items-center justify-content-end w-100" style="color: #e7004d;">
 
-            <div></div>
-
-            <!-- Otomatik Kurye Atama -->
-            <div class="form-check form-switch me-3">
-                @php
-                    $admin = \App\Models\Admin::find(auth()->id());
-                @endphp
-
-                <label class="form-check-label text-dark fw-bold px-3 mt-3" for="auto_order">Otomatik Kurye Atama</label>
-                <input class="form-check-input" type="checkbox" id="auto_order" onclick="autoOrders(event)"
-                       role="switch" style="height: 40px; width: 80px;"
-                       @if($admin->auto_orders == 1) checked @endif>
-            </div>
-
-            <!-- Yeni Sipariş Uyarısı -->
-            <div class="text-success fw-bold d-none" id="new-order">Yeni Bir Siparişiniz Var !!!</div>
-
-            <p class="size-6 {{ \Illuminate\Support\Facades\Auth::guard('admin')->user()->top_up_balance > 0 ? 'special-button ' : 'special-ok-button'}}">
-                Kalan Kontör:
-
+            <!-- Kalan Kontör -->
+            <p class="size-4 mb-0 me-4 fw-bold text-danger">
+                Kontör Bakiyei:
                 <strong>{{\Illuminate\Support\Facades\Auth::guard('admin')->user()->top_up_balance}}</strong>
             </p>
+
+            <!-- Bildirimler -->
+            <div class="dropdown me-3">
+                <a class="nav-link position-relative" href="#" id="notificationDropdown" data-bs-toggle="dropdown">
+                    <i class="bi bi-bell-fill" style="font-size: 1.5rem;"></i>
+                    @if(($notifications ?? collect())->count() > 0)
+                        <span id="notificationCount"
+                              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            {{ ($notifications ?? collect())->count() }}
+                        </span>
+                    @endif
+                </a>
+
+                <div class="dropdown-menu dropdown-menu-end shadow-lg p-0"
+                     aria-labelledby="notificationDropdown"
+                     style="width: 400px; border-radius: 10px; overflow: hidden;">
+
+                    <div class="d-flex justify-content-between align-items-center text-white px-3 py-2"
+                         style="background: #e7004d">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-bell me-2"></i>
+                            <strong>Bildirimler</strong>
+                        </div>
+                        <div class="clear-all-container">
+                            @if(($notifications ?? collect())->count() > 0)
+                                <a href="javascript:void(0)" class="text-white small clear-all-link"
+                                   onclick="clearAllNotifications()">Tümünü Temizle</a>
+                            @endif
+                        </div>
+                    </div>
+
+                    <ul class="list-unstyled mb-0 p-1 py-2" id="notificationList"
+                        style="max-height: 40vh;overflow-y: scroll">
+                        @forelse($notifications ?? [] as $notification)
+                            <li class="border-bottom d-flex justify-content-between align-items-center p-2"
+                                data-id="{{ $notification->id }}">
+                                <a href="{{ $notification->url }}"
+                                   class="text-decoration-none text-dark flex-grow-1 me-2">
+                                    <span class="d-block fw-bold">{{ $notification->title }}</span>
+                                    @if(!empty($notification->description))
+                                        <small class="text-muted">{{ $notification->description }}</small>
+                                    @endif
+                                </a>
+                                <a class="text-danger" style="cursor: pointer;"
+                                   onclick="deleteNotification({{ $notification->id }})">
+                                    <strong class="size-3">x</strong>
+                                </a>
+                            </li>
+                        @empty
+                            <li class="p-3 text-center text-muted no-notification">📭 Bildirim yok</li>
+                        @endforelse
+                    </ul>
+                </div>
+            </div>
+
             <!-- Profil -->
             <div class="dropdown">
                 <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" data-bs-toggle="dropdown">
-                    <img src="/theme/images/avatar.jpg" class="rounded-circle" style="height: 45px; width: 45px;" alt="Avatar">
+                    <img src="/theme/images/avatar.jpg" class="rounded-circle border border-2"
+                         style="height: 45px; width: 45px; border-color: #e7004d;" alt="Avatar">
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li>
@@ -77,6 +116,106 @@
     </audio>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    Pusher.logToConsole = true;
+
+    var pusher = new Pusher('{{ env('PUSHER_APP_KEY') }}', {
+        cluster: 'mt1',
+        encrypted: true
+    });
+
+    var channel = pusher.subscribe('notifications-' + {{ auth()->id() }});
+
+    channel.bind('new-notify-' + {{ auth()->id() }}, function(data) {
+        const audio = new Audio('{{ asset('voices/notifications/Bell.mp3') }}');
+        audio.play().catch(err => console.error("Ses çalma başarısız:", err));
+
+        let notificationList = document.getElementById('notificationList');
+
+        // 📭 Bildirim yok mesajını kaldır
+        let emptyItem = notificationList.querySelector('.no-notification');
+        if (emptyItem) {
+            emptyItem.remove();
+        }
+
+        notificationList.insertAdjacentHTML('afterbegin', `
+        <li class="border-bottom d-flex justify-content-between align-items-center p-2" data-id="${data.id}">
+            <a href="${data.url}" class="text-decoration-none text-dark flex-grow-1 me-2">
+                <span class="d-block fw-bold">${data.title}</span>
+                ${data.description ? `<small class="text-muted">${data.description}</small>` : ''}
+            </a>
+            <a class="text-danger" style="cursor: pointer" onclick="deleteNotification(${data.id})">
+                <strong class="size-3">x</strong>
+            </a>
+        </li>
+    `);
+
+        updateCount(1);
+        showClearAllLink();
+    });
+
+    function updateCount(change) {
+        let countElem = $('#notificationCount');
+        let count = parseInt(countElem.text() || '0') + change;
+        if (count > 0) {
+            if (countElem.length === 0) {
+                $('#notificationDropdown').append(`
+                    <span id="notificationCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">${count}</span>
+                `);
+            } else {
+                countElem.text(count);
+            }
+        } else {
+            countElem.remove();
+            hideClearAllLink();
+        }
+    }
+
+    function showClearAllLink() {
+        if ($('.clear-all-link').length === 0) {
+            $('.clear-all-container').append(`
+                <a href="javascript:void(0)" class="text-white small clear-all-link" onclick="clearAllNotifications()">Tümünü Temizle</a>
+            `);
+        }
+    }
+
+    function hideClearAllLink() {
+        $('.clear-all-link').remove();
+    }
+
+    function clearAllNotifications() {
+        $.ajax({
+            type: 'GET',
+            url: '/admin/notifications/clear-all',
+            data: {_token: '{{ csrf_token() }}'},
+            success: function () {
+                $('#notificationList').html('<li class="p-3 text-center text-muted">📭 Bildirim yok</li>');
+                updateCount(-parseInt($('#notificationCount').text() || '0'));
+            },
+            error: function (err) {
+                console.error(err);
+            }
+        });
+    }
+
+    function deleteNotification(id) {
+        $.ajax({
+            type: 'GET',
+            url: '/admin/notifications/' + id,
+            data: {_token: '{{ csrf_token() }}'},
+            success: function () {
+                $('#notificationList').find('li[data-id="' + id + '"]').remove();
+                updateCount(-1);
+                if ($('#notificationList li').length === 0) {
+                    $('#notificationList').html('<li class="p-3 text-center text-muted">📭 Bildirim yok</li>');
+                }
+            },
+            error: function (err) {
+                console.error(err);
+            }
+        });
+    }
+</script>
 
 <script>
     function autoOrders(e) {
@@ -88,7 +227,7 @@
         $.ajax({
             type: 'GET',
             url: '/admin/order/auto_order/' + status,
-            success: function(data) {
+            success: function (data) {
                 let message = '';
                 if (data == "Active") {
                     message = 'Otomatik Sipariş Aktif!';
@@ -119,7 +258,7 @@
                     }
                 });
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 console.log(xhr.responseText);
             }
         });

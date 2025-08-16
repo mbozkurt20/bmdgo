@@ -3,8 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\CourierStatus;
+use App\Models\AdminSystemFeature;
 use App\Models\Courier;
+use App\Models\Notification;
 use App\Models\Order;
+use App\Models\Restaurant;
+use App\Models\RestaurantSystemFeature;
+use App\Models\SystemFeature;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
@@ -12,6 +17,7 @@ use App\Models\Admin;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use function PHPUnit\Framework\exactly;
 use function Symfony\Component\VarDumper\Dumper\esc;
 
 class AdminController extends Controller
@@ -52,6 +58,18 @@ class AdminController extends Controller
         return view('admin.profile');
     }
 
+    public function notifications()
+    {
+        Notification::query()->where('admin_id', Auth::guard('admin')->id())->delete();
+
+        return response()->json(['status' => "OK"]);
+    }
+
+    public function notificationDelete($id)
+    {
+        Notification::where('id',$id)->delete();
+        return response()->json(['status' => "OK"]);
+    }
 
     public function profileUpdate(Request $request)
     {
@@ -122,6 +140,30 @@ class AdminController extends Controller
 
         return view('admin.home', compact('totalCouriers','serviceCouriers', 'idleCouriers', 'breakCouriers', 'totalExpense', 'formattedExpense', 'averageExpense', 'formattedAverageExpense', 'telefonsiparis', 'tumu', 'yemeksepeti', 'getiryemek', 'trendyol', 'couriers', 'migros', 'teslimEdilenSiparisler'));
     }
+    public function features()
+    {
+        $admin = Admin::find(Auth::user()->id);
+        $adminFeatures = AdminSystemFeature::where('admin_id', $admin->id)->get();
+        $features = SystemFeature::all();
+        return view('admin.features', compact('admin','features','adminFeatures'));
+    }
+
+    public function featuresUpdate($id)
+    {
+        $admin = Auth::guard('admin')->id();
+
+       $systemFeature = AdminSystemFeature::where('admin_id', $admin)->where('system_feature_id',$id)->first();
+        if ($systemFeature) {
+            $systemFeature->delete();
+        }else{
+           AdminSystemFeature::create([
+                'admin_id' => $admin,
+                'system_feature_id' => $id,
+           ]);
+        }
+
+         echo 'OK';
+    }
 
     public function auto_order($status)
     {
@@ -135,7 +177,6 @@ class AdminController extends Controller
             echo "Passive";
         }
     }
-
     public function filterByDate(Request $request)
     {
         // Başlangıç ve bitiş tarihlerini al
@@ -221,5 +262,60 @@ class AdminController extends Controller
 
         // Gerekli diğer veriler ve siparişler ile birlikte view döndürülür
         return view('admin.home', compact('totalCouriers', 'idleCouriers', 'breakCouriers', 'totalExpense', 'orders', 'formattedExpense', 'averageExpense', 'formattedAverageExpense', 'telefonsiparis', 'tumu', 'yemeksepeti', 'getiryemek', 'trendyol', 'couriers', 'migros','serviceCouriers'));
+    }
+
+    public function statistics(Request $request)
+    {
+        $adminId = auth()->id();
+
+        $startDate = $request->input('start_date') ?? Carbon::today()->toDateString();
+        $endDate = $request->input('end_date') ?? Carbon::today()->toDateString();
+
+        $start = Carbon::parse($startDate)->startOfDay();
+        $end = Carbon::parse($endDate)->endOfDay();
+
+        // Platform listesi
+        $platforms = ['yemeksepeti', 'getir', 'trendyol', 'migros', 'adisyo', 'telefonsiparis'];
+
+        // Siparişleri al
+        $orders = Order::whereBetween('created_at', [$start, $end])->get();
+
+        // Günlük toplamları hazırlamak için boş dizi
+        $orderStats = [];
+
+        // Günleri belirle
+        $dateRange = [];
+        for ($date = $start; $date->lte($end); $date->addDay()) {
+            $dateRange[] = $date->format('Y-m-d');
+        }
+
+        // Platformlara göre günlük siparişleri gruplandır
+        foreach ($platforms as $platform) {
+            $dailyCounts = [];
+            foreach ($dateRange as $dateStr) {
+                $count = $orders->where('platform', $platform)
+                    ->where('created_at', '>=', $dateStr . ' 00:00:00')
+                    ->where('created_at', '<=', $dateStr . ' 23:59:59')
+                    ->count();
+                $dailyCounts[$dateStr] = $count;
+            }
+            $orderStats[$platform] = $dailyCounts;
+        }
+
+        // Toplam sayılar
+        $totalOrders = $orders->count();
+        $totalRestaurants = Restaurant::where('admin_id', $adminId)->count();
+        $totalCouriers = Courier::where('admin_id', $adminId)->count();
+
+        return view('admin.statistics', [
+            'orderStats' => $orderStats,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'labels' => $dateRange,
+            'platforms' => $platforms,
+            'totalOrders' => $totalOrders,
+            'totalRestaurants' => $totalRestaurants,
+            'totalCouriers' => $totalCouriers,
+        ]);
     }
 }

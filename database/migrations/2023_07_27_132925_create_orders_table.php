@@ -17,6 +17,7 @@ class CreateOrdersTable extends Migration
             $table->id();
             $table->string('platform');
             $table->bigInteger('restaurant_id');
+            $table->bigInteger('customer_id')->nullable();
             $table->bigInteger('courier_id')->nullable();
             $table->string('tracking_id');
             $table->string('full_name');
@@ -27,9 +28,12 @@ class CreateOrdersTable extends Migration
             $table->string('payment_method');
             $table->decimal('amount', 9, 2);
             $table->decimal('sub_amount', 9, 2)->nullable();
+            $table->decimal('discount', 9, 2)->nullable();
             $table->json('items')->nullable();
             $table->json('promotions')->nullable();
             $table->json('coupon')->nullable();
+            $table->string('message')->nullable(); //iptal mesajı
+            $table->string('distance')->nullable();
             $table->string('status');
             $table->timestamps();
         });

@@ -15,4 +15,9 @@ class Categorie extends Model
         'status',
         'desk'
     ];
+
+    public function products()
+    {
+        return $this->hasMany(Product::class,'category_id','id');
+    }
 }

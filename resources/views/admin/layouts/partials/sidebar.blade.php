@@ -1,12 +1,18 @@
 <div class="deznav" style="background:  #0d2646">
     <div class="deznav-scroll">
         <ul class="metismenu" id="menu">
-            <li><a class="ai-icon" href="{{ url('/admin') }}" aria-expanded="false">
+            <li>
+                <a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
                     <i class="flaticon-025-dashboard text-white"></i>
-                    <span class="nav-text text-white">Anasayfa</span>
+                    <span class="nav-text text-white">Panel</span>
                 </a>
+                <ul aria-expanded="false">
+                    <li><a class="text-white" href="{{ url('/admin') }}">Anasayfa</a></li>
+                    <li><a class="text-white" href="{{ url('/admin/statistics') }}">İstatistikler</a></li>
+                </ul>
             </li>
-            <li><a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
+            <li>
+                <a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
                     <i class="flaticon-048-home text-white"></i>
                     <span class="nav-text text-white">Restaurantlar</span>
                 </a>
@@ -24,6 +30,7 @@
                     <li><a class="text-white" href="{{ route('admin.couriers') }}">Kuryeler</a></li>
                     <li><a class="text-white" href="{{ route('admin.couriers.new') }}"> Kurye Ekle</a></li>
                     <li><a class="text-white" href="{{ route('admin.couriers.maps') }}">Kurye Takip</a></li>
+                    <li><a class="text-white" href="{{ route('admin.courier.performance') }}">Kurye Performans</a></li>
                 </ul>
             </li>
 
@@ -66,6 +73,12 @@
             <li><a href="{{ route('admin.balance') }}" class="ai-icon" aria-expanded="false">
                     <i class="fa fa-money-bill text-white"></i>
                     <span class="nav-text text-white">Bakiye</span>
+                </a>
+            </li>
+
+            <li><a href="{{ route('admin.features') }}" class="ai-icon" aria-expanded="false">
+                    <i class="fa fa-cogs text-white"></i>
+                    <span class="nav-text text-white">Ayarlar</span>
                 </a>
             </li>
         </ul>

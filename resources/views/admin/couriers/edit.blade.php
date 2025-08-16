@@ -82,6 +82,55 @@
                                         <input value="{{$courier->price}}" required type="text" class="form-control" name="price" placeholder="10,00">
                                     </div>
 
+                                    <div class="col-lg-4 mb-3">
+                                        <label class="form-label fs-14 text-dark d-block">Durum</label>
+
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio"
+                                                   name="status"
+                                                   id="status_active"
+                                                   value="{{ \App\Helpers\CourierStatus::active }}"
+                                                {{ $courier->status == \App\Helpers\CourierStatus::active ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="status_active">
+                                                Müsait
+                                            </label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio"
+                                                   name="status"
+                                                   id="status_service"
+                                                   value="{{ \App\Helpers\CourierStatus::service }}"
+                                                {{ $courier->status == \App\Helpers\CourierStatus::service ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="status_service">
+                                                Serviste
+                                            </label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio"
+                                                   name="status"
+                                                   id="status_break"
+                                                   value="{{ \App\Helpers\CourierStatus::break }}"
+                                                {{ $courier->status == \App\Helpers\CourierStatus::break ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="status_break">
+                                                Molada
+                                            </label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio"
+                                                   name="status"
+                                                   id="status_passive"
+                                                   value="{{ \App\Helpers\CourierStatus::passive }}"
+                                                {{ $courier->status == \App\Helpers\CourierStatus::passive ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="status_passive">
+                                                Kapalı
+                                            </label>
+                                        </div>
+                                    </div>
+
+
                                     <div class="mt-5 mb-3">
                                         <p class="text-danger fw-bold">Lütfen haritadan konum işaratlemesi yapınız.</p>
                                         <div id="map"></div>
@@ -96,15 +145,6 @@
                                         <label for="form-password" class="form-label fs-14 text-dark">Boylam</label>
                                         <input required  value="{{$courier->longitude}}" type="text" class="form-control" name="longitude" id="lng"
                                                placeholder="Boylam Giriniz">
-                                    </div>
-                                    <div class="col-lg-6 mb-3">
-                                        <label for="form-password" class="form-label fs-14 text-dark">Durum</label>
-                                        <select class="form-control" name="status" id="">
-                                            <option  {{$courier->status == App\Helpers\CourierStatus::active ? 'selected' : null}} value="{{App\Helpers\CourierStatus::active}}">Aktif</option>
-                                            <option {{$courier->status == App\Helpers\CourierStatus::passive ? 'selected' : null}} value="{{App\Helpers\CourierStatus::passive}}">Pasif</option>
-                                            <option {{$courier->status == App\Helpers\CourierStatus::break ? 'selected' : null}} value="{{App\Helpers\CourierStatus::break}}">Molada</option>
-                                            <option {{$courier->status == App\Helpers\CourierStatus::service ? 'selected' : null}} value="{{App\Helpers\CourierStatus::service}}">Serviste</option>
-                                        </select>
                                     </div>
                                 </div>
 
@@ -166,8 +206,8 @@
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
-        var existingLat = {{ auth()->user()->latitude ?? '37.15026069044849' }};
-        var existingLng = {{ auth()->user()->longitude ?? '38.77905463205474' }};
+        var existingLat = {{ $courier->latitude ?? '37.15026069044849' }};
+        var existingLng = {{ $courier->longitude ?? '38.77905463205474' }};
         var map;
 
         if (existingLat && existingLng) {

@@ -712,7 +712,7 @@
         encrypted: true
     });
 
-    var channel = pusher.subscribe('orders');
+    var channel = pusher.subscribe('orders-'+ {{auth()->id()}});
 
     channel.bind('order.created', function(data) {
         console.log('Yeni sipariş geldi:', data.orders);

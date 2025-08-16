@@ -24,10 +24,10 @@ class UserFactory extends Factory
     public function definition()
     {
         return [
-            'name' => 'User',
-            'email' => 'user@user.com',
-            'email_verified_at' => now(),
-            'password' => Hash::make('123456'),
+            'name' => 'Güneydoğu Bayi',
+            'email' => 'test@bayi.com',
+            'phone' => '1234567899',
+            'password' => Hash::make('password'),
             'remember_token' => Str::random(10),
         ];
     }

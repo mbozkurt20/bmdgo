@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antique Bakery Cafe HTML Template by Tooplate</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600&family=Oswald:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/all.min.css"> <!-- fontawesome -->
+    <!-- <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet"> -->
+    <link rel="stylesheet" href="css/tailwind.css">
+    <link rel="stylesheet" href="css/tooplate-antique-cafe.css">
+</head>
+<body>
+<!-- Intro -->
+<div id="intro" class="parallax-window" data-parallax="scroll" data-image-src="img/antique-cafe-bg-01.jpg">
+    <nav id="tm-nav" class="fixed w-full">
+        <div class="tm-container mx-auto px-2 md:py-6 text-right">
+            <button class="md:hidden py-2 px-2" id="menu-toggle"><i class="fas fa-2x fa-bars tm-text-gold"></i></button>
+            <ul class="mb-3 md:mb-0 text-2xl font-normal flex justify-end flex-col md:flex-row">
+                <li class="inline-block mb-4 mx-4"><a href="#intro" class="tm-text-gold py-1 md:py-3 px-4">Giriş</a></li>
+                <li class="inline-block mb-4 mx-4"><a href="#menu" class="tm-text-gold py-1 md:py-3 px-4">Menü</a></li>
+                <li class="inline-block mb-4 mx-4"><a href="#about" class="tm-text-gold py-1 md:py-3 px-4">Hakkında</a></li>
+                <li class="inline-block mb-4 mx-4"><a href="#contact" class="tm-text-gold py-1 md:py-3 px-4">İletişim</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container mx-auto px-2 tm-intro-width">
+        <div class="sm:pb-60 sm:pt-48 py-20">
+            <div class="bg-black bg-opacity-70 p-12 mb-5 text-center">
+                <h1 class="text-white text-5xl tm-logo-font mb-5">{{$data['company']['name']}}</h1>
+                <p class="tm-text-gold tm-text-2xl">Günlük Enerji Kaynağınız</p>
+            </div>
+            <div class="bg-black bg-opacity-70 p-10 mb-5">
+                <p class="text-white leading-8 text-sm font-light">
+                    {{$data['company']['slogan']}}
+                </p>
+            </div>
+            <div class="text-center">
+                <div class="inline-block">
+                    <a href="#menu" class="flex justify-center items-center bg-black bg-opacity-70 py-6 px-8 rounded-lg font-semibold tm-text-2xl tm-text-gold hover:text-gray-200 transition">
+                        <i class="fas fa-coffee mr-3"></i>
+                        <span>Keşfetmeye başlayalım...</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Cafe Menu -->
+<div id="menu" class="parallax-window" data-parallax="scroll" data-image-src="img/antique-cafe-bg-02.jpg">
+    <div class="container mx-auto tm-container py-24 sm:py-48">
+        <div class="text-center mb-16">
+            <h2 class="bg-white tm-text-brown py-6 px-12 text-4xl font-medium inline-block rounded-md">Menu</h2>
+        </div>
+        @foreach($data['categories'] as $index => $category)
+            <div class="flex flex-col lg:flex-row justify-around items-center">
+                <div class="flex-1 m-5 rounded-xl px-4 py-6 sm:px-8 sm:py-10 tm-bg-brown tm-item-container">
+                    @foreach($category->products as $product)
+                        <div class="flex items-start mb-6 tm-menu-item">
+                            <img src="{{$product->image}}" alt="Image" class="rounded-md" style="height: 10vh">
+                            <div class="ml-3 sm:ml-6">
+                                <h3 class="text-lg sm:text-xl mb-2 sm:mb-3 tm-text-yellow">{{$product->name}}</h3>
+                                <p class="text-white mb-4">{{$product->details}}</p>
+                                <div class="text-white text-md sm:text-lg font-light mb-1">{{$product->price}} ₺</div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endforeach
+    </div>
+</div>
+<div id="about" class="parallax-window" data-parallax="scroll" data-image-src="img/antique-cafe-bg-03.jpg">
+    <div class="container mx-auto tm-container py-24 sm:py-48">
+        <div class="tm-item-container sm:ml-auto sm:mr-12 mx-auto sm:px-0 px-4">
+            <div class="bg-white bg-opacity-80 p-12 pb-14 rounded-xl mb-5">
+                <h2 class="mb-6 tm-text-green text-4xl font-medium">Hakkımızda</h2>
+                <p class="mb-6 text-base leading-8">
+                    {!! $data['company']['about'] !!}
+                </p>
+            </div>
+            <a href="#contact" class="inline-block tm-bg-green transition text-white text-xl pt-3 pb-4 px-8 rounded-md">
+                <i class="far fa-comments mr-4"></i>
+                Bize Ulaşın
+            </a>
+        </div>
+    </div>
+</div>
+<div id="contact" class="parallax-window relative" data-parallax="scroll" data-image-src="img/antique-cafe-bg-04.jpg">
+    <div class="container mx-auto tm-container pt-24 pb-48 sm:py-48">
+        <div class="flex flex-col lg:flex-row justify-around items-center lg:items-stretch">
+            <div class="flex-1 rounded-xl px-10 py-12 m-5 bg-white bg-opacity-80 tm-item-container">
+                <h2 class="text-3xl mb-6 tm-text-green">Bize Ulaşın</h2>
+                <p class="mb-6 text-lg leading-8">
+                    {{$data['company']['address']}}
+                </p>
+                <p class="mb-10 text-lg">
+                    <span class="block mb-2">Tel: <a href="tel:0100200340" class="hover:text-yellow-600 transition">  {{$data['company']['phone']}}</a></span>
+                    <span class="block">Email: <a href="mailto:info@company.com" class="hover:text-yellow-600 transition">  {{$data['company']['email']}}</a></span>
+                </p>
+                <div class="text-center">
+                    <a href=" {!! $data['company']['map'] !!}" class="inline-block text-white text-2xl pl-10 pr-12 py-6 rounded-lg transition tm-bg-green">
+                        <i class="fas fa-map-marked-alt mr-8"></i>
+                        Haritadan Ulaşabilirsiniz
+                    </a>
+                </div>
+            </div>
+            {{--            <div class="flex-1 rounded-xl p-12 pb-14 m-5 bg-black bg-opacity-50 tm-item-container">--}}
+            {{--                <form action="" method="POST" class="text-lg">--}}
+            {{--                    <input type="text" name="name" class="input w-full bg-black border-b bg-opacity-0 text-white px-0 py-4 mb-4 tm-border-gold" placeholder="İsminiz" required="" />--}}
+            {{--                    <input type="email" name="email" class="input w-full bg-black border-b bg-opacity-0 text-white px-0 py-4 mb-4 tm-border-gold" placeholder="E-posta" required="" />--}}
+            {{--                    <textarea rows="6" name="message" class="input w-full bg-black border-b bg-opacity-0 text-white px-0 py-4 mb-4 tm-border-gold" placeholder="Mesajınız..." required=""></textarea>--}}
+            {{--                    <div class="text-right">--}}
+            {{--                        <button type="submit" class="text-white hover:text-yellow-500 transition">Gönder</button>--}}
+            {{--                    </div>--}}
+            {{--                </form>--}}
+            {{--            </div>--}}
+        </div>
+        <footer class="absolute bottom-0 left-0 w-full">
+            <div class="text-white container mx-auto tm-container p-8 text-lg flex flex-col md:flex-row justify-between">
+                {{--                <span>Copyright 2022 Antique Cafe. All rights reserved.</span>--}}
+            </div>
+        </footer>
+    </div>
+</div>
+
+<script src="js/jquery-3.6.0.min.js"></script>
+<script src="js/parallax.min.js"></script>
+<script src="js/jquery.singlePageNav.min.js"></script>
+<script>
+
+    function checkAndShowHideMenu() {
+        if(window.innerWidth < 768) {
+            $('#tm-nav ul').addClass('hidden');
+        } else {
+            $('#tm-nav ul').removeClass('hidden');
+        }
+    }
+
+    $(function(){
+        var tmNav = $('#tm-nav');
+        tmNav.singlePageNav();
+
+        checkAndShowHideMenu();
+        window.addEventListener('resize', checkAndShowHideMenu);
+
+        $('#menu-toggle').click(function(){
+            $('#tm-nav ul').toggleClass('hidden');
+        });
+
+        $('#tm-nav ul li').click(function(){
+            if(window.innerWidth < 768) {
+                $('#tm-nav ul').addClass('hidden');
+            }
+        });
+
+        $(document).scroll(function() {
+            var distanceFromTop = $(document).scrollTop();
+
+            if(distanceFromTop > 100) {
+                tmNav.addClass('scroll');
+            } else {
+                tmNav.removeClass('scroll');
+            }
+        });
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    });
+</script>
+</body>
+</html>

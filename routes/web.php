@@ -1,5 +1,6 @@
 <?php
 
+use App\Helpers\NotificationHelper;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MahalleController;
@@ -27,6 +28,9 @@ Route::view('login', 'auth.login')->name('admin.login');
 include __DIR__ . '/app/superAdminRoutes.php';
 include __DIR__ . '/app/adminRoutes.php';
 include __DIR__ . '/app/restaurantRoutes.php';
+include __DIR__ . '/app/ownerRoutes.php';
 
 Route::post('/order/add-online-order', [App\Http\Controllers\Api\OrderController::class, 'addOnlineOrder']);
 Route::post('/order/cancel-order', [App\Http\Controllers\Api\OrderController::class, 'cancelEntegraOrder']);
+
+

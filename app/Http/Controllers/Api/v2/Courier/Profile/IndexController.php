@@ -64,6 +64,7 @@ class IndexController extends Controller
             'birthday' => 'required',
             'price_type' => 'required',
             'online' => 'required',
+            'status' => 'required',
         ]);
 
         if ($requestData->fails()) {
@@ -88,7 +89,9 @@ class IndexController extends Controller
             return Json::error('Bu telefon numarasına ait bir kayıt zaten mevcut.');
         }
 
-        $courier = Courier::where('id',$id)->update([
+        $courier = Courier::find($id);
+
+        $courier->update([
             'name' => $request->input('name'),
             'phone' => $request->input('phone'),
             'birthday' => $request->input('birthday'),
@@ -100,9 +103,8 @@ class IndexController extends Controller
             'fixed_price' => $request->input('fixed_price'),
             'km_price' => $request->input('km_price'),
             'online' => $request->input('online'),
+            'status' => $request->input('status'),
         ]);
-
-        $courier = Courier::find($id);
 
         return Json::success('Bilgileriniz Başarıyla Güncellenmiştir', new CourierResource($courier));
     }

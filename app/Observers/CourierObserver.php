@@ -2,9 +2,10 @@
 
 namespace App\Observers;
 
-use App\Jobs\AssignOrderToCourier;
 use App\Models\Courier;
+use App\Models\CourierStatusMovement;
 use App\Models\Order;
+use Illuminate\Support\Facades\Log;
 
 class CourierObserver
 {
@@ -27,16 +28,36 @@ class CourierObserver
      */
     public function updated(Courier $courier)
     {
-        if ($courier->status === 'active') {
-            $order = Order::whereNull('courier_id')
-                ->where('status', 'pending')
-                ->orderBy('created_at')
-                ->first();
-
-            if ($order) {
-                dispatch(new AssignOrderToCourier($order));
-            }
+        Log::info('geldi');
+        // 🔒 Sadece status değiştiyse devam et
+        if (!$courier->wasChanged('status')) {
+            return;
         }
+
+        $newStatus = $courier->status;
+        $orderId = null;
+
+        // 🔚 Önceki açık hareket varsa, kapat
+        $lastMovement = CourierStatusMovement::where('courier_id', $courier->id)
+            ->whereNull('ended_at')
+            ->latest('started_at')
+            ->first();
+
+        if ($lastMovement) {
+            $lastMovement->ended_at = now();
+            $lastMovement->duration_seconds = $lastMovement->started_at->diffInSeconds(now());
+            $lastMovement->save();
+        }
+
+        // 🆕 Yeni hareketi oluştur (order_id varsa eklenir)
+        CourierStatusMovement::create([
+            'courier_id' => $courier->id,
+            'status' => $newStatus,
+            'order_id' => $orderId,
+            'started_at' => now(),
+            'ended_at' => null,
+            'duration_seconds' => null,
+        ]);
     }
 
     /**

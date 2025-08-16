@@ -3,8 +3,11 @@
 namespace App\Jobs;
 
 use App\Helpers\CourierStatus;
+use App\Helpers\NotificationHelper;
+use App\Helpers\OrdersHelper;
 use App\Helpers\OrderStatus;
 use App\Models\CourierOrder;
+use App\Models\Notification;
 use App\Models\Order;
 use App\Models\Courier;
 use Illuminate\Bus\Queueable;
@@ -22,7 +25,7 @@ class AssignPendingOrders implements ShouldQueue
     {
         // Atanmamış siparişleri sırayla al
         $orders = Order::where('courier_id', -1)
-            ->where('status', 'PENDING')
+            ->where('status', OrderStatus::PENDING)
             ->orderBy('created_at')
             ->get();
 
@@ -55,6 +58,14 @@ class AssignPendingOrders implements ShouldQueue
                     $newOrderCourier->save();
 
                     Log::info("Kurye atandı ve durumu Serviste yapıldı. Sipariş ID: " . $order->id . " Kurye ID: " . $courier->id);
+                }
+
+                if (OrdersHelper::getOrderSystem(3)){
+                    NotificationHelper::add([
+                        'title' => 'Paket Kuryeye Atandı',
+                        'description' => $order->tracking_id. ' takip numaralı paket '.$courier->name. ' isimli kuryeye atandı.',
+                        'url' => route('admin.balance')
+                    ]);
                 }
 
                 Log::info("Sipariş #{$order->id} kurye #{$courier->id} ile eşlendi.");

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\CourierStatus;
 use App\Helpers\OrdersHelper;
-use App\Jobs\AssignOrderToCourier;
+use App\Jobs\AssignPendingOrders;
 use Illuminate\Http\Request;
 use App\Models\Restaurant;
 use App\Models\Order;
@@ -143,7 +143,7 @@ class AdisyoController extends Controller
             //sipariş eklenince ses bildirimi gerçekleştirir.
             OrdersHelper::createOrderNotification($order);
 
-			AssignOrderToCourier::dispatch($order)->onQueue('high');
+			AssignPendingOrders::dispatch($order)->onQueue('high');
         }
 	}
 
@@ -228,7 +228,7 @@ class AdisyoController extends Controller
 					if ($courier) {
 						// Kuryenin durumunu güncelle
 						$courier->status = CourierStatus::active;;
-						$courier->save();
+						$courier->update();
 						Log::info('Kurye durumu güncellendi', ['courier_id' => $courier->id]);
 					}
 				}

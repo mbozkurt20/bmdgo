@@ -2,10 +2,15 @@
 
 namespace App\Providers;
 
+use App\Models\AdminSystemFeature;
 use App\Models\Categorie;
 use App\Models\Courier;
 use App\Models\Customer;
+use App\Models\Notification;
 use App\Models\Order;
+use App\Models\RestaurantCoupon;
+use App\Observers\AdminSystemFeautureObserver;
+use App\Observers\CourierObserver;
 use App\Observers\OrderObserver;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
@@ -30,14 +35,19 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        Courier::observe(CourierObserver::class);
         Order::observe(OrderObserver::class);
+        AdminSystemFeature::observe(AdminSystemFeautureObserver::class);
 
         View::composer('*', function ($view) {
-            if (Auth::check()) {
+            if (Auth::guard('restaurant')->check()) {
                 $restaurantId = Auth::user()->id;
 
                 $courierses = Courier::where('status', 'active')
                     ->where('restaurant_id', $restaurantId)
+                    ->get();
+
+                $coupons = RestaurantCoupon::where('restaurant_id', $restaurantId)
                     ->get();
 
                 $customers = Customer::where('status', 'active')
@@ -51,7 +61,18 @@ class AppServiceProvider extends ServiceProvider
                 $view->with([
                     'courierses' => $courierses,
                     'customers' => $customers,
+                    'coupons' => $coupons,
                     'categories' => $categories,
+                ]);
+            }
+
+            if (Auth::guard('admin')->check()) {
+                $notifications = Notification::where('status', true)
+                    ->where('admin_id', Auth::guard('admin')->id())
+                    ->get();
+
+                $view->with([
+                    'notifications' => $notifications,
                 ]);
             }
         });

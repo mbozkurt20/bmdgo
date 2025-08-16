@@ -12,7 +12,44 @@
     <link href="{{asset('pos/assets/css/OverlayScrollbars.css')}}" type="text/css" rel="stylesheet"/>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <style>
+        .coupon-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: flex-start;
+            padding-bottom: 12px;
+        }
 
+        .coupon-item {
+            flex: 1 1 calc(50% - 12px);
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            box-sizing: border-box;
+            background-color: #fce9ef;
+            color: #e7004d;,
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+            user-select: none;
+        }
+
+        .coupon-item:hover {
+            background-color: #fdf7f9;
+            border-color: #b3003a;
+        }
+
+        .coupon-item.selected {
+            background-color: #e7004d;
+            color: white;
+            border-color: #a3003b;
+        }
+
+        @media (max-width: 576px) {
+            .coupon-item {
+                flex: 1 1 100%;
+            }
+        }
+    </style>
     <style>
         .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
             background: #e7004d;
@@ -80,7 +117,26 @@
         }
 
     </style>
+
     <style>
+        #map {
+            border: #0d2646 solid 2px;
+            height: 300px; /* ya da istediğin başka bir yükseklik */
+            width: 100%;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+    </style>
+    <style>
+        .select2-results__option[aria-selected] {
+            height: 40px;
+            font-weight: bold;
+        }
+
+        .select2-container--default .select2-selection--single {
+            height: 40px;
+        }
+
         .avatar {
             vertical-align: middle;
             width: 35px;
@@ -331,6 +387,8 @@
                             <i class="fas fa-home"></i> Anasayfa
                         </a>
                         <span class="px-1"></span>
+
+
                         <a class="special-ok-button text-white" data-toggle="modal" data-target="#musteriAta">
                             <i class="fas fa-user-plus"></i> Müşteri Seçiniz
                         </a>
@@ -360,11 +418,12 @@
                             @php $checked = 0; @endphp
 
                             {{-- Kategori Sekmeleri --}}
-                            <div class="nav nav-tabs mb-4" id="categoryTabs">
+                            <div class="nav nav-tabs mb-4 b" id="categoryTabs">
                                 @foreach($categories as $cat)
                                     @php $checked++; @endphp
                                     <button
-                                        class="size-3 nav-link {{ $checked == 1 ? 'active  text-dark' : '' }}"
+                                        style="background: #0d2646"
+                                        class="size-3 text-white nav-link {{ $checked == 1 ? 'active  text-dark' : '' }}"
                                         id="tabProduct_{{$cat->id}}_tab"
                                         data-bs-toggle="tab"
                                         data-bs-target="#tabProduct_{{$cat->id}}"
@@ -422,100 +481,148 @@
                                         <a class="special-ok-button-small text-white mt-2 float-end float-right"
                                            onclick="removePos(1)"><i
                                                 class="fa fa-trash-alt"></i> Sepeti Temizle </a>
-                                    </div>
-                                </div>
 
-                                <hr>
+                                        <!-- Kupon Seçimi Butonu -->
+                                        @if(count($coupons))
+                                            <button type="button" class="px-2 special-ok-button-small text-white mt-2 float-end float-right" data-bs-toggle="modal" data-bs-target="#couponModal">
+                                               + Kuponlar
+                                            </button>
 
-                                <div class="productItems row" style="min-height: 500px;">
-                                    <div class="col-lg-12" id="productItemListp"
-                                         style="padding: 20px;height: 460px;overflow-y: scroll">
-                                        @foreach(\Cart::session(\Illuminate\Support\Facades\Auth::user()->id)->getContent() as $basket)
-                                            <div id="posItem_{{$basket->id}}"
-                                                 style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
-                background-color: #f1f1f1; border-radius: 10px; padding: 12px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
-
-                                                <!-- Ürün Görseli -->
-                                                <div style="flex: 0 0 auto; margin-right: 12px;">
-                                                    <img src="{{$basket->associatedModel->image}}" alt="Ürün Görseli"
-                                                         style="height: 60px; width: 60px; object-fit: cover; border-radius: 6px;">
-                                                    <input type="hidden" name="product_id[]" value="{{$basket->id}}">
-                                                </div>
-
-                                                <!-- Ürün Bilgileri -->
-                                                <div style="flex: 1 1 auto; min-width: 150px;">
-                                                    <div
-                                                        style="font-weight: bold; font-size: 14px; color: #333;">{{$basket->name}}</div>
-                                                    <div
-                                                        style="color: #555; font-size: 13px;">{{number_format($basket->price, 2, ',', '.')}}
-                                                        ₺
+                                            <!-- Kupon Modal -->
+                                            <div class="modal fade" id="couponModal" tabindex="-1" aria-labelledby="couponModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                                    <div class="modal-content" style="border-radius: 10px;">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="couponModalLabel">Kuponlar</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                                                        </div>
+                                                        <div class="modal-body" style="max-height: 500px; overflow-y: auto;">
+                                                            <div class="coupon-list p-3">
+                                                                @foreach($coupons as $coupon)
+                                                                    <div class="coupon-item"
+                                                                         data-coupon-id="{{ $coupon->id }}"
+                                                                         data-coupon-name="{{ $coupon->name }}"
+                                                                         data-coupon-amount="{{ $coupon->total_seller_amount }}"
+                                                                         onclick="selectCoupon(this); $('#couponModal').modal('hide');"
+                                                                         style="cursor: pointer; padding: 10px; border-bottom: 1px solid #eee;">
+                                                                        <strong>{{ $coupon->name }}</strong><br>
+                                                                        Toplam Tutar: {{ number_format($coupon->total_seller_amount, 2, ',', '.') }} ₺
+                                                                    </div>
+                                                                @endforeach
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
+                                            </div>
+                                        @endif
 
-                                                <!-- Adet Butonları -->
-                                                <div
-                                                    style="flex: 0 0 auto; display: flex; align-items: center; gap: 6px; margin-top: 8px;">
-                                                    <button type="button" onclick="updateMinus({{$basket->id}})"
-                                                            style="background-color: #dc3545; border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer;">
-                                                        <i class="fa fa-minus"></i>
-                                                    </button>
+                                    </div>
+                                    <hr>
 
-                                                    <input type="text" name="quantity[]" id="quantity_{{$basket->id}}"
-                                                           value="{{$basket->quantity}}" disabled
-                                                           style="width: 40px; height: 30px; text-align: center; font-weight: bold; font-size: 13px; border: 1px solid #ccc; border-radius: 4px; background-color: white;">
+                                    <div class="productItems row" style="min-height: 500px;">
+                                        <div class="col-lg-12" id="productItemListp"
+                                             style="padding: 20px;height: 460px;overflow-y: scroll">
+                                            @foreach(\Cart::session(\Illuminate\Support\Facades\Auth::user()->id)->getContent() as $basket)
+                                                <div id="posItem_{{$basket->id}}"
+                                                     style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+                background-color: #f1f1f1; border-radius: 10px; padding: 12px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
 
-                                                    <button type="button" onclick="updatePlus({{$basket->id}})"
-                                                            style="background-color: #0d2646; border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer;">
-                                                        <i class="fa fa-plus"></i>
-                                                    </button>
+                                                    <!-- Ürün Görseli -->
+                                                    <div style="flex: 0 0 auto; margin-right: 12px;">
+                                                        <img src="{{$basket->associatedModel->image}}"
+                                                             alt="Ürün Görseli"
+                                                             style="height: 60px; width: 60px; object-fit: cover; border-radius: 6px;">
+                                                        <input type="hidden" name="product_id[]"
+                                                               value="{{$basket->id}}">
+                                                    </div>
+
+                                                    <!-- Ürün Bilgileri -->
+                                                    <div style="flex: 1 1 auto; min-width: 150px;">
+                                                        <div
+                                                            style="font-weight: bold; font-size: 14px; color: #333;">{{$basket->name}}</div>
+                                                        <div
+                                                            style="color: #555; font-size: 13px;">{{number_format($basket->price, 2, ',', '.')}}
+                                                            ₺
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Adet Butonları -->
+                                                    <div
+                                                        style="flex: 0 0 auto; display: flex; align-items: center; gap: 6px; margin-top: 8px;">
+                                                        <button type="button" onclick="updateMinus({{$basket->id}})"
+                                                                style="background-color: #dc3545; border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer;">
+                                                            <i class="fa fa-minus"></i>
+                                                        </button>
+
+                                                        <input type="text" name="quantity[]"
+                                                               id="quantity_{{$basket->id}}"
+                                                               value="{{$basket->quantity}}" disabled
+                                                               style="width: 40px; height: 30px; text-align: center; font-weight: bold; font-size: 13px; border: 1px solid #ccc; border-radius: 4px; background-color: white;">
+
+                                                        <button type="button" onclick="updatePlus({{$basket->id}})"
+                                                                style="background-color: #0d2646; border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer;">
+                                                            <i class="fa fa-plus"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                        <div class="col-lg-12" id="productItemLista"
+                                             style="padding: 20px;height: 460px;overflow-y: scroll;display: none">
+
+                                        </div>
+                                    </div>
+                                    <div style="padding: 1rem 1.2rem;" class="">
+
+                                        <dl class="dlist-align">
+                                            <dt>Toplam:</dt>
+                                            <dd class="text-right h4 b"
+                                                id="posTotal"> {{number_format(\Cart::session(\Illuminate\Support\Facades\Auth::user()->id)->getTotal(), 2, ',', '.')}}
+                                                TL
+                                            </dd>
+
+                                            <dt>Kupon:</dt>
+                                            <dd class="fw-bold size-4 text-danger" id="selectedCoupon">
+                                                <span id="selectedCouponName">Bulunmuyor</span>
+                                                <input type="hidden" id="coupon_id" name="coupon_id" value="">
+                                            </dd>
+                                        </dl>
+
+                                        <div class="text-danger" id="selectedCoupon"
+                                             style="margin-top:10px; font-weight: normal;">
+
+                                        </div>
+                                        <div class="row" style="margin:0px;">
+                                            <div class="col-md-4" style="padding: 10px 0px">
+                                                <div class="paymentRol nakit"
+                                                     onclick="PaymentMethodSave('Kapıda Nakit ile Ödeme')"
+                                                     style="font-size: 14px;">
+                                                    <i class="fas fa-lira-sign"></i><br>
+                                                    Nakit
                                                 </div>
                                             </div>
-                                        @endforeach
-                                    </div>
-                                    <div class="col-lg-12" id="productItemLista"
-                                         style="padding: 20px;height: 460px;overflow-y: scroll;display: none">
-
-                                    </div>
-                                </div>
-                                <div style="padding: 1rem 1.2rem;" class="">
-
-                                    <dl class="dlist-align">
-                                        <dt>Toplam:</dt>
-                                        <dd class="text-right h4 b"
-                                            id="posTotal"> {{number_format(\Cart::session(\Illuminate\Support\Facades\Auth::user()->id)->getTotal(), 2, ',', '.')}}
-                                            TL
-                                        </dd>
-                                    </dl>
-                                    <div class="row" style="margin:0px;">
-                                        <div class="col-md-4" style="padding: 10px 0px">
-                                            <div class="paymentRol nakit"
-                                                 onclick="PaymentMethodSave('Kapıda Nakit ile Ödeme')"
-                                                 style="font-size: 14px;">
-                                                <i class="fas fa-lira-sign"></i><br>
-                                                Nakit
+                                            <div class="col-md-4" style="padding: 10px 0px">
+                                                <div class="paymentRol kkarti"
+                                                     onclick="PaymentMethodSave('Kapıda Ticket ile Ödeme')"
+                                                     style="font-size: 14px;">
+                                                    <i class="fas fa-credit-card"></i><br>
+                                                    Ticket
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="col-md-4" style="padding: 10px 0px">
-                                            <div class="paymentRol kkarti"
-                                                 onclick="PaymentMethodSave('Kapıda Ticket ile Ödeme')"
-                                                 style="font-size: 14px;">
-                                                <i class="fas fa-credit-card"></i><br>
-                                                Ticket
+                                            <div class="col-md-4" style="padding: 10px 0px">
+                                                <div class="paymentRol kkkarti"
+                                                     onclick="PaymentMethodSave('Kapıda Kredi Kartı ile Ödeme')"
+                                                     style="font-size: 14px;">
+                                                    <i class="fas fa-credit-card"></i><br>
+                                                    Kredi Kartı
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="col-md-4" style="padding: 10px 0px">
-                                            <div class="paymentRol kkkarti"
-                                                 onclick="PaymentMethodSave('Kapıda Kredi Kartı ile Ödeme')"
-                                                 style="font-size: 14px;">
-                                                <i class="fas fa-credit-card"></i><br>
-                                                Kredi Kartı
-                                            </div>
-                                        </div>
 
-                                        <div class="col-md-12" style="padding: 10px 0px">
-                                            <div class="paymentRol kayit" onclick="CreateOrder()">
-                                                <i class="fas fa-check"></i>
-                                                Kaydet
+                                            <div class="col-md-12" style="padding: 10px 0px">
+                                                <div class="paymentRol kayit" onclick="CreateOrder()">
+                                                    <i class="fas fa-check"></i>
+                                                    Kaydet
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -557,7 +664,8 @@
             </div>
         </div>
 
-        <div class="modal fade" id="musteriAta" tabindex="-1" role="dialog" aria-labelledby="musteriAtaLabel" aria-hidden="true">
+        <div class="modal fade" id="musteriAta" tabindex="-1" role="dialog" aria-labelledby="musteriAtaLabel"
+             aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
 
@@ -576,22 +684,35 @@
 
                     <!-- Modal Body -->
                     <div class="modal-body">
-                        <div class="form-group">
-                            <label for="customerSelect">Müşteri Listesi</label>
-                            <select id="customerSelect" class="form-control js-example-basic-single" onchange="customerSelect(event)">
-                                <option value="0">Müşteri Seçiniz</option>
+                        <div class="form-group mb-3">
+                            <label for="customerSelect" class="font-weight-medium mb-2" style="font-size: 0.95rem;">
+                                📋 Müşteri Seçimi
+                            </label>
+                            <select id="customerSelect"
+                                    class="form-control js-example-basic-single"
+                                    onchange="customerSelect(event)">
+                                <option value="0">🔍 Müşteri Seçiniz...</option>
                                 @foreach($customers as $customer)
-                                    <option value="{{ $customer->id }}">{{ $customer->name }} - {{ $customer->phone }}</option>
+                                    <option value="{{ $customer->id }}">
+                                        {{ $customer->name }} - {{ $customer->phone }}
+                                    </option>
                                 @endforeach
                             </select>
+                            <small class="form-text text-muted mt-2">
+                                Aramak için yazmaya başlayabilirsiniz. Seçim yapıldıktan sonra "Tamam" tuşuna basınız.
+                            </small>
                         </div>
                     </div>
 
+
                     <!-- Modal Footer -->
                     <div class="modal-footer d-flex justify-content-between">
-                        <button type="button" class="special-ok-button" data-toggle="modal" data-target="#yeniMusteri">
+                        <!--button type="button" class="special-ok-button" data-toggle="modal" data-target="#yeniMusteri">
                             <i class="fas fa-plus"></i> Müşteri Ekle
-                        </button>
+                        </button-->
+                        <a target="_blank" class="special-ok-button" href="/restaurant/customers/new">
+                            <i class="fas fa-plus"></i> Müşteri Ekle
+                        </a>
                         <button type="button" class="special-button" data-dismiss="modal">Tamam</button>
                     </div>
 
@@ -601,7 +722,7 @@
 
         <!-- Select2 Script -->
         <script>
-            $(document).ready(function() {
+            $(document).ready(function () {
                 $('#customerSelect').select2({
                     dropdownParent: $('#musteriAta'),
                     width: '100%',
@@ -700,9 +821,23 @@
                                             <div class="mb-3 col-md-12">
                                                 <textarea placeholder="Adres Tarifi" required name="adres_tarifi"
                                                           class="form-control" id="adres_tarifi">
-
                                                 </textarea>
+                                            </div>
 
+                                            <div class="mt-5 mb-3">
+                                                <p class="text-danger fw-bold">Lütfen haritadan konum işaratlemesi yapınız.</p>
+                                                <div id="map"></div>
+                                            </div>
+
+                                            <div class="col-lg-6 mb-3">
+                                                <label for="form-password" class="form-label fs-14 text-dark">Enlem</label>
+                                                <input required   type="text" class="form-control" name="latitude" id="lat"
+                                                       placeholder="Enlem Giriniz">
+                                            </div>
+                                            <div class="col-lg-6 mb-3">
+                                                <label for="form-password" class="form-label fs-14 text-dark">Boylam</label>
+                                                <input required  type="text" class="form-control" name="longitude" id="lng"
+                                                       placeholder="Boylam Giriniz">
                                             </div>
                                         </div>
                                     </div>
@@ -722,14 +857,61 @@
     </div>
 </div>
 
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+    var existingLat = '37.15026069044849'
+    var existingLng = '37.15026069044849'
+    var map;
+
+    if (existingLat && existingLng) {
+        map = L.map('map').setView([existingLat, existingLng], 13);
+        marker = L.marker([existingLat, existingLng]).addTo(map);
+    } else {
+        map = L.map('map').setView([39.9208, 32.8541], 6); // Türkiye geneli
+    }
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    map.on('click', function(e) {
+        var lat = e.latlng.lat;
+        var lng = e.latlng.lng;
+
+        if (marker) {
+            map.removeLayer(marker);
+        }
+
+        marker = L.marker([lat, lng]).addTo(map);
+
+        document.getElementById('lat').value = lat;
+        document.getElementById('lng').value = lng;
+    });
+
+</script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{asset('pos/assets/js/jquery-2.0.0.min.js')}}" type="text/javascript"></script>
 <script src="{{asset('pos/assets/js/bootstrap.bundle.min.js')}}" type="text/javascript"></script>
 <script src="{{asset('pos/assets/js/OverlayScrollbars.js')}}" type="text/javascript"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-
 <script>
+    function selectCoupon(element) {
+        var couponId = $(element).data('coupon-id');
+        var couponName = $(element).data('coupon-name');
+        var couponAmount = $(element).data('coupon-amount');
+
+        // Önce tüm kuponlardan seçili stilini kaldır
+        $('.coupon-item').removeClass('selected');
+
+        // Tıklanan kupona seçili stilini ekle
+        $(element).addClass('selected');
+
+        // Seçilen kuponu göster
+        $('#selectedCouponName').text(couponName);
+        $('#coupon_id').val(couponId);
+    }
+
     $('form[name="formPos"]').on('submit', function (e) {
         e.preventDefault(); // Sayfa yenilenmesin
         CreateOrder(); // Siparişi oluştur
@@ -748,11 +930,31 @@
             localStorage.setItem('drawerState', 'open');
         }
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const drawer = document.getElementById('drawer');
+        drawer.classList.remove('open'); // her zaman kapalı başlat
+    });
 </script>
 
 <script type="text/javascript">
 
     $(document).ready(function () {
+        $.ajax({
+            type: 'GET', //THIS NEEDS TO BE GET
+            url: '/restaurant/orders/removePOS',
+            success: function (data) {
+                $('#productItemListp').html("");
+                $('#productItemLista').html("");
+                $('.customer').html('<div style="text-align: center;padding: 15px">Müşteri Seçin</div>');
+                $('#posTotalItem').html("0");
+                $('#posTotal').html("0,00 TL");
+            },
+            error: function () {
+                console.log(data);
+            }
+        });
+
         const drawer = document.getElementById('drawer');
         const savedState = localStorage.getItem('drawerState');
 
@@ -767,7 +969,6 @@
             placeholder: 'Müşteri Arayınız..',
             allowClear: true // placeholder için önerilir
         });
-
 
         $.ajax({
             type: 'GET',
@@ -843,8 +1044,6 @@
                 $('#totalPrice').val(data.total);
 
                 $('#loader').css('display', 'none');
-
-
             },
             error: function () {
                 console.log(data);
@@ -853,7 +1052,6 @@
     }
 
     function updateMinus(id) {
-
         $('#loader').css('display', 'block');
 
         let qty = document.getElementById("quantity_" + id).value;
@@ -880,8 +1078,6 @@
                 }
 
                 $('#loader').css('display', 'none');
-
-
             },
             error: function () {
                 console.log(data);
@@ -983,8 +1179,10 @@
         var payment_control = $('#payment_control').val();
         var customer_id = $('#customer_id').val();
         var courier_id = $('#courier_id').val();
+        var coupon_id = $('#coupon_id').val();
         var total = $('#totalPrice').val();
 
+        console.log({coupon_id: coupon_id})
         let products = [];
 
         $('.item').each(function () {
@@ -1009,11 +1207,12 @@
                             customer_id: customer_id,
                             payment_method: payment_control,
                             courier_id: courier_id,
+                            coupon_id: coupon_id,
                             products: products,
                             amount: total
                         },
                         success: function (response) {
-                            console.log({sgf:response})
+                            console.log({sgf: response})
                             if (response.status === "BalanceError") {
                                 console.log('balance girdi')
                                 Swal.fire({

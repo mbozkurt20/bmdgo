@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Admin;
 use App\Models\Restaurant;
+use App\Models\RestaurantSystemFeature;
+use App\Models\SystemFeature;
 use App\Services\VatanSmsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -88,7 +90,7 @@ class MyController extends Controller
 
     public function profile()
     {
-        return view('restaurant.profile');
+        return view('restaurant.profile.profile');
     }
     public function profileUpdate(Request $request)
     {

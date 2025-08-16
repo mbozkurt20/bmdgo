@@ -94,11 +94,86 @@ th {
 .btn-error {
     color: #ef5f5f;
 }
+.nav-tabs {
+    border-bottom: 2px solid #0d2646;
+}
 
+.nav-tabs .nav-link {
+    color: white;
+    border: 1px solid transparent;
+    background-color: #0d2646;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    margin-right: 5px;
+    border-radius: 10px 10px 0 0;
+
+}
+
+.nav-tabs .nav-link:hover {
+    color: #e7004d;
+    background-color: #f5f5f5;
+}
+
+.nav-tabs .nav-link.active {
+    color: white;
+    background-color: #e7004d;
+    font-weight: 600;
+}
 /* ========= TABS ========= */
 .tabs {
     display: flex;
     flex-wrap: wrap;
+}
+/* --- Tabs Container --- */
+.tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid #eef0f4;
+    padding-bottom: 8px;
+}
+
+/* --- Tab Button --- */
+.tab-btn {
+    appearance: none;
+    background: #fff;
+    border: 1px solid #e6e8ee;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-weight: 700;
+    color: #0f172a;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+    background: #f9fafb;
+}
+
+
+/* --- Aktif Tab --- */
+.tab-btn[data-active="true"] {
+    background: #0d2646;       /* aktif renk */
+    color: #fff;
+    border-color: #0d2646;
+}
+
+.tab-btn[data-active="true"] .count {
+    background: #fff;
+    color: #111827;
+}
+
+
+/* --- Sayaç --- */
+.count {
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: #f3f4f6;
+    font-weight: 800;
+    font-size: .78rem;
 }
 
 .tabs label {
@@ -322,7 +397,7 @@ th {
 /* ========= SECTION ========= */
 .orders-section,
 .performance-section {
-    background-color: #efefef;
+    background-color: #e9e6f1;
     padding: 20px;
     border-radius: 10px;
 }

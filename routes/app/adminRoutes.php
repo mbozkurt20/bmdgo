@@ -1,5 +1,6 @@
 <?php
 
+use App\Helpers\NotificationHelper;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'admin'], function () {
@@ -8,8 +9,16 @@ Route::group(['prefix' => 'admin'], function () {
     });
 
     Route::group(['middleware' => ['admin.auth']], function () {
+        Route::get('/printed/{orderId}', [App\Http\Controllers\OrderController::class, 'printed']);
+        Route::get('/statistics', [App\Http\Controllers\AdminController::class, 'statistics'])->name('admin.statistics');
+
+        Route::get('notifications/clear-all', [App\Http\Controllers\AdminController::class, 'notifications'])->name('admin.notifications');
+        Route::get('notifications/{id}', [App\Http\Controllers\AdminController::class, 'notificationDelete']);
         Route::get('profile', [App\Http\Controllers\AdminController::class, 'profile'])->name('admin.profile');
         Route::post('/profile', [App\Http\Controllers\AdminController::class, 'profileUpdate'])->name('admin.profile.update');
+
+        Route::get('/features', [App\Http\Controllers\AdminController::class, 'features'])->name('admin.features');
+        Route::get('/features/update/{id}', [App\Http\Controllers\AdminController::class, 'featuresUpdate'])->name('admin.features.update');
 
         Route::get('/sms/entegrations', [App\Http\Controllers\MyController::class, 'smsEntegrations'])->name('admin.sms.entegrations');
         Route::post('/sms/entegrations/update', [App\Http\Controllers\MyController::class, 'smsEntegrastionUpdate'])->name('admin.sms.entegrations.update');
@@ -28,11 +37,11 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/deliveredOrders', [App\Http\Controllers\Admin\SiparislerController::class, 'deliveredOrders'])->name('admin.deliveredOrders');
 
         Route::post('/telefonsiparis/updateOrderStatus', [App\Http\Controllers\OrderController::class, 'updateOrderStatus']);
+        Route::get('/trendyol/get-orders', [App\Http\Controllers\TrendyolYemekController::class, 'index']);
         Route::post('/trendyol/updateOrderStatus', [App\Http\Controllers\TrendyolYemekController::class, 'orderStatus']);
         Route::post('/yemeksepeti/updateOrderStatus', [App\Http\Controllers\OrderController::class, 'updateOrderStatus']);
         Route::post('/getir/updateOrderStatus', [App\Http\Controllers\OrderController::class, 'updateOrderStatus']);
         Route::post('/adisyo/updateOrderStatus', [App\Http\Controllers\AdisyoController::class, 'updateOrder']);
-        Route::post('/updateCourierStatus', [App\Http\Controllers\OrderController::class, 'updateCourierStatus'])->name('updateCourierStatus2');
         Route::post('/orders/message', [App\Http\Controllers\OrderController::class, 'message']);
 
         /* Restaurants */
@@ -45,13 +54,13 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::get('/reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('admin.reports');
 
+        //Giderler - hakedişler
         Route::get('/progress-payment/restaurant', [\App\Http\Controllers\Admin\ProgressPaymentController::class, 'restaurant'])->name('admin.progress_payment.restaurant');
         Route::get('/progress-payment/courier', [\App\Http\Controllers\Admin\ProgressPaymentController::class, 'courier'])->name('admin.progress_payment.courier');
         Route::post('/progress-payment/records', [\App\Http\Controllers\Admin\ProgressPaymentController::class, 'storeRecords'])->name('admin.progress.payments.store');
         Route::post('/progress-payment/restaurant', [\App\Http\Controllers\Admin\ProgressPaymentController::class, 'restaurantFilter']);
         Route::post('/progress-payment/courier', [\App\Http\Controllers\Admin\ProgressPaymentController::class, 'courierFilter']);
         Route::get('/progress-payment/record/delete/{recordId}', [\App\Http\Controllers\Admin\ProgressPaymentController::class, 'deleteRecords']);
-
 
         /* GİDERLER */
         Route::prefix('expenses')->group(function () {
@@ -63,8 +72,9 @@ Route::group(['prefix' => 'admin'], function () {
             Route::get('/delete/{id}',[\App\Http\Controllers\Admin\ExpensesController::class, 'destroy'])->name('admin.expenses.destroy');
         });
 
-
         /* KURYELER */
+        Route::get('/courier-performance', [\App\Http\Controllers\Admin\CourierController::class, 'performance'])->name('admin.courier.performance');
+        Route::get('/get-couriers', [\App\Http\Controllers\Admin\CourierController::class, 'getCourier']);
         Route::get('/couriers', [\App\Http\Controllers\Admin\CourierController::class, 'index'])->name('admin.couriers');
         Route::get('/couriers/maps', [\App\Http\Controllers\Admin\CourierController::class, 'maps'])->name('admin.couriers.maps');
         Route::get('/couriers/new', [App\Http\Controllers\Admin\CourierController::class, 'new'])->name('admin.couriers.new');
@@ -75,7 +85,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('/couriers/update', [App\Http\Controllers\Admin\CourierController::class, 'update'])->name('admin.couriers.update');
 
         Route::get('/order/auto_order/{status}', [App\Http\Controllers\AdminController::class, 'auto_order'])->name('admin.couriers.auto_order');
-        Route::get('/orders/sendCourier/{orderid}/{courier}', [\App\Http\Controllers\Admin\CourierController::class, 'sendCourier']);
+        Route::get('/orders/sendCourier/{orderId}/{courierId}', [\App\Http\Controllers\Admin\CourierController::class, 'sendCourier']);
         Route::post('/reports/globalFilter', [App\Http\Controllers\Admin\ReportController::class, 'globalFilter']);
         Route::get('orders/delete/{id}', [App\Http\Controllers\OrderController::class, 'deleteOrder']);
     });

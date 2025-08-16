@@ -2,37 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\OrdersHelper;
+use App\Jobs\AssignPendingOrders;
 use Illuminate\Http\Request;
 use App\Models\Restaurant;
 use App\Models\Order;
-use App\Models\Admin;
-use App\Models\Courier;
-use App\Jobs\AssignOrderToCourier;
-use Illuminate\Support\Facades\Log;
 
 class TrendyolYemekController extends Controller
 {
-    function remove_emoji($string)
-    {
-        $regex_sets = [
-            '/[\x{1F600}-\x{1F64F}]/u', // Emoticons
-            '/[\x{1F300}-\x{1F5FF}]/u', // Symbols & Pictographs
-            '/[\x{1F680}-\x{1F6FF}]/u', // Transport & Map
-            '/[\x{2600}-\x{26FF}]/u',   // Misc Symbols
-            '/[\x{2700}-\x{27BF}]/u'    // Dingbats
-        ];
-
-        foreach ($regex_sets as $regex) {
-            $string = preg_replace($regex, '', $string);
-        }
-
-        return $string;
-    }
-
     public function index()
     {
         $restaurants = Restaurant::get();
-
         foreach ($restaurants as $restaurant) {
             $this->orders($restaurant);
         }
@@ -61,18 +41,15 @@ class TrendyolYemekController extends Controller
         }
 
         foreach ($content->content as $row) {
-            Log::info(json_encode($row));
-
             $order = Order::where('tracking_id', $row->orderId)->first();
             if ($order) {
                 continue;
             }
 
             $address = $row->address;
-
             $orderAddress = $address->city . " " . $address->district . " " . $address->address1 . " Kat: " . $address->floor . " Kapi no:" . $address->doorNumber . " Adres Detay:" . $address->addressDescription;
 
-			$promotionsAmount = 0;
+            $promotionsAmount = 0;
             if (isset($row->promotions) && is_array($row->promotions)) {
                 foreach ($row->promotions as $promotion) {
                     $promotionsAmount += (float) $promotion->totalSellerAmount;
@@ -100,12 +77,19 @@ class TrendyolYemekController extends Controller
    				'promotions'     => isset($row->promotions) ? json_encode($row->promotions) : json_encode([]),
                 'coupon'         => isset($row->coupon) ? json_encode($row->coupon) : json_encode([]),
                 'sub_amount'     => $row->totalPrice,
+                'discount'       => $couponAmount+$promotionsAmount,
                 'amount'         => (float) $row->totalPrice - $couponAmount - $promotionsAmount,
-                'notes'          => $row->customerNote
+                'notes'          => $row->customerNote,
+                'distance' => OrdersHelper::haversineDistance(
+                    $restaurant->latitude,
+                    $restaurant->longitude,
+                    $row->address->latitude,
+                    $row->address->longitude
+                )
             ];
 
             $order = Order::create($orderData);
-            AssignOrderToCourier::dispatch($order);
+            AssignPendingOrders::dispatch();
         }
     }
 
@@ -114,30 +98,21 @@ class TrendyolYemekController extends Controller
         $action = $request->action;
 
         $order = Order::where('tracking_id', $request->tracking_id)->first();
+
         if (!$order) {
             return response()->json(['message' => 'Sipariş bulunamadı'], 404);
         }
 
         $order->status = $action;
-        $order->save();
+        $order->update();
 
         $restaurant = Restaurant::find($order->restaurant_id);
+
         if (!$restaurant) {
-            return response()->json(['message' => 'Restoran bulunamadı'], 404);
+            return response()->json(['message' => 'Restaurant Bulunamadı'], 404);
         }
 
-        switch ($action) {
-            case 'picked':
-            case 'manual-shipped':
-            case 'manual-delivered':
-            case 'unsupplied':
-                $type = $action;
-                break;
-            default:
-                return response()->json(['message' => 'Geçersiz işlem'], 400);
-        }
-
-        $url = 'https://api.trendyol.com/mealgw/suppliers/' . $restaurant->trendyol_satici_id . '/packages/' . $type;
+        $url = 'https://api.trendyol.com/mealgw/suppliers/' . $restaurant->trendyol_satici_id . '/packages/' . $action;
 
         $header = array(
             'Authorization: Basic ' . base64_encode($restaurant->trendyol_api_key . ":" . $restaurant->trendyol_secret_key),

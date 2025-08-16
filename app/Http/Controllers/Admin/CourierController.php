@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Helpers\CourierStatus;
+use App\Helpers\NotificationHelper;
 use App\Helpers\OrdersHelper;
 use App\Helpers\OrderStatus;
 use App\Helpers\Pusher;
@@ -16,7 +17,9 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class CourierController extends Controller
@@ -29,9 +32,19 @@ class CourierController extends Controller
     {
         $couriers = Courier::where('restaurant_id', 0)
             ->where('admin_id', auth()->id())
+            ->where('status',CourierStatus::active)
             ->get();
 
         return view('admin.couriers.index', compact('couriers'));
+    }
+    public function getCourier()
+    {
+        $couriers = Courier::where('restaurant_id', 0)
+            ->where('admin_id', auth()->id())
+            ->where('status',CourierStatus::active)
+            ->get();
+
+        return response()->json($couriers);
     }
     public function new()
     {
@@ -103,7 +116,9 @@ class CourierController extends Controller
             ]);
         }
 
-        Courier::whereId($request->input('id'))->update([
+        $courier = Courier::whereId($request->input('id'))->first();
+
+        $courier->update([
             'name' => $request->input('name'),
             'phone' => $request->input('phone'),
             'latitude' => $request->input('latitude'),
@@ -218,44 +233,100 @@ class CourierController extends Controller
         $auto->save();
     }
 
-    public function sendCourier($orderid, $courier)
+    public function sendCourier($orderId, $courierId)
     {
-        $ordersor = CourierOrder::where('order_id', $orderid)->first();
+        $order = Order::find($orderId);
+        $courier = Courier::find($courierId);
 
-        if ($ordersor) {
+        $order->courier_id = $courier->id;
+        $order->status = OrderStatus::HANDOVER;
+        $order->save();
 
-            $courierx = Courier::where('id', $ordersor->courier_id)->first();
-            $courierx->status =  CourierStatus::active;;
-            $courierx->save();
+        // Kuryeyi busy yap ve son atama zamanını güncelle
+        $courier->status = CourierStatus::service;
+        $courier->last_assigned_at = now();
+        $courier->save();
 
-            $ordersor->courier_id = $courier;
-            $sav = $ordersor->save();
+        $orderCourier = CourierOrder::where('courier_id',$courier->id)->where('order_id', $order->id)->first();
 
-            $couriery = Courier::where('id', $courier)->first();
-            $couriery->status = CourierStatus::service;
-            $couriery->save();
+        if (!$orderCourier) {
+            // Yeni siparişi kuryeye atama
+            $newOrderCourier = new CourierOrder();
+            $newOrderCourier->courier_id = $courier->id;
+            $newOrderCourier->order_id = $order->id;
+            $newOrderCourier->save();
 
-            if ($sav) {
-                echo "OK";
-            } else {
-                echo "ERR";
-            }
-        } else {
-
-            $order = new CourierOrder();
-            $order->courier_id = $courier;
-            $order->order_id = $orderid;
-            $sav = $order->save();
-
-            $courierx = Courier::where('id', $courier)->first();
-            $courierx->status = CourierStatus::service;
-            $courierx->save();
-
-            if ($sav) {
-                echo "OK";
-            } else {
-                echo "ERR";
-            }
+            Log::info("Kurye atandı ve durumu Serviste yapıldı. Sipariş ID: " . $order->id . " Kurye ID: " . $courier->id);
         }
+
+        if (OrdersHelper::getOrderSystem(3)){
+            NotificationHelper::add([
+                'title' => 'Paket Kuryeye Atandı',
+                'description' => $order->tracking_id. ' takip numaralı paket '.$courier->name. ' isimli kuryeye atandı.',
+                'url' => route('admin.balance')
+            ]);
+        }
+
+        echo 'OK';
+    }
+
+    public function performance(Request $request)
+    {
+        $courierId = $request->input('courier_id');
+        $period = $request->input('period', 'daily'); // daily, weekly, monthly
+        $date = Carbon::parse($request->input('date', now()));
+
+        // Tarih aralığına göre filtre
+        $startDate = match($period) {
+            'weekly' => $date->copy()->startOfWeek(),
+            'monthly' => $date->copy()->startOfMonth(),
+            default => $date->copy()->startOfDay(),
+        };
+        $endDate = match($period) {
+            'weekly' => $date->copy()->endOfWeek(),
+            'monthly' => $date->copy()->endOfMonth(),
+            default => $date->copy()->endOfDay(),
+        };
+
+        $query = DB::table('courier_status_movements')
+            ->select('courier_id', 'status', DB::raw('SUM(duration_seconds) as total_duration'))
+            ->whereBetween('started_at', [$startDate, $endDate])
+            ->groupBy('courier_id', 'status');
+
+        if ($courierId) {
+            $query->where('courier_id', $courierId);
+        }
+
+        $statusSummary = $query->get();
+
+        // Günlük en çok aktif olan courier
+        $topActiveCourier = DB::table('courier_status_movements')
+            ->select('courier_id', DB::raw('SUM(duration_seconds) as active_duration'))
+            ->where('status', 'active')
+            ->whereBetween('started_at', [$startDate, $endDate])
+            ->groupBy('courier_id')
+            ->orderByDesc('active_duration')
+            ->first();
+
+        // Sağdaki liste: tüm courier'lar için statülere göre sıralama
+        $topStatusList = DB::table('courier_status_movements')
+            ->select('courier_id', 'status', DB::raw('SUM(duration_seconds) as total_duration'))
+            ->whereBetween('started_at', [$startDate, $endDate])
+            ->groupBy('courier_id', 'status')
+            ->orderByDesc('total_duration')
+            ->get();
+
+        $couriers = Courier::where('admin_id', auth()->id())->get();
+
+        return view('admin.couriers.performance', compact(
+            'statusSummary',
+            'topActiveCourier',
+            'topStatusList',
+            'period',
+            'startDate',
+            'endDate',
+            'courierId',
+            'couriers'
+        ));
     }
 }

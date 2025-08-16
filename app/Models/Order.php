@@ -13,6 +13,7 @@ class Order extends Model
     protected $fillable = [
         'platform',
         'restaurant_id',
+        'customer_id',
         'courier_id',
         'tracking_id',
         'full_name',
@@ -27,10 +28,18 @@ class Order extends Model
         'coupon',
         'amount',
         'sub_amount',
+        'message',
+        'discount',
+        'distance',
     ];
 
     public function restaurant(): BelongsTo
     {
         return $this->belongsTo(Restaurant::class, 'restaurant_id', 'id');
+    }
+
+    public function courier()
+    {
+        return $this->belongsTo(Courier::class, 'courier_id', 'id')->where('status', '!=',-1);
     }
 }

@@ -19,7 +19,12 @@
           integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
           crossorigin="anonymous" referrerpolicy="no-referrer" />
 
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.16/jspdf.plugin.autotable.min.js"></script>
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
     {{-- <link href="{{ asset('pos/assets/css/bootstrap.css') }}" rel="stylesheet" type="text/css" /> --}}
@@ -33,16 +38,6 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
         rel="stylesheet">
-    {{-- @if ($_SERVER['REQUEST_URI'] == '/restaurant')
-        <script type="text/javascript">
-            $(document).ready(function() {
-                setTimeout(function() {
-                    location.reload();
-                }, 60000)
-            });
-        </script>
-    @endif --}}
-
 
     <style>
         .text-head {

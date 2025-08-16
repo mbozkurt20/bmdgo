@@ -45,9 +45,9 @@ class CreateRestaurantsTable extends Migration
             $table->string('trendyol_secret_key')->nullable();
             $table->string('entegra_id')->nullable();
             $table->string('entegra_token')->nullable();
+            $table->string('menu_template')->nullable();
             $table->string('remember_token')->nullable();
             $table->boolean('email_verified_at')->nullable();
-            $table->boolean('auto_orders')->default(0);
             $table->enum('status',['active','deactive'])->default('active');
             $table->timestamps();
         });

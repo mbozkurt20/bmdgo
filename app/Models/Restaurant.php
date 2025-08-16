@@ -22,6 +22,7 @@ class Restaurant extends Authenticatable
         'restaurant_code',
         'restaurant_name',
         'name',
+        'menu_template',
         'latitude',
         'longitude',
         'email',

@@ -61,6 +61,8 @@ class RestaurantsController extends Controller
         $create->entegra_token = $request->entegra_token;
         $create->package_price = $request->package_price;
         $create->address = $request->address;
+        $create->latitude = $request->latitude;
+        $create->longitude = $request->longitude;
         $create->save();
 
         return redirect()->back()->with('message', 'Restaurant Kaydı Tamamlandı.');
@@ -91,6 +93,8 @@ class RestaurantsController extends Controller
         $create->entegra_token = $request->entegra_token;
         $create->package_price = $request->package_price;
         $create->status = $request->status;
+        $create->latitude = $request->latitude;
+        $create->longitude = $request->longitude;
 
         $create->save();
 

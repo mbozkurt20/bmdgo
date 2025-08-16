@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Helpers\CourierStatus;
 use App\Helpers\OrdersHelper;
 use App\Models\Expenses;
+use App\Models\Restaurant;
+use App\Models\RestaurantCoupon;
 use App\Models\Topup;
 use App\Traits\RequestTrait;
 use App\Models\Admin;
@@ -30,6 +32,7 @@ class OrderController extends Controller
     {
         $this->middleware('auth');
     }
+
     public function index($link)
     {
         if ($link == "tumu") {
@@ -47,6 +50,7 @@ class OrderController extends Controller
             }
         }
     }
+
     public function sendCourier(Request $request)
     {
         $orders = $request->input('orders');
@@ -114,6 +118,7 @@ class OrderController extends Controller
             return response()->json(['error' => 'Transaction failed: ' . $e->getMessage()], 500);
         }
     }
+
     public function new()
     {
         $couriers = Courier::where('status', 'active')->where('restaurant_id', Auth::user()->id)->get();
@@ -121,6 +126,7 @@ class OrderController extends Controller
         $categories = Categorie::where('status', 'active')->where('restaurant_id', Auth::user()->id)->get();
         return view('restaurant.orders.new', compact('customers', 'couriers', 'categories'));
     }
+
     public function addPOS($id)
     {
         $product = Product::find($id);
@@ -232,6 +238,7 @@ class OrderController extends Controller
 
         return response()->json(['items' => $items, 'posTotalItem' => $posTotalItem, 'posTotal' => $posTotal, 'durum' => $durum, 'total' => $total]);
     }
+
     public function updatePlusPOS($id)
     {
         $userId = Auth::user()->id;
@@ -246,12 +253,13 @@ class OrderController extends Controller
 
         return response()->json(['posTotalItem' => $posTotalItem, 'posTotal' => $posTotal, 'total' => $total]);
     }
+
     public function getPosItems()
     {
         $userId = Auth::user()->id;
         $cart = \Cart::session($userId)->getContent();
 
-        $items  = '';
+        $items = '';
 
         foreach ($cart as $item) {
             $product = $item->associatedModel;
@@ -293,9 +301,10 @@ class OrderController extends Controller
             'posTotalItem' => $posTotalItem,
             'posTotal' => $posTotal,
             'total' => $total,
-           ' durum' => 'var',
+            ' durum' => 'var',
         ]);
     }
+
     public function message(Request $request)
     {
         $order = Order::where('restaurant_id', Auth::user()->id)->where('tracking_id', $request->tracking_id)->first();
@@ -308,11 +317,12 @@ class OrderController extends Controller
             return response()->json(['status' => "ERR"]);
         }
     }
+
     public function storeQuick(Request $request)
     {
         \App\Models\Order::create([
             'platform' => 'telefonsiparis',
-            'courier_id' => $request->courier_id??-1,
+            'courier_id' => $request->courier_id ?? -1,
             'restaurant_id' => $request->restaurant_id,
             'tracking_id' => "POS-" . rand(9, 99999),
             'full_name' => $request->full_name,
@@ -326,6 +336,7 @@ class OrderController extends Controller
 
         return response()->json(['message' => 'Sipariş başarıyla kaydedildi.']);
     }
+
     public function message2(Request $request)
     {
         $order = Order::where('restaurant_id', Auth::user()->id)->where('tracking_id', $request->tracking_id)->first();
@@ -338,6 +349,7 @@ class OrderController extends Controller
             return response()->json(['status' => "ERR"]);
         }
     }
+
     public function updateMinusPOS($id, $qty)
     {
         $userId = Auth::user()->id;
@@ -356,6 +368,7 @@ class OrderController extends Controller
 
         return response()->json(['posTotalItem' => $posTotalItem, 'posTotal' => $posTotal, 'total' => $total]);
     }
+
     public function removePOS()
     {
         $userId = Auth::user()->id;
@@ -365,6 +378,7 @@ class OrderController extends Controller
 
         return response()->json(['TotalQuantity' => $TotalQuantity, 'TotalMoney' => $TotalMoney]);
     }
+
     public function customerpos($id)
     {
         // Müşteri bulunuyor mu kontrol et
@@ -379,21 +393,22 @@ class OrderController extends Controller
 
         // Müşteri adresi bulunamazsa alternatif bir mesaj göster
         if (!$adres) {
-            $customer = '<p class="text-white mr-2 logo-text">' . $custom->name . '</p> ' .  '<span class="ml-2 text-white"> - '. $custom->phone.'</span>'  . ' <br><span>Adres bulunamadı</span>';
+            $customer = '<p class="text-white mr-2 logo-text">' . $custom->name . '</p> ' . '<span class="ml-2 text-white"> - ' . $custom->phone . '</span>' . ' <br><span>Adres bulunamadı</span>';
         } else {
             // Müşteri ve adres bilgilerini birleştir
-            $customer = '<p class="text-white mr-2 logo-text">' . $custom->name . '</p> ' . '<span class=" ml-2 text-white"> - '. $custom->phone.'</span>'. ' <br><span>' . $adres->mahalle . ' Mah.' . $adres->sokak_cadde . '.No:' . $adres->bina_no . ' Kat:' . $adres->kat . ' Daire:' . $adres->daire_no . '</span>';
+            $customer = '<p class="text-white mr-2 logo-text">' . $custom->name . '</p> ' . '<span class=" ml-2 text-white"> - ' . $custom->phone . '</span>' . ' <br><span>' . $adres->mahalle . ' Mah.' . $adres->sokak_cadde . '.No:' . $adres->bina_no . ' Kat:' . $adres->kat . ' Daire:' . $adres->daire_no . '</span>';
         }
 
         return response()->json(['customer' => $customer]);
     }
+
     public function customeradd(Request $request)
     {
         $testMode = env('TEST_MODE');
 
         if ($testMode) {
             if (Customer::count() > env('TEST_MODE_LIMIT')) {
-                return redirect()->back()->with('test', 'Test Modu: Üzgünüz, En Fazla '.env('TEST_MODE_LIMIT').' Kayıt Ekleyebilirsiniz');
+                return redirect()->back()->with('test', 'Test Modu: Üzgünüz, En Fazla ' . env('TEST_MODE_LIMIT') . ' Kayıt Ekleyebilirsiniz');
             }
         }
 
@@ -402,16 +417,16 @@ class OrderController extends Controller
             'phone' => 'required'
         ]);
 
-        $custom  = Customer::where('phone', $data['phone'])->whereDate('restaurant_id', Auth::user()->id)->first();
+        $custom = Customer::where('phone', $data['phone'])->whereDate('restaurant_id', Auth::user()->id)->first();
 
         if ($custom) {
             $adres = CustomerAddress::where('customer_id', $custom->id)->first();
-            $customer = '<p class="logo-text text-white mr-2">' . $custom->name . '</p> ' .  '<span class="ml-2 text-white"> - '. $adres->phone.'</span>' . ' <br><span>' . $adres->mahalle . ' Mah.' . $adres->sokak_cadde . '.No:' . $request->bina_no . ' Kat:' . $request->kat . ' Daire:' . $request->daire_no . '</span>';
+            $customer = '<p class="logo-text text-white mr-2">' . $custom->name . '</p> ' . '<span class="ml-2 text-white"> - ' . $adres->phone . '</span>' . ' <br><span>' . $adres->mahalle . ' Mah.' . $adres->sokak_cadde . '.No:' . $request->bina_no . ' Kat:' . $request->kat . ' Daire:' . $request->daire_no . '</span>';
 
             return response()->json(['customer' => $customer, 'customerid' => $custom->id]);
         } else {
             $create = new Customer();
-            $create->restaurant_id =  Auth::user()->id;
+            $create->restaurant_id = Auth::user()->id;
             $create->name = $data['name'];
             $create->phone = $data['phone'];
             $create->mobile = $request->mobile;
@@ -419,7 +434,7 @@ class OrderController extends Controller
 
             if ($request->adres_name) {
                 $adreses = new CustomerAddress();
-                $adreses->restaurant_id =  Auth::user()->id;
+                $adreses->restaurant_id = Auth::user()->id;
                 $adreses->customer_id = $create->id;
                 $adreses->name = $request->adres_name;
                 $adreses->sokak_cadde = $request->sokak_cadde;
@@ -431,13 +446,14 @@ class OrderController extends Controller
                 $adreses->save();
             }
 
-            $customer = '<p class="logo-text mr-2 text-white">' . $data['name'] . '</p> ' . '<span class="ml-2 text-white"> - '.$data['phone'].'</span>' . ' <br><span>' . $request->mahalle . ' Mah.' . $request->sokak_cadde . '.No:' . $request->bina_no . ' Kat:' . $request->kat . ' Daire:' . $request->daire_no . '</span>';
+            $customer = '<p class="logo-text mr-2 text-white">' . $data['name'] . '</p> ' . '<span class="ml-2 text-white"> - ' . $data['phone'] . '</span>' . ' <br><span>' . $request->mahalle . ' Mah.' . $request->sokak_cadde . '.No:' . $request->bina_no . ' Kat:' . $request->kat . ' Daire:' . $request->daire_no . '</span>';
             return response()->json(['customer' => $customer, 'customerid' => $create->id]);
         }
     }
+
     public function addOrder(Request $request)
     {
-        if (!OrdersHelper::isTopup(null,Auth::user()->id)){
+        if (!OrdersHelper::isTopup(null, Auth::user()->id)) {
             return response()->json(['status' => "BalanceError", 'message' => 'Yetersiz Kontör Bakiyesi']);
         }
 
@@ -458,16 +474,42 @@ class OrderController extends Controller
             return response()->json(['status' => "ERR", 'message' => 'Ürünler listesi boş veya geçersiz.']);
         }
 
+        $discount = 0;;
+        $coupon = [];
+        if ($request->coupon_id) {
+            $coupon = RestaurantCoupon::find($request->coupon_id);
+
+            $coupon = [
+                'couponId' => $coupon->coupon_id,
+                'description' => $coupon->name,
+                'totalSellerAmount' => $coupon->total_seller_amount,
+            ];
+
+            $discount = (float) $coupon['totalSellerAmount'];
+        }
+
         $order = new Order();
         $order->restaurant_id = Auth::user()->id;
+        $order->customer_id = $request->customer_id;
         $order->full_name = $customer->name;
+        $order->coupon = json_encode($coupon);
         $order->address = $customer_address->mahalle . " Mah. " . $customer_address->sokak_cadde . " Cad/Sk. No:" . $customer_address->bina_no . ". Kat:" . $customer_address->kat . ". D:" . $customer_address->daire_no . " / Adres Tarifi:" . $customer_address->adres_tarifi;
         $order->phone = $customer->phone;
-        $order->amount = $request->amount;
+        $order->discount = $discount;
+        $order->sub_amount = $request->amount;
+        $order->amount = $request->amount-$discount;
         $order->platform = "telefonsiparis";
         $order->tracking_id = "POS-" . rand(9, 99999);
         $order->payment_method = $request->payment_method;
         $order->courier_id = $request->courier_id > 0 ? $request->courier_id : -1;
+
+        $restaurant = Restaurant::find($order->restaurant_id);
+        $order->distance = OrdersHelper::haversineDistance(
+            $restaurant->latitude,
+            $restaurant->longitude,
+            $customer_address->latitude,
+            $customer_address->longitude
+        );
 
         $items = [];
         foreach ($request->products as $productData) {
@@ -528,21 +570,7 @@ class OrderController extends Controller
         // Siparişin durumunu ve mesajını güncelle
         $order->status = $action;
         $order->message = $message;
-        $saveStatus = $order->save();
-
-        // Eğer sipariş durumu DELIVERED veya UNSUPPLIED ise kuryeyi aktif hale getir
-        if ($action == 'DELIVERED' || $action == 'UNSUPPLIED') {
-            // Siparişle ilişkilendirilmiş kurye siparişini bul
-            $courierOrder = CourierOrder::where('order_id', $order->id)->first();
-            if ($courierOrder) {
-                // Kuryeyi bul ve durumunu aktif olarak güncelle
-                $courier = Courier::find($courierOrder->courier_id);
-                if ($courier) {
-                    $courier->status = CourierStatus::active;
-                    $courier->save();
-                }
-            }
-        }
+        $saveStatus = $order->update();
 
         // Güncelleme işlemi başarılıysa yanıt ver
         if ($saveStatus) {
@@ -554,167 +582,18 @@ class OrderController extends Controller
 
     public function printed($id)
     {
-        $order = Order::where('id', $id)->first();
+        $order = Order::where('id', $id)->firstOrFail();
         $customer_address = CustomerAddress::where('customer_id', $order->customer_id)->first();
+        $items = json_decode($order->items, false);
 
-        $printed = '
-                <style>
-                    body{
-                      font-family: Arial;
-                      text-align: left;
-                      font-size: 14px;
-                    }
-                    .restaurant{
-                      font-weight: bold;
-                      text-align: center;
-                      padding-bottom: 5px;
-                    }
+        $html = view('receipt', [
+            'order' => $order,
+            'customer_address' => $customer_address,
+            'items' => $items,
+            'restaurant' => Restaurant::find($order->restaurant_id),
+        ])->render(); // render() ile HTML stringi alın
 
-                    .adres{
-                      font-weight: bold;
-                    }
-
-                    .order_time{
-                      font-weight: bold;
-                    }
-                    .dot{
-                      border-bottom: 1px dotted;
-                      padding-top: 10px;
-                      padding-bottom: 10px;
-                    }
-                    .name{
-                      padding: 10px 0px 20px;
-                    }
-                    .item{
-                      font-weight: bold;
-                    }
-                    .tabletitle{
-                      padding-top: 10px;
-                    }
-                    .legalcopy{
-                      text-align: center;
-
-                    }
-                  </style>
-
-             <div id="invoice-POS">
-
-                  <div class="logo"></div>
-                  <div class="restaurant">
-                    ' . Auth::user()->name . '
-                  </div><!--End Info-->
-                  <div class="adres">
-                     <b>Restoran Adresi:</b>' . Auth::user()->address . '
-                  </div>
-                   <div class="adres">
-                    <b>Restoran İletişim:</b>' . Auth::user()->phone . '
-                  </div>
-                  <div class="order_time">
-                    Sipariş Zamanı: ' . Carbon::parse($order->created_at)->format('d.m.Y H:i:s') . '
-                  </div>
-                  <div class="trackingid">
-                    <b>Sipariş No: </b>' . $order->tracking_id . '
-                  </div>
-                     <div class="dot"></div>
-
-                  <div class="name"><b>Müşteri Adı:</b>' . $order->full_name . '</div>
-                  <div class="adress">
-                  <b>Adres:</b>' . $order->address . '
-                  </div>
-                  <div class="adress">
-                   ' . $order->notes . '
-                  </div>
-                  <div class="adress">
-                   <b>Müşteri İletişim Numarası: ' . $order->phone . '</b>
-                  </div>
-
-                  <div class="dot"></div>
-
-
-                  <div id="bot">
-
-                      <div id="table"  style="padding-top: 20px;">
-                          <table>
-                              <tr class="tabletitle">
-                                  <td class="item">Adet</td>
-                                  <td class="item">Yemek</td>
-                                  <td class="item">Fiyat</td>
-                                  <td class="item">Tutar</td>
-                              </tr>
-                              ';
-        $items = json_decode($order->items);
-
-        if ($order->platform == "yemeksepeti") {
-
-
-            foreach ($items as $item) {
-                $printed .=  '<tr class="service">
-                                          <td class="tableitem"><p class="itemtext">' . $item->amount . '</p></td>
-                                          <td class="tableitem"><p class="itemtext">' . $item->name . '</p></td>
-                                          <td class="tableitem"><p class="itemtext">' . $item->price . ' TL</p></td>
-                                          <td class="tableitem"><p class="itemtext">' . $item->total . ' TL</p></td>
-                                      </tr> ';
-            }
-        } elseif ($order->platform == "getir") {
-
-            foreach ($items as $item) {
-                $printed .=  '<tr class="service">
-                                          <td class="tableitem"><p class="itemtext">' . $item->amount . '</p></td>
-                                          <td class="tableitem"><p class="itemtext">' . $item->name . '</p></td>
-                                          <td class="tableitem"><p class="itemtext">' . $item->price . ' TL</p></td>
-                                          <td class="tableitem"><p class="itemtext">' . (int)$item->amount * (int)$item->price . ' TL</p></td>
-                                      </tr> ';
-            }
-        } else {
-
-            foreach ($items as $item) {
-                $printed .=  '<tr class="service">
-                                          <td class="tableitem"><p class="itemtext">' . count($item->items) . '</p></td>
-                                          <td class="tableitem"><p class="itemtext">' . $item->name . '</p></td>
-                                          <td class="tableitem"><p class="itemtext">' . $item->price . ' TL</p></td>
-                                          <td class="tableitem"><p class="itemtext">' . (int)count($item->items) * (int)$item->price . ' TL</p></td>
-                                      </tr> ';
-            }
-        }
-
-        $printed .= '
-
-                              <tr class="tabletitle">
-                                  <td></td>
-                                  <td></td>
-                                  <td class="item">Toplam:</td>
-                                  <td class="payment">' . $order->amount . ' TL</td>
-                              </tr>
-
-
-
-                          </table>
-                      </div><!--End Table-->
-                       <div class="dot"></div>
-
-                       <div class="adress" style="padding-top: 20px;">
-                        <span class="item">Ödeme Şekli:</span> ' . $order->payment_method . '.<br>
-
-
-                      </div>
-                      <div class="dot"></div>
-
-                      <div class="legalcopy">
-                          <p class="legal"><strong></strong>
-                          <br>
-                          <center>
-                          <br>
-                          <b>- '.env('APP_NAME').' Bizi Tercih Ettiğiniz İçin Teşekkür Ederiz.</b>
-                          </center>
-
-
-                          </p>
-                      </div>
-
-                    </div>
-              </div>';
-
-        return response()->json(['printed' => $printed]);
+        return response()->json(['printed' => $html]);
     }
 
     public function deleteOrder($id)

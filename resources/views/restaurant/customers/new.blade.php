@@ -4,7 +4,7 @@
     <style>
         .map-container {
             border: #0d2646 solid 2px;
-            height: 300px;
+            height: 350px;
             width: 100%;
             border-radius: 15px;
             margin-bottom: 20px;
@@ -60,14 +60,14 @@
                             <hr>
 
                             <!-- Adresler -->
-                            <div>
+                            <div class="p-3" style="background: #f4f0f0">
                                 <div class="repeater-heading mb-3">
                                     <div class="row">
                                         <div class="col-lg-10">
                                             <h5>Adres Ekle <small class="text-danger">*</small></h5>
                                         </div>
                                         <div class="col-lg-2 text-end">
-                                            <a id="new-add" class="btn btn-sm btn-success repeater-add-btn" data-repeater-create>+ Yeni Ekle</a>
+                                            <a id="new-add" class="btn btn-sm btn-secondary repeater-add-btn" data-repeater-create>+ Yeni Ekle</a>
                                         </div>
                                     </div>
                                 </div>
@@ -128,7 +128,7 @@
                                 </div>
                             </div>
 
-                            <button type="submit" class="btn btn-primary float-end mt-4">Kaydı Tamamla</button>
+                            <button type="submit" class="special-button float-end mt-4">Kaydı Tamamla</button>
                         </form>
                     </div>
                 </div>

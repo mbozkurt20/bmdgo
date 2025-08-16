@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use App\Events\OrderNotification;
 use App\Models\Admin;
+use App\Models\AdminSystemFeature;
 use App\Models\Categorie;
 use App\Models\Courier;
 use App\Models\CourierOrder;
@@ -11,6 +12,7 @@ use App\Models\Customer;
 use App\Models\Notification;
 use App\Models\Order;
 use App\Models\Restaurant;
+use App\Models\RestaurantSystemFeature;
 use App\Models\Topup;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -80,12 +82,30 @@ class OrdersHelper
 
             return true;
         } else {
-            Notification::create([
+            NotificationHelper::add([
                 'title' => 'Yetersiz Kontör Bakiyesi',
                 'description' => 'Üzgünüz, Kontor bakiyeniz yetersiz olduğu için ürün eklemesi yapılamıyor!!',
+                'url' => route('admin.balance')
             ]);
 
             return false;
+        }
+    }
+
+    static function formatDistance($distanceKm)
+    {
+        if ($distanceKm >= 1) {
+            // 1 km ve üzeri → kilometre cinsinden
+            return number_format($distanceKm, 2) . " km";
+        } elseif ($distanceKm >= 0.001) {
+            // 1 metre ile 1 km arası → metre cinsinden
+            return number_format($distanceKm * 1000, 2) . " m";
+        } elseif ($distanceKm > 0) {
+            // 1 mm ile 1 metre arası → santimetre cinsinden
+            return number_format($distanceKm * 100000, 2) . " cm";
+        } else {
+            // Sıfır veya negatif mesafe
+            return "0 m";
         }
     }
 
@@ -108,4 +128,17 @@ class OrdersHelper
         return $angle * $earthRadius;
     }
 
+    static function getOrderSystem($id)
+    {
+        return AdminSystemFeature::where('admin_id', Auth::guard('admin')->id())
+            ->where('system_feature_id', $id)
+            ->exists();
+    }
+
+    static function restaurantGetOrderSystem($id)
+    {
+        return RestaurantSystemFeature::where('restaurant_id', Auth::guard('admin')->id())
+            ->where('system_feature_id', $id)
+            ->exists();
+    }
 }

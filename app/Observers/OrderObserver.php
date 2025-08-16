@@ -3,12 +3,15 @@
 namespace App\Observers;
 
 use App\Helpers\OrdersHelper;
+use App\Helpers\OrderStatus;
 use App\Helpers\SendSms;
 use App\Jobs\AssignOrderToCourier;
+use App\Jobs\AssignPendingOrders;
 use App\Models\Admin;
 use App\Models\Courier;
 use App\Models\Order;
 use App\Models\Restaurant;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Pusher\Pusher;
 
@@ -16,7 +19,7 @@ class OrderObserver
 {
     public function creating(Order $order)
     {
-       OrdersHelper::updateTopup(null,$order->restaurant_id);
+        OrdersHelper::updateTopup(null, $order->restaurant_id);
     }
 
     public function created(Order $order)
@@ -26,10 +29,16 @@ class OrderObserver
 
         $restaurant = Restaurant::find($order->restaurant_id);
 
-        SendSms::send($order->phone,'Sayın '.$order->full_name.', '. $order->tracking_id. ' numaralı siparişiniz alınmıştır.'. '\n \n '.
-            $order->verify_code.' doğrulama kodu ile siparişinizi teslim alabilirsiniz.', $restaurant->admin_id);
+        SendSms::send($order->phone, 'Sayın ' . $order->full_name . ', ' . $order->tracking_id . ' numaralı siparişiniz alınmıştır.' . '\n \n ' .
+            $order->verify_code . ' doğrulama kodu ile siparişinizi teslim alabilirsiniz.', $restaurant->admin_id);
 
-        $options = array (
+        if (Admin::where('id', $restaurant->admin_id)->first()->auto_orders) {
+            if ($order) {
+                dispatch(new AssignPendingOrders());
+            }
+        }
+
+        $options = array(
             'cluster' => 'mt1',
             'useTLS' => true
         );
@@ -40,9 +49,8 @@ class OrderObserver
             env('PUSHER_APP_ID'),
             $options
         );
-        
-        $order = Order::where('id',$order->id)->with('restaurant')->first();
-        $pusher->trigger('my-channel', 'orders', ['order' => $order]);
+
+        $pusher->trigger('orders', 'new-order', ['order' => $order]);
     }
 
     public function updated(Order $order)
@@ -55,21 +63,15 @@ class OrderObserver
 
         $restaurant = Restaurant::find($order->restaurant_id);
 
-        if ($order->status == 'HANDOVER') {
-            SendSms::send($order->phone,'Sayın '.$order->full_name.', '. $order->tracking_id. ' numaralı siparişiniz yola çıkmıştır.', $restaurant->admin_id);
+        if ($order->status == OrderStatus::HANDOVER) {
+            SendSms::send($order->phone, 'Sayın ' . $order->full_name . ', ' . $order->tracking_id . ' numaralı siparişiniz yola çıkmıştır.', $restaurant->admin_id);
         }
 
-        if ($order->status == 'DELIVERED') {
-            SendSms::send($order->phone,'Sayın '.$order->full_name.', '. $order->tracking_id. ' numaralı siparişiniz teslim edilmiştir. \n \n Bizi tercih ettiğiniz için teşekkür ederiz.', $restaurant->admin_id);
+        if ($order->status == OrderStatus::DELIVERED) {
+            SendSms::send($order->phone, 'Sayın ' . $order->full_name . ', ' . $order->tracking_id . ' numaralı siparişiniz teslim edilmiştir. \n \n Bizi tercih ettiğiniz için teşekkür ederiz.', $restaurant->admin_id);
         }
 
-        if (Admin::where('id', $restaurant->admin_id)->first()->auto_orders) {
-            if ($order) {
-                dispatch(new AssignOrderToCourier($order));
-            }
-        }
-
-        $options = array (
+        $options = array(
             'cluster' => 'mt1',
             'useTLS' => true
         );
@@ -81,19 +83,19 @@ class OrderObserver
             $options
         );
 
-        $order = Order::where('id',$order->id)->with('restaurant')->first();
-        $pusher->trigger('my-channel', 'orders', ['order' => $order]);
+        $order = Order::where('id', $order->id)->with(['restaurant','courier'])->first();
+        $pusher->trigger('orders', 'update-order', ['order' => $order]);
     }
 
     /**
      * Handle the Courier "deleted" event.
      *
-     * @param  \App\Models\Order  $order
+     * @param \App\Models\Order $order
      * @return void
      */
     public function deleted(Order $order)
     {
-        $options = array (
+        $options = array(
             'cluster' => 'mt1',
             'useTLS' => true
         );
@@ -105,7 +107,7 @@ class OrderObserver
             $options
         );
 
-        $order = Order::where('id',$order->id)->with('restaurant')->first();
-        $pusher->trigger('my-channel', 'orders', ['order' => $order]);
+        $order = Order::where('id', $order->id)->with('restaurant')->first();
+        $pusher->trigger('orders-' . Auth::user()->id, 'update-orders-' . Auth::user()->id, ['order' => $order]);
     }
 }

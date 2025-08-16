@@ -3,11 +3,15 @@
 namespace App\Http\Controllers\Api\v2\Courier\Orders;
 
 
+use App\Helpers\CourierStatus;
 use App\Helpers\Json;
+use App\Helpers\NotificationHelper;
+use App\Helpers\OrdersHelper;
 use App\Helpers\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\OrderResource;
 use App\Models\CourierOrder;
+use App\Models\Notification;
 use App\Models\Order;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -41,6 +45,14 @@ class OrderController extends Controller
 
         if ($request->input('order_status_id') == 1){
             $status = OrderStatus::DELIVERED;
+
+            if (OrdersHelper::getOrderSystem(3)){
+                NotificationHelper::add([
+                    'title' => 'Paket Teslim Edildi',
+                    'description' => $order->tracking_id. ' takip numaralı paket '.$courier->name. '  kurye tarafından teslim edildi.',
+                    'url' => route('admin.balance')
+                ]);
+            }
         }
 
         if ($request->input('order_status_id') == 2){
@@ -49,6 +61,9 @@ class OrderController extends Controller
 
         Order::where('id', $orderId)
             ->update(["status" =>  $status]);
+
+        $courier->status = CourierStatus::active;
+        $courier->update();
 
         return Json::success('Sipariş Durumu Güncellendi', new OrderResource($order));
     }

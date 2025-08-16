@@ -12,9 +12,10 @@ Route::group(['prefix' => 'restaurant'], function () {
     });
 
     Route::group(['middleware' => ['restaurant.auth']], function () {
+        Route::get('/printed/{orderId}', [App\Http\Controllers\OrderController::class, 'printed']);
+
         Route::get('profile', [App\Http\Controllers\MyController::class, 'profile'])->name('restaurant.profile');
         Route::post('/profile', [App\Http\Controllers\MyController::class, 'profileUpdate'])->name('restaurant.profile.update');
-
 
         Route::post('/quick-order', [App\Http\Controllers\OrderController::class, 'storeQuick'])->name('quick.order.store');
 
@@ -33,6 +34,15 @@ Route::group(['prefix' => 'restaurant'], function () {
         Route::get('/products/delete/{id}', [App\Http\Controllers\ProductController::class, 'delete'])->name('restaurant.products.delete');
         Route::post('/products/create', [App\Http\Controllers\ProductController::class, 'create'])->name('restaurant.products.create');
         Route::post('/products/update', [App\Http\Controllers\ProductController::class, 'update'])->name('restaurant.products.update');
+
+        /* Coupons */
+        Route::get('/coupons', [App\Http\Controllers\CouponController::class, 'index'])->name('restaurant.coupons');
+        Route::get('/coupons/new', [App\Http\Controllers\CouponController::class, 'create'])->name('restaurant.coupons.new');
+        Route::get('/coupons/edit/{id}', [App\Http\Controllers\CouponController::class, 'edit'])->name('restaurant.coupons.edit');
+        Route::get('/coupons/delete/{id}', [App\Http\Controllers\CouponController::class, 'delete'])->name('restaurant.coupons.delete');
+        Route::post('/coupons/create', [App\Http\Controllers\CouponController::class, 'store'])->name('restaurant.coupons.create');
+        Route::post('/coupons/update', [App\Http\Controllers\CouponController::class, 'update'])->name('restaurant.coupons.update');
+
 
         /* Categories */
         Route::get('/categories', [App\Http\Controllers\CategorieController::class, 'index'])->name('restaurant.categories');
@@ -85,6 +95,11 @@ Route::group(['prefix' => 'restaurant'], function () {
 
         Route::get('/deletedOrders', [App\Http\Controllers\SiparislerController::class, 'deletedOrders'])->name('restaurant.deletedOrders');
         Route::get('/deliveredOrders', [App\Http\Controllers\SiparislerController::class, 'deliveredOrders'])->name('restaurant.deliveredOrders');
+
+        Route::get('/menus', [App\Http\Controllers\MenuController::class, 'index'])->name('restaurant.menus');
+        Route::get('/menu', [App\Http\Controllers\MenuController::class, 'show'])->name('restaurant.menu');
+        Route::post('/menus/select', [App\Http\Controllers\MenuController::class, 'store'])->name('restaurant.menu.template.select');
+
 
         /* Menus */
         Route::get('/menus', [App\Http\Controllers\MenuController::class, 'index'])->name('restaurant.menus');

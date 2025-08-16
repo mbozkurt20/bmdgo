@@ -3,7 +3,7 @@
     <link rel="stylesheet" href="{{asset('css/pages/admin/home/index.css')}}">
     <div class="container-fluid">
         <div class="row">
-            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap" >
                 <div class="w-100 d-flex align-items-center justify-content-between">
                     <form method="GET" action="{{ route('admin.filterByDate') }}"
                           class="d-flex  gap-3 align-items-center">
@@ -59,6 +59,7 @@
                 </div>
 
             </div>
+
             <div class="col-lg-6">
                 <div class="orders-section" style="margin-bottom: 10px">
                     <h4>Siparişler</h4>
@@ -74,6 +75,16 @@
                                 <span class="badge bg-white text-dark order-number">{{ count($tumu) }}</span>
                             </button>
                         </div>
+                        <div class="col-md-6">
+                            <button
+                                class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100"
+                                style="background: #0d2646">
+                                <i class="fa-solid fa-phone" style="color: #fff;font-size:18px;padding-left:10px"></i>
+                                <span class="fw-bold">Telefon Sipariş</span>
+                                <span class="badge bg-white text-dark order-number">{{ count($telefonsiparis) }}</span>
+                            </button>
+                        </div>
+
                         <!-- Getir Orders -->
                         <div class="col-md-6">
                             <button
@@ -81,7 +92,6 @@
                                 <img src="{{ asset('theme/images/GetirYemek_Logo.png') }}"
                                      style="background-repeat: no-repeat; background-position:center" width="77px"
                                      height="14px" alt="">
-                                <span class="fw-bold">Getir Yemek</span>
                                 <span class="badge bg-white text-dark order-number">{{ count($getiryemek) }}</span>
                             </button>
                         </div>
@@ -92,7 +102,6 @@
                                 <img src="{{ asset('theme/images/trendyolyemek.png') }}"
                                      style="background-repeat: no-repeat; background-position:center" width="71px"
                                      height="14px" alt="">
-                                <span class="fw-bold">Trendyol Yemek</span>
                                 <span class="badge bg-white text-dark order-number">{{ count($trendyol) }}</span>
                             </button>
                         </div>
@@ -105,7 +114,6 @@
                                 <img src="{{ asset('theme/images/Yemeksepeti_Logo.png') }}"
                                      style="background-repeat: no-repeat; background-position:center" width="79px"
                                      height="15px" alt="">
-                                <span class="fw-bold">Yemeksepeti</span>
                                 <span class="badge bg-white text-dark order-number">{{ count($yemeksepeti) }}</span>
                             </button>
                         </div>
@@ -117,81 +125,75 @@
                                 <img src="{{ asset('theme/images/MigrosYemek_logo.png') }}"
                                      style="background-repeat: no-repeat; background-position:center" width="69px"
                                      height="28px" alt="">
-                                <span class="fw-bold">Migros Yemek </span>
                                 <span class="badge bg-white text-dark order-number">{{ $migros }}</span>
                             </button>
                         </div>
                         <!-- Phone Orders -->
-                        <div class="col-md-6">
-                            <button
-                                class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100"
-                                style="background: #0d2646">
-                                <i class="fa-solid fa-phone" style="color: #fff;font-size:18px;padding-left:10px"></i>
-                                <span class="fw-bold">Telefon Sipariş</span>
-                                <span class="badge bg-white text-dark order-number">{{ count($telefonsiparis) }}</span>
-                            </button>
-                        </div>
+
                     </div>
                 </div>
             </div>
 
             <!-- Performance Section -->
             <div class="col-lg-6">
-                <div class="performance-section mb-2">
-                    <h4>Satış Performansı</h4>
+                <!-- Satış Performansı -->
+                <div class="performance-section mb-4">
+                    <h4 class="mb-3">Satış Performansı</h4>
                     <div class="row g-3">
-                        <!-- Revenue Card -->
+                        <!-- Ciro -->
                         <div class="col-4">
-                            <div class="order-card text-white" style="background: #0d2646">
-                                <p class="fw-bold">Ciro</p>
-                                <span class="order-number">{{ $formattedExpense }} ₺</span>
+                            <div class="order-card-custom text-center bg-white p-3 rounded shadow-sm">
+                                <p class=" text-danger fw-bold mb-2">Ciro</p>
+                                <p class="card-value text-black fw-bold h5 mb-0">{{ $formattedExpense }} ₺</p>
                             </div>
                         </div>
-                        <!-- Orders Count Card -->
+                        <!-- Sipariş Sayısı -->
                         <div class="col-4">
-                            <div class="order-card text-white" style="background: #e7004d">
-                                <p class="fw-bold">Sipariş Sayısı</p>
-                                <span class="order-number">{{ count($tumu) }} Adet</span>
+                            <div class="order-card-custom text-center bg-white p-3 rounded shadow-sm">
+                                <p class=" text-danger fw-bold mb-2">Sipariş Sayısı</p>
+                                <p class="card-value text-black fw-bold h5 mb-0">{{ count($tumu) }} Adet</p>
                             </div>
                         </div>
-                        <!-- Average Order Amount Card -->
+                        <!-- Ortalama Sipariş Tutarı -->
                         <div class="col-4">
-                            <div class="order-card text-white" style="background: #0d2646">
-                                <p class="fw-bold">Ortalama Sipariş Tutarı</p>
-                                <span class="order-number">{{ $formattedAverageExpense }} ₺</span>
+                            <div class="order-card-custom text-center bg-white p-3 rounded shadow-sm">
+                                <p class=" text-danger fw-bold mb-2">Ortalama Sipariş Tutarı</p>
+                                <p class="card-value text-black fw-bold h5 mb-0">{{ $formattedAverageExpense }} ₺</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- Kurye Performansı -->
                 <div class="performance-section">
-                    <h4>Kurye Performansı</h4>
+                    <h4 class="mb-3">Kurye Performansı</h4>
                     <div class="row g-3">
-                        <!-- Revenue Card -->
+                        <!-- Toplam -->
                         <div class="col-3">
-                            <div class="order-card text-white" style="background: #0d2646">
-                                <p class="fw-bold">Toplam</p>
-                                <span class="order-number">{{ $totalCouriers }} Kurye</span>
+                            <div class="order-card-custom text-center bg-white p-3 rounded shadow-sm">
+                                <p class=" text-danger fw-bold mb-2">Toplam</p>
+                                <p class="card-value text-black fw-bold h6 mb-0">{{ $totalCouriers }} Kurye</p>
                             </div>
                         </div>
-                        <!-- Orders Count Card -->
+                        <!-- Müsait -->
                         <div class="col-3">
-                            <div class="order-card text-white" style="background: #e7004d">
-                                <p class="fw-bold">Müsait</p>
-                                <span class="order-number">{{ $idleCouriers }} Kurye</span>
+                            <div class="order-card-custom text-center bg-white p-3 rounded shadow-sm">
+                                <p class=" text-danger fw-bold mb-2">Müsait</p>
+                                <p class="card-value text-black fw-bold h6 mb-0">{{ $idleCouriers }} Kurye</p>
                             </div>
                         </div>
+                        <!-- Serviste -->
                         <div class="col-3">
-                            <div class="order-card text-white" style="background: #0d2646">
-                                <p class="fw-bold">Serviste</p>
-                                <span class="order-number">{{ $serviceCouriers }} Kurye</span>
+                            <div class="order-card-custom text-center bg-white p-3 rounded shadow-sm">
+                                <p class=" text-danger fw-bold mb-2">Serviste</p>
+                                <p class="card-value text-black fw-bold h6 mb-0">{{ $serviceCouriers }} Kurye</p>
                             </div>
                         </div>
-                        <!-- Average Order Amount Card -->
+                        <!-- Molada -->
                         <div class="col-3">
-                            <div class="order-card text-white" style="background: #e7004d">
-                                <p class="fw-bold">Molada</p>
-                                <span class="order-number">{{ $breakCouriers }} Kurye</span>
+                            <div class="order-card-custom text-center bg-white p-3 rounded shadow-sm">
+                                <p class=" text-danger fw-bold mb-2">Molada</p>
+                                <p class="card-value text-black fw-bold h6 mb-0">{{ $breakCouriers }} Kurye</p>
                             </div>
                         </div>
                     </div>
@@ -200,6 +202,5 @@
 
             @include('admin.home_table')
         </div>
-
     </div>
 @endsection

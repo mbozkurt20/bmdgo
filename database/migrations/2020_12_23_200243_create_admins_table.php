@@ -15,6 +15,7 @@ class CreateAdminsTable extends Migration
     {
         Schema::create('admins', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('created_by_id')->nullable(); //bayi id user
             $table->string('name')->nullable();
             $table->string('email')->unique();
             $table->string('password');

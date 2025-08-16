@@ -25767,7 +25767,8 @@ table.dataTable tfoot th {
 .dataTables_wrapper input[type="search"], .dataTables_wrapper input[type="text"], .dataTables_wrapper select {
   border: 0.0625rem solid #e2e2e2;
   padding: .3rem 0.5rem;
-  color: #715d5d;
+  color: #0d2646;
+    background: white;
   border-radius: 0.3125rem; }
   [data-theme-version="dark"] .dataTables_wrapper input[type="search"], [data-theme-version="dark"] .dataTables_wrapper input[type="text"], [data-theme-version="dark"] .dataTables_wrapper select {
     background: #171622;

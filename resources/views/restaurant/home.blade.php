@@ -1,6 +1,7 @@
 @extends('restaurant.layouts.app')
 @section('content')
     <link rel="stylesheet" href="{{asset('css/pages/home/index.css')}}">
+    <link rel="stylesheet" href="{{asset('css/pages/admin/home/index.css')}}">
 
     <div class="container-fluid" style="padding-top: 1.5rem">
         <div class="row">
@@ -140,65 +141,35 @@
 
             <!-- Performance Section -->
             <div class="col-lg-6">
-                <div class="performance-section mb-2">
-                    <h4>Satış Performansı</h4>
+                <div class="performance-section mb-4">
+                    <h4 class="mb-3">Satış Performansı</h4>
                     <div class="row g-3">
-                        <!-- Revenue Card -->
+                        <!-- Ciro -->
                         <div class="col-4">
-                            <div class="order-card text-white" style="background: #0d2646">
-                                <p class="fw-bold">Ciro</p>
-                                <span class="order-number">{{ $formattedExpense }} TL</span>
+                            <div class="order-card-custom text-center bg-white p-3 rounded shadow-sm">
+                                <p class=" text-danger fw-bold mb-2">Ciro</p>
+                                <p class="card-value text-black fw-bold h5 mb-0">{{ $formattedExpense }} ₺</p>
                             </div>
                         </div>
-                        <!-- Orders Count Card -->
+                        <!-- Sipariş Sayısı -->
                         <div class="col-4">
-                            <div class="order-card text-white" style="background: #e7004d">
-                                <p class="fw-bold">Sipariş Sayısı</p>
-                                <span class="order-number">{{ count($tumu) }} Adet</span>
+                            <div class="order-card-custom text-center bg-white p-3 rounded shadow-sm">
+                                <p class=" text-danger fw-bold mb-2">Sipariş Sayısı</p>
+                                <p class="card-value text-black fw-bold h5 mb-0">{{ count($tumu) }} Adet</p>
                             </div>
                         </div>
-                        <!-- Average Order Amount Card -->
+                        <!-- Ortalama Sipariş Tutarı -->
                         <div class="col-4">
-                            <div class="order-card text-white" style="background: #0d2646">
-                                <p class="fw-bold">Ortalama Sipariş Tutarı</p>
-                                <span class="order-number">{{ $formattedAverageExpense }} TL</span>
+                            <div class="order-card-custom text-center bg-white p-3 rounded shadow-sm">
+                                <p class=" text-danger fw-bold mb-2">Ortalama Sipariş Tutarı</p>
+                                <p class="card-value text-black fw-bold h5 mb-0">{{ $formattedAverageExpense }} ₺</p>
                             </div>
                         </div>
                     </div>
                 </div>
-
-
             </div>
 
-            @include('restaurant.partials.orders.datatable')
+            @include('restaurant.home_table')
         </div>
     </div>
-
-    <script>
-        const selectBox = document.getElementById("selectedCourier");
-        const optionsContainer = document.getElementById("courierOptions");
-        const options = document.querySelectorAll(".option");
-        const courierIdInput = document.getElementById("courierId");
-
-        selectBox.addEventListener("click", () => {
-            optionsContainer.style.display = optionsContainer.style.display === "block" ? "none" : "block";
-        });
-
-        options.forEach(option => {
-            option.addEventListener("click", (e) => {
-                const selectedText = option.innerText;
-                const selectedId = option.getAttribute("data-id");
-
-                selectBox.innerHTML = selectedText;
-                courierIdInput.value = selectedId;
-                optionsContainer.style.display = "none";
-            });
-        });
-
-        document.addEventListener("click", function (event) {
-            if (!selectBox.contains(event.target) && !optionsContainer.contains(event.target)) {
-                optionsContainer.style.display = "none";
-            }
-        });
-    </script>
 @endsection

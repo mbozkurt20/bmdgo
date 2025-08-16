@@ -66,11 +66,31 @@
             </li>
 
             <li><a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
+                    <i class="flaticon-069-plus text-white"></i>
+                    <span class="nav-text text-white">Kuponlar</span>
+                </a>
+                <ul aria-expanded="false">
+                    <li><a class="text-white" href="{{ route('restaurant.coupons') }}">Kuponlar</a></li>
+                    <li><a class="text-white" href="{{ route('restaurant.coupons.new') }}">Kupon Tanımla</a></li>
+                </ul>
+            </li>
+
+            <li><a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
                     <i class="flaticon-381-settings-5 text-white"></i>
                     <span class="nav-text text-white">Entegrasyonlar</span>
                 </a>
                 <ul aria-expanded="false">
                     <li><a class="text-white" href="{{ route('restaurant.entegrations') }}">Platformlar</a></li>
+                </ul>
+            </li>
+
+            <li><a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
+                    <i class="flaticon-042-menu text-white"></i>
+                    <span class="nav-text text-white">Menüler</span>
+                </a>
+                <ul aria-expanded="false">
+                    <li><a  class="text-white" href="{{ route('restaurant.menus') }}">Menüler</a></li>
+                    <li><a target="_blank" class="text-white" href="{{ route('restaurant.menu') }}">Aktif Menü</a></li>
                 </ul>
             </li>
 

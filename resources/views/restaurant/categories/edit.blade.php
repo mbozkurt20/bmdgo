@@ -44,12 +44,14 @@
                                     </div>
                                     <div class="mb-3 col-md-4">
                                         <label class="form-label">POS Sırası</label>
-                                        <input type="number" class="form-control" name="desk" value="{{$categorie->desk}}"
+                                        <input type="number" class="form-control" name="desk"
+                                               value="{{$categorie->desk}}"
                                                placeholder="POS Görünüm Sırası">
                                     </div>
                                 </div>
 
-                                <button type="submit" class="special-button float-end mt-4">Kaydı Güncelle</button                            </form>
+                                <button type="submit" class="special-button float-end mt-4">Kaydı Güncelle</button>
+                            </form>
                         </div>
                     </div>
                 </div>

@@ -15,9 +15,11 @@ class CreateTopupMovementsTable extends Migration
     {
         Schema::create('topup_movements', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('created_by_user_id');
             $table->unsignedBigInteger('admin_id');
-            $table->bigInteger('limit')->default(0);
-            $table->string('amount');
+            $table->bigInteger('top_up')->default(0);
+            $table->string('top_up_price')->default(0);
+            $table->string('total_amount');
             $table->timestamps();
         });
     }

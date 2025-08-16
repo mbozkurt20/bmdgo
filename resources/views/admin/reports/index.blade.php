@@ -211,12 +211,12 @@
     }
 
     // Pusher kurulumu
-    var pusher = new Pusher('c68579a24eeaebfd6487', {
-        cluster: 'eu'
+    var pusher = new Pusher('{{ env("PUSHER_APP_KEY") }}', {
+        cluster: '{{ env("PUSHER_APP_CLUSTER") }}'
     });
 
     var channel = pusher.subscribe('sweet-garden-70');
-    channel.bind('App\\Events\\NewOrderAdded', function(data) {
+    channel.bind('new-order-'+ {{auth()->id()}}, function(data) {
         console.log('Yeni sipariş:', data.order);
         // İsterseniz DOM'a yeni siparişi ekleyebilirsiniz
     });
