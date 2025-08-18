@@ -1,12 +1,22 @@
 @extends('superadmin.layouts.app')
-
 @section('content')
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map {
+            border: #0d2646 solid 2px;
+            height: 500px; /* ya da istediğin başka bir yükseklik */
+            width: 100%;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+    </style>
+
     <div class="container-fluid">
         <div class="mb-sm-4 d-flex flex-wrap align-items-center text-head">
-            <h2 class="mb-3 me-auto">Bayii</h2>
+            <h2 class="mb-3 me-auto">Bayi</h2>
             <div>
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Bayii</a></li>
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Bayi</a></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Güncelle</a></li>
                 </ol>
             </div>
@@ -41,38 +51,154 @@
 
                                 <div class="row">
                                     <div class="mb-3 col-md-4">
-                                        <label class="form-label">Bayii Adı</label>
+                                        <label class="form-label text-black">Bayii Adı</label>
                                         <input type="text" class="form-control" name="name" placeholder="Bayii Adı" value="{{ $dealer->name }}">
                                     </div>
                                     <div class="mb-3 col-md-4">
-                                        <label class="form-label">Email</label>
+                                        <label class="form-label text-black">Email</label>
                                         <input type="text" class="form-control" name="email"
                                                placeholder="Email" value="{{ $dealer->email }}">
                                     </div>
                                     <div class="mb-3 col-md-4">
-                                        <label class="form-label">Parola</label>
+                                        <label class="form-label">Telefon</label>
+                                        <input required type="tel" value="{{ $dealer->phone }}" class="form-control" name="phone"
+                                               placeholder="Telefon Numarası">
+                                    </div>
+                                    <div class="mb-3 col-md-4">
+                                        <label class="form-label text-black">Parola</label>
                                         <input type="password" class="form-control" name="password"
                                                placeholder="Parola">
                                     </div>
+
                                     <div class="mb-3 col-md-4">
-                                        <label class="form-label">Lokasyon (Latitude)</label>
-                                        <input type="text" class="form-control" name="lat" placeholder="546932" value="{{ $dealer->latitude }}" >
+                                        <label class="form-label">Şehir</label>
+                                        <select required class="form-control select2" name="city_id" id="city-select">
+                                            <option value="">Şehir Seç</option>
+                                            @foreach($cities as $city)
+                                                <option {{$dealer->city_id == $city->id ? 'selected' : ''}} value="{{$city->id}}" data-lat="{{$city->lat}}" data-lng="{{$city->lng}}">{{$city->name}}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
-									<div class="mb-3 col-md-4">
-                                        <label class="form-label">Lokasyon (Longitude)</label>
-                                        <input type="text" class="form-control" name="lon" placeholder="546932" value="{{ $dealer->longitude }}">
+
+                                    <div class="mb-3 col-md-4">
+                                        <label class="form-label">İlçe</label>
+                                        <select required class="form-control select2" name="district_id" id="district-select">
+                                            <option value="">İlçe Seç</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="mt-5 mb-3">
+                                        <p class="text-danger fw-bold">Lütfen haritadan konum işaratlemesi yapınız.</p>
+                                        <div id="map"></div>
+                                    </div>
+
+                                    <div class="mb-3 col-md-4">
+                                        <label class="form-label text-black">Lokasyon (Latitude)</label>
+                                        <input value="{{$dealer->latitude}}" required type="text" class="form-control" id="latit" name="lat" placeholder=""  >
+                                    </div>
+                                    <div class="mb-3 col-md-4">
+                                        <label class="form-label text-black">Lokasyon (Longitude)</label>
+                                        <input value="{{$dealer->longitude}}" required type="text" id="longi" class="form-control" name="lng" placeholder="" >
                                     </div>
                                 </div>
 
-                                <button type="submit" class="btn btn-primary">Güncelle</button>
+                                <div class="mb-3 mt-3">
+                                    <label for="adres" class="form-label text-black">Adres (opsiyonel)</label>
+                                    <textarea rows="12" name="address" class="form-control"></textarea>
+                                </div>
+
+                                <button type="submit" class="special-button float-end">Güncelle</button>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
+
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            var existingLat = {{ $dealer->latitude ?? '37.15026069044849' }};
+            var existingLng = {{ $dealer->longitude ?? '38.77905463205474' }};
+            var map;
+
+            if (existingLat && existingLng) {
+                map = L.map('map').setView([existingLat, existingLng], 13);
+                marker = L.marker([existingLat, existingLng]).addTo(map);
+            } else {
+                map = L.map('map').setView([39.9208, 32.8541], 6); // Türkiye geneli
+            }
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+
+            map.on('click', function(e) {
+                var lat = e.latlng.lat;
+                var lng = e.latlng.lng;
+
+                if (marker) {
+                    map.removeLayer(marker);
+                }
+
+                marker = L.marker([lat, lng]).addTo(map);
+
+                document.getElementById('latit').value = lat;
+                document.getElementById('longi').value = lng;
+            });
+
+            $('.select2').select2();
+
+            $('#city-select').on('change', function () {
+                var cityId = $(this).val();
+                var selectedOption = $(this).find('option:selected');
+                var lat = selectedOption.data('lat');
+                var lng = selectedOption.data('lng');
+
+                if (lat && lng && map) {
+                    map.setView([lat, lng], 13);
+
+                    if (marker) {
+                        map.removeLayer(marker);
+                    }
+                    marker = L.marker([lat, lng]).addTo(map);
+
+                    $('#latit').val(lat);
+                    $('#longi').val(lng);
+                }
+
+                if (cityId) {
+                    let dealerDistrictId = {{ $dealer->district_id ?? 'null' }};
+
+                    $.ajax({
+                        url: '/superadmin/get-districts/' + cityId,
+                        type: 'GET',
+                        success: function (data) {
+                            $('#district-select').empty();
+                            $('#district-select').append('<option value="">İlçe Seç</option>');
+                            $.each(data, function (key, value) {
+                                $('#district-select').append(
+                                    '<option value="' + value.id + '"' +
+                                    (value.id === dealerDistrictId ? ' selected' : '') +
+                                    '>' + value.name + '</option>'
+                                );
+                            });
+                        }
+                    });
+                } else {
+                    $('#district-select').empty();
+                    $('#district-select').append('<option value="">İlçe Seç</option>');
+                }
+            });
+
+            // 🚀 SAYFA YÜKLENİNCE city değişikliği tetiklenir
+            $('#city-select').trigger('change');
+        });
+    </script>
+
 @endsection
 
 

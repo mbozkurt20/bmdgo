@@ -25,8 +25,10 @@ class CreateUsersTable extends Migration
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();
             $table->tinyText('address')->nullable();
+            $table->boolean( 'is_active')->default(0);
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

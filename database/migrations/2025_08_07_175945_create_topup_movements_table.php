@@ -16,10 +16,14 @@ class CreateTopupMovementsTable extends Migration
         Schema::create('topup_movements', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('created_by_user_id');
+            $table->enum('created_type',['dealer','admin','superadmin']);
             $table->unsignedBigInteger('admin_id');
-            $table->bigInteger('top_up')->default(0);
-            $table->string('top_up_price')->default(0);
+            $table->bigInteger('top_up')->default(0); //kontör
+            $table->string('top_up_price')->default(0); //kontör ücreti
             $table->string('total_amount');
+            $table->enum('type',['talep','yükleme'])->default('talep');
+            $table->boolean('is_approved')->default(false);
+            $table->boolean('is_paid')->default(false);
             $table->timestamps();
         });
     }

@@ -68,7 +68,7 @@
         if (!testMode) return;
 
         if (type === 'admin') {
-            emailInput.value = 'admin@admin.com';
+            emailInput.value = 'test@admin.com';
             passwordInput.value = 'test';
         } else if (type === 'restaurant') {
             emailInput.value = 'test@restaurant.com';

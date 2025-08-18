@@ -4,108 +4,170 @@
     <div class="container-fluid">
         <div class="mb-sm-4 d-flex flex-wrap align-items-center text-head">
             <h2 class="mb-3 me-auto">Bayiler</h2>
-            <div>
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Bayiler</a></li>
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Liste</a></li>
-                </ol>
-            </div>
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="#">Bayiler</a></li>
+                <li class="breadcrumb-item active">Liste</li>
+            </ol>
         </div>
+
         <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
-            <div class="customer-search mb-sm-0 mb-3">
+            <div class="customer-search">
                 <div class="input-group search-area">
-                    <input type="text" class="form-control"  id="custom-filter"  placeholder="Bayii ara..">
-                    <span class="input-group-text"><a href="javascript:void(0)"><i
-                                class="flaticon-381-search-2"></i></a></span>
+                    <input type="text" class="form-control" id="custom-filter" placeholder="Bayi ara...">
+                    <span class="input-group-text"><i class="flaticon-381-search-2"></i></span>
                 </div>
             </div>
             <div class="d-flex align-items-center flex-wrap">
-                <a href="{{route('superadmin.dealer_create')}}" class="btn btn-primary btn-rounded me-3 mb-2"><i
-                        class="fas fa-user me-2"></i>+ Yeni Ekle</a>
-
-                <a href="javascript:void(0);" class="btn btn-secondary btn-rounded mb-2"><i class="fas fa-sync"></i></a>
+                <a href="{{ route('superadmin.dealer_create') }}" class="special-button me-3 mb-2">
+                    <i class="fas fa-user me-2"></i>+ Yeni Ekle
+                </a>
+                <a href="javascript:void(0);" onclick="location.reload();" class="special-ok-button  mb-2">
+                    <i class="fas fa-sync"></i>
+                </a>
             </div>
         </div>
-        <div class="row">
-            <div class="col-xl-12">
-                <div class="table-responsive">
-                    <table id="example3" class="display" style="min-width: 845px">
-                        <thead>
-                        <tr>
-                            <th style="width: 60%">Bayii Adı</th>
-                            <th style="width: 15%">Email</th>
-                            <th style="width: 10%">İşlem</th>
+
+        <div class="card">
+            <div class="card-body table-responsive">
+                <table id="dealerTable" class="t table-hover text-black">
+                    <thead>
+                    <tr>
+                        <th>İsim Soyisim</th>
+                        <th>Email</th>
+                        <th>Telefon</th>
+                        <th>Şehir</th>
+                        <th>İlçe</th>
+                        <th>Eklenme Tarihi</th>
+                        <th>Durum <small>(Aktif/Pasif)</small></th>
+                        <th>İşlem</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($dealers as $dealer)
+                        <tr id="data_{{ $dealer->id }}">
+                            <td>{{ $dealer->name }}</td>
+                            <td>{{ $dealer->email }}</td>
+                            <td>{{ $dealer->phone }}</td>
+                            <td>{{ $dealer->city_id ? \App\Models\City::find($dealer->city_id)->name : '-' }}</td>
+                            <td>{{ $dealer->district_id ? \App\Models\District::find($dealer->district_id)->name : '-'}}</td>
+                            <td>{{ $dealer->created_at->format('d.m.Y H:i') }}</td>
+                            <td>
+                                <div class="form-check form-switch me-3">
+                                    <label class="form-check-label text-dark fw-bold px-3 mt-3" for="s-{{$dealer->id}}"></label>
+                                    <input class="form-check-input" type="checkbox" id="s-{{$dealer->id}}"
+                                           role="switch" style="height: 30px; width: 60px;"
+                                           {{ $dealer->is_active ? 'checked' : '' }}
+                                           onchange="event.preventDefault(); StatusFunction(this, '{{$dealer->id}}')">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex">
+                                    <a href="{{ route('superadmin.dealer_edit', $dealer->id) }}" class="btn btn-primary btn-xs me-1">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </a>
+                                    <button onclick="DeleteFunction({{ $dealer->id }})" class="btn btn-danger btn-xs">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
                         </tr>
-                        </thead>
-                        <tbody>
-                        @foreach($dealers as $dealer)
-                            <tr id="data_{{$dealer->id}}">
-                                <td>{{$dealer->name}}</td>
-                                <td>{{$dealer->email}}</td>
-                                <td>
-                                    <div class="d-flex">
-                                        <a href="{{route('superadmin.dealer_edit', ['id' => $dealer->id])}}" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fas fa-pencil-alt"></i></a>
-                                    </div>
-
-                                </td>
-                            </tr>
-                        @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                    @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
-
     </div>
 
+    <!-- Scripts -->
     <script type="text/javascript">
+        $(document).ready(function () {
+            var table = $('#dealerTable').DataTable({
+                order: [[6, "asc"]], // created_at sütunu
+                language: {
+                    orderBy: 'asc',
+                    search: "Ara:",
+                    url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/tr.json",
+                    lengthMenu: "Sayfa başına _MENU_ kayıt",
+                    info: "_TOTAL_ kayıttan _START_ - _END_ arası gösteriliyor",
+                    infoEmpty: "Gösterilecek kayıt yok",
+                    paginate: {
+                        next: "Sonraki",
+                        previous: "Önceki"
+                    }
+                }
+            });
 
-        $(document).ready(function(){
-            var table = $('#example3').DataTable();
-            //DataTable custom search field
-            $('#custom-filter').keyup( function() {
-                table.search( this.value ).draw();
-            } );
+            $('#custom-filter').on('keyup', function () {
+                table.search(this.value).draw();
+            });
         });
-
-        function DeleteFunction(event) {
-
+        function StatusFunction(checkbox, id) {
+            const currentState = checkbox.checked;
 
             Swal.fire({
-                title: 'Silmek istediğinizden emin misiniz ?',
-                text: "Bu işlemi geri alamazsınız!",
-                type: 'warning',
+                title: 'Durum Güncelleme',
+                text: "Güncellemek istediğinizden emin misiniz?",
+                icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#0d2646',
                 cancelButtonColor: '#e7004d',
                 cancelButtonText: 'Hayır',
-                confirmButtonText: 'Evet, Silmek istiyorum!',
-
-            }).then(function (isConfirm) {
-                if (isConfirm.value) {
+                confirmButtonText: 'Evet, Güncellemek istiyorum!'
+            }).then((result) => {
+                if (result.isConfirmed) {
                     $.ajax({
-                        type: 'GET', //THIS NEEDS TO BE GET
-                        url: '/admin/couriers/delete/' + event,
+                        type: 'GET',
+                        url: '/superadmin/dealer/status/' + id,
                         success: function (data) {
-                            if (data == "OK") {
-                                isConfirm.value && Swal.fire("Silindi!", "Silme işlemi başarılı.", "success");
-                                $("#data_" + event).fadeOut($("#data_" + event).remove());
+                            if (data === "OK") {
+                                Swal.fire("Güncellendi!", "Güncelleme işlemi başarılı.", "success");
+                                // Başarılıysa checkbox olduğu gibi bırak
+                            } else {
+                                Swal.fire("Uyarı!", "Bu Bayi Güncellenmiyor.", "warning");
+                                checkbox.checked = !currentState; // Eski haline döndür
                             }
-                            if (data == "NO") {
-                                isConfirm.value && Swal.fire("Uyarı !!", "Bu Kuryeyi silemezsiniz..", "warning");
-                            }
-
                         },
                         error: function () {
-                            console.log(data);
+                            Swal.fire("Hata!", "Bir hata oluştu, lütfen tekrar deneyin.", "error");
+                            checkbox.checked = !currentState; // Eski haline döndür
+                        }
+                    });
+                } else {
+                    checkbox.checked = !currentState; // Kullanıcı onaylamadıysa eski haline döndür
+                }
+            });
+        }
+        function DeleteFunction(id) {
+            Swal.fire({
+                title: 'Silmek istediğinizden emin misiniz?',
+                text: "Bu işlemi geri alamazsınız!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#0d2646',
+                cancelButtonColor: '#e7004d',
+                cancelButtonText: 'Hayır',
+                confirmButtonText: 'Evet, Silmek istiyorum!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: 'GET',
+                        url: '/superadmin/dealer/delete/' + id,
+                        success: function (data) {
+                            if (data === "OK") {
+                                $('#data_' + id).fadeOut(300, function () {
+                                    $(this).remove();
+                                });
+                                Swal.fire("Silindi!", "Silme işlemi başarılı.", "success");
+                            } else {
+                                Swal.fire("Uyarı!", "Bu kuryeyi silemezsiniz.", "warning");
+                            }
+                        },
+                        error: function () {
+                            Swal.fire("Hata!", "Bir hata oluştu, lütfen tekrar deneyin.", "error");
                         }
                     });
                 }
-
-
-            })
-
-
+            });
         }
     </script>
 @endsection

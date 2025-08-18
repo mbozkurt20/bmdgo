@@ -26,7 +26,10 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/update/entegrations/status', [App\Http\Controllers\MyController::class, 'smsEntegrastionStatus'])->name('admin.sms.entegrations.status');
 
         Route::get('/', [App\Http\Controllers\AdminController::class, 'home'])->name('admin.index');
+
         Route::get('/top-up-balance', [App\Http\Controllers\AdminController::class, 'balance'])->name('admin.balance');
+        Route::get('topup/talep', [App\Http\Controllers\AdminController::class, 'topupTalep'])->name('admin.topupTalep');
+
         Route::get('/tt', [App\Http\Controllers\AdminController::class, 'tt']);
         Route::post('logout', [App\Http\Controllers\AdminController::class, 'logout'])->name('admin.logout');
         Route::get('/filter-by-date', [App\Http\Controllers\AdminController::class, 'filterByDate'])->name('admin.filterByDate');

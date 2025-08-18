@@ -13,10 +13,10 @@ class ImportSql extends Command
     public function handle()
     {
         $sqlFiles = [
-            base_path('database/seeders/import/cities.sql'),
+           // base_path('database/seeders/import/cities.sql'),
             base_path('database/seeders/import/districts.sql'),
             //base_path('database/seeders/import/locations.sql'),
-            base_path('database/seeders/import/quarters.sql'),
+            //base_path('database/seeders/import/quarters.sql'),
         ];
 
         foreach ($sqlFiles as $file) {

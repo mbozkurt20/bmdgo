@@ -10,6 +10,7 @@ use App\Models\Order;
 use App\Models\Restaurant;
 use App\Models\RestaurantSystemFeature;
 use App\Models\SystemFeature;
+use App\Models\TopupMovement;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
@@ -52,7 +53,17 @@ class AdminController extends Controller
     {
         return Auth::guard('admin');
     }
-
+    public function topupTalep(REquest $request){
+        $topup = TopupMovement::create([
+            'admin_id' => Auth::guard('admin')->id(),
+            'top_up_price' => 3,
+            'top_up' => $request->input('top_up'),
+            'type' => 'talep',
+            'total_amount' => 3*$request->input('top_up'),
+            'created_by_user_id' => Auth::guard('admin')->id(),
+            'created_type' => 'admin',
+        ]);
+    }
     public function profile()
     {
         return view('admin.profile');
@@ -89,7 +100,8 @@ class AdminController extends Controller
     }
     public function balance()
     {
-        return view('admin.balance.index');
+        $movements = TopupMovement::where('admin_id', Auth::guard('admin')->id())->get();
+        return view('admin.balance.index', compact('movements'));
     }
     public function home()
     {

@@ -44,6 +44,10 @@ return [
             'driver' => 'session',
             'provider' => 'admins',
         ],
+        'dealer' => [
+            'driver' => 'session',
+            'provider' => 'dealers',
+        ],
         'courier' => [
             'driver' => 'jwt',
             'provider' => 'couriers',
@@ -98,6 +102,10 @@ return [
         'admins' => [
             'driver' => 'eloquent',
             'model' => App\Models\Admin::class,
+        ],
+        'dealers' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\User::class,
         ],
         'merchants' => [
             'driver' => 'eloquent',

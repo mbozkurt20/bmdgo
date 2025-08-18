@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{env('APP_NAME')}} - Restaurant Girişi</title>
+    <title>{{env('APP_NAME')}} - Bayi Girişi</title>
 
     <link rel="shortcut icon" type="image/png" href="{{config('site.logo')}}">
     <link href="{{asset('theme/login/css/bootstrap.min.css')}}" rel="stylesheet">

@@ -25,6 +25,19 @@
                         <strong> Satın Alım:: </strong> Paketlerimizi <a class="text-primary" style="text-decoration: underline" href="https://bmdgo.com/fiyat/">BmdGo </a>  adresimizden inceleyebilirsiniz.
                     </p>
                 </div>
+
+                <div class="border border-dark p-3 rounded-2" style="max-width: 25%">
+                    <form method="POST" action="{{ route('admin.topupTalep') }}">
+                        @csrf
+
+                        <div class="mb-4 text-dark">
+                            <label class="fw-bold text-black">Kontör Adet</label>
+                            <input required class="form-control" type="number" placeholder="1 kontör = 1 paket" id="top_up" name="top_up">
+                        </div>
+
+                        <button class="special-button" type="submit">Talep Et</button>
+                    </form>
+                </div>
             </div>
         </div>
 

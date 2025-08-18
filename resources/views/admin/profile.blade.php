@@ -63,7 +63,7 @@
 
                                     <div class="col-md-4 mb-3">
                                         <label class="text-dark" for="phone">Telefon</label>
-                                        <input type="text" value="{{ old('latitude', auth()->user()->phone) }}" name="phone" class="form-control">
+                                        <input type="text" value="{{ old('phone', auth()->user()->phone) }}" name="phone" class="form-control">
                                     </div>
 
                                     <div class="col-md-4 mb-3">

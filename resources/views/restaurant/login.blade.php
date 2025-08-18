@@ -26,8 +26,8 @@
         <div class="user-type-selector">
             <p class="selector-label">Giriş Türünü Seçin:</p>
             <div class="button-group" id="userTypeButtons">
-                <button type="button" data-type="restaurant" class="type-btn active">🍽️ Restaurant</button>
                 <button type="button" data-type="admin" class="type-btn">🗯️ Yönetici</button>
+                <button type="button" data-type="restaurant" class="type-btn active">🍽️ Restaurant</button>
             </div>
         </div>
 
@@ -69,7 +69,7 @@
         if (!testMode) return;
 
         if (type === 'admin') {
-            emailInput.value = 'admin@admin.com';
+            emailInput.value = 'test@admin.com';
             passwordInput.value = 'test';
         } else if (type === 'restaurant') {
             emailInput.value = 'test@restaurant.com';

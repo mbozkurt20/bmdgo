@@ -16,4 +16,8 @@ class Customer extends Model
         'mobile',
         'status',
     ];
+
+    public function restaurant(){
+        return $this->belongsTo(Restaurant::class);
+    }
 }

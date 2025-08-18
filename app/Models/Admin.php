@@ -4,12 +4,13 @@ namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class Admin extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable,SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -18,14 +19,19 @@ class Admin extends Authenticatable
      */
     protected $fillable = [
         'created_by_id',
+        'created_by_type',
         'name',
         'email',
         'password',
         'phone',
+        'address',
         'auto_orders',
         'top_up_balance',
         'latitude',
+        'city_id',
+        'district_id',
         'longitude',
+        'is_active',
         'vatan_sms_customer',
         'vatan_sms_username',
         'vatan_sms_password',

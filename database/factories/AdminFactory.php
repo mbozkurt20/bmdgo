@@ -26,7 +26,7 @@ class AdminFactory extends Factory
         if (env('TEST_MODE')){
             return [
                 'name' => 'Admin',
-                'email' => 'admin@admin.com',
+                'email' => 'test@admin.com',
                 'password' => Hash::make('test'),
                 'remember_token' => Str::random(10),
             ];
