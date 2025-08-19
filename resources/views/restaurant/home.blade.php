@@ -169,7 +169,7 @@
                 </div>
             </div>
 
-            @include('restaurant.home_table')
+            @include('restaurant.partials.home_table')
         </div>
     </div>
 @endsection

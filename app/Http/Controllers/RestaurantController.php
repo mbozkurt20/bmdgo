@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\CourierStatus;
+use App\Helpers\OrderStatus;
 use App\Models\Courier;
 use App\Models\Order;
 use App\Models\Restaurant;
@@ -24,7 +25,27 @@ class RestaurantController extends Controller
     {
         return redirect()->route('restaurant.index');
     }
+    public function ajax(Request $request)
+    {
+        $tumu = Order::whereDate('created_at', Carbon::today())
+          ->where('restaurant_id',Auth::guard('restaurant')->id())
+            ->orderBy('created_at', 'desc')->with(['restaurant','courier'])->get();
 
+        // Siparişleri duruma göre ayır
+        $pending = $tumu->where('status', OrderStatus::PENDING);
+        $prepared = $tumu->where('status',  OrderStatus::PREPARED);
+        $handover = $tumu->where('status',  OrderStatus::HANDOVER);
+        $delivered = $tumu->where('status',  OrderStatus::DELIVERED);
+        $unsupplied = $tumu->where('status',  OrderStatus::UNSUPPLIED);
+
+        return response()->json([
+            'pending' => $pending->values()->all(),
+            'prepared' => $prepared->values()->all(),
+            'handover' => $handover->values()->all(),
+            'delivered' => $delivered->values()->all(),
+            'unsupplied' => $unsupplied->values()->all(),
+        ]);
+    }
     private function getCommonData($startDate, $endDate)
     {
         $userId = Auth::user()->id;

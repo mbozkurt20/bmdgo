@@ -8,9 +8,9 @@
             @csrf
             <div class="row">
                 @foreach([
-                    ['key' => 'first', 'title' => 'Tasarım 1', 'img' => '/images/templates/template1.png'],
-                    ['key' => 'second', 'title' => 'Tasarım 2', 'img' => '/images/templates/template2.png'],
-                    ['key' => 'third', 'title' => 'Tasarım 3', 'img' => '/images/templates/template3.png'],
+                    ['key' => 'first', 'title' => 'Tasarım 1', 'img' => '/theme/images/img.png'],
+                    ['key' => 'second', 'title' => 'Tasarım 2', 'img' => '/theme/images/img_1.png'],
+
                 ] as $template)
                     <div class="col-md-4 mb-4">
                         <label class="template-card w-100 h-100">

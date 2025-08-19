@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Categorie;
+use App\Helpers\GeoLocation;
+use App\Models\City;
 use App\Models\Courier;
 use App\Models\Customer;
 use App\Models\CustomerAddress;
@@ -55,23 +56,31 @@ class CustomerController extends Controller
         $create->email = $request->input('email')??null;
         $create->save();
 
+
         // Check if address data is present
         if ($request->address) {
             foreach ($request->address as $adres) {
-                // Save each address for the customer
-                $address = new CustomerAddress();
-                $address->customer_id = $create->id; // Associate address with the created customer
-                $address->restaurant_id = Auth::user()->id; // Associate address with the restaurant
-                $address->name = $adres['name']; // Address title
-                $address->sokak_cadde = $adres['sokak_cadde'];
-                $address->bina_no = $adres['bina_no'];
-                $address->kat = $adres['kat'];
-                $address->latitude = $adres['latitude'];
-                $address->longitude = $adres['longitude'];
-                $address->daire_no = $adres['daire_no'];
-                $address->mahalle = $adres['mahalle'];
-                $address->adres_tarifi = $adres['adres_tarifi'] ?? ''; // Set empty string if not provided
-                $address->save();
+                $city = City::find($adres['sehir']);
+                $addre = $adres['mahalle'].' mah. '.$adres['sokak_cadde'].' sokak. Bina No:'.$adres['bina_no'].' Kat:'.$adres['kat'].' Daire No:'.$adres['daire_no'].' '.$city->name;
+                $location = GeoLocation::getLatLong($addre);
+
+                if (!isset($location['error'])) {
+                    // Save each address for the customer
+                    $address = new CustomerAddress();
+                    $address->customer_id = $create->id; // Associate address with the created customer
+                    $address->restaurant_id = Auth::user()->id; // Associate address with the restaurant
+                    $address->name = $adres['name']; // Address title
+                    $address->sokak_cadde = $adres['sokak_cadde'];
+                    $address->bina_no = $adres['bina_no'];
+                    $address->city_id = $city->id;
+                    $address->kat = $adres['kat'];
+                    $address->latitude = $location['lat'];
+                    $address->longitude = $location['lon'];
+                    $address->daire_no = $adres['daire_no'];
+                    $address->mahalle = $adres['mahalle'];
+                    $address->adres_tarifi = $adres['adres_tarifi'] ?? ''; // Set empty string if not provided
+                    $address->save();
+                }
             }
         }
 

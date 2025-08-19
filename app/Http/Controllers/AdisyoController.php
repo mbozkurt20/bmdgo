@@ -157,7 +157,7 @@ class AdisyoController extends Controller
 		$action = $request->input('action');
 		$message = $request->input('message');
 		// Siparişi bul
-		$order = Order::where('tracking_id', $trackingId)->first();
+        $order = Order::where('tracking_id', $trackingId)->with(['restaurant','courier'])->first();
 		if (!$order) {
 			Log::error('Sipariş bulunamadı', ['tracking_id' => $trackingId]);
 			return response()->json(['message' => 'Sipariş bulunamadı'], 404);
@@ -168,12 +168,13 @@ class AdisyoController extends Controller
 		$order->message = $message;
 		// Sipariş içindeki ürünlerin kontrolü
 		$items = json_decode($order->items, true);
-		if (!isset($items[0]['items'][0]['orderId'])) {
+
+        if (!isset($items[0]['items'][0]['orderId'])) {
 			Log::error('OrderId bulunamadı', ['order' => $order->id]);
 			return response()->json(['message' => 'OrderId bulunamadı'], 400);
 		}
 
-		$orderId = $items[0]['items'][0]['orderId'];
+		$orderId = $order->id;
 
 		// Restoran bilgilerini al
 		$restaurant = Restaurant::where('id', $order->restaurant_id)->first();

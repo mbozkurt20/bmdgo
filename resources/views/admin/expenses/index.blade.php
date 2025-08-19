@@ -53,7 +53,7 @@
                                 <td>{{ $expense->payment_method }}</td>
                                 <td>
                                     <div class="d-flex">
-                                        <a href="{{ route('admin.expenses.edit', ['id' => $expense->id]) }}" class="btn btn-primary shadow btn-xs sharp me-1">
+                                        <a href="{{ route('admin.expenses.edit', ['id' => $expense->id]) }}" class="special-button shadow btn-xs sharp me-1">
                                             <i class="fas fa-pencil-alt"></i>
                                         </a>
                                         <a onclick="DeleteFunction({{ $expense->id }})" class="btn btn-danger shadow btn-xs sharp">

@@ -17,12 +17,12 @@ class CreateCustomerAddressesTable extends Migration
             $table->id();
             $table->bigInteger('restaurant_id');
             $table->bigInteger('customer_id');
-            $table->string('name');
-            $table->string('sokak_cadde');
-            $table->string('bina_no');
-            $table->string('kat');
-            $table->string('daire_no');
-            $table->string('mahalle');
+            $table->string('name')->nullable();
+            $table->string('sokak_cadde')->nullable();
+            $table->string('bina_no')->nullable();
+            $table->string('kat')->nullable();
+            $table->string('daire_no')->nullable();
+            $table->string('mahalle')->nullable();
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();
             $table->text('adres_tarifi')->nullable();

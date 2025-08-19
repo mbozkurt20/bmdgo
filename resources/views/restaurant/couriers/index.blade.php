@@ -57,7 +57,7 @@
                                     <a href="{{ route('restaurant.couriers.report', $courier->id) }}" class="btn btn-secondary btn-xs me-1">
                                         <i class="fas fa-file-pdf"></i>
                                     </a>
-                                    <a href="{{ route('restaurant.couriers.edit', $courier->id) }}" class="btn btn-primary btn-xs me-1">
+                                    <a href="{{ route('restaurant.couriers.edit', $courier->id) }}" class="special-button btn-xs me-1">
                                         <i class="fas fa-pencil-alt"></i>
                                     </a>
                                     <button onclick="DeleteFunction({{ $courier->id }})" class="btn btn-danger btn-xs">

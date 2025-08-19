@@ -38,7 +38,7 @@
                                 <td>{{ $coupon->created_at->format('d.m.Y H:i') }}</td>
                                 <td>
                                     <div class="d-flex">
-                                        <a href="{{ route('restaurant.coupons.edit', ['id' => $coupon->id]) }}" class="btn btn-primary btn-sm me-1">
+                                        <a href="{{ route('restaurant.coupons.edit', ['id' => $coupon->id]) }}" class="special-button btn-sm me-1">
                                             <i class="fas fa-pencil-alt"></i>
                                         </a>
                                         <button onclick="DeleteFunction({{ $coupon->id }})" class="btn btn-danger btn-sm">

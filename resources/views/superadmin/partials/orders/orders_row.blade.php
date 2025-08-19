@@ -58,20 +58,6 @@
         </strong>
     </td>
     <td>
-        <input type="hidden" id="tracking_{{ $order->id }}" value="{{ $order->tracking_id }}">
-        <input type="hidden" id="platform_{{ $order->id }}" value="{{ $order->platform }}">
-
-        <select class="inline-order-select"
-                onchange="StatusOrderChange(event, {{ $order->id }})"
-                @if ($order->status == App\Helpers\OrderStatus::DELIVERED) disabled @endif>
-            <option value="{{ App\Helpers\OrderStatus::PENDING }}" @if ($order->status == App\Helpers\OrderStatus::PENDING) selected @endif>BEKLİYOR</option>
-            <option value="{{ App\Helpers\OrderStatus::PREPARED }}" @if ($order->status == App\Helpers\OrderStatus::PREPARED) selected @endif>HAZIRLANIYOR</option>
-            <option value="{{ App\Helpers\OrderStatus::HANDOVER }}" @if ($order->status == App\Helpers\OrderStatus::HANDOVER) selected @endif>KURYEYE VERİLDİ</option>
-            <option value="{{ App\Helpers\OrderStatus::DELIVERED }}" @if ($order->status == App\Helpers\OrderStatus::DELIVERED) selected @endif>TESLİM EDİLDİ</option>
-            <option value="{{ App\Helpers\OrderStatus::UNSUPPLIED }}" @if ($order->status == App\Helpers\OrderStatus::UNSUPPLIED) selected @endif>İPTAL EDİLDİ</option>
-        </select>
-    </td>
-    <td>
         <div class="d-flex">
             <a data-bs-toggle="modal" data-bs-target="#Orders{{ $order->id }}"
                class="btn btn-secondary shadow btn-xs sharp me-1">
@@ -244,7 +230,6 @@
     </div>
 </div>
 
-
 <style>
     .inline-order-select {
         padding: 6px 10px;
@@ -279,70 +264,5 @@
         }
     }
 </style>
-<script>
-    function StatusOrderChange(e, id) {
-        var action = e.target.value;
-        var tracking_id = $('#tracking_' + id).val();
-        var platform = $('#platform_' + id).val();
 
-        // İptal işlemi için modal açılır
-        if (action === 'UNSUPPLIED') {
-            $('#cancelModal').modal('show');
-
-            $('#confirmCancel').off('click').on('click', function() {
-                var cancelReason = $('#message').val();
-
-                if (cancelReason.trim() === '') {
-                    Swal.fire('Lütfen iptal nedenini belirtin.');
-                    return;
-                }
-
-                // Sipariş durumu ve kurye durumu güncellemesi
-                sendOrderStatusUpdate(action, tracking_id, platform, cancelReason, id);
-            });
-        } else {
-            // Diğer durumlar için doğrudan sipariş durumu ve kurye durumu güncellemesi
-            sendOrderStatusUpdate(action, tracking_id, platform, null, id);
-        }
-    }
-
-    function sendOrderStatusUpdate(action, tracking_id, platform, message, orderId) {
-        var requestData = {
-            action: action,
-            tracking_id: tracking_id,
-            _token: '{{ csrf_token() }}'
-        };
-
-        if (message) {
-            requestData.message = message;
-        }
-
-        $.ajax({
-            type: 'POST',
-            url: '/restaurant/' + platform + '/updateOrderStatus',
-            data: requestData,
-            success: function(data) {
-                Swal.fire({
-                    title: 'Sipariş durumu başarıyla değiştirildi.',
-                    icon: 'success',
-                    confirmButtonText: 'Tamam',
-                    confirmButtonColor: '#0d2646',
-                    cancelButtonColor: '#e7004d',
-                })
-                $('#cancelModal').modal('hide');
-            },
-            error: function(xhr, status, error) {
-                console.log('Failed to update order status');
-                console.log('Status:', status);
-                console.log('Error:', error);
-                console.log('Response Text:', xhr.responseText); // Daha detaylı hata mesajını gösterir
-                Swal.fire({
-                    title: 'Hata oluştu!',
-                    text: xhr.responseText, // Sunucudan gelen hata mesajını göstermek için
-                    icon: 'error',
-                    confirmButtonText: 'Tamam'
-                });
-            }
-        });
-    }
-</script>
+@include('admin.partials.home_scripts')

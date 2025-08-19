@@ -45,7 +45,7 @@
                                 <td class="text-ov">{{$product->preparation_time}} dk.</td>
                                 <td>
                                     <div class="d-flex">
-                                        <a href="{{route('restaurant.products.edit', ['id' => $product->id])}}" class="btn btn-primary btn-sm me-1 shadow sharp"><i class="fas fa-pencil-alt"></i></a>
+                                        <a href="{{route('restaurant.products.edit', ['id' => $product->id])}}" class="special-button btn-sm me-1 shadow sharp"><i class="fas fa-pencil-alt"></i></a>
                                         <button onclick="DeleteFunction({{$product->id}})" class="btn btn-danger btn-sm shadow sharp"><i class="fa fa-trash"></i></button>
                                     </div>
                                 </td>

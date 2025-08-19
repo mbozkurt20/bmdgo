@@ -3,13 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\CourierStatus;
+use App\Helpers\GeoLocation;
 use App\Helpers\OrdersHelper;
-use App\Models\Expenses;
+use App\Helpers\OrderStatus;
 use App\Models\Restaurant;
 use App\Models\RestaurantCoupon;
-use App\Models\Topup;
 use App\Traits\RequestTrait;
-use App\Models\Admin;
 use App\Models\Categorie;
 use App\Models\Courier;
 use App\Models\CourierOrder;
@@ -20,9 +19,9 @@ use App\Models\Product;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Jobs\AssignOrderToCourier;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Yajra\DataTables\Facades\DataTables;
 
 class OrderController extends Controller
 {
@@ -56,14 +55,14 @@ class OrderController extends Controller
         $orders = $request->input('orders');
         $courierId = $request->input('courier_id');
 
-        \Log::info('Courier ID:', [$courierId]);
-        \Log::info('Orders:', $orders);
+        Log::info('Courier ID:', [$courierId]);
+        Log::info('Orders:', $orders);
 
         // Check if the courier exists
         $newCourier = Courier::find($courierId);
 
         if (!$newCourier) {
-            \Log::error('Courier not found with ID ' . $courierId);
+            Log::error('Courier not found with ID ' . $courierId);
             return response()->json(['error' => 'Courier not found'], 404);
         }
 
@@ -71,16 +70,16 @@ class OrderController extends Controller
 
         try {
             foreach ($orders as $orderId) {
-                \Log::info('Processing order ID: ' . $orderId);
+                Log::info('Processing order ID: ' . $orderId);
 
                 $order = Order::find($orderId);
 
                 if ($order) {
-                    \Log::info('Order found: ' . $orderId);
+                    Log::info('Order found: ' . $orderId);
 
                     $order->courier_id = $courierId;
                     $order->save();
-                    \Log::info('Order ID ' . $orderId . ' updated in orders table with courier ID ' . $courierId);
+                    Log::info('Order ID ' . $orderId . ' updated in orders table with courier ID ' . $courierId);
 
                     $existingCourierOrder = CourierOrder::where('order_id', $orderId)->first();
 
@@ -88,33 +87,33 @@ class OrderController extends Controller
                         // Var ise güncelliyoruz
                         $existingCourierOrder->courier_id = $courierId;
                         $existingCourierOrder->save();
-                        \Log::info('Order ID ' . $orderId . ' updated in CourierOrder table with courier ID ' . $courierId);
+                        Log::info('Order ID ' . $orderId . ' updated in CourierOrder table with courier ID ' . $courierId);
                     } else {
                         $newCourierOrder = new CourierOrder();
                         $newCourierOrder->courier_id = $courierId;
                         $newCourierOrder->order_id = $orderId;
 
                         if ($newCourierOrder->save()) {
-                            \Log::info('Order ID ' . $orderId . ' created in CourierOrder table with courier ID ' . $courierId);
+                            Log::info('Order ID ' . $orderId . ' created in CourierOrder table with courier ID ' . $courierId);
                         } else {
-                            \Log::error('Failed to create CourierOrder for order ID: ' . $orderId);
+                            Log::error('Failed to create CourierOrder for order ID: ' . $orderId);
                         }
                     }
 
                     $newCourier->status = CourierStatus::service;
                     $newCourier->save();
                 } else {
-                    \Log::error('Order ID ' . $orderId . ' not found in orders table');
+                    Log::error('Order ID ' . $orderId . ' not found in orders table');
                     throw new \Exception('Order ID ' . $orderId . ' not found in orders table');
                 }
             }
 
             DB::commit();
-            \Log::info('Transaction committed successfully');
+            Log::info('Transaction committed successfully');
             return response()->json('OK');
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Transaction failed: ' . $e->getMessage());
+            Log::error('Transaction failed: ' . $e->getMessage());
             return response()->json(['error' => 'Transaction failed: ' . $e->getMessage()], 500);
         }
     }
@@ -320,21 +319,80 @@ class OrderController extends Controller
 
     public function storeQuick(Request $request)
     {
-        \App\Models\Order::create([
-            'platform' => 'telefonsiparis',
-            'courier_id' => $request->courier_id ?? -1,
-            'restaurant_id' => $request->restaurant_id,
-            'tracking_id' => "POS-" . rand(9, 99999),
-            'full_name' => $request->full_name,
-            'phone' => $request->phone,
-            'address' => $request->address,
-            'verify_code' => $request->verify_code,
-            'payment_method' => $request->payment_method,
-            'amount' => $request->amount,
-            'items' => $request->items,
-        ]);
+        try {
+            DB::beginTransaction();
 
-        return response()->json(['message' => 'Sipariş başarıyla kaydedildi.']);
+            $location = GeoLocation::getLatLong($request->address);
+
+            if (isset($location['error'])) {
+                return response()->json(['message' => 'Lütfen Adres Bilginizi Detaylı ve Anlaşılır Yazınız.'],400);
+            }
+
+            $customer = Customer::where('phone', $request->phone)->first();
+
+            if (!$customer) {
+                $customer = new Customer();
+                $customer->restaurant_id = Auth::user()->id;
+                $customer->name = $request->input('full_name');
+                $customer->phone = $request->input('phone');
+                $customer->mobile = $request->input('mobile');
+                $customer->email = $request->input('email') ?? null;
+                $customer->save();
+
+                $address = CustomerAddress::where('customer_id', $customer->id)
+                    ->where('restaurant_id', Auth::guard('restaurant')->id())
+                    ->where('latitude', $location['lat'])
+                    ->where('longitude', $location['lon'])
+                    ->first();
+
+                if (!$address) {
+                    $address = new CustomerAddress();
+                    $address->customer_id = $customer->id;
+                    $address->restaurant_id = Auth::guard('restaurant')->id();
+                    $address->name = 'Hızlı Sipariş';
+                    $address->sokak_cadde = ' ';
+                    $address->bina_no = ' ';
+                    $address->kat = ' ';
+                    $address->latitude = $location['lat'];
+                    $address->longitude = $location['lon'];
+                    $address->daire_no = ' ';
+                    $address->mahalle = ' ';
+                    $address->adres_tarifi = ' ';
+                    $address->save();
+                }
+            }
+
+            $order = \App\Models\Order::create([
+                'platform' => 'telefonsiparis',
+                'courier_id' => $request->courier_id ?? -1,
+                'customer_id' => $customer->id,
+                'restaurant_id' => $request->restaurant_id,
+                'tracking_id' => "POS-" . rand(9, 99999),
+                'full_name' => $request->full_name,
+                'phone' => $request->phone,
+                'address' => $request->address,
+                'payment_method' => $request->payment_method,
+                'sub_amount' => $request->amount,
+                'discount' => 0.00,
+                'amount' => $request->amount,
+                'items' => json_encode([]),
+            ]);
+
+            if (!$order) {
+                DB::rollBack();
+                return response()->json(['message' => 'Sipariş Alınamadı!!']);
+            }
+
+            DB::commit();
+
+            return response()->json(['message' => 'Sipariş Başarıyla Alındı.']);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            // Hata loglama yapılabilir
+            return response()->json(['message' => 'Sipariş İşleminde Hata Oluştu.', 'error' => $e->getMessage()], 500);
+        }
+
     }
 
     public function message2(Request $request)
@@ -485,7 +543,7 @@ class OrderController extends Controller
                 'totalSellerAmount' => $coupon->total_seller_amount,
             ];
 
-            $discount = (float) $coupon['totalSellerAmount'];
+            $discount = (float)$coupon['totalSellerAmount'];
         }
 
         $order = new Order();
@@ -497,7 +555,7 @@ class OrderController extends Controller
         $order->phone = $customer->phone;
         $order->discount = $discount;
         $order->sub_amount = $request->amount;
-        $order->amount = $request->amount-$discount;
+        $order->amount = $request->amount - $discount;
         $order->platform = "telefonsiparis";
         $order->tracking_id = "POS-" . rand(9, 99999);
         $order->payment_method = $request->payment_method;
@@ -561,7 +619,7 @@ class OrderController extends Controller
         $message = $request->input('message');
 
         // Siparişi bul
-        $order = Order::where('tracking_id', $trackingId)->first();
+        $order = Order::where('tracking_id', $trackingId)->with(['restaurant', 'courier'])->first();
 
         if (!$order) {
             return response()->json(['error' => 'Order not found'], 404);
@@ -572,9 +630,10 @@ class OrderController extends Controller
         $order->message = $message;
         $saveStatus = $order->update();
 
+
         // Güncelleme işlemi başarılıysa yanıt ver
         if ($saveStatus) {
-            return response()->json(['status' => "OK"]);
+            return response()->json(['status' => "OK", 'order' => $order]);
         } else {
             return response()->json(['status' => "ERR"]);
         }

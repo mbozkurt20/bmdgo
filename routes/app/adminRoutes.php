@@ -11,6 +11,7 @@ Route::group(['prefix' => 'admin'], function () {
     Route::group(['middleware' => ['admin.auth']], function () {
         Route::get('/printed/{orderId}', [App\Http\Controllers\OrderController::class, 'printed']);
         Route::get('/statistics', [App\Http\Controllers\AdminController::class, 'statistics'])->name('admin.statistics');
+        Route::get('/orders/ajax', [App\Http\Controllers\AdminController::class, 'ajax'])->name('admin.orders.ajax');
 
         Route::get('notifications/clear-all', [App\Http\Controllers\AdminController::class, 'notifications'])->name('admin.notifications');
         Route::get('notifications/{id}', [App\Http\Controllers\AdminController::class, 'notificationDelete']);

@@ -64,7 +64,7 @@
                                     <a href="{{ route('dealer.admin_topup', $admin->id) }}" class="btn btn-secondary btn-xs me-1">
                                         <i class="fas fa-receipt"></i>
                                     </a>
-                                    <a href="{{ route('dealer.admin_edit', $admin->id) }}" class="btn btn-primary btn-xs me-1">
+                                    <a href="{{ route('dealer.admin_edit', $admin->id) }}" class="special-button btn-xs me-1">
                                         <i class="fas fa-pencil-alt"></i>
                                     </a>
                                     <button onclick="DeleteFunction({{ $admin->id }})" class="btn btn-danger btn-xs">

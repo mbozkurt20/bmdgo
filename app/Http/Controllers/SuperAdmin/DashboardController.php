@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\SuperAdmin;
 
 use App\Helpers\CourierStatus;
+use App\Helpers\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\City;
@@ -68,11 +69,39 @@ class DashboardController extends Controller
 
         return view('superadmin.home', compact('totalCouriers', 'serviceCouriers', 'idleCouriers', 'breakCouriers', 'totalExpense', 'formattedExpense', 'averageExpense', 'formattedAverageExpense', 'telefonsiparis', 'tumu', 'yemeksepeti', 'getiryemek', 'trendyol', 'couriers', 'migros', 'teslimEdilenSiparisler'));
     }
+    public function getCourier()
+    {
+        $couriers = Courier::where('restaurant_id', 0)
+            ->where('admin_id', auth()->id())
+            ->where('status',CourierStatus::active)
+            ->get();
 
+        return response()->json($couriers);
+    }
     public function dealer()
     {
         $dealers = User::orderBy('is_active','asc')->get();
         return view('superadmin.dealer.index', compact('dealers'));
+    }
+    public function ajax(Request $request)
+    {
+        $tumu = Order::whereDate('created_at', Carbon::today())
+           ->orderBy('created_at', 'desc')->with(['restaurant','courier'])->get();
+
+        // Siparişleri duruma göre ayır
+        $pending = $tumu->where('status', OrderStatus::PENDING);
+        $prepared = $tumu->where('status',  OrderStatus::PREPARED);
+        $handover = $tumu->where('status',  OrderStatus::HANDOVER);
+        $delivered = $tumu->where('status',  OrderStatus::DELIVERED);
+        $unsupplied = $tumu->where('status',  OrderStatus::UNSUPPLIED);
+
+        return response()->json([
+            'pending' => $pending->values()->all(),
+            'prepared' => $prepared->values()->all(),
+            'handover' => $handover->values()->all(),
+            'delivered' => $delivered->values()->all(),
+            'unsupplied' => $unsupplied->values()->all(),
+        ]);
     }
     public function profile()
     {
