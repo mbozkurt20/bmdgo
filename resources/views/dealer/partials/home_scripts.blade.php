@@ -5,7 +5,7 @@
 
     function fetchOrders() {
         $.ajax({
-            url: '/admin/orders/ajax',
+            url: '/dealer/orders/ajax',
             method: 'GET', // veya 'POST' gerekiyorsa
             success: function (data) {
                 console.log({gird: data})
@@ -102,7 +102,7 @@
 
         $.ajax({
             type: 'POST',
-            url: '/admin/' + platform + '/updateOrderStatus',
+            url: '/dealer/' + platform + '/updateOrderStatus',
             data: requestData,
             success: function (data) {
                 Swal.fire({
@@ -130,6 +130,7 @@
             }
         });
     }
+
 
     async function refreshOrderTable(order) {
         const statusMap = {
@@ -165,15 +166,8 @@
         updateTableForStatus(order.status);
     }
 
-    function updateTables(data) {
-        const statusMap = {
-            'PENDING': 'pending',
-            'PREPARED': 'prepared',
-            'HANDOVER': 'handover',
-            'DELIVERED': 'delivered',
-            'UNSUPPLIED': 'unsupplied'
-        };
 
+    function updateTables(data) {
         // Temizle
         Object.keys(data).forEach(status => {
             const tabId = statusMap[status];
@@ -294,7 +288,7 @@
     }
 
     function printOrder(orderId) {
-        fetch('/admin/printed/' + orderId)
+        fetch('/dealer/printed/' + orderId)
             .then(response => response.json())
             .then(data => {
                 const printWindow = window.open('', '', 'height=600,width=800');
@@ -356,7 +350,7 @@
 
         $.ajax({
             type: 'GET', //THIS NEEDS TO BE GET
-            url: '/admin/orders/delete/' + orderid,
+            url: '/dealer/orders/delete/' + orderid,
             success: function (data) {
                 if (data == "OK") {
                     $('#Courier' + orderid).hide();
@@ -379,7 +373,7 @@
 
         $.ajax({
             type: 'GET', //THIS NEEDS TO BE GET
-            url: '/admin/orders/sendCourier/' + orderid + '/' + courier,
+            url: '/dealer/orders/sendCourier/' + orderid + '/' + courier,
             success: function (data) {
                 if (data == "OK") {
                     $('#Courier' + orderid).hide();
@@ -400,7 +394,7 @@
         return new Promise((resolve, reject) => {
             $.ajax({
                 type: 'GET',
-                url: '/admin/get-couriers',
+                url: '/restaurant/get-couriers',
                 success: function (data) {
                     resolve(data);
                 },
@@ -533,6 +527,8 @@
                     <div class="modal-body" style="padding: 1rem;">
                         <div class="row">
                             <div class="mb-1 col-md-12">
+                                    ${couriers.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
+
                                 <select class="single-select-placeholder js-states form-control" onchange="Courier(event, ${order.id})">
                                     <option value="0">Kurye Seçiniz</option>
                                     ${couriers.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
@@ -556,32 +552,7 @@
             ${distanceStr}
         </strong>
     </td>
-    <td>
-        <input type="hidden" id="tracking_${order.id}" value="${trackingId}">
-        <input type="hidden" id="platform_${order.id}" value="${platform}">
-        <select class="inline-order-select form-control" onchange="StatusOrderChange(event, ${order.id})" ${status == 4 ? 'disabled' : ''}>
-            ${statusOptions} s
-        </select>
-        <!-- İptal modal -->
-        <div class="modal fade" id="cancelModal${order.id}">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Siparişi İptal Et</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <label for="cancelReason${order.id}" class="form-label">İptal nedeniniz?</label>
-                        <textarea class="form-control" id="cancelReason${order.id}" rows="4" placeholder="İptal nedeninizi yazın..."></textarea>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Geri Dön</button>
-                        <button type="button" class="btn btn-danger" onclick="cancelOrder(${order.id})">İptal Et</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </td>
+
     <td>
         <!-- İşlem ikonları -->
         <div class="d-flex">

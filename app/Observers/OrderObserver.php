@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Helpers\CourierStatus;
 use App\Helpers\OrdersHelper;
 use App\Helpers\OrderStatus;
 use App\Helpers\SendSms;
@@ -69,6 +70,10 @@ class OrderObserver
 
         if ($order->status == OrderStatus::DELIVERED) {
             SendSms::send($order->phone, 'Sayın ' . $order->full_name . ', ' . $order->tracking_id . ' numaralı siparişiniz teslim edilmiştir. \n \n Bizi tercih ettiğiniz için teşekkür ederiz.', $restaurant->admin_id);
+
+            $courier = Courier::find($order->courier_id);
+            $courier->status = CourierStatus::active;
+            $courier->update();
         }
 
         $options = array(

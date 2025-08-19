@@ -390,21 +390,19 @@
         });
     }
 
-    function getCouriers() {
-        let couriers = [];
-
-        $.ajax({
-            type: 'GET',
-            url: '/superadmin/get-couriers',
-            success: function (data) {
-                console.log({couriers: data})
-                couriers = data
-            },
-            error: function (xhr, status, error) {
-            }
+    function fetchCouriers() {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                type: 'GET',
+                url: '/restaurant/get-couriers',
+                success: function (data) {
+                    resolve(data);
+                },
+                error: function (xhr, status, error) {
+                    reject(error);
+                }
+            });
         });
-
-        return couriers;
     }
 
     function formatDistance(distanceKm) {
@@ -424,18 +422,7 @@
     }
 
     async function generateOrderRowHtml(order) {
-        let couriers = [];
-
-        $.ajax({
-            type: 'GET',
-            url: '/superadmin/get-couriers',
-            success: function (data) {
-                console.log({couriers: data})
-                couriers = data
-            },
-            error: function (xhr, status, error) {
-            }
-        });
+        const couriers = await fetchCouriers();
 
         const restaurantName = order.restaurant ? order.restaurant.restaurant_name : 'İsim Yok';
         const trackingId = order.tracking_id || '';

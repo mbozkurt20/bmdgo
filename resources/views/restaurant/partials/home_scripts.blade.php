@@ -131,7 +131,6 @@
         });
     }
 
-
     async function refreshOrderTable(order) {
         const statusMap = {
             'PENDING': 'pending',
@@ -165,7 +164,6 @@
         // Tab içeriğini kontrol et ve boşsa mesaj göster
         updateTableForStatus(order.status);
     }
-
 
     function updateTables(data) {
         const statusMap = {
@@ -281,6 +279,14 @@
     }
 
     function updateTableForStatus(status) {
+        const statusMap = {
+            'PENDING': 'pending',
+            'PREPARED': 'prepared',
+            'HANDOVER': 'handover',
+            'DELIVERED': 'delivered',
+            'UNSUPPLIED': 'unsupplied'
+        };
+
         const tableBody = document.querySelector(`#${statusMap[status]} tbody`);
         if (!tableBody || tableBody.children.length === 0) {
             tableBody.innerHTML = `<tr><td colspan="10" class="text-center">Sipariş bulunmuyor</td></tr>`;
@@ -390,21 +396,19 @@
         });
     }
 
-    function getCouriers() {
-        let couriers = [];
-
-        $.ajax({
-            type: 'GET',
-            url: '/restaurant/get-couriers',
-            success: function (data) {
-                console.log({couriers: data})
-                couriers = data
-            },
-            error: function (xhr, status, error) {
-            }
+    function fetchCouriers() {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                type: 'GET',
+                url: '/restaurant/get-couriers',
+                success: function (data) {
+                    resolve(data);
+                },
+                error: function (xhr, status, error) {
+                    reject(error);
+                }
+            });
         });
-
-        return couriers;
     }
 
     function formatDistance(distanceKm) {
@@ -424,18 +428,7 @@
     }
 
     async function generateOrderRowHtml(order) {
-        let couriers = [];
-
-        $.ajax({
-            type: 'GET',
-            url: '/restaurant/get-couriers',
-            success: function (data) {
-                console.log({couriers: data})
-                couriers = data
-            },
-            error: function (xhr, status, error) {
-            }
-        });
+        const couriers = await fetchCouriers();
 
         const restaurantName = order.restaurant ? order.restaurant.restaurant_name : 'İsim Yok';
         const trackingId = order.tracking_id || '';
@@ -540,8 +533,6 @@
                     <div class="modal-body" style="padding: 1rem;">
                         <div class="row">
                             <div class="mb-1 col-md-12">
-                                    ${couriers.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
-
                                 <select class="single-select-placeholder js-states form-control" onchange="Courier(event, ${order.id})">
                                     <option value="0">Kurye Seçiniz</option>
                                     ${couriers.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
