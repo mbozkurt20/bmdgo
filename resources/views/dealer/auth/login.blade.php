@@ -40,59 +40,6 @@
     </div>
 </div>
 
-<script>
-    const typeButtons = document.querySelectorAll('.type-btn');
-    const userTypeInput = document.getElementById('userTypeInput');
-    const loginForm = document.getElementById('loginForm');
-    const emailInput = document.getElementById('emailInput');
-    const passwordInput = document.getElementById('passwordInput');
-    const formTitle = document.getElementById('formTitle');
-
-    const routeMap = {
-        dealer: "{{ route('owner.auth') }}",
-    };
-
-    const testMode = {{ env('TEST_MODE') ? 'true' : 'false' }};
-
-    function setTestCredentials(type) {
-        if (!testMode) return;
-
-        if (type === 'owner') {
-
-        } else if (type === 'dealer') {
-            emailInput.value = 'test@bayi.com';
-            passwordInput.value = 'test';
-        }
-    }
-
-    // Sayfa yüklendiğinde restaurant varsayılan olarak seçilsin ve test bilgileri ayarlansın
-    document.addEventListener('DOMContentLoaded', () => {
-        setTestCredentials('dealer');
-    });
-
-    typeButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            typeButtons.forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-
-            const selectedType = button.getAttribute('data-type');
-            userTypeInput.value = selectedType;
-
-            setTestCredentials(selectedType);
-        });
-    });
-
-    loginForm.addEventListener('submit', function(e) {
-        const selectedType = userTypeInput.value;
-        if (!selectedType) {
-            e.preventDefault();
-            alert('Lütfen giriş türünü seçiniz.');
-            return;
-        }
-        this.action = routeMap[selectedType];
-    });
-</script>
-
 <script src="{{asset('theme/login/js/bootstrap.bundle.min.js')}}"></script>
 </body>
 </html>

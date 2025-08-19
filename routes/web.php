@@ -35,5 +35,3 @@ include __DIR__ . '/app/dealerRoutes.php';
 
 Route::post('/order/add-online-order', [App\Http\Controllers\Api\OrderController::class, 'addOnlineOrder']);
 Route::post('/order/cancel-order', [App\Http\Controllers\Api\OrderController::class, 'cancelEntegraOrder']);
-
-

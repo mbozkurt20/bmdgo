@@ -8,7 +8,7 @@
                 </a>
                 <ul aria-expanded="false">
                     <li><a class="text-white" href="{{ url('/admin') }}">Anasayfa</a></li>
-                    <li><a class="text-white" href="{{ url('/admin/statistics') }}">İstatistikler</a></li>
+                    <li><a class="text-white" href="{{ url('/admin/statistics') }}">Genel Raporlar</a></li>
                 </ul>
             </li>
             <li>

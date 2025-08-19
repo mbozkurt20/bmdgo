@@ -8,10 +8,12 @@ use App\Models\Courier;
 use App\Models\Customer;
 use App\Models\Notification;
 use App\Models\Order;
+use App\Models\Restaurant;
 use App\Models\RestaurantCoupon;
 use App\Observers\AdminSystemFeautureObserver;
 use App\Observers\CourierObserver;
 use App\Observers\OrderObserver;
+use App\Observers\RestaurantObserver;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -37,6 +39,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Courier::observe(CourierObserver::class);
         Order::observe(OrderObserver::class);
+        Restaurant::observe(RestaurantObserver::class);
         AdminSystemFeature::observe(AdminSystemFeautureObserver::class);
 
         View::composer('*', function ($view) {

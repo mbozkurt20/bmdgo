@@ -47,7 +47,7 @@
                                 <td>{{ $customer->created_at->format('d.m.Y H:i') }}</td>
                                 <td>
                                     <div class="d-flex">
-                                        <a href="{{ route('restaurant.customers.edit', $customer->id) }}" class="btn btn-primary btn-sm me-1">
+                                        <a href="{{ route('restaurant.customers.edit', $customer->id) }}" class="special-button btn-sm me-1">
                                             <i class="fas fa-pencil-alt"></i>
                                         </a>
                                         <button onclick="DeleteFunction({{ $customer->id }})" class="btn btn-danger btn-sm">

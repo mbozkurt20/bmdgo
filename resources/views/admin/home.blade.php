@@ -200,7 +200,7 @@
                 </div>
             </div>
 
-            @include('admin.home_table')
+            @include('admin.partials.home_table')
         </div>
     </div>
 @endsection

@@ -13,6 +13,7 @@ Route::group(['prefix' => 'restaurant'], function () {
 
     Route::group(['middleware' => ['restaurant.auth']], function () {
         Route::get('/printed/{orderId}', [App\Http\Controllers\OrderController::class, 'printed']);
+        Route::get('/orders/ajax', [App\Http\Controllers\RestaurantController::class, 'ajax'])->name('restaurant.orders.ajax');
 
         Route::get('profile', [App\Http\Controllers\MyController::class, 'profile'])->name('restaurant.profile');
         Route::post('/profile', [App\Http\Controllers\MyController::class, 'profileUpdate'])->name('restaurant.profile.update');

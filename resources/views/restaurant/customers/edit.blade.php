@@ -1,16 +1,5 @@
 @extends('restaurant.layouts.app')
 @section('content')
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <style>
-        .map-container {
-            border: #0d2646 solid 2px;
-            height: 300px;
-            width: 100%;
-            border-radius: 15px;
-            margin-bottom: 20px;
-        }
-    </style>
-
     <div class="container-fluid">
         <div class="mb-sm-4 d-flex flex-wrap align-items-center text-head">
             <h2 class="mb-3 me-auto">Müşteriler</h2>
@@ -77,73 +66,56 @@
                                                     </a>
                                                 </div>
                                             </div>
-
-
                                         </div>
+
                                         <div class="clearfix"></div>
                                         <!-- Repeater Items -->
                                         <div data-repeater-list="address">
-                                            @foreach (\App\Models\CustomerAddress::where('customer_id', $customer->id)->get() as $adres)
+                                            @foreach (\App\Models\CustomerAddress::where('customer_id', $customer->id)->get() as $address)
                                                 <!-- Repeater Content -->
-                                                <div data-repeater-item class="item-content row"
-                                                    style="background: #f4f4f4;margin: 15px 0px  10px;padding:10px 0px;border-radius: 10px">
-                                                    <input req type="hidden" name="customer_id" value="{{ $customer->id }}">
-                                                    <input type="hidden" name="id" value="{{ $adres->id }}">
-                                                    <input type="hidden" name="type" value="up">
-                                                    <div class="mb-3 col-md-5">
-                                                        <input type="text" class="form-control" name="name" required
-                                                            placeholder="Adres Başlığı" value="{{ $adres->name }}">
-                                                    </div>
-                                                    <div class="mb-3 col-md-6">
-                                                        <input type="text" class="form-control" name="sokak_cadde" required
-                                                            placeholder="Sokak/Cadde" value="{{ $adres->sokak_cadde }}">
-                                                    </div>
-                                                    <div class="mb-3 col-md-1">
-                                                        <div class="pull-right repeater-remove-btn">
-                                                            <a id="remove-btn" style="font-size: 20px;cursor: pointer"
-                                                                class="text-danger" data-repeater-delete>
+                                                <div data-repeater-item class="item-content row border p-3 mb-4 rounded">
+                                                        <!-- Adres Başlığı -->
+                                                        <div class="mb-3 col-md-5">
+                                                            <input type="text" class="form-control" name="name" required placeholder="Adres Başlığı">
+                                                        </div>
+
+                                                        <div class="mb-3 col-md-3">
+                                                            <select class="form-control" required name="sehir" id="">
+                                                                @foreach(App\Models\City::all() as $city)
+                                                                    <option {{$city->id == $address->city_id}} value="{{$city->id}}">{{$city->name}}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+
+                                                        <div class="mb-3 col-md-3">
+                                                            <input value="{{$address->mahalle}}" type="text" class="form-control" name="mahalle" required placeholder="Mahalle">
+                                                        </div>
+                                                        <div class="mb-3 col-md-1 text-end">
+                                                            <a style="font-size: 20px; cursor: pointer" class="text-danger" data-repeater-delete>
                                                                 <i class="fa fa-trash"></i>
                                                             </a>
                                                         </div>
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control" name="bina_no" required
-                                                            value="{{ $adres->bina_no }}" placeholder="Bina No">
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control" name="kat" required
-                                                            value="{{ $adres->kat }}" placeholder="Kat">
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control" name="daire_no" required
-                                                            value="{{ $adres->daire_no }}" placeholder="Daire No">
-                                                    </div>
-                                                    <div class="mb-3 col-md-3">
-                                                        <input type="text" class="form-control" name="mahalle" required
-                                                            value="{{ $adres->mahalle }}" placeholder="Mahalle">
-                                                    </div>
-                                                    <div class="mb-3 col-md-12">
-                                                        <input type="text" name="adres_tarifi" class="form-control"
-                                                            value="{{ $adres->adres_tarifi }}"
-                                                            placeholder="Adres Tarifi">
-                                                    </div>
 
-                                                    <div class="col-md-12">
-                                                        <div class="map-container" id="map-{{ uniqid() }}"></div>
-                                                    </div>
+                                                        <div class="mb-3 col-md-3">
+                                                            <input type="text" class="form-control" value="{{$address->sokak_cadde}}" name="sokak_cadde" required placeholder="Sokak/Cadde">
+                                                        </div>
 
-                                                    <!-- Enlem/Boylam -->
-                                                    <div class="col-md-6 mb-3">
-                                                        <label class="text-dark">Enlem (Latitude)</label>
-                                                        <input required type="text" value="{{ $adres->latitude }}" name="latitude" class="form-control lat-input">
-                                                    </div>
+                                                        <div class="mb-3 col-md-3">
+                                                            <input type="text" class="form-control" value="{{$address->bina_no}}" name="bina_no" required placeholder="Bina No">
+                                                        </div>
 
-                                                    <div class="col-md-6 mb-3">
-                                                        <label class="text-dark">Boylam (Longitude)</label>
-                                                        <input required type="text"   value="{{ $adres->longitude }}" name="longitude" class="form-control lng-input">
-                                                    </div>
+                                                        <div class="mb-3 col-md-3">
+                                                            <input type="text" class="form-control" value="{{$address->kat}}" name="kat" required placeholder="Kat">
+                                                        </div>
 
-                                                </div>
+                                                        <div class="mb-3 col-md-3">
+                                                            <input type="text" class="form-control" value="{{$address->daire_no}}" name="daire_no" required placeholder="Daire No">
+                                                        </div>
+
+                                                        <div class="mb-3 col-md-12">
+                                                            <input type="text" name="adres_tarifi" value="{{$address->adres_tarifi}}" class="form-control" required placeholder="Adres Tarifi">
+                                                        </div>
+                                                    </div>
                                                 <!-- Repeater Remove Btn -->
 
                                                 <div class="clearfix"></div>
@@ -159,85 +131,4 @@
             </div>
         </div>
     </div>
-
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-    <script>
-        $(document).ready(function () {
-            const initializedMaps = new Set();
-
-            function initMap(mapId, latInput, lngInput) {
-                if (initializedMaps.has(mapId)) return; // Eğer zaten başlatıldıysa atla
-                initializedMaps.add(mapId);
-
-                const defaultLat = parseFloat(latInput.val()) || 37.15026069044849;  // Varsayılan koordinat
-                const defaultLng = parseFloat(lngInput.val()) || 38.77905463205474;
-
-                const map = L.map(mapId).setView([defaultLat, defaultLng], 13);
-
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '© OpenStreetMap'
-                }).addTo(map);
-
-                let marker;
-
-                if (latInput.val() && lngInput.val()) {
-                    const lat = parseFloat(latInput.val());
-                    const lng = parseFloat(lngInput.val());
-                    marker = L.marker([lat, lng]).addTo(map);
-                    map.setView([lat, lng], 15);
-                }
-
-                map.on('click', function (e) {
-                    const lat = e.latlng.lat.toFixed(6);
-                    const lng = e.latlng.lng.toFixed(6);
-
-                    if (marker) {
-                        map.removeLayer(marker);
-                    }
-
-                    marker = L.marker([lat, lng]).addTo(map);
-
-                    latInput.val(lat);
-                    lngInput.val(lng);
-                });
-            }
-
-            // Sayfa açıldığında mevcut map-container'ları başlat
-            $('.map-container').each(function () {
-                const mapId = $(this).attr('id');
-                if (!mapId) return;
-
-                const container = $(this).closest('[data-repeater-item]');
-                const latInput = container.find('input.lat-input');
-                const lngInput = container.find('input.lng-input');
-
-                initMap(mapId, latInput, lngInput);
-            });
-
-            // Repeater plugin için
-            $('.repeater').repeater({
-                show: function () {
-                    const $this = $(this);
-                    $this.slideDown(400, function () {
-                        const mapContainer = $this.find('.map-container');
-
-                        if (!mapContainer.attr('id')) {
-                            const newId = 'map-' + Math.random().toString(36).substr(2, 9);
-                            mapContainer.attr('id', newId);
-                        }
-
-                        const latInput = $this.find('input.lat-input');
-                        const lngInput = $this.find('input.lng-input');
-
-                        initMap(mapContainer.attr('id'), latInput, lngInput);
-                    });
-                },
-                hide: function (deleteElement) {
-                    $(this).slideUp(deleteElement);
-                }
-            });
-        });
-    </script>
-
 @endsection

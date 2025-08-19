@@ -20,7 +20,7 @@
 
                 <ul class="navbar-nav header-right">
                     <li class="nav-item recipe">
-                        <button id="openModalBtn" class="special-button ">
+                        <button id="openModalBtn2" class="special-button ">
                             Hızlı Sipariş Ver
                         </button>
                     </li>
@@ -30,7 +30,7 @@
                     <li class="nav-item dropdown header-profile">
                         <a class="nav-link" href="javascript:void(0);" role="button"
                            data-bs-toggle="dropdown">
-                            <img class="img-fluid" src="{{asset('/theme/images/resLogo.png')}}">
+                            <img alt="" style="height: 45px;width: 45px" class="img-fluid" src="{{asset('/theme/images/resLogo.png')}}">
                         </a>
                         <div class="dropdown-menu dropdown-menu-end">
                             <a class="dropdown-item" href="{{route('restaurant.profile')}}">

@@ -3,12 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\CourierStatus;
+use App\Helpers\OrderStatus;
 use App\Models\AdminSystemFeature;
 use App\Models\Courier;
+use App\Models\Customer;
 use App\Models\Notification;
 use App\Models\Order;
 use App\Models\Restaurant;
-use App\Models\RestaurantSystemFeature;
 use App\Models\SystemFeature;
 use App\Models\TopupMovement;
 use Carbon\Carbon;
@@ -18,8 +19,6 @@ use App\Models\Admin;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use function PHPUnit\Framework\exactly;
-use function Symfony\Component\VarDumper\Dumper\esc;
 
 class AdminController extends Controller
 {
@@ -52,6 +51,29 @@ class AdminController extends Controller
     protected function guard()
     {
         return Auth::guard('admin');
+    }
+
+    public function ajax(Request $request)
+    {
+        $tumu = Order::whereDate('created_at', Carbon::today())
+            ->whereHas('restaurant', function($query){
+                return $query->where('admin_id', auth()->id());
+            })->orderBy('created_at', 'desc')->with(['restaurant','courier'])->get();
+
+        // Siparişleri duruma göre ayır
+        $pending = $tumu->where('status', OrderStatus::PENDING);
+        $prepared = $tumu->where('status',  OrderStatus::PREPARED);
+        $handover = $tumu->where('status',  OrderStatus::HANDOVER);
+        $delivered = $tumu->where('status',  OrderStatus::DELIVERED);
+        $unsupplied = $tumu->where('status',  OrderStatus::UNSUPPLIED);
+
+        return response()->json([
+            'pending' => $pending->values()->all(),
+            'prepared' => $prepared->values()->all(),
+            'handover' => $handover->values()->all(),
+            'delivered' => $delivered->values()->all(),
+            'unsupplied' => $unsupplied->values()->all(),
+        ]);
     }
     public function topupTalep(REquest $request){
         $topup = TopupMovement::create([
@@ -164,17 +186,17 @@ class AdminController extends Controller
     {
         $admin = Auth::guard('admin')->id();
 
-       $systemFeature = AdminSystemFeature::where('admin_id', $admin)->where('system_feature_id',$id)->first();
+        $systemFeature = AdminSystemFeature::where('admin_id', $admin)->where('system_feature_id',$id)->first();
         if ($systemFeature) {
             $systemFeature->delete();
         }else{
-           AdminSystemFeature::create([
+            AdminSystemFeature::create([
                 'admin_id' => $admin,
                 'system_feature_id' => $id,
-           ]);
+            ]);
         }
 
-         echo 'OK';
+        echo 'OK';
     }
 
     public function auto_order($status)
@@ -280,54 +302,83 @@ class AdminController extends Controller
     {
         $adminId = auth()->id();
 
-        $startDate = $request->input('start_date') ?? Carbon::today()->toDateString();
-        $endDate = $request->input('end_date') ?? Carbon::today()->toDateString();
+        $startDate = $request->input('start_date', now()->startOfMonth()->toDateString());
+        $endDate   = $request->input('end_date', now()->addDay()->toDateString());
+        $groupBy   = $request->input('group_by', 'day'); // day | week
 
-        $start = Carbon::parse($startDate)->startOfDay();
-        $end = Carbon::parse($endDate)->endOfDay();
+        // 🔹 Siparişler
+        $orders = Order::whereHas('restaurant',function ($q) use($adminId) {
+            $q->where('admin_id',$adminId);
+        })->whereBetween('created_at', [$startDate, $endDate])->get();
 
-        // Platform listesi
-        $platforms = ['yemeksepeti', 'getir', 'trendyol', 'migros', 'adisyo', 'telefonsiparis'];
+        // 🔹 Genel toplamlar
+        $totalOrders      = $orders->count();
+        $totalSubAmount   = $orders->sum('sub_amount');
+        $totalDiscount    = $orders->sum('discount');
+        $totalAmount      = $orders->sum('amount');
 
-        // Siparişleri al
-        $orders = Order::whereBetween('created_at', [$start, $end])->get();
+        // 🔹 Diğer modelleri topla (tek sorgudan)
+        $couriers    = Courier::where('admin_id',$adminId)->whereBetween('created_at', [$startDate, $endDate])->get();
+        $restaurants = Restaurant::where('admin_id',$adminId)->whereBetween('created_at', [$startDate, $endDate])->get();
+        $customers   = Customer::whereHas('restaurant',function ($q) use($adminId) {
+            $q->where('admin_id',$adminId);
+        })->whereBetween('created_at', [$startDate, $endDate])->get();
 
-        // Günlük toplamları hazırlamak için boş dizi
-        $orderStats = [];
+        $totalCouriers    = $couriers->count();
+        $totalRestaurants = $restaurants->count();
+        $totalCustomers   = $customers->count();
 
-        // Günleri belirle
-        $dateRange = [];
-        for ($date = $start; $date->lte($end); $date->addDay()) {
-            $dateRange[] = $date->format('Y-m-d');
-        }
-
-        // Platformlara göre günlük siparişleri gruplandır
-        foreach ($platforms as $platform) {
-            $dailyCounts = [];
-            foreach ($dateRange as $dateStr) {
-                $count = $orders->where('platform', $platform)
-                    ->where('created_at', '>=', $dateStr . ' 00:00:00')
-                    ->where('created_at', '<=', $dateStr . ' 23:59:59')
-                    ->count();
-                $dailyCounts[$dateStr] = $count;
+        // 🔹 Gruplama fonksiyonu
+        $groupFn = function($item) use ($groupBy) {
+            if ($groupBy === 'week') {
+                return \Carbon\Carbon::parse($item->created_at)->startOfWeek()->format('Y-m-d');
             }
-            $orderStats[$platform] = $dailyCounts;
-        }
+            return \Carbon\Carbon::parse($item->created_at)->format('Y-m-d');
+        };
 
-        // Toplam sayılar
-        $totalOrders = $orders->count();
-        $totalRestaurants = Restaurant::where('admin_id', $adminId)->count();
-        $totalCouriers = Courier::where('admin_id', $adminId)->count();
+        // 🔹 Dataset fonksiyonu
+        $makeDataset = function($collection, $field = null, $sum = false) use ($groupFn) {
+            if ($sum) {
+                return $collection->groupBy($groupFn)->map(fn($items) => $items->sum($field));
+            }
+            return $collection->groupBy($groupFn)->map(fn($items) => $items->count());
+        };
 
-        return view('admin.statistics', [
-            'orderStats' => $orderStats,
-            'startDate' => $startDate,
-            'endDate' => $endDate,
-            'labels' => $dateRange,
-            'platforms' => $platforms,
-            'totalOrders' => $totalOrders,
-            'totalRestaurants' => $totalRestaurants,
-            'totalCouriers' => $totalCouriers,
-        ]);
+        // 🔹 Günlük/Haftalık kırılım
+        $ordersByDate      = $makeDataset($orders);
+        $couriersByDate    = $makeDataset($couriers);
+        $restaurantsByDate = $makeDataset($restaurants);
+        $customersByDate   = $makeDataset($customers);
+
+        $subAmountByDate = $makeDataset($orders, 'sub_amount', true);
+        $discountByDate  = $makeDataset($orders, 'discount', true);
+        $amountByDate    = $makeDataset($orders, 'amount', true);
+
+        // 🔹 Boş günleri doldur (eksik gün varsa sıfır yap)
+        $period = $groupBy === 'week'
+            ? \Carbon\CarbonPeriod::create($startDate, '1 week', $endDate)
+            : \Carbon\CarbonPeriod::create($startDate, $endDate);
+
+        $labels = collect($period)->map(fn($d) =>
+        $groupBy === 'week' ? $d->startOfWeek()->format('Y-m-d') : $d->format('Y-m-d')
+        );
+
+        $fillMissing = function($dataset) use ($labels) {
+            return $labels->mapWithKeys(fn($d) => [$d => $dataset[$d] ?? 0]);
+        };
+
+        $metrics = [
+            ['title' => 'Toplam Sipariş',    'value' => $totalOrders,      'data' => $fillMissing($ordersByDate)],
+            ['title' => 'Toplam Kurye',      'value' => $totalCouriers,    'data' => $fillMissing($couriersByDate)],
+            ['title' => 'Toplam Restoran',   'value' => $totalRestaurants, 'data' => $fillMissing($restaurantsByDate)],
+            ['title' => 'Toplam Müşteri',    'value' => $totalCustomers,   'data' => $fillMissing($customersByDate)],
+            ['title' => 'Toplam Ara Toplam', 'value' => number_format($totalSubAmount, 2), 'data' => $fillMissing($subAmountByDate)],
+            ['title' => 'Toplam İndirim',    'value' => number_format($totalDiscount, 2),  'data' => $fillMissing($discountByDate)],
+            ['title' => 'Toplam Net Tutar',  'value' => number_format($totalAmount, 2),    'data' => $fillMissing($amountByDate)],
+        ];
+
+        return view('admin.statistics', compact(
+            'startDate', 'endDate', 'groupBy', 'metrics'
+        ));
     }
 }

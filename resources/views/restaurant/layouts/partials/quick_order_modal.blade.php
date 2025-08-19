@@ -9,19 +9,19 @@
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <label for="full_name" class="form-label fw-semibold">Müşteri Adı</label>
+                    <label for="full_name" class="form-label fw-semibold text-black">Müşteri Adı</label>
                     <input type="text" name="full_name" id="full_name" class="form-control rounded-pill" required>
                 </div>
                 <div class="mb-3">
-                    <label for="phone" class="form-label fw-semibold">Telefon</label>
+                    <label for="phone" class="form-label fw-semibold text-black">Telefon</label>
                     <input type="text" name="phone" id="phone" class="form-control rounded-pill" required>
                 </div>
                 <div class="mb-3">
-                    <label for="address" class="form-label fw-semibold">Adres</label>
-                    <textarea name="address" id="address" rows="3" class="form-control rounded-4" required></textarea>
+                    <label for="address" class="form-label fw-semibold text-black">Adres <small class="text-danger fw-bold"> | Lütfen örnek formata uygun adres giriniz.</small></label>
+                    <textarea name="address" placeholder="Ankara mah: 5021.Sokak. Deniz Apt. Kat:3 A Blok. Kartal/İstanbul" id="address" rows="3" class="form-control rounded-4" required></textarea>
                 </div>
                 <div class="mb-3 mt-3">
-                    <label for="payment_method" class="form-label fw-semibold">Ödeme Yöntemi</label>
+                    <label for="payment_method" class="form-label fw-semibold text-black">Ödeme Yöntemi</label>
                     <div class="custom-select-wrapper">
                         <select name="payment_method" id="payment_method" class="form-select custom-select" required>
                             <option value="Kapıda Nakit İle Ödeme">Kapıda Nakit İle Ödeme</option>
@@ -32,12 +32,12 @@
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label for="amount" class="form-label fw-semibold">Sipariş Tutarı</label>
+                    <label for="amount" class="form-label fw-semibold text-black">Sipariş Tutarı</label>
                     <input type="number" step="0.01" name="amount" id="amount" class="form-control rounded-pill" required>
                 </div>
             </div>
             <div class="modal-footer border-0 pt-0">
-                <button type="submit" class="special-button w-100 rounded-pill py-2 fw-bold">
+                <button id="submitOrderBtn"  type="submit" class="special-button w-100 rounded-pill py-2 fw-bold">
                     Siparişi Gönder
                 </button>
             </div>
@@ -134,7 +134,7 @@
 
 <script>
     const modal = document.getElementById('quickOrderModal');
-    const openBtn = document.getElementById('openModalBtn');
+    const openBtn = document.getElementById('openModalBtn2');
     const closeBtn = document.getElementById('closeModalBtn');
 
     // Modal başlangıçta kapalı kalsın
@@ -162,6 +162,14 @@
         e.preventDefault();
 
         const form = e.target;
+        const submitBtn = document.getElementById("submitOrderBtn");
+
+        // Butonu loading moduna al
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Sipariş Alınıyor...";
+        submitBtn.classList.remove("special-button");
+        submitBtn.classList.add("special-ok-button");
+
         const data = {
             restaurant_id: {{ auth()->user()->id }},
             full_name: form.full_name.value,
@@ -181,22 +189,36 @@
             ])
         };
 
-        const response = await fetch("{{ route('quick.order.store') }}", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": "{{ csrf_token() }}"
-            },
-            body: JSON.stringify(data)
-        });
+        try {
+            const response = await fetch("{{ route('quick.order.store') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                },
+                body: JSON.stringify(data)
+            });
 
-        if (response.ok) {
-            form.reset();
-            modal.style.display = 'none';
-            showToast("Siparişiniz Başarıyla Eklendi", "success");
-        } else {
-            showToast("Bir hata meydana geldi", "error");
+            if (response.ok) {
+                form.reset();
+                modal.style.display = 'none';
+                showToast("Siparişiniz Başarıyla Eklendi", "success");
+            } else {
+                if(response.status === 400){
+                    showToast("Lütfen Adres Bilginizi Detaylı ve Anlaşılır Yazınız.", "error");
+                }else {
+                    showToast("Bir hata meydana geldi", "error");
+                }
+            }
+        } catch (error) {
+            showToast("Sunucu hatası: " + error.message, "error");
         }
+
+        // Butonu eski haline döndür
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Siparişi Gönder";
+        submitBtn.classList.remove("special-ok-button");
+        submitBtn.classList.add("special-button");
     });
 
     function showToast(message, type) {
