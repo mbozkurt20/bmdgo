@@ -375,6 +375,7 @@ class OrderController extends Controller
                 'sub_amount' => $request->amount,
                 'discount' => 0.00,
                 'amount' => $request->amount,
+                'status' => OrderStatus::PENDING,
                 'items' => json_encode([]),
             ]);
 
