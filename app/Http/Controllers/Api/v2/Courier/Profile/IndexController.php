@@ -108,6 +108,46 @@ class IndexController extends Controller
 
         return Json::success('Bilgileriniz Başarıyla Güncellenmiştir', new CourierResource($courier));
     }
+    public function updatePassword(Request $request)
+    {
+        $requestData = Validator::make($request->all(), [
+            'password' => 'required|confirmed',
+        ]);
+
+        if ($requestData->fails()) {
+            return response()->json(['errors' => $requestData->errors()->messages(), 'status' => 400],400);
+        }
+
+        $id = auth('courier')->id();
+
+        $courier = Courier::find($id);
+
+        $courier->update([
+            'password' => Hash::make($request->input('password')),
+        ]);
+
+        return Json::success('Şifreniz Başarıyla Güncellenmiştir', new CourierResource($courier));
+    }
+    public function updateStatus(Request $request)
+    {
+        $requestData = Validator::make($request->all(), [
+            'status' => 'required|in:active,passive,break',
+        ]);
+
+        if ($requestData->fails()) {
+            return response()->json(['errors' => $requestData->errors()->messages(), 'status' => 400],400);
+        }
+
+        $id = auth('courier')->id();
+
+        $courier = Courier::find($id);
+
+        $courier->update([
+            'status' => $request->input('status'),
+        ]);
+
+        return Json::success('Durumunuz Başarıyla Güncellenmiştir', new CourierResource($courier));
+    }
 
     /**
      * Remove the specified resource from storage.

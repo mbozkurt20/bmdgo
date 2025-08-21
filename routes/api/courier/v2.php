@@ -13,6 +13,8 @@ Route::middleware('jwt.courier')->group(function () {
 
         Route::get('/profile', [\App\Http\Controllers\Api\v2\Courier\Profile\IndexController::class, 'index']);
         Route::post('/profile', [\App\Http\Controllers\Api\v2\Courier\Profile\IndexController::class, 'update']);
+        Route::post('/profile/update-password', [\App\Http\Controllers\Api\v2\Courier\Profile\IndexController::class, 'updatePassword']);
+        Route::post('/profile/update-status', [\App\Http\Controllers\Api\v2\Courier\Profile\IndexController::class, 'updateStatus']);
         Route::post('/location', [\App\Http\Controllers\Api\v2\Courier\Profile\IndexController::class, 'updateLocation']);
         Route::get('/orders', [\App\Http\Controllers\Api\v2\Courier\Orders\OrderController::class, 'index']);
         Route::get('/orders/report', [\App\Http\Controllers\Api\v2\Courier\Orders\OrderController::class, 'reports']);

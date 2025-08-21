@@ -2805,7 +2805,7 @@ textarea.form-control-lg {
   border-color: #f72b50; }
   .btn-outline-danger:hover {
     color: #000;
-    background-color: #f72b50;
+    background-color: #e7004d;
     border-color: #f72b50; }
   .btn-check:focus + .btn-outline-danger, .btn-outline-danger:focus {
     box-shadow: 0 0 0 0.25rem rgba(247, 43, 80, 0.5); }
@@ -12885,7 +12885,7 @@ Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Comp
   [data-sidebar-style="full"][data-layout="vertical"] .menu-toggle .deznav .metismenu li {
     position: relative; }
     [data-sidebar-style="full"][data-layout="vertical"] .menu-toggle .deznav .metismenu li a {
-      background: #0d2646;
+      background: #e7004d;
       margin: 0.125rem 0; }
       [data-sidebar-style="full"][data-layout="vertical"] .menu-toggle .deznav .metismenu li a svg {
         max-width: 1.5rem;
