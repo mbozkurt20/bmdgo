@@ -362,6 +362,7 @@ class OrderController extends Controller
                 }
             }
 
+            $restaurant = Restaurant::find($request->restaurant_id);
             $order = \App\Models\Order::create([
                 'platform' => 'telefonsiparis',
                 'courier_id' => $request->courier_id ?? -1,
@@ -377,6 +378,12 @@ class OrderController extends Controller
                 'amount' => $request->amount,
                 'status' => OrderStatus::PENDING,
                 'items' => json_encode([]),
+                'distance' => OrdersHelper::haversineDistance(
+                    $restaurant->latitude,
+                    $restaurant->longitude,
+                    $address->latitude,
+                    $address->longitude
+                )
             ]);
 
             if (!$order) {
