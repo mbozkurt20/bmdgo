@@ -587,7 +587,7 @@ class OrderController extends Controller
             $items[] = [
                 "price" => $product->price,
                 "unitSellingPrice" => $product->price,
-                "items" => array_fill(0, $productData["quantity"], ["packageItemId" => "ahtaPOS"]),
+                "quantity" =>  $productData["quantity"],
                 "productId" => $product->id,
                 "name" => $product->name,
             ];
