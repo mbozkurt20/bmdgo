@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Helpers;
+use App\Models\CourierOrder;
+
 class CourierStatus
 {
     public const active = 'active'; // bekliyor
@@ -21,5 +23,13 @@ class CourierStatus
     public static function isValid(string $value): bool
     {
         return in_array($value, self::all(), true);
+    }
+
+    public static function calculatePrice($courier,$totalAmount){
+        if($courier->price_type == 'package'){
+
+        }else{
+
+        }
     }
 }
