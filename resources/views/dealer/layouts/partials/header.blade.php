@@ -14,7 +14,7 @@
 <div class="header">
     <div class="row" style="background-color: #f3eded; color: #e7004d;">
         <div class="text-center fw-bold py-2">
-            <strong>BmdGo</strong> Bayi Paneli
+            <strong>BmdGo</strong> Partner Paneli
         </div>
     </div>
 

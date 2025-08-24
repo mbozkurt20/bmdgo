@@ -13,4 +13,9 @@ class CourierOrder extends Model
         'courier_id',
         'order_id',
     ];
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class); // Tek bir order ile ilişkiliyse
+    }
 }

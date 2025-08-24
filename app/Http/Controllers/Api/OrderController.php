@@ -27,10 +27,9 @@ class OrderController extends Controller
                 foreach ($order['items'] as $product) {
                     $addItem = [];
                     $addItem['price'] = $product['price'];
-                    $addItem['count'] = $product['count'];
+                    $addItem['quantity'] = $product['quantity'];
                     $addItem['unitSellingPrice'] = $product['total_price_with_option'];
                     $addItem['name'] = $product['name'];
-                    $addItem['items'][0]['packageItemId'] = "ahtaPOS";
                     $items[] = $addItem;
                 }
             }

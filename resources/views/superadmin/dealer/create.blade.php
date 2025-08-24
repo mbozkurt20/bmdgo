@@ -16,10 +16,10 @@
 
     <div class="container-fluid">
         <div class="mb-sm-4 d-flex flex-wrap align-items-center text-head">
-            <h2 class="mb-3 me-auto">Bayi Ekle</h2>
+            <h2 class="mb-3 me-auto">Partner Ekle</h2>
             <div>
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Bayi</a></li>
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Partner</a></li>
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Yeni</a></li>
                 </ol>
             </div>
@@ -47,7 +47,7 @@
             <div class="col-xl-8 col-lg-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">Yeni Bayi Formu</h4>
+                        <h4 class="card-title">Yeni Partner Formu</h4>
                     </div>
                     <div class="card-body">
                         <div class="basic-form">
@@ -55,8 +55,8 @@
                                 @csrf
                                 <div class="row">
                                     <div class="mb-3 col-md-4">
-                                        <label class="form-label">Bayi Adı</label>
-                                        <input required type="text" class="form-control" name="name" placeholder="Bayii Adı">
+                                        <label class="form-label">Partner Adı</label>
+                                        <input required type="text" class="form-control" name="name" placeholder="Partner Adı">
                                     </div>
                                     <div class="mb-3 col-md-4">
                                         <label class="form-label">Email</label>

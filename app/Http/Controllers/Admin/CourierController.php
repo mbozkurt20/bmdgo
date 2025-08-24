@@ -32,7 +32,6 @@ class CourierController extends Controller
     {
         $couriers = Courier::where('restaurant_id', 0)
             ->where('admin_id', auth()->id())
-            ->where('status',CourierStatus::active)
             ->get();
 
         return view('admin.couriers.index', compact('couriers'));
@@ -171,13 +170,75 @@ class CourierController extends Controller
         }
     }
 
-    public function report($id)
+    public function report(Request $request, $id)
     {
-        $courier = Courier::where('id', $id)->first();
+        $courier = Courier::findOrFail($id);
 
-        $orders = Order::where('courier_id', $id)->whereDate('created_at', Carbon::today())->get();
-        return view('admin.couriers.report', compact('courier', 'orders'));
+        // Tarih aralığı alıyoruz (varsayılan: bugün)
+        $startDate = $request->input('start_date', Carbon::today()->toDateString());
+        $endDate   = $request->input('end_date', Carbon::today()->toDateString());
+
+        $startDateObj = Carbon::parse($startDate)->startOfDay();
+        $endDateObj   = Carbon::parse($endDate)->endOfDay();
+
+        // Kurye'nin eşleşmiş siparişleri
+        $courierOrderIds = CourierOrder::where('courier_id', $courier->id)
+            ->whereBetween('created_at', [$startDateObj, $endDateObj])
+            ->pluck('order_id');
+
+        // Sipariş listesi (admin ekranında tablo için)
+        $orders = Order::whereIn('id', $courierOrderIds)
+            ->whereBetween('created_at', [$startDateObj, $endDateObj])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Teslim edilen siparişler
+        $deliveredOrders = $orders->where('status', OrderStatus::DELIVERED);
+
+        // Ödeme yöntemine göre filtreleme
+        $cashOrders   = $deliveredOrders->where('payment_method', 'Kapıda Nakit ile Ödeme');
+        $cardOrders   = $deliveredOrders->where('payment_method', 'Kapıda Kredi Kartı ile Ödeme');
+        $ticketOrders = $deliveredOrders->where('payment_method', 'Kapıda Ticket ile Ödeme');
+
+        // Kazanç hesaplama
+        if ($courier->price_type == 'package') {
+            // Paket başı ücretlendirme
+            $totalCash       = $cashOrders->count() * $courier->price;
+            $totalCreditCard = $cardOrders->count() * $courier->price;
+            $totalTicket     = $ticketOrders->count() * $courier->price;
+        } else {
+            // Km başı ücretlendirme
+            $kmPrice = $courier->km_price;
+
+            $totalCash       = $cashOrders->sum(fn($o) => $o->distance * $kmPrice);
+            $totalCreditCard = $cardOrders->sum(fn($o) => $o->distance * $kmPrice);
+            $totalTicket     = $ticketOrders->sum(fn($o) => $o->distance * $kmPrice);
+        }
+
+        $summary = [
+            'order_count'    => $deliveredOrders->count(),
+            'cash_orders'    => $cashOrders->count(),
+            'card_orders'    => $cardOrders->count(),
+            'ticket_orders'  => $ticketOrders->count(),
+        ];
+
+        $totals = [
+            'cash'        => $totalCash,
+            'credit_card' => $totalCreditCard,
+            'ticket'      => $totalTicket,
+            'overall'     => $totalCash + $totalCreditCard + $totalTicket,
+        ];
+
+        return view('admin.couriers.report', compact(
+            'courier',
+            'orders',
+            'startDate',
+            'endDate',
+            'summary',
+            'totals'
+        ));
     }
+
 
     public function maps()
     {

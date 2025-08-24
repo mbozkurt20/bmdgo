@@ -12,7 +12,7 @@
         <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
             <div class="customer-search">
                 <div class="input-group search-area">
-                    <input type="text" class="form-control" id="custom-filter" placeholder="Bayi ara...">
+                    <input type="text" class="form-control" id="custom-filter" placeholder="Partner ara...">
                     <span class="input-group-text"><i class="flaticon-381-search-2"></i></span>
                 </div>
             </div>
@@ -36,6 +36,7 @@
                         <th>Telefon</th>
                         <th>Şehir</th>
                         <th>İlçe</th>
+                        <th>Kontör Ücreti</th>
                         <th>Eklenme Tarihi</th>
                         <th>Durum <small>(Aktif/Pasif)</small></th>
                         <th>İşlem</th>
@@ -49,6 +50,7 @@
                             <td>{{ $admin->phone }}</td>
                             <td>{{ $admin->city_id ? \App\Models\City::find($admin->city_id)->name : '-' }}</td>
                             <td>{{ $admin->district_id ? \App\Models\District::find($admin->district_id)->name : '-'}}</td>
+                            <td>{{ number_format($admin->top_up_price,2) }}</td>
                             <td>{{ $admin->created_at->format('d.m.Y H:i') }}</td>
                             <td>
                                 <div class="form-check form-switch me-3">
@@ -125,7 +127,7 @@
                                 Swal.fire("Güncellendi!", "Güncelleme işlemi başarılı.", "success");
                                 // Başarılıysa checkbox olduğu gibi bırak
                             } else {
-                                Swal.fire("Uyarı!", "Bu Bayi Güncellenmiyor.", "warning");
+                                Swal.fire("Uyarı!", "Bu Partner Güncellenmiyor.", "warning");
                                 checkbox.checked = !currentState; // Eski haline döndür
                             }
                         },

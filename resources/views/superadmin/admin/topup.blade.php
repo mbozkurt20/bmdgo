@@ -193,7 +193,7 @@
                                                 @switch($record->created_type)
                                                     @case('superadmin') Üst Yönetici @break
                                                     @case('admin') Yönetici @break
-                                                    @case('dealer') Bayi @break
+                                                    @case('dealer') Partner @break
                                                 @endswitch
                                             </td>
                                             <td>{{ $record->top_up }} ₺</td>

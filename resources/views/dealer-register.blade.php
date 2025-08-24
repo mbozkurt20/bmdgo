@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{env('APP_NAME')}} - Bayi Başvurusu</title>
+    <title>{{env('APP_NAME')}} - Partner Başvurusu</title>
 
     <link rel="shortcut icon" type="image/png" href="{{config('site.logo')}}">
     <link href="{{asset('theme/login/css/bootstrap.min.css')}}" rel="stylesheet">
@@ -159,7 +159,7 @@
         <div class="dealer-layout">
             <div class="card">
                 <div class="card-header">
-                    <p class=" size-1">  Bayi Başvurusu</p>
+                    <p class=" size-1">  Partner Başvurusu</p>
 
                     <p class="size-4">
                         <a class="text-white fw-bold" style="text-decoration: underline" href="/dealer/login">Zaten bir hesabım var...</a>
@@ -171,8 +171,8 @@
                         @csrf
                         <div class="row">
                             <div class="mb-3 col-md-4">
-                                <label class="form-label">Bayi Adı</label>
-                                <input required type="text" class="form-control border border-white" name="name" placeholder="Bayi Adı">
+                                <label class="form-label">Partner Adı</label>
+                                <input required type="text" class="form-control border border-white" name="name" placeholder="Partner Adı">
                             </div>
                             <div class="mb-3 col-md-4">
                                 <label class="form-label">Email</label>

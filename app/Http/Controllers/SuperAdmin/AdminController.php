@@ -232,6 +232,7 @@ class AdminController extends Controller
             'lat' => 'required',
             'lng' => 'required',
             'city_id' => 'required',
+            'top_up_price' => 'required',
             'district_id' => 'required',
             'address' => 'nullable',
         ]);
@@ -244,6 +245,7 @@ class AdminController extends Controller
         Admin::create([
             'created_by_id' => \auth()->id(),
             'created_by_type' => 'superadmin',
+            'top_up_price' => $request->top_up_price,
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
@@ -289,6 +291,7 @@ class AdminController extends Controller
 
         // Güncelleme verilerini hazırla
         $updateData = [
+            'top_up_price' => $request->top_up_price,
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,

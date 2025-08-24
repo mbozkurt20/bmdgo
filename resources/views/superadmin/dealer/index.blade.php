@@ -3,9 +3,9 @@
 @section('content')
     <div class="container-fluid">
         <div class="mb-sm-4 d-flex flex-wrap align-items-center text-head">
-            <h2 class="mb-3 me-auto">Bayiler</h2>
+            <h2 class="mb-3 me-auto">Partnerler</h2>
             <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item"><a href="#">Bayiler</a></li>
+                <li class="breadcrumb-item"><a href="#">Partnerler</a></li>
                 <li class="breadcrumb-item active">Liste</li>
             </ol>
         </div>
@@ -13,7 +13,7 @@
         <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
             <div class="customer-search">
                 <div class="input-group search-area">
-                    <input type="text" class="form-control" id="custom-filter" placeholder="Bayi ara...">
+                    <input type="text" class="form-control" id="custom-filter" placeholder="Partner ara...">
                     <span class="input-group-text"><i class="flaticon-381-search-2"></i></span>
                 </div>
             </div>
@@ -123,7 +123,7 @@
                                 Swal.fire("Güncellendi!", "Güncelleme işlemi başarılı.", "success");
                                 // Başarılıysa checkbox olduğu gibi bırak
                             } else {
-                                Swal.fire("Uyarı!", "Bu Bayi Güncellenmiyor.", "warning");
+                                Swal.fire("Uyarı!", "Bu Partner Güncellenmiyor.", "warning");
                                 checkbox.checked = !currentState; // Eski haline döndür
                             }
                         },

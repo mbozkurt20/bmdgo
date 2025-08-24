@@ -56,9 +56,10 @@ class CustomerController extends Controller
         $create->email = $request->input('email')??null;
         $create->save();
 
-
         // Check if address data is present
         if ($request->address) {
+            $errors = [];
+
             foreach ($request->address as $adres) {
                 $city = City::find($adres['sehir']);
                 $addre = $adres['mahalle'].' mah. '.$adres['sokak_cadde'].' sokak. Bina No:'.$adres['bina_no'].' Kat:'.$adres['kat'].' Daire No:'.$adres['daire_no'].' '.$city->name;
@@ -67,9 +68,9 @@ class CustomerController extends Controller
                 if (!isset($location['error'])) {
                     // Save each address for the customer
                     $address = new CustomerAddress();
-                    $address->customer_id = $create->id; // Associate address with the created customer
-                    $address->restaurant_id = Auth::user()->id; // Associate address with the restaurant
-                    $address->name = $adres['name']; // Address title
+                    $address->customer_id = $create->id;
+                    $address->restaurant_id = Auth::user()->id;
+                    $address->name = $adres['name'];
                     $address->sokak_cadde = $adres['sokak_cadde'];
                     $address->bina_no = $adres['bina_no'];
                     $address->city_id = $city->id;
@@ -78,9 +79,22 @@ class CustomerController extends Controller
                     $address->longitude = $location['lon'];
                     $address->daire_no = $adres['daire_no'];
                     $address->mahalle = $adres['mahalle'];
-                    $address->adres_tarifi = $adres['adres_tarifi'] ?? ''; // Set empty string if not provided
+                    $address->adres_tarifi = $adres['adres_tarifi'] ?? '';
                     $address->save();
+                } else {
+                    // Eğer konum bulunamadıysa hata kaydet
+                    $errors[] = [
+                        'input' => $location['input'],
+                        'message' => $location['error']
+                    ];
                 }
+            }
+
+            if (!empty($errors)) {
+                // Hata varsa kullanıcıyı editlemeye yönlendir
+                return redirect()->route('restaurant.customers.edit', $create->id)
+                    ->with('test', 'Bazı adreslerin konumu bulunamadı.')
+                    ->with('errors', $errors);
             }
         }
 

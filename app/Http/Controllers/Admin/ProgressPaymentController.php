@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Models\ProgressPaymentRecord;
 use Illuminate\Http\Request;
@@ -105,11 +106,11 @@ class ProgressPaymentController extends Controller
     public function courierFilter(Request $request){
         $courier = Courier::find($request->courier);
 
-
         $startDate = Carbon::createFromFormat('Y-m-d', $request->start)->startOfDay();
         $endDate = Carbon::createFromFormat('Y-m-d', $request->end)->endOfDay();
 
         $orderCount = Order::where('courier_id', $courier->id)
+            ->where('status',OrderStatus::DELIVERED)
             ->whereBetween('created_at', [$startDate, $endDate])
             ->count();
 
@@ -124,16 +125,52 @@ class ProgressPaymentController extends Controller
             ->orderBy('payment_date', 'desc')
             ->get();
 
+        $courierOrderIds = CourierOrder::where('courier_id', $courier->id)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->pluck('order_id');
+
+        // Sipariş listesi (admin ekranında tablo için)
+        $orders = Order::whereIn('id', $courierOrderIds)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Teslim edilen siparişler
+        $deliveredOrders = $orders->where('status', OrderStatus::DELIVERED);
+
+        // Ödeme yöntemine göre filtreleme
+        $cashOrders   = $deliveredOrders->where('payment_method', 'Kapıda Nakit ile Ödeme');
+        $cardOrders   = $deliveredOrders->where('payment_method', 'Kapıda Kredi Kartı ile Ödeme');
+        $ticketOrders = $deliveredOrders->where('payment_method', 'Kapıda Ticket ile Ödeme');
+
         $totalProgressPayment = floatval($courier->price) * $orderCount;
 
         // Tabloda göstermek için kayıtları HTML'e çevireceğiz
         $recordsHtml = view('admin.progressPayment._courier_records', compact('records'))->render();
 
+        $total = 0;
+
+        if ($courier->price_type == 'package') {
+            // Paket başı ücretlendirme
+            $total+= $cashOrders->count() * $courier->price;
+            $total+= $cardOrders->count() * $courier->price;
+            $total+= $ticketOrders->count() * $courier->price;
+        } else {
+            // Km başı ücretlendirme
+            $kmPrice = $courier->km_price;
+
+            $total+= $cashOrders->sum(fn($o) => $o->distance * $kmPrice);
+            $total+= $cardOrders->sum(fn($o) => $o->distance * $kmPrice);
+            $total+= $ticketOrders->sum(fn($o) => $o->distance * $kmPrice);
+        }
+
+
         return response()->json([
             'paidAmount' => number_format($paidAmount, 2, '.', ''), // 2 basamak
-            'courier_name' => $courier->name,
+            'courier' => $courier,
             'order_count' => $orderCount,
-            'total_progress_payment' => number_format($totalProgressPayment, 2, '.', ''), // 2 basamak
+            'fixed_amount' => $courier->fixed_price,
+            'total_progress_payment' => $total,
             'records_html' => $recordsHtml,
         ]);
     }

@@ -30,11 +30,11 @@
             </li>
             <li><a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
                     <i class="flaticon-381-user text-white"></i>
-                    <span class="nav-text text-white">Bayiler</span>
+                    <span class="nav-text text-white">Partnerler</span>
                 </a>
                 <ul aria-expanded="false">
-                    <li><a class="text-white" href="{{ route('superadmin.dealer') }}">Bayiler</a></li>
-                    <li><a class="text-white" href="{{ route('superadmin.dealer_create') }}">Bayi Ekle</a></li>
+                    <li><a class="text-white" href="{{ route('superadmin.dealer') }}">Partnerler</a></li>
+                    <li><a class="text-white" href="{{ route('superadmin.dealer_create') }}">Partner Ekle</a></li>
                 </ul>
             </li>
         </ul>

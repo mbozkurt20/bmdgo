@@ -32,6 +32,7 @@ class Admin extends Authenticatable
         'district_id',
         'longitude',
         'is_active',
+        'top_up_price',
         'vatan_sms_customer',
         'vatan_sms_username',
         'vatan_sms_password',

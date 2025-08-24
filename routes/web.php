@@ -1,6 +1,7 @@
 <?php
 
 use App\Helpers\NotificationHelper;
+use App\Http\Controllers\TamiPaymentController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MahalleController;
@@ -19,9 +20,12 @@ use App\Http\Controllers\MahalleController;
 Route::get('/restaurant/orders/new', [MahalleController::class, 'create']);
 Route::get('/restaurant/couriers', [App\Http\Controllers\CourierController::class, 'index'])->name('restaurant.couriers.index');
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-Route::get('/dealer', [App\Http\Controllers\HomeController::class, 'dealer'])->name('dealer');
-Route::post('/new-dealer', [App\Http\Controllers\HomeController::class, 'createDealerRequest'])->name('createDealerRequest');
+Route::get('/partner', [App\Http\Controllers\HomeController::class, 'dealer'])->name('dealer');
+Route::post('/new-partner', [App\Http\Controllers\HomeController::class, 'createDealerRequest'])->name('createDealerRequest');
 Route::get('/get-districts/{cityId}', [App\Http\Controllers\HomeController::class, 'getDistricts']);
+Route::post('/payment/success', [TamiPaymentController::class, 'success'])->name('payment.callback');
+Route::post('/payment/fail', [TamiPaymentController::class, 'fail'])->name('payment.fail');
+
 
 Auth::routes();
 
@@ -31,7 +35,7 @@ Route::view('login', 'auth.login')->name('admin.login');
 include __DIR__ . '/app/superAdminRoutes.php';
 include __DIR__ . '/app/adminRoutes.php';
 include __DIR__ . '/app/restaurantRoutes.php';
-include __DIR__ . '/app/dealerRoutes.php';
+include __DIR__ . '/app/partnerRoutes.php';
 
 Route::post('/order/add-online-order', [App\Http\Controllers\Api\OrderController::class, 'addOnlineOrder']);
 Route::post('/order/cancel-order', [App\Http\Controllers\Api\OrderController::class, 'cancelEntegraOrder']);

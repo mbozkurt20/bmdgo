@@ -26,18 +26,40 @@
                     </p>
                 </div>
 
-                <div class="border border-dark p-3 rounded-2" style="max-width: 25%">
-                    <form method="POST" action="{{ route('admin.topupTalep') }}">
+                {{--
+                  <div class="border border-dark p-3 rounded-2" style="max-width: 25%">
+                    <form method="GET" action="{{ route('payment.form') }}">
                         @csrf
 
-                        <div class="mb-4 text-dark">
-                            <label class="fw-bold text-black">Kontör Adet</label>
-                            <input required class="form-control" type="number" placeholder="1 kontör = 1 paket" id="top_up" name="top_up">
+                        <!-- Kullanıcıya tanımlı kontör fiyatı -->
+                        <input type="hidden" id="top_up_price" value="{{ auth()->user()->top_up_price }}">
+
+                        <div class="mb-3">
+                            <label class="fw-bold text-black">Kontör Fiyatı</label>
+                            <div class="form-control bg-secondary text-white fw-bold">
+                                1 Kontör = <span class="text-white fw-bold">{{ auth()->user()->top_up_price }} ₺</span>
+                            </div>
                         </div>
 
-                        <button class="special-button" type="submit">Talep Et</button>
+                        <div class="mb-3">
+                            <label class="fw-bold text-black">Kontör Adet</label>
+                            <input required class="form-control" type="number" min="1" placeholder="Adet giriniz" id="top_up" name="top_up">
+                        </div>
+
+                        <!-- Anlık hesaplanan tutar -->
+                        <div class="alert alert-info" id="hesaplamaBox" style="display: none;">
+                            <span class="fw-bold">Ödemeniz Gereken Tutar:</span>
+                            <span id="toplamTutar" class="text-success"></span> ₺
+                        </div>
+
+                        <!-- Butonlar -->
+                        <div class="d-flex gap-2">
+                            <button class="special-button" style="display: none" type="button" id="hesaplaBtn">Hesapla</button>
+                            <button class="special-button" type="submit">Ödeme Yap</button>
+                        </div>
                     </form>
                 </div>
+                --}}
             </div>
         </div>
 
@@ -64,6 +86,32 @@
 
             console.log("Mesaj gönderildi!");
         }
+    </script>
+
+    <script>
+        const topUpInput = document.getElementById("top_up");
+        const fiyat = parseFloat(document.getElementById("top_up_price").value);
+        const hesaplamaBox = document.getElementById("hesaplamaBox");
+        const toplamTutar = document.getElementById("toplamTutar");
+        const hesaplaBtn = document.getElementById("hesaplaBtn");
+
+        function hesapla() {
+            let adet = parseInt(topUpInput.value);
+            let toplam = adet * fiyat;
+
+            if (!isNaN(toplam) && adet > 0) {
+                toplamTutar.innerText = toplam.toFixed(2);
+                hesaplamaBox.style.display = "block";
+            } else {
+                hesaplamaBox.style.display = "none";
+            }
+        }
+
+        // Hesapla butonu ile
+        hesaplaBtn.addEventListener("click", hesapla);
+
+        // Kullanıcı yazdıkça otomatik hesapla
+        topUpInput.addEventListener("input", hesapla);
     </script>
 @endsection
 

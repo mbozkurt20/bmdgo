@@ -3,21 +3,21 @@
 @section('content')
     <style>
         .tops {
-            padding: 20px 10px;
+            padding: 15px 10px;
             font-weight: bold;
             color: #fff;
+            background: #0d2646;
         }
         .tops span {
             font-size: 15px;
         }
         .table thead tr {
-            background: #ddd;
+            background: #e7004d; /* bg-primary rengi */
         }
         .table thead tr th {
-            color: #000;
-            font-size: 15px;
+            color: #fff;
+            font-size: 14px;
         }
-
         #alertBox {
             position: fixed;
             top: 20px;
@@ -25,16 +25,23 @@
             z-index: 9999;
             min-width: 250px;
             max-width: 400px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.2);
             opacity: 0.95;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        .no-data {
+            text-align: center;
+            color: #1a1414;
+            font-weight: bold;
+            padding: 30px 0;
+            background: #ede3e6;
         }
     </style>
 
     <div id="alertBox" class="alert d-none" role="alert"></div>
 
-
     <div class="container-fluid">
-        <div class="mb-sm-4 d-flex flex-wrap align-items-center text-head">
+        <div class="mb-4 d-flex flex-wrap align-items-center text-head">
             <h2 class="mb-3 me-auto">Kurye Raporları</h2>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="#">Kurye Raporlar</a></li>
@@ -59,10 +66,13 @@
                 <div class="col-lg-3 mb-2">
                     <input type="date" value="{{ date('Y-m-d') }}" class="form-control" id="end_date">
                 </div>
-                <div class="col-lg-3 flex mb-2">
-                    <button class="special-button w-50" onclick="ReportFilter()">
-                        <i class="fa fa-filter"></i> Filtrele</button>
-                    <button class="special-ok-button" id="downloadPDF">PDF İndir</button>
+                <div class="col-lg-3 mb-2 gap-2 d-flex">
+                    <button class="special-button" onclick="ReportFilter()">
+                        <i class="fa fa-filter"></i> Filtrele
+                    </button>
+
+                    <button class="btn btn-danger" id="downloadPDF">PDF İndir</button>
+                    <button class="btn btn-success" id="downloadExcel">Excel İndir</button>
                 </div>
             </div>
         </div>
@@ -83,13 +93,17 @@
                             <th>Saat</th>
                         </tr>
                         </thead>
-                        <tbody id="report"></tbody>
+                        <tbody id="report">
+                        <tr class="no-data">
+                            <td colspan="8">Veri bulunamadı</td>
+                        </tr>
+                        </tbody>
                     </table>
                 </div>
 
-                <div class="row bg-danger text-white">
-                    <div class="col-md-2 tops">Sipariş Sayısı: <span id="topsiparis">0</span></div>
-                    <div class="col-md-2 tops">Top. Nakit: <span id="topnakit">0</span></div>
+                <div class="row mt-2">
+                    <div class="col-md-3 tops">Sipariş Sayısı: <span id="topsiparis">0</span></div>
+                    <div class="col-md-3 tops">Top. Nakit: <span id="topnakit">0</span></div>
                     <div class="col-md-2 tops">Top. Kredi Kartı: <span id="topkkarti">0</span></div>
                     <div class="col-md-2 tops">Top. Ticket: <span id="topticket">0</span></div>
                     <div class="col-md-2 tops">Top. Online: <span id="toponline">0</span></div>
@@ -98,40 +112,19 @@
         </div>
     </div>
 
-    {{-- PDF & Table Scripts --}}
+    {{-- PDF & Excel --}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.16/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <script>
-        document.getElementById("downloadPDF").addEventListener("click", function () {
-            const tableRows = document.querySelectorAll("#report tr");
-            if (tableRows.length === 0) {
-                showAlert("PDF oluşturmak için önce rapor filtreleyin.", "danger");
-                return;
-            }
-
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-
-            doc.autoTable({
-                html: '#reportTable',
-                theme: 'grid',
-                styles: {
-                    fontSize: 6,
-                    textColor: [0, 0, 0],
-                    cellPadding: 4,
-                },
-                headStyles: {
-                    fillColor: [253, 104, 62],
-                    textColor: [255, 255, 255],
-                    fontSize: 7,
-                    fontStyle: 'bold',
-                },
-                alternateRowStyles: { fillColor: [245, 245, 245] },
-            });
-
-            doc.save('siparis_raporlari.pdf');
-        });
+        function showAlert(message, type='info') {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.className = `alert alert-${type}`;
+            alertBox.innerText = message;
+            alertBox.classList.remove('d-none');
+            setTimeout(() => alertBox.classList.add('d-none'), 3000);
+        }
 
         function ReportFilter() {
             const courier = $('#courier').val();
@@ -146,58 +139,77 @@
             $.ajax({
                 type: 'POST',
                 url: '/restaurant/reports/globalFilter?_token={{ csrf_token() }}',
-                data: {
-                    courier: courier,
-                    start: start,
-                    end: end
-                },
+                data: { courier, start, end },
                 success: function(response) {
                     $('#report').empty();
 
                     if (!response.data || response.data.length === 0) {
+                        $('#report').html('<tr class="no-data"><td colspan="8">Veri bulunamadı</td></tr>');
                         showAlert("Seçilen kriterlere göre veri bulunamadı.", "danger");
                         return;
                     }
 
                     response.data.forEach((el) => {
                         $('#report').append(`
-                        <tr>
-                            <td>${el.platform}</td>
-                            <td>${el.tracking_id}</td>
-                            <td>${el.courier}</td>
-                            <td>${el.full_name}</td>
-                            <td>${el.phone}</td>
-                            <td>${el.payment}</td>
-                            <td>${el.amount}</td>
-                            <td>${el.time}</td>
-                        </tr>
-                    `);
-
-                        $('#topnakit').text(el.kapida_nakit || 0);
-                        $('#topkkarti').text(el.kapida_k_karti || 0);
-                        $('#topticket').text(el.kapida_ticket || 0);
-                        $('#toponline').text(el.online || 0);
-                        $('#topsiparis').text(el.topsiparis || 0);
+                            <tr>
+                                <td class="text-black font-weight-bold">${el.platform}</td>
+                                <td class="text-black font-weight-bold">${el.tracking_id}</td>
+                                <td class="text-black font-weight-bold">${el.courier}</td>
+                                <td class="text-black font-weight-bold">${el.full_name}</td>
+                                <td class="text-black font-weight-bold">${el.phone}</td>
+                                <td class="text-black font-weight-bold">${el.payment}</td>
+                                <td class="text-black font-weight-bold">${el.amount}</td>
+                                <td class="text-black font-weight-bold">${el.time}</td>
+                            </tr>
+                        `);
                     });
+
+                    console.log({response21:response})
+                    $('#topnakit').text(response.totals.kapida_nakit || 0);
+                    $('#topkkarti').text(response.totals.kapida_k_karti || 0);
+                    $('#topticket').text(response.totals.kapida_ticket || 0);
+                    $('#toponline').text(response.totals.online || 0);
+                    $('#topsiparis').text(response.totals.topsiparis || 0);
                 },
                 error: function(err) {
-                    alert("Raporlar yüklenirken bir hata oluştu.");
+                    showAlert("Raporlar yüklenirken bir hata oluştu.", "danger");
                     console.error(err);
                 }
             });
         }
-    </script>
 
-    <script>
-        function showAlert(message, type = 'info') {
-            const alertBox = document.getElementById('alertBox');
-            alertBox.className = `alert alert-${type}`;
-            alertBox.innerText = message;
-            alertBox.classList.remove('d-none');
+        // PDF
+        document.getElementById("downloadPDF").addEventListener("click", function () {
+            const tableRows = document.querySelectorAll("#report tr");
+            if (!tableRows.length || tableRows[0].classList.contains('no-data')) {
+                showAlert("PDF oluşturmak için önce rapor filtreleyin.", "danger");
+                return;
+            }
 
-            setTimeout(() => {
-                alertBox.classList.add('d-none');
-            }, 3000);
-        }
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.autoTable({
+                html: '#reportTable',
+                theme: 'grid',
+                styles: { fontSize: 6, cellPadding: 4 },
+                headStyles: { fillColor: [231, 0, 77], textColor: [255,255,255], fontSize:7, fontStyle:'bold' },
+                alternateRowStyles: { fillColor: [245,245,245] },
+            });
+
+            doc.save('siparis_raporlari.pdf');
+        });
+
+        // Excel
+        document.getElementById("downloadExcel").addEventListener("click", function () {
+            const tableRows = document.querySelectorAll("#report tr");
+            if (!tableRows.length || tableRows[0].classList.contains('no-data')) {
+                showAlert("Excel oluşturmak için önce rapor filtreleyin.", "danger");
+                return;
+            }
+
+            const wb = XLSX.utils.table_to_book(document.getElementById('reportTable'), {sheet:"Rapor"});
+            XLSX.writeFile(wb, "siparis_raporlari.xlsx");
+        });
     </script>
 @endsection

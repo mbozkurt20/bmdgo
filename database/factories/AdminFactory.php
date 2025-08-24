@@ -27,6 +27,8 @@ class AdminFactory extends Factory
             return [
                 'name' => 'Admin',
                 'email' => 'test@admin.com',
+                'top_up_balance'  => 100,
+                'top_up_price'  => 3,
                 'password' => Hash::make('test'),
                 'remember_token' => Str::random(10),
             ];

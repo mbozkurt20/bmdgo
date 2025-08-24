@@ -56,6 +56,13 @@
                                 @csrf
                                 <div class="row">
                                     <div class="mb-3 col-md-4">
+                                        <label class="form-label text-success fw-bold">Tanımlı Kontör Ücreti (1 Kontör)</label>
+                                        <input type="text" class="border border-success form-control text-success fw-bold" name="top_up_price" placeholder="Kontör Ücreti">
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="mb-3 col-md-4">
                                         <label class="form-label">Yönetici Adı</label>
                                         <input required type="text" class="form-control" name="name" placeholder="Yönetici Adı">
                                     </div>

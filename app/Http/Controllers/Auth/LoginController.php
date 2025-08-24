@@ -54,7 +54,7 @@ class LoginController extends Controller
     }
     protected function loggedOut(Request $request)
     {
-        return redirect()->route('login');
+        return redirect()->route('login')->with(['test','Giriş Bilgileriniz Hatalı']);
     }
 
     /**

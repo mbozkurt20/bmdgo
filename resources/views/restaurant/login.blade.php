@@ -10,9 +10,52 @@
     <link href="{{asset('theme/login/css/bootstrap.min.css')}}" rel="stylesheet">
     <link href="{{asset('theme/login/css/style.css')}}" rel="stylesheet">
     <link rel="stylesheet" href="{{asset('css/pages/restaurants/login/index.css')}}">
+
+    <style>
+        .custom-alert {
+            padding: 10px 14px;
+            border-radius: 12px;
+            margin: 10px 0;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: relative;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .custom-alert.success {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: #fff;
+        }
+
+        .custom-alert.error {
+            background: linear-gradient(135deg, #f43f5e, #e11d48);
+            color: #fff;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 6px;
+            right: 8px;
+            font-size: 16px;
+            color: rgba(255,255,255,0.8);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .close-btn:hover {
+            color: #fff;
+        }
+
+        /* küçük animasyon */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
 
 <body>
+
 <div class="login-container">
     <div class="login-box">
         <div class="logo">
@@ -20,6 +63,20 @@
                 <img src="{{config('site.logo')}}" alt="Logo">
             </a>
         </div>
+
+        @if(session()->has('message'))
+            <div class="custom-alert success">
+                <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+                <span class="alert-message">{{ session()->get('message') }}</span>
+            </div>
+        @endif
+
+        @if(session()->has('test') )
+            <div class="custom-alert error">
+                <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+                <span class="alert-message">{{ session()->get('test') }}</span>
+            </div>
+        @endif
 
         <h2 class="form-title" id="formTitle">Restaurant Girişi</h2>
 

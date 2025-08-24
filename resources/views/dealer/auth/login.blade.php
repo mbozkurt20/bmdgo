@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{env('APP_NAME')}} - Bayi Girişi</title>
+    <title>{{env('APP_NAME')}} - Partner Girişi</title>
 
     <link rel="shortcut icon" type="image/png" href="{{config('site.logo')}}">
     <link href="{{asset('theme/login/css/bootstrap.min.css')}}" rel="stylesheet">
@@ -21,7 +21,7 @@
             </a>
         </div>
 
-        <h2 class="form-title" id="formTitle">Bayi Girişi</h2>
+        <h2 class="form-title" id="formTitle">Partner Girişi</h2>
 
         <form id="loginForm" method="POST" action="">
             @csrf

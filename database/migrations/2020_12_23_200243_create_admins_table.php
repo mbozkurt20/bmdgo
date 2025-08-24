@@ -28,6 +28,7 @@ class CreateAdminsTable extends Migration
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();
             $table->string('top_up_balance')->default(0);
+            $table->decimal('top_up_price',8,2)->default(0.00);
             $table->string('vatan_sms_customer')->nullable();
             $table->string('vatan_sms_username')->nullable();
             $table->string('vatan_sms_password')->nullable();

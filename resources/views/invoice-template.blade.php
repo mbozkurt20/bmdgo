@@ -143,9 +143,9 @@
         @foreach (json_decode($order->items) as $item)
             <tr>
                 <td>{{ $item->name }}</td>
-                <td>{{ count($item->items) }}</td>
+                <td>{{ $item->quantity }}</td>
                 <td>{{ number_format($item->price, 2, ',', '.') }} TL</td>
-                <td>{{ number_format($item->price * count($item->items), 2, ',', '.') }} TL</td>
+                <td>{{ number_format($item->price * $item->quantity, 2, ',', '.') }} TL</td>
             </tr>
         @endforeach
         </tbody>

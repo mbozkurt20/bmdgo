@@ -707,12 +707,9 @@
 
                     <!-- Modal Footer -->
                     <div class="modal-footer d-flex justify-content-between">
-                        <!--button type="button" class="special-ok-button" data-toggle="modal" data-target="#yeniMusteri">
+                        <button type="button" class="special-ok-button" data-toggle="modal" data-target="#yeniMusteri">
                             <i class="fas fa-plus"></i> Müşteri Ekle
-                        </button-->
-                        <a target="_blank" class="special-ok-button" href="/restaurant/customers/new">
-                            <i class="fas fa-plus"></i> Müşteri Ekle
-                        </a>
+                        </button>
                         <button type="button" class="special-button" data-dismiss="modal">Tamam</button>
                     </div>
 
@@ -761,12 +758,15 @@
                                             <input type="text" class="form-control" name="phone"
                                                    placeholder="Telefon Numarası" id="phoneNumber" required>
                                         </div>
-                                        <div class="mb-3 col-md-6">
-                                            <label class="form-label">2.Telefon Numarası</label>
-                                            <input type="text" class="form-control" name="mobile"
-                                                   placeholder="2.Telefon Numarası">
-                                        </div>
 
+                                        <div class="mb-3 col-md-6">
+                                            <label class="form-label">Şehir Seçiniz</label>
+                                            <select class="form-control" required name="sehir" id="">
+                                                @foreach(App\Models\City::all() as $city)
+                                                    <option value="{{$city->id}}">{{$city->name}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
                                     </div>
 
                                     <div class="card-body" style="border-top:1px solid #ddd;padding: 0px 0px">
@@ -820,24 +820,7 @@
 
                                             <div class="mb-3 col-md-12">
                                                 <textarea placeholder="Adres Tarifi" required name="adres_tarifi"
-                                                          class="form-control" id="adres_tarifi">
-                                                </textarea>
-                                            </div>
-
-                                            <div class="mt-5 mb-3">
-                                                <p class="text-danger fw-bold">Lütfen haritadan konum işaratlemesi yapınız.</p>
-                                                <div id="map"></div>
-                                            </div>
-
-                                            <div class="col-lg-6 mb-3">
-                                                <label for="form-password" class="form-label fs-14 text-dark">Enlem</label>
-                                                <input required   type="text" class="form-control" name="latitude" id="lat"
-                                                       placeholder="Enlem Giriniz">
-                                            </div>
-                                            <div class="col-lg-6 mb-3">
-                                                <label for="form-password" class="form-label fs-14 text-dark">Boylam</label>
-                                                <input required  type="text" class="form-control" name="longitude" id="lng"
-                                                       placeholder="Boylam Giriniz">
+                                                          class="form-control" id="adres_tarifi"></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -857,38 +840,6 @@
     </div>
 </div>
 
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script>
-    var existingLat = '37.15026069044849'
-    var existingLng = '37.15026069044849'
-    var map;
-
-    if (existingLat && existingLng) {
-        map = L.map('map').setView([existingLat, existingLng], 13);
-        marker = L.marker([existingLat, existingLng]).addTo(map);
-    } else {
-        map = L.map('map').setView([39.9208, 32.8541], 6); // Türkiye geneli
-    }
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap'
-    }).addTo(map);
-
-    map.on('click', function(e) {
-        var lat = e.latlng.lat;
-        var lng = e.latlng.lng;
-
-        if (marker) {
-            map.removeLayer(marker);
-        }
-
-        marker = L.marker([lat, lng]).addTo(map);
-
-        document.getElementById('lat').value = lat;
-        document.getElementById('lng').value = lng;
-    });
-
-</script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{asset('pos/assets/js/jquery-2.0.0.min.js')}}" type="text/javascript"></script>
 <script src="{{asset('pos/assets/js/bootstrap.bundle.min.js')}}" type="text/javascript"></script>
@@ -974,7 +925,7 @@
             type: 'GET',
             url: '/restaurant/get-pos-items',
             success: function (data) {
-                console.log({girdi: data})
+                console.log({new: data})
                 $('#productItemLista').append(data.items);
 
                 $('#posTotalItem').html(data.posTotalItem);
@@ -1157,6 +1108,15 @@
     }
 
     function CreateCustomer() {
+        const form = document.getElementById('customerForm');
+
+        // Form validation kontrolü
+        if (!form.checkValidity()) {
+            form.reportValidity(); // Eksik alanları gösterir
+            return; // AJAX çalışmaz
+        }
+
+        // AJAX işlemi
         $.ajax({
             type: 'POST',
             url: '/restaurant/orders/customeradd' + '?_token=' + '{{ csrf_token() }}',
@@ -1167,8 +1127,8 @@
                 $('#yeniMusteri').modal('hide');
                 $('#musteriAta').modal('hide');
             },
-            error: function () {
-                console.log(response);
+            error: function (xhr, status, error) {
+                console.error(xhr.responseText);
             }
         });
     }

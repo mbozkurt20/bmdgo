@@ -24,6 +24,7 @@ class CreateTopupMovementsTable extends Migration
             $table->enum('type',['talep','yükleme'])->default('talep');
             $table->boolean('is_approved')->default(false);
             $table->boolean('is_paid')->default(false);
+            $table->json('payment_details')->nullable();
             $table->timestamps();
         });
     }

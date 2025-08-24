@@ -127,7 +127,14 @@
                         <div class="card shadow-sm border-0">
                             <div class="card-body">
                                 <h4 class="card-title mb-4 text-center" id="selected-courier" style="font-weight: 700;"></h4>
+                                <p id="fixed_price_text" style="display: none" class="size-7 text-danger">Aşağıda ki Kalan Ödeme ve Toplam Hakediş, Sabit Ücret hariç km üzerinden hesaplanmaktadır.</p>
                                 <div class="row text-center">
+                                    <div id="fixed_price" style="display: none" class=" col-md-6 mb-3">
+                                        <div class="p-3 border rounded bg-ok">
+                                            <h6 class="mb-1 text-white">Sabit Ücret</h6>
+                                            <h4 class="text-white mb-0" id="fixed-amount">0₺</h4>
+                                        </div>
+                                    </div>
 
                                     <div class="col-md-6 mb-3">
                                         <div class="p-3 border rounded bg-ok">
@@ -228,8 +235,18 @@
                 url: '/admin/progress-payment/courier' + '?_token=' + '{{ csrf_token() }}',
                 data: {courier: courier, start: start, end: end},
                 success: function (response) {
-                    $("#selected-courier").text(response.courier_name);
+                    if (response.courier.price_type == 'fixed'){
+                        document.getElementById('fixed_price').style.display = 'block'
+                        document.getElementById('fixed_price_text').style.display = 'block'
+                    }else {
+                        document.getElementById('fixed_price').style.display = 'none'
+                        document.getElementById('fixed_price_text').style.display = 'none'
+                    }
+                    $("#selected-courier").text(response.courier.name);
                     $("#order-count").html(response.order_count + ' Adet');
+                    $("#fixed-amount").html(
+                        Number(response.fixed_amount).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ₺'
+                    );
                     $("#total-progress-payment").html(
                         Number(response.total_progress_payment).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ₺'
                     );

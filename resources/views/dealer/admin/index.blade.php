@@ -12,7 +12,7 @@
         <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
             <div class="customer-search">
                 <div class="input-group search-area">
-                    <input type="text" class="form-control" id="custom-filter" placeholder="Bayi ara...">
+                    <input type="text" class="form-control" id="custom-filter" placeholder="Partner ara...">
                     <span class="input-group-text"><i class="flaticon-381-search-2"></i></span>
                 </div>
             </div>
@@ -125,7 +125,7 @@
                                 Swal.fire("Güncellendi!", "Güncelleme işlemi başarılı.", "success");
                                 // Başarılıysa checkbox olduğu gibi bırak
                             } else {
-                                Swal.fire("Uyarı!", "Bu Bayi Güncellenmiyor.", "warning");
+                                Swal.fire("Uyarı!", "Bu Partner Güncellenmiyor.", "warning");
                                 checkbox.checked = !currentState; // Eski haline döndür
                             }
                         },

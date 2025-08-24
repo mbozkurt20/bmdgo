@@ -35,7 +35,6 @@
     channel.bind('new-order', function (data) {
         console.log('Gelen data:', data);
         if (data.order) {
-            f
             refreshOrderTable(data.order);
 
             if ('{{\App\Helpers\OrdersHelper::getOrderSystem(1)}}') {
@@ -142,26 +141,27 @@
 
         const tabId = statusMap[order.status];
         const rowId = 'data_' + order.id;
-        const existingRow = $('#' + rowId);
+
         const newRowHtml = await generateOrderRowHtml(order);
+        const existingRow = $('#' + rowId);
 
         if (existingRow.length) {
-            // Eğer satır zaten var ise, tab durumunu kontrol et
+            // Aynı satır zaten var
             const parentTableId = existingRow.closest("table").attr("id");
             if (parentTableId !== tabId) {
-                existingRow.remove(); // eski tablodan kaldır
-                // Yeni tabta uygun tabloya ekle
+                // Eski tablodan kaldır ve yeni tab’a ekle
+                existingRow.remove();
                 $('#' + tabId).find('tbody').append(newRowHtml);
             } else {
                 // Aynı tabloda ise güncelle
                 existingRow.replaceWith(newRowHtml);
             }
         } else {
-            // Yeni satır ekle
+            // Satır yoksa ekle
             $('#' + tabId).find('tbody').append(newRowHtml);
         }
 
-        // Tab içeriğini kontrol et ve boşsa mesaj göster
+        // Tab boşsa mesaj göster
         updateTableForStatus(order.status);
     }
 
@@ -374,19 +374,18 @@
     }
 
     function Courier(e, order) {
-        let courier = e.target.value;
-        let orderid = order;
+        let courierId = e.target.value;
 
         $.ajax({
             type: 'GET', //THIS NEEDS TO BE GET
-            url: '/restaurant/orders/sendCourier/' + orderid + '/' + courier,
+            url: '/restaurant/orders/sendCourier/' + order + '/' + courierId,
             success: function (data) {
                 if (data == "OK") {
                     $('#Courier' + orderid).hide();
-                    Swal.fire('Kurye başarılı bir şekilde atand!!');
+                    Swal.fire('Kurye Başarıyla Atandı');
                 }
                 if (data == "ERR") {
-                    Swal.fire('Kurye molada veya müsait deil!!');
+                    Swal.fire('Kurye Atama Başarısız');
                 }
 
             },
@@ -560,7 +559,7 @@
         <input type="hidden" id="tracking_${order.id}" value="${trackingId}">
         <input type="hidden" id="platform_${order.id}" value="${platform}">
         <select class="inline-order-select form-control" onchange="StatusOrderChange(event, ${order.id})" ${status == 4 ? 'disabled' : ''}>
-            ${statusOptions} s
+            ${statusOptions}
         </select>
         <!-- İptal modal -->
         <div class="modal fade" id="cancelModal${order.id}">

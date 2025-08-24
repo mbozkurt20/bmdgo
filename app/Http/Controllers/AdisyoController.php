@@ -104,8 +104,8 @@ class AdisyoController extends Controller
                 $items[] = [
                     'name' => $product->productName,
                     'price' => $product->unitPrice,
-                    'count' => intval($product->quantity),
-                    'items' => [$product]
+                    'unitSellingPrice' => $product->price,
+                'quantity' => intval($product->quantity),
                 ];
             }
             $itemsJson = json_encode($items);

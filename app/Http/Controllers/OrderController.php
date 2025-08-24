@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Helpers\CourierStatus;
 use App\Helpers\GeoLocation;
+use App\Helpers\NotificationHelper;
 use App\Helpers\OrdersHelper;
 use App\Helpers\OrderStatus;
+use App\Models\City;
 use App\Models\Restaurant;
 use App\Models\RestaurantCoupon;
 use App\Traits\RequestTrait;
@@ -50,14 +52,8 @@ class OrderController extends Controller
         }
     }
 
-    public function sendCourier(Request $request)
+    public function sendCourier(Request $request, $orderId, $courierId)
     {
-        $orders = $request->input('orders');
-        $courierId = $request->input('courier_id');
-
-        Log::info('Courier ID:', [$courierId]);
-        Log::info('Orders:', $orders);
-
         // Check if the courier exists
         $newCourier = Courier::find($courierId);
 
@@ -69,44 +65,53 @@ class OrderController extends Controller
         DB::beginTransaction();
 
         try {
-            foreach ($orders as $orderId) {
-                Log::info('Processing order ID: ' . $orderId);
+            Log::info('Processing order ID: ' . $orderId);
 
-                $order = Order::find($orderId);
+            $order = Order::find($orderId);
 
-                if ($order) {
-                    Log::info('Order found: ' . $orderId);
+            if ($order) {
+                // Müsait kurye bul
+                $courier = Courier::where('status', CourierStatus::active)
+                    ->orderBy('last_assigned_at', 'asc')
+                    ->where('admin_id', $order->restaurant->admin_id)   // round robin için
+                    ->first();
 
-                    $order->courier_id = $courierId;
-                    $order->save();
-                    Log::info('Order ID ' . $orderId . ' updated in orders table with courier ID ' . $courierId);
+                if ($courier) {
+                    // Siparişi kuryeye ata
+                    $order->courier_id = $courier->id;
+                    $order->status = OrderStatus::HANDOVER;
+                    $order->update();
 
-                    $existingCourierOrder = CourierOrder::where('order_id', $orderId)->first();
+                    // Kuryeyi busy yap ve son atama zamanını güncelle
+                    $courier->status = CourierStatus::service;
+                    $courier->last_assigned_at = now();
+                    $courier->update();
 
-                    if ($existingCourierOrder) {
-                        // Var ise güncelliyoruz
-                        $existingCourierOrder->courier_id = $courierId;
-                        $existingCourierOrder->save();
-                        Log::info('Order ID ' . $orderId . ' updated in CourierOrder table with courier ID ' . $courierId);
-                    } else {
-                        $newCourierOrder = new CourierOrder();
-                        $newCourierOrder->courier_id = $courierId;
-                        $newCourierOrder->order_id = $orderId;
+                    // Yeni siparişi kuryeye atama
+                    $newOrderCourier = new CourierOrder();
+                    $newOrderCourier->courier_id = $courier->id;
+                    $newOrderCourier->order_id = $order->id;
+                    $newOrderCourier->save();
 
-                        if ($newCourierOrder->save()) {
-                            Log::info('Order ID ' . $orderId . ' created in CourierOrder table with courier ID ' . $courierId);
-                        } else {
-                            Log::error('Failed to create CourierOrder for order ID: ' . $orderId);
-                        }
+                    Log::info("Kurye atandı ve durumu Serviste yapıldı. Sipariş ID: " . $order->id . " Kurye ID: " . $courier->id);
+
+                    if (OrdersHelper::getOrderSystem(3)) {
+                        NotificationHelper::add([
+                            'title' => 'Paket Kuryeye Atandı',
+                            'description' => $order->tracking_id . ' takip numaralı paket ' . $courier->name . ' isimli kuryeye atandı.',
+                            'url' => route('admin.balance')
+                        ]);
                     }
 
-                    $newCourier->status = CourierStatus::service;
-                    $newCourier->save();
+                    Log::info("Sipariş #{$order->id} kurye #{$courier->id} ile eşlendi.");
                 } else {
-                    Log::error('Order ID ' . $orderId . ' not found in orders table');
-                    throw new \Exception('Order ID ' . $orderId . ' not found in orders table');
+                    Log::info("Sipariş #{$order->id} için müsait kurye yok.");
                 }
+            } else {
+                Log::error('Order ID ' . $orderId . ' not found in orders table');
+                throw new \Exception('Order ID ' . $orderId . ' not found in orders table');
             }
+
 
             DB::commit();
             Log::info('Transaction committed successfully');
@@ -325,7 +330,7 @@ class OrderController extends Controller
             $location = GeoLocation::getLatLong($request->address);
 
             if (isset($location['error'])) {
-                return response()->json(['message' => 'Lütfen Adres Bilginizi Detaylı ve Anlaşılır Yazınız.'],400);
+                return response()->json(['message' => 'Lütfen Adres Bilginizi Detaylı ve Anlaşılır Yazınız.'], 400);
             }
 
             $customer = Customer::where('phone', $request->phone)->first();
@@ -499,6 +504,11 @@ class OrderController extends Controller
             $create->save();
 
             if ($request->adres_name) {
+                $city = City::find($request->sehir);
+
+                $addre = $request->mahalle . ' mah. ' . $request->sokak_cadde . ' sokak. Bina No:' . $request->bina_no . ' Kat:' . $request->kat . ' Daire No:' . $request->daire_no . ' ' . $city->name;
+                $location = GeoLocation::getLatLong($addre);
+
                 $adreses = new CustomerAddress();
                 $adreses->restaurant_id = Auth::user()->id;
                 $adreses->customer_id = $create->id;
@@ -506,6 +516,8 @@ class OrderController extends Controller
                 $adreses->sokak_cadde = $request->sokak_cadde;
                 $adreses->bina_no = $request->bina_no;
                 $adreses->kat = $request->kat;
+                $adreses->latitude = $location['lat'];
+                $adreses->longitude = $location['lon'];
                 $adreses->daire_no = $request->daire_no;
                 $adreses->mahalle = $request->mahalle;
                 $adreses->adres_tarifi = $request->adres_tarifi;
@@ -587,14 +599,13 @@ class OrderController extends Controller
             $items[] = [
                 "price" => $product->price,
                 "unitSellingPrice" => $product->price,
-                "quantity" =>  $productData["quantity"],
-                "productId" => $product->id,
+                "quantity" => $productData["quantity"],
                 "name" => $product->name,
             ];
         }
 
         $order->items = json_encode($items);
-        $order->status = "PENDING";
+        $order->status = OrderStatus::PENDING;
 
         try {
             $order->save();

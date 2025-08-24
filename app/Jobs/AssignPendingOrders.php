@@ -25,7 +25,7 @@ class AssignPendingOrders implements ShouldQueue
     {
         // Atanmamış siparişleri sırayla al
         $orders = Order::where('courier_id', -1)
-            ->where('status', OrderStatus::PENDING)
+            ->where('status', OrderStatus::PREPARED)
             ->orderBy('created_at')
             ->get();
 

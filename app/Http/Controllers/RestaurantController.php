@@ -29,7 +29,7 @@ class RestaurantController extends Controller
     {
         $tumu = Order::whereDate('created_at', Carbon::today())
           ->where('restaurant_id',Auth::guard('restaurant')->id())
-            ->orderBy('created_at', 'desc')->with(['restaurant','courier'])->get();
+            ->orderBy('created_at', 'asc')->with(['restaurant','courier'])->get();
 
         // Siparişleri duruma göre ayır
         $pending = $tumu->where('status', OrderStatus::PENDING);

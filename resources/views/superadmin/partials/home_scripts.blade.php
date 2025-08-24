@@ -35,7 +35,6 @@
     channel.bind('new-order', function (data) {
         console.log('Gelen data:', data);
         if (data.order) {
-            f
             refreshOrderTable(data.order);
 
             if ('{{\App\Helpers\OrdersHelper::getOrderSystem(1)}}') {
@@ -131,7 +130,6 @@
         });
     }
 
-
     async function refreshOrderTable(order) {
         const statusMap = {
             'PENDING': 'pending',
@@ -143,29 +141,29 @@
 
         const tabId = statusMap[order.status];
         const rowId = 'data_' + order.id;
-        const existingRow = $('#' + rowId);
+
         const newRowHtml = await generateOrderRowHtml(order);
+        const existingRow = $('#' + rowId);
 
         if (existingRow.length) {
-            // Eğer satır zaten var ise, tab durumunu kontrol et
+            // Aynı satır zaten var
             const parentTableId = existingRow.closest("table").attr("id");
             if (parentTableId !== tabId) {
-                existingRow.remove(); // eski tablodan kaldır
-                // Yeni tabta uygun tabloya ekle
+                // Eski tablodan kaldır ve yeni tab’a ekle
+                existingRow.remove();
                 $('#' + tabId).find('tbody').append(newRowHtml);
             } else {
                 // Aynı tabloda ise güncelle
                 existingRow.replaceWith(newRowHtml);
             }
         } else {
-            // Yeni satır ekle
+            // Satır yoksa ekle
             $('#' + tabId).find('tbody').append(newRowHtml);
         }
 
-        // Tab içeriğini kontrol et ve boşsa mesaj göster
+        // Tab boşsa mesaj göster
         updateTableForStatus(order.status);
     }
-
 
     function updateTables(data) {
         // Temizle
