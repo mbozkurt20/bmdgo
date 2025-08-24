@@ -30,7 +30,7 @@ Route::post('/payment/fail', [TamiPaymentController::class, 'fail'])->name('paym
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home.dashboard');
-Route::view('login', 'auth.login')->name('admin.login');
+Route::view('login', 'restaurant.login')->name('admin.login');
 
 include __DIR__ . '/app/superAdminRoutes.php';
 include __DIR__ . '/app/adminRoutes.php';
