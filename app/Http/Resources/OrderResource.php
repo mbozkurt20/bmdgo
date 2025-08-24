@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources;
 
+use App\Helpers\OrdersHelper;
+use App\Models\Restaurant;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class OrderResource extends JsonResource
@@ -16,6 +18,8 @@ class OrderResource extends JsonResource
         return [
             'id' =>$this->id,
             'platform' => $this->platform,
+            'restaurantName' => Restaurant::find($this->restaurant_id)->restaurant_name,
+            'distance' => OrdersHelper::formatDistance($this->distance),
             'full_name' => $this->full_name,
             'tracking_id' => $this->tracking_id,
             'phone' => $this->phone,
