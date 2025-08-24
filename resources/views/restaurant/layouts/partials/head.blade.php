@@ -3,7 +3,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <!-- PAGE TITLE HERE -->
-    <title>{{ Auth::user()->restaurant_name }} Restaurant Paneli - {{env('APP_NAME')}}</title>
+    <title> {{env('APP_NAME')}} </title>
     <!-- FAVICONS ICON -->
     <link rel="shortcut icon" type="image/png" href="{{config('site.logo')}}">
     <link rel="stylesheet" href="{{ asset('theme/css/chartist.min.css') }}">
