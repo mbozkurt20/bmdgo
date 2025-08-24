@@ -13,10 +13,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        \App\Models\User::factory()->create();
-        \App\Models\Admin::factory()->create();
+       // \App\Models\User::factory()->create();
+      //  \App\Models\Admin::factory()->create();
         \App\Models\SuperAdmin::factory()->create();
-        \App\Models\Restaurant::factory()->create();
+      //  \App\Models\Restaurant::factory()->create();
 
         $this->call([
             CitySeeder::class,
