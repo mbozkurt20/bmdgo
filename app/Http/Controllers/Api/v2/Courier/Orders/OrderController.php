@@ -10,9 +10,11 @@ use App\Helpers\OrdersHelper;
 use App\Helpers\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\OrderResource;
+use App\Models\Courier;
 use App\Models\CourierOrder;
 use App\Models\Notification;
 use App\Models\Order;
+use App\Models\ProgressPaymentRecord;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -69,73 +71,59 @@ class OrderController extends Controller
         return Json::success('Sipariş Durumu Güncellendi', new OrderResource($order));
     }
 
-    public function report(Request $request, $id)
-    {
-        $courier = Courier::findOrFail($id);
+    public function reports(Request $request){
+        $courier = auth('courier')->user();
 
-        // Tarih aralığı alıyoruz (varsayılan: bugün)
-        $startDate = $request->input('start_date', Carbon::today()->toDateString());
-        $endDate   = $request->input('end_date', Carbon::today()->toDateString());
+        $startDate = $request->input('startDate');
+        $endDate = $request->input('endDate');
 
-        $startDateObj = Carbon::parse($startDate)->startOfDay();
-        $endDateObj   = Carbon::parse($endDate)->endOfDay();
-
-        // Kurye'nin eşleşmiş siparişleri
-        $courierOrderIds = CourierOrder::where('courier_id', $courier->id)
-            ->whereBetween('created_at', [$startDateObj, $endDateObj])
-            ->pluck('order_id');
-
-        // Sipariş listesi (admin ekranında tablo için)
-        $orders = Order::whereIn('id', $courierOrderIds)
-            ->whereBetween('created_at', [$startDateObj, $endDateObj])
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        // Teslim edilen siparişler
-        $deliveredOrders = $orders->where('status', OrderStatus::DELIVERED);
-
-        // Ödeme yöntemine göre filtreleme
-        $cashOrders   = $deliveredOrders->where('payment_method', 'Kapıda Nakit ile Ödeme');
-        $cardOrders   = $deliveredOrders->where('payment_method', 'Kapıda Kredi Kartı ile Ödeme');
-        $ticketOrders = $deliveredOrders->where('payment_method', 'Kapıda Ticket ile Ödeme');
-
-        // Kazanç hesaplama
-        if ($courier->price_type == 'package') {
-            // Paket başı ücretlendirme
-            $totalCash       = $cashOrders->count() * $courier->price;
-            $totalCreditCard = $cardOrders->count() * $courier->price;
-            $totalTicket     = $ticketOrders->count() * $courier->price;
-        } else {
-            // Km başı ücretlendirme
-            $kmPrice = $courier->km_price;
-
-            $totalCash       = $cashOrders->sum(fn($o) => $o->distance * $kmPrice);
-            $totalCreditCard = $cardOrders->sum(fn($o) => $o->distance * $kmPrice);
-            $totalTicket     = $ticketOrders->sum(fn($o) => $o->distance * $kmPrice);
+        if (!$courier || !$startDate || !$endDate) {
+            return Json::error('Başlangıç ve bitiş tarihlerini gönderiniz!');
         }
 
-        $summary = [
-            'order_count'    => $deliveredOrders->count(),
-            'cash_orders'    => $cashOrders->count(),
-            'card_orders'    => $cardOrders->count(),
-            'ticket_orders'  => $ticketOrders->count(),
-        ];
+        // Tarih formatlama
+        $startDate = Carbon::parse($startDate)->startOfDay();
+        $endDate   = Carbon::parse($endDate)->endOfDay();
 
-        $totals = [
-            'cash'        => $totalCash,
-            'credit_card' => $totalCreditCard,
-            'ticket'      => $totalTicket,
-            'overall'     => $totalCash + $totalCreditCard + $totalTicket,
-        ];
+        // Kurye'ye ait ilgili tarih aralığındaki sipariş eşlemeleri
+        $courierOrderIds = CourierOrder::where('courier_id', $courier->id)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->pluck('order_id');
 
-        return view('admin.couriers.report', compact(
-            'courier',
-            'orders',
-            'startDate',
-            'endDate',
-            'summary',
-            'totals'
-        ));
+        $orderCount = $courierOrderIds->count();
+        $totalProgressPayment = ProgressPaymentRecord::where('payable_id',$courier->id)
+            ->whereBetween('payment_date', [$startDate, $endDate])
+            ->where('payable_type','courier')
+            ->sum('amount');
+
+        // Sipariş detayları: Sadece belirtilen tarih aralığında olanlar
+        $orders = Order::whereIn('id', $courierOrderIds)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->get();
+
+        $totalOrders = $orders->count();
+        $totalAmount = $orders->sum('amount');
+        $totalCash = $orders->where('payment_method', 'Kapıda Nakit ile Ödeme')->sum('amount');
+        $totalCreditCard = $orders->where('payment_method', 'Kapıda Kredi Kartı ile Ödeme')->sum('amount');
+        $totalTicket = $orders->where('payment_method', 'Kapıda Ticket ile Ödeme')->sum('amount');
+
+        // Geri dönen veri
+        return Json::success('Kurye Raporları', [
+            'name' => $courier->name,
+            'text' =>
+                $courier->price_type == 'fixed'
+                    ? 'Sabit kazancınız: '.$courier->fixed_price.'₺. Aşağıda km (1 km '. $courier->km_price .'₺) bazlı kazançlarınız listelenmiştir.'
+                    : 'Paket ('.$courier->price.'₺) kazançlarınıza ait veriler aşağıda listelenmiştir.',
+            'order_count' => $orderCount,
+            'total_progress_payment' => number_format($totalProgressPayment, 2) . ' TL',
+            'report' => [
+                'total_orders'     => $totalOrders,
+                'total_amount'     => number_format($totalAmount, 2) . ' TL',
+                'cash_payment'     => number_format($totalCash, 2) . ' TL',
+                'credit_card'      => number_format($totalCreditCard, 2) . ' TL',
+                'ticket_payment'   => number_format($totalTicket, 2) . ' TL',
+            ]
+        ]);
     }
 
 
