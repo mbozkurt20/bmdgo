@@ -190,6 +190,7 @@ return [
     | the aliases are "lazy" loaded so they don't hinder performance.
     |
     */
+    'courier_fcm_token' => env('APP_ADMIN_FCM_TOKEN'),
 
     'aliases' => [
 

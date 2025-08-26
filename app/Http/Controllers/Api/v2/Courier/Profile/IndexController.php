@@ -76,18 +76,17 @@ class IndexController extends Controller
         $courier = Courier::find($id);
 
         $courier->update([
-            'name' => $request->input('name'),
-            'phone' => $request->input('phone'),
-            'birthday' => $request->input('birthday'),
-            'password' => Hash::make($request->input('password')),
-            'latitude' => $request->input('latitude'),
-            'longitude' => $request->input('longitude'),
-            'price_type' => $request->input('price_type'),
-            'price' => $request->input('price')??0.00,
-            'fixed_price' => $request->input('fixed_price'),
-            'km_price' => $request->input('km_price'),
-            'online' => $request->input('online'),
-            'status' => $request->input('status'),
+            'name' => $request->input('name')??$courier->name,
+            'phone' => $request->input('phone')??$courier->phone,
+            'birthday' => $request->input('birthday')??$courier->birthday,
+            'latitude' => $request->input('latitude')??$courier->latitude,
+            'longitude' => $request->input('longitude')??$courier->longitude,
+            'price_type' => $request->input('price_type')??$courier->price_type,
+            'price' => $request->input('price')? ($request->input('price')) : ($courier->price_type == null ? 0.00 : $courier->price_type),
+            'fixed_price' => $request->input('fixed_price')??$courier->fixed_price,
+            'km_price' => $request->input('km_price')??$courier->km_price,
+            'online' => $request->input('online')??$courier->online,
+            'status' => $request->input('status')??$courier->status,
         ]);
 
         return Json::success('Bilgileriniz Başarıyla Güncellenmiştir', new CourierResource($courier));
