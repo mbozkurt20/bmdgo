@@ -50,6 +50,8 @@
                         <div class="basic-form">
                             <form method="post" class="repeater" action="{{ route('restaurant.customers.update') }}">
                                 @csrf
+                                <input type="text" style="display: none" class="form-control" name="tyoe"
+                                       value="up" >
                                 <div class="row">
                                     <input type="hidden" name="id" value="{{ $customer->id }}">
                                     <div class="mb-3 col-md-12">
