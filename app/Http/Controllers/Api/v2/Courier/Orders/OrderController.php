@@ -148,6 +148,8 @@ class OrderController extends Controller
             $order->verify_code = null;
             $order->update();
 
+            $courier->status = CourierStatus::active;
+            $courier->update();
             return Json::success('Kod başarıyla doğrulandı ve sipariş başarıyla teslim edildi.');
         } else {
             return Json::success('Doğrulama Kodu Eşleşmiyor', null, 401);

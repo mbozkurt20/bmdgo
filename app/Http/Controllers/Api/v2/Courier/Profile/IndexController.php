@@ -56,15 +56,15 @@ class IndexController extends Controller
     public function update(Request $request)
     {
         $requestData = Validator::make($request->all(), [
-            'name' => 'nullable',
-            'phone' => 'nullable',
-            'password' => 'nullable',
-            'latitude' => 'nullable',
-            'longitude' => 'nullable',
-            'birthday' => 'nullable',
-            'price_type' => 'nullable',
-            'online' => 'nullable',
-            'status' => 'nullable',
+            'name' => 'required',
+            'phone' => 'required',
+            'password' => 'required',
+            'latitude' => 'required',
+            'longitude' => 'required',
+            'birthday' => 'required',
+            'price_type' => 'required',
+            'online' => 'required',
+            'status' => 'required',
         ]);
 
         if ($requestData->fails()) {
