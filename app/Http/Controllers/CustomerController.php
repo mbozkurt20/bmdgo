@@ -111,19 +111,20 @@ class CustomerController extends Controller
 
         if ($request->address) {
             foreach ($request->address as $adres) {
-                $address = CustomerAddress::where('id', $adres['id'])->first();
-
-                if ($address) {
-                    $address->name = $adres['name'];
-                    $address->sokak_cadde = $adres['sokak_cadde'];
-                    $address->bina_no = $adres['bina_no'];
-                    $address->kat = $adres['kat'];
-                    $address->daire_no = $adres['daire_no'];
-                    $address->mahalle = $adres['mahalle'];
-                    $address->adres_tarifi = $adres['adres_tarifi'];
-                    $address->latitude = $adres['latitude'];
-                    $address->longitude = $adres['longitude'];
-                    $address->save();
+                if ($adres['type'] == "up") {
+                    $address = CustomerAddress::where('id', $adres['id'])->first();
+                    if ($address) {
+                        $address->name = $adres['name'];
+                        $address->sokak_cadde = $adres['sokak_cadde'];
+                        $address->bina_no = $adres['bina_no'];
+                        $address->kat = $adres['kat'];
+                        $address->daire_no = $adres['daire_no'];
+                        $address->mahalle = $adres['mahalle'];
+                        $address->adres_tarifi = $adres['adres_tarifi'];
+                        $address->latitude = $adres['latitude'];
+                        $address->longitude = $adres['longitude'];
+                        $address->save();
+                    }
                 } else {
                     $newAddress = new CustomerAddress();
                     $newAddress->restaurant_id = Auth::user()->id;
