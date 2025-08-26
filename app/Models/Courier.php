@@ -30,6 +30,7 @@ class Courier extends Authenticatable implements JWTSubject
         'birthday',
         'point',
         'day_point',
+        'is_active',
     ];
 
     public function payments()

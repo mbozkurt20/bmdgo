@@ -27,7 +27,7 @@ class OrderController extends Controller
         $orders = Order::where('courier_id', $courier->id)
             ->whereDate('created_at', Carbon::today())
             ->orderBy('created_at', 'asc')
-            ->whereIn('status', [OrderStatus::PENDING, OrderStatus::DELIVERED, OrderStatus::HANDOVER])
+            ->whereIn('status', [OrderStatus::HANDOVER])
             ->get();
 
         return Json::success('Siparişler', OrderResource::collection($orders));
