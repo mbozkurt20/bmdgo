@@ -55,22 +55,6 @@ class IndexController extends Controller
      */
     public function update(Request $request)
     {
-        $requestData = Validator::make($request->all(), [
-            'name' => 'required',
-            'phone' => 'required',
-            'password' => 'required',
-            'latitude' => 'required',
-            'longitude' => 'required',
-            'birthday' => 'required',
-            'price_type' => 'required',
-            'online' => 'required',
-            'status' => 'required',
-        ]);
-
-        if ($requestData->fails()) {
-            return Json::error($requestData->errors());
-        }
-
         if ($request->input('price_type') == 'package' && (!$request->has('price') || $request->input('price') == null)) {
             return Json::error('Lütfen Paket Başı Ücretinizi Giriniz!!');
         }

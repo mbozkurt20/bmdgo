@@ -12,7 +12,7 @@ Route::middleware('jwt.courier')->group(function () {
         Route::post('auth/logout', [\App\Http\Controllers\Api\v2\Courier\Auth\LoginController::class, 'logout']);
 
         Route::get('/profile', [\App\Http\Controllers\Api\v2\Courier\Profile\IndexController::class, 'index']);
-        Route::post('/profile', [\App\Http\Controllers\Api\v2\Courier\Profile\IndexController::class, 'update']);
+        Route::put('/profile', [\App\Http\Controllers\Api\v2\Courier\Profile\IndexController::class, 'update']);
         Route::post('/profile/update-password', [\App\Http\Controllers\Api\v2\Courier\Profile\IndexController::class, 'updatePassword']);
         Route::post('/profile/update-status', [\App\Http\Controllers\Api\v2\Courier\Profile\IndexController::class, 'updateStatus']);
         Route::post('/location', [\App\Http\Controllers\Api\v2\Courier\Profile\IndexController::class, 'updateLocation']);
