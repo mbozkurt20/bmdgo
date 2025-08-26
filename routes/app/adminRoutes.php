@@ -10,6 +10,7 @@ Route::group(['prefix' => 'admin'], function () {
     });
 
     Route::group(['middleware' => ['admin.auth']], function () {
+
         Route::get('/payment/form', [TamiPaymentController::class, 'showForm'])->name('payment.form');
         Route::post('/payment/start', [TamiPaymentController::class, 'start'])->name('payment.start');
 

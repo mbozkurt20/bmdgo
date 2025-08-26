@@ -17,17 +17,21 @@ use App\Http\Controllers\MahalleController;
 |
 */
 
+
+
 Route::get('/restaurant/orders/new', [MahalleController::class, 'create']);
 Route::get('/restaurant/couriers', [App\Http\Controllers\CourierController::class, 'index'])->name('restaurant.couriers.index');
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::get('/partner', [App\Http\Controllers\HomeController::class, 'dealer'])->name('dealer');
 Route::post('/new-partner', [App\Http\Controllers\HomeController::class, 'createDealerRequest'])->name('createDealerRequest');
 Route::get('/get-districts/{cityId}', [App\Http\Controllers\HomeController::class, 'getDistricts']);
-Route::post('/payment/success', [TamiPaymentController::class, 'success'])->name('payment.callback');
-Route::post('/payment/fail', [TamiPaymentController::class, 'fail'])->name('payment.fail');
-
 
 Auth::routes();
+
+Route::post('/payment/callback', [TamiPaymentController::class, 'callback'])->name('payment.callback');
+Route::get('/payment/success', [TamiPaymentController::class, 'successPage'])->name('payment.success');
+Route::get('/payment/fail', [TamiPaymentController::class, 'failPage'])->name('payment.fail');
+
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home.dashboard');
 Route::view('login', 'restaurant.login')->name('admin.login');

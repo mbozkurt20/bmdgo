@@ -30,6 +30,12 @@ class LoginController extends Controller
         // Courier kullanıcıyı bul
         $courier = Courier::where('phone', $request->phone)->first();
 
+        if (!$courier->is_active){
+            JWTAuth::invalidate(JWTAuth::getToken());
+
+            return Json::success('Hesabınız Aktif Edilmemiş, yöneticiniz ile iletişime geçiniz.',401);
+        }
+
         if (!$courier || !Hash::check($request->password, $courier->password)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
@@ -73,6 +79,7 @@ class LoginController extends Controller
 
         $courier = Courier::create([
             'name' => $request->input('name'),
+            'birthday' => $request->input('birthday'),
             'phone' => $request->input('phone'),
             'password' => Hash::make($request->input('password')),
             'latitude' => $request->input('latitude'),

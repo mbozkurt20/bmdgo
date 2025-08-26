@@ -26,7 +26,7 @@
                     </p>
                 </div>
 
-                {{--
+
                   <div class="border border-dark p-3 rounded-2" style="max-width: 25%">
                     <form method="GET" action="{{ route('payment.form') }}">
                         @csrf
@@ -59,7 +59,7 @@
                         </div>
                     </form>
                 </div>
-                --}}
+
             </div>
         </div>
 

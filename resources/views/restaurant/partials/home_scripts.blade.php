@@ -67,6 +67,18 @@
         var action = e.target.value;
         var tracking_id = $('#tracking_' + id).val();
         var platform = $('#platform_' + id).val();
+        var selectEl = e.target;
+
+        // Spinner + bekleniyor yazısı
+        let loadingSpan = document.createElement('span');
+        loadingSpan.className = 'ms-2 d-flex align-items-center';
+        loadingSpan.innerHTML = `
+        <div class="spinner-border spinner-border-sm me-1" role="status"></div>
+        <small>Bekleniyor...</small>
+    `;
+
+        // Select elementinin yanına ekle
+        selectEl.parentNode.appendChild(loadingSpan);
 
         // İptal işlemi
         if (action === 'UNSUPPLIED') {
@@ -77,14 +89,17 @@
 
                 if (cancelReason.trim() === '') {
                     Swal.fire('Lütfen iptal nedenini belirtin.');
+                    loadingSpan.remove(); // iptal durumunda spinner kaldır
                     return;
                 }
                 // Güncelle
-                sendOrderStatusUpdate(action, tracking_id, platform, cancelReason, id);
+                sendOrderStatusUpdate(action, tracking_id, platform, cancelReason, id)
+                    .finally(() => loadingSpan.remove());
             });
         } else {
             // Diğer durumlar
-            sendOrderStatusUpdate(action, tracking_id, platform, null, id);
+            sendOrderStatusUpdate(action, tracking_id, platform, null, id)
+                .finally(() => loadingSpan.remove());
         }
     }
 
@@ -375,25 +390,41 @@
 
     function Courier(e, order) {
         let courierId = e.target.value;
+        const selectEl = e.target;
 
+        // Spinner + bekleniyor yazısı oluştur
+        let loadingSpan = document.createElement('span');
+        loadingSpan.className = 'ms-2 d-flex align-items-center';
+        loadingSpan.innerHTML = `
+        <div class="spinner-border spinner-border-sm me-1" role="status"></div>
+        <small>Bekleniyor...</small>
+    `;
+
+        // Select elementinin hemen yanına ekle
+        selectEl.parentNode.appendChild(loadingSpan);
+
+        // AJAX isteği
         $.ajax({
-            type: 'GET', //THIS NEEDS TO BE GET
+            type: 'GET',
             url: '/restaurant/orders/sendCourier/' + order + '/' + courierId,
             success: function (data) {
+                // Spinner + yazıyı kaldır
+                loadingSpan.remove();
+
                 if (data == "OK") {
-                    $('#Courier' + orderid).hide();
+                    $('#Courier' + order).modal('hide'); // modalı gizle
                     Swal.fire('Kurye Başarıyla Atandı');
-                }
-                if (data == "ERR") {
+                } else if (data == "ERR") {
                     Swal.fire('Kurye Atama Başarısız');
                 }
-
             },
             error: function () {
-                console.log(data);
+                loadingSpan.remove(); // hata durumunda da kaldır
+                Swal.fire('İşlem sırasında bir hata oluştu!');
             }
         });
     }
+
 
     function fetchCouriers() {
         return new Promise((resolve, reject) => {

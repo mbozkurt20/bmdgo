@@ -819,7 +819,7 @@
 
 
                                             <div class="mb-3 col-md-12">
-                                                <textarea placeholder="Adres Tarifi" required name="adres_tarifi"
+                                                <textarea placeholder="Adres Tarifi" name="adres_tarifi"
                                                           class="form-control" id="adres_tarifi"></textarea>
                                             </div>
                                         </div>
@@ -1124,11 +1124,30 @@
             success: function (response) {
                 $('.customer').html(response.customer);
                 $('#customer_id').val(response.customerid);
+
+                if(response.message){
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Başarılı',
+                        text: response.message,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+
+                // Modal kapat ve formu sıfırla
                 $('#yeniMusteri').modal('hide');
-                $('#musteriAta').modal('hide');
+                form.reset();
             },
             error: function (xhr, status, error) {
                 console.error(xhr.responseText);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hata',
+                    text: 'Müşteri eklenirken bir hata oluştu!',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
             }
         });
     }

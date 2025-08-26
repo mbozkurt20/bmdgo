@@ -21,6 +21,7 @@ class CreateTopupMovementsTable extends Migration
             $table->bigInteger('top_up')->default(0); //kontör
             $table->string('top_up_price')->default(0); //kontör ücreti
             $table->string('total_amount');
+            $table->string('order_id')->nullable();
             $table->enum('type',['talep','yükleme'])->default('talep');
             $table->boolean('is_approved')->default(false);
             $table->boolean('is_paid')->default(false);

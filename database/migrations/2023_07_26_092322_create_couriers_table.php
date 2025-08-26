@@ -31,6 +31,7 @@ class CreateCouriersTable extends Migration
             $table->string('last_assigned_at',)->nullable();
             $table->boolean('online')->nullable()->default(1);
             $table->string('status')->default('active');
+            $table->boolean('is_active')->default(0);
             $table->timestamps();
              $table->softDeletes();
         });

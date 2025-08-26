@@ -52,6 +52,7 @@ class TamiPaymentController extends Controller
 
         $payload = [
             "callbackUrl"      => $callbackUrl,
+
             "currency"         => "TRY",
             "installmentCount" => 1,
             "motoInd"          => false,
@@ -121,11 +122,6 @@ class TamiPaymentController extends Controller
             'correlationId'   => $this->generateGuid()
         ];
 
-        $payload['metadata'] = [
-            'adminId' => $admin->id,
-            'topUp' => $request->topup,
-        ];
-
         $response = $this->client->post($endpoint.'/payment/auth', [
             'headers' => $headers,
             'json'    => $payload,
@@ -134,20 +130,32 @@ class TamiPaymentController extends Controller
 
         $data = json_decode($response->getBody(), true);
 
-        session()->put('tami', [
-            'adminId' => $admin->id,
-            'topUp' => $request->topup,
+        $topUp = TopupMovement::create([
+            'admin_id'          => $admin->id,
+            'top_up_price'      => $admin->top_up_price,
+            'top_up'            => $request->topup,
+            'type'              => 'yükleme',
+            'is_approved'       => 0,
+            'total_amount'      => $request->amount,
+            'created_by_user_id'=> Auth::guard('admin')->id(),
+            'created_type'      => 'admin',
+            'order_id'          => $data['orderId'],
+            'payment_details'   => json_encode([])
         ]);
 
-        return view('admin.payment.tami.3ds', [
-            'threeDSHtmlContent' => $data['threeDSHtmlContent'] ?? ''
-        ]);
+        if ($topUp){
+            return view('admin.payment.tami.3ds', [
+                'threeDSHtmlContent' => $data['threeDSHtmlContent'] ?? ''
+            ]);
+        }else {
+            return view('admin.payment.form')->with(['test' => 'Ödeme Sırasında Bir Sorun MEydana Geldi']);
+        }
     }
 
     /**
      * 3. Callback → Başarılı
      */
-    public function success(Request $request)
+    public function callback(Request $request)
     {
         $endpoint    = env('TAMI_ENDPOINT', 'https://sandbox-paymentapi.tami.com.tr');
         $merchantId  = env('TAMI_MERCHANT_ID', '77006950');
@@ -190,28 +198,14 @@ class TamiPaymentController extends Controller
 
         $data = json_decode($response->getBody(), true);
 
-        $tami = session('tami');
+        $topUp = TopupMovement::where('order_id', $request->input('orderId'))->first();
 
-        dd($tami);
-        $admin = Admin::find($tami['adminId']);
-dd($tami);
-        if (!$admin) {
-            abort(404);
-        }
-
-        $topUp = TopupMovement::create([
-            'admin_id'          => $admin->id,
-            'top_up_price'      => $admin->top_up_price,
-            'top_up'            => $tami['topUp'],
-            'type'              => 'yükleme',
-            'is_approved'       => 1,
-            'total_amount'      => $tami['topUp'] * $admin->top_up_price,
-            'created_by_user_id'=> Auth::guard('admin')->id(),
-            'created_type'      => 'admin',
+        $topUp->update([
+            'is_approved' => 1,
+            'is_paid' => 1,
             'payment_details'   => json_encode([
                 'success' => $data['success'],
                 'systemTime' => $data['systemTime'],
-                'orderId' => $data['orderId'],
                 'amount' => $data['amount'],
                 'orderDate' => $data['orderDate'],
                 'currency' => $data['currency'],
@@ -221,19 +215,23 @@ dd($tami);
         ]);
 
         if ($topUp) {
+            $admin = Admin::where('id',$topUp->admin_id)->first();
             $admin->increment('top_up_balance', $topUp->top_up);
         }
 
-        return redirect()->route('admin.balance')
-            ->with('message', 'Ödeme İşlemi Başarılı, Bizi Tercih Ettiğiniz için Teşekkürler.');
+        return response()->json(['status'=>'ok']);
     }
 
-    /**
-     * 4. Callback → Hatalı
-     */
-    public function fail()
+    public function successPage()
     {
-        return view('payment.tami.fail');
+        dd(12215);
+        return view('admin.payment.tami.success', [ 'message' => 'Ödeme Başarılı!']);
+    }
+
+    public function failPage()
+    {
+
+        return view('admin.payment.tami.fail', [ 'message' => 'Ödeme Başarısız!']);
     }
 
     private function generateAuthToken(string $merchantId, string $terminalId, string $secretKey): string

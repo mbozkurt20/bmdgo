@@ -14,13 +14,16 @@ class TopupMovement extends Model
         'top_up_price',
         'total_amount',
         'top_up',
+        'order_id',
         'type',
         'created_type',
         'is_approved',
+        'is_paid',
         'created_by_user_id',
     ];
 
     protected $casts = [
         'is_approved' => 'boolean',
+        'is_paid' => 'boolean',
     ];
 }

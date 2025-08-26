@@ -488,7 +488,7 @@ class OrderController extends Controller
             'phone' => 'required'
         ]);
 
-        $custom = Customer::where('phone', $data['phone'])->whereDate('restaurant_id', Auth::user()->id)->first();
+        $custom = Customer::where('phone', $data['phone'])->where('restaurant_id', Auth::user()->id)->first();
 
         if ($custom) {
             $adres = CustomerAddress::where('customer_id', $custom->id)->first();
@@ -509,6 +509,10 @@ class OrderController extends Controller
                 $addre = $request->mahalle . ' mah. ' . $request->sokak_cadde . ' sokak. Bina No:' . $request->bina_no . ' Kat:' . $request->kat . ' Daire No:' . $request->daire_no . ' ' . $city->name;
                 $location = GeoLocation::getLatLong($addre);
 
+                if (isset($location['error'])) {
+                    return response()->json(['message' => 'Konumu doğru girip tekrar deneyiniz.']);
+                }
+
                 $adreses = new CustomerAddress();
                 $adreses->restaurant_id = Auth::user()->id;
                 $adreses->customer_id = $create->id;
@@ -525,7 +529,7 @@ class OrderController extends Controller
             }
 
             $customer = '<p class="logo-text mr-2 text-white">' . $data['name'] . '</p> ' . '<span class="ml-2 text-white"> - ' . $data['phone'] . '</span>' . ' <br><span>' . $request->mahalle . ' Mah.' . $request->sokak_cadde . '.No:' . $request->bina_no . ' Kat:' . $request->kat . ' Daire:' . $request->daire_no . '</span>';
-            return response()->json(['customer' => $customer, 'customerid' => $create->id]);
+            return response()->json(['customer' => $customer, 'customerid' => $create->id,'message' => 'Müşteri Başarıyla Eklendi']);
         }
     }
 
