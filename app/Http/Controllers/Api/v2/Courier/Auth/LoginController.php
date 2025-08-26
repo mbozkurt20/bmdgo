@@ -30,7 +30,7 @@ class LoginController extends Controller
         // Courier kullanıcıyı bul
         $courier = Courier::where('phone', $request->phone)->first();
 
-        if (!$courier->is_active){
+        if (isset($courier->is_active) && !$courier->is_active){
             JWTAuth::invalidate(JWTAuth::getToken());
 
             return Json::success('Hesabınız Aktif Edilmemiş, yöneticiniz ile iletişime geçiniz.',401);
