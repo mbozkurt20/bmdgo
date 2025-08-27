@@ -20,6 +20,7 @@ class LoginController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'phone' => 'required|numeric',
+            'fcm_token' => 'nullable',
             'password' => 'required|string|min:6',
         ]);
 
@@ -39,6 +40,9 @@ class LoginController extends Controller
         if (!$courier || !Hash::check($request->password, $courier->password)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
+
+        $courier->fcm_token = $request->input("fcm_token");
+        $courier->update();
 
         $ttl = 60;  // Token'ın geçerlilik süresi 60 dakika
         $expiryDate = Carbon::now()->addMinutes($ttl);
