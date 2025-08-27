@@ -10,6 +10,7 @@ use App\Models\CourierOrder;
 use App\Models\Notification;
 use App\Models\Order;
 use App\Models\Courier;
+use App\Services\PushNotificationService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -21,6 +22,9 @@ class AssignPendingOrders implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    /**
+     * @throws \Exception
+     */
     public function handle()
     {
         // Atanmamış siparişleri sırayla al
@@ -47,6 +51,9 @@ class AssignPendingOrders implements ShouldQueue
                 $courier->status = CourierStatus::service;
                 $courier->last_assigned_at = now();
                 $courier->save();
+
+                $ser = new PushNotificationService();
+                $ser->sendNotification($courier->fcm_token,'Yeni Sipariş Atantı',$order->tracking_id.' takip nolu siparişiniz var');
 
                 $orderCourier = CourierOrder::where('courier_id',$courier->id)->where('order_id', $order->id)->first();
 

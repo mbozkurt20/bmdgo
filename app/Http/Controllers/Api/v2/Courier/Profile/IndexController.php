@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\v2\Courier\Profile;
 
+use App\Helpers\CourierStatus;
 use App\Helpers\Json;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CourierResource;
@@ -9,6 +10,7 @@ use App\Models\Courier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class IndexController extends Controller
@@ -21,7 +23,7 @@ class IndexController extends Controller
         $courier = auth('courier')->user();
 
         if (!$courier) {
-            return Json::error('Kurye Bulunamadı',404);
+            return Json::error('Kurye Bulunamadı', 404);
         }
 
         return Json::success('Kurye Bilgileri', new CourierResource($courier));
@@ -76,21 +78,23 @@ class IndexController extends Controller
         $courier = Courier::find($id);
 
         $courier->update([
-            'name' => $request->input('name')??$courier->name,
-            'phone' => $request->input('phone')??$courier->phone,
-            'birthday' => $request->input('birthday')??$courier->birthday,
-            'latitude' => $request->input('latitude')??$courier->latitude,
-            'longitude' => $request->input('longitude')??$courier->longitude,
-            'price_type' => $request->input('price_type')??$courier->price_type,
-            'price' => $request->input('price')? ($request->input('price')) : ($courier->price_type == null ? 0.00 : $courier->price_type),
-            'fixed_price' => $request->input('fixed_price')??$courier->fixed_price,
-            'km_price' => $request->input('km_price')??$courier->km_price,
-            'online' => $request->input('online')??$courier->online,
-            'status' => $request->input('status')??$courier->status,
+            'name' => $request->input('name') ?? $courier->name,
+            'phone' => $request->input('phone') ?? $courier->phone,
+            'fcm_token' => $request->input('fcm_token') ?? $courier->fcm_token,
+            'birthday' => $request->input('birthday') ?? $courier->birthday,
+            'latitude' => $request->input('latitude') ?? $courier->latitude,
+            'longitude' => $request->input('longitude') ?? $courier->longitude,
+            'price_type' => $request->input('price_type') ?? $courier->price_type,
+            'price' => $request->input('price') ? ($request->input('price')) : ($courier->price_type == null ? 0.00 : $courier->price_type),
+            'fixed_price' => $request->input('fixed_price') ?? $courier->fixed_price,
+            'km_price' => $request->input('km_price') ?? $courier->km_price,
+            'online' => $request->input('online') ?? $courier->online,
+            'status' => $request->input('status') ?? $courier->status,
         ]);
 
         return Json::success('Bilgileriniz Başarıyla Güncellenmiştir', new CourierResource($courier));
     }
+
     public function updatePassword(Request $request)
     {
         $requestData = Validator::make($request->all(), [
@@ -98,7 +102,7 @@ class IndexController extends Controller
         ]);
 
         if ($requestData->fails()) {
-            return response()->json(['errors' => $requestData->errors()->messages(), 'status' => 400],400);
+            return response()->json(['errors' => $requestData->errors()->messages(), 'status' => 400], 400);
         }
 
         $id = auth('courier')->id();
@@ -111,6 +115,7 @@ class IndexController extends Controller
 
         return Json::success('Şifreniz Başarıyla Güncellenmiştir', new CourierResource($courier));
     }
+
     public function updateStatus(Request $request)
     {
         $requestData = Validator::make($request->all(), [
@@ -118,7 +123,7 @@ class IndexController extends Controller
         ]);
 
         if ($requestData->fails()) {
-            return response()->json(['errors' => $requestData->errors()->messages(), 'status' => 400],400);
+            return response()->json(['errors' => $requestData->errors()->messages(), 'status' => 400], 400);
         }
 
         $id = auth('courier')->id();
@@ -132,11 +137,29 @@ class IndexController extends Controller
         return Json::success('Durumunuz Başarıyla Güncellenmiştir', new CourierResource($courier));
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy()
     {
-        //
+        try {
+            $id = auth('courier')->id();
+
+            $courier = Courier::find($id);
+
+            if ($courier->status == CourierStatus::service) {
+                return Json::error('Üzgünüz, şuan aktif bir paket taşıyor görünüyorsunuz, durumunu kontrol ediniz!');
+            }
+
+            $isDelete = $courier->delete();
+
+            if ($isDelete) {
+                JWTAuth::invalidate(JWTAuth::getToken());
+
+                return Json::success('Hesabınız Silindi ve Oturumunuz Sonlandırıldı');
+            } else {
+                return Json::error('Hesabınız Silineedi');
+            }
+
+        } catch (JWTException $e) {
+            return Json::error($e->getMessage());
+        }
     }
 }

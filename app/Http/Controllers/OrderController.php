@@ -10,6 +10,7 @@ use App\Helpers\OrderStatus;
 use App\Models\City;
 use App\Models\Restaurant;
 use App\Models\RestaurantCoupon;
+use App\Services\PushNotificationService;
 use App\Traits\RequestTrait;
 use App\Models\Categorie;
 use App\Models\Courier;
@@ -87,13 +88,24 @@ class OrderController extends Controller
                     $courier->last_assigned_at = now();
                     $courier->update();
 
-                    // Yeni siparişi kuryeye atama
-                    $newOrderCourier = new CourierOrder();
-                    $newOrderCourier->courier_id = $courier->id;
-                    $newOrderCourier->order_id = $order->id;
-                    $newOrderCourier->save();
+                    $orderCourier = CourierOrder::where('courier_id',$courier->id)->where('order_id', $order->id)->first();
+
+                    if (!$orderCourier) {
+                        // Yeni siparişi kuryeye atama
+                        $newOrderCourier = new CourierOrder();
+                        $newOrderCourier->courier_id = $courier->id;
+                        $newOrderCourier->order_id = $order->id;
+                        $newOrderCourier->save();
+
+                        Log::info("Kurye atandı ve durumu Serviste yapıldı. Sipariş ID: " . $order->id . " Kurye ID: " . $courier->id);
+                    }
 
                     Log::info("Kurye atandı ve durumu Serviste yapıldı. Sipariş ID: " . $order->id . " Kurye ID: " . $courier->id);
+
+
+                    //mobil bildiri
+                    $ser = new PushNotificationService();
+                    $ser->sendNotification($courier->fcm_token,'Yeni Sipariş Atantı',$order->tracking_id.' takip nolu siparişiniz var');
 
                     if (OrdersHelper::getOrderSystem(3)) {
                         NotificationHelper::add([

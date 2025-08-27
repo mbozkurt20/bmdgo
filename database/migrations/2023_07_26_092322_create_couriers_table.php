@@ -28,6 +28,7 @@ class CreateCouriersTable extends Migration
             $table->string('longitude',)->nullable();
             $table->string('birthday',)->nullable();
             $table->string('code',)->nullable();
+            $table->tinyText('fcm_token',)->nullable();
             $table->string('last_assigned_at',)->nullable();
             $table->boolean('online')->nullable()->default(1);
             $table->string('status')->default('active');

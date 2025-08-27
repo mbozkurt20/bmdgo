@@ -14,6 +14,7 @@ use App\Models\Order;
 use App\Models\CourierOrder;
 use App\Models\TenantModel;
 use App\Models\User;
+use App\Services\PushNotificationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -294,6 +295,9 @@ class CourierController extends Controller
         $auto->save();
     }
 
+    /**
+     * @throws \Exception
+     */
     public function sendCourier($orderId, $courierId)
     {
         $order = Order::find($orderId);
@@ -303,7 +307,7 @@ class CourierController extends Controller
         $order->status = OrderStatus::HANDOVER;
         $order->save();
 
-        // Kuryeyi busy yap ve son atama zamanını güncelle
+        // Kuryeyi servide de yap ve son atama zamanını güncelle
         $courier->status = CourierStatus::service;
         $courier->last_assigned_at = now();
         $courier->save();
@@ -319,6 +323,10 @@ class CourierController extends Controller
 
             Log::info("Kurye atandı ve durumu Serviste yapıldı. Sipariş ID: " . $order->id . " Kurye ID: " . $courier->id);
         }
+
+        //mobil bildiri
+        $ser = new PushNotificationService();
+        $ser->sendNotification($courier->fcm_token,'Yeni Sipariş Atantı',$order->tracking_id.' takip nolu siparişiniz var');
 
         if (OrdersHelper::getOrderSystem(3)){
             NotificationHelper::add([

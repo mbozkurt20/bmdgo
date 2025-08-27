@@ -30,10 +30,10 @@ class LoginController extends Controller
         // Courier kullanıcıyı bul
         $courier = Courier::where('phone', $request->phone)->first();
 
-        if (isset($courier->is_active) && !$courier->is_active){
+        if (isset($courier->is_active) && !$courier->is_active) {
             JWTAuth::invalidate(JWTAuth::getToken());
 
-            return Json::success('Hesabınız Aktif Edilmemiş, yöneticiniz ile iletişime geçiniz.',401);
+            return Json::success('Hesabınız Aktif Edilmemiş, yöneticiniz ile iletişime geçiniz.', 401);
         }
 
         if (!$courier || !Hash::check($request->password, $courier->password)) {
@@ -45,10 +45,11 @@ class LoginController extends Controller
 
         $token = JWTAuth::fromUser($courier, ['exp' => $expiryDate]);
 
-        return response()->json(['message' => 'Giriş Başarılı', 'token' => $token, 'expiry_date' => $expiryDate,'courier' => new CourierResource($courier)], 200);
+        return response()->json(['message' => 'Giriş Başarılı', 'token' => $token, 'expiry_date' => $expiryDate, 'courier' => new CourierResource($courier)], 200);
     }
 
-    public function register(Request $request){
+    public function register(Request $request)
+    {
         $requestData = Validator::make($request->all(), [
             'name' => 'required',
             'phone' => 'required',
@@ -57,6 +58,7 @@ class LoginController extends Controller
             'longitude' => 'required',
             'birthday' => 'required',
             'price_type' => 'required',
+            'fcm_token' => 'nullable',
         ]);
 
         if ($requestData->fails()) {
@@ -73,7 +75,7 @@ class LoginController extends Controller
             }
         }
 
-        if (Courier::where('phone' ,$request->input('phone'))->exists()) {
+        if (Courier::where('phone', $request->input('phone'))->exists()) {
             return Json::error('Bu telefon numarasına ait bir kayıt zaten mevcut.');
         }
 
@@ -85,14 +87,15 @@ class LoginController extends Controller
             'latitude' => $request->input('latitude'),
             'longitude' => $request->input('longitude'),
             'price_type' => $request->input('price_type'),
-            'price' => $request->input('price')??0.00,
+            'price' => $request->input('price') ?? 0.00,
             'fixed_price' => $request->input('fixed_price'),
             'km_price' => $request->input('km_price'),
+            'fcm_token' => $request->input('fcm_token'),
             'code' => $this->generateCode(),
             'status' => CourierStatus::passive,
         ]);
 
-        return Json::success('Kaydınız Başarıyla Alınmıştır',$courier);
+        return Json::success('Kaydınız Başarıyla Alınmıştır', $courier);
     }
 
     public function generateCode()
@@ -111,7 +114,7 @@ class LoginController extends Controller
         try {
             JWTAuth::invalidate(JWTAuth::getToken());
 
-            return Json::success('Oturumunuz Sonlandırıldı',201);
+            return Json::success('Oturumunuz Sonlandırıldı', 201);
         } catch (JWTException $e) {
             return Json::error($e->getMessage());
         }

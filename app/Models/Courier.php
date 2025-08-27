@@ -10,7 +10,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class Courier extends Authenticatable implements JWTSubject
 {
-    use HasFactory;
+    use HasFactory,SoftDeletes;
 
     protected $fillable = [
         'admin_id',
@@ -31,6 +31,7 @@ class Courier extends Authenticatable implements JWTSubject
         'point',
         'day_point',
         'is_active',
+        'fcm_token',
     ];
 
     public function payments()
