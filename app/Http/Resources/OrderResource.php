@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Helpers\OrdersHelper;
+use App\Models\Customer;
 use App\Models\Restaurant;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -28,6 +29,7 @@ class OrderResource extends JsonResource
             'amount' => $this->amount,
             'payment_method' => $this->payment_method,
             'address' => $this->address,
+            'customer' => new CustomerResource(Customer::find($this->customer_id)),
             'notes' => $this->notes,
             'status' => $this->status,
             'created_at' => date('d-m-Y h:i:s',strtotime($this->created_at)),

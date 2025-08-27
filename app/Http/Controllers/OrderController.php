@@ -104,9 +104,9 @@ class OrderController extends Controller
 
 
                     //mobil bildiri
-                    $ser = new PushNotificationService();
+                  /*  $ser = new PushNotificationService();
                     $ser->sendNotification($courier->fcm_token,'Yeni Sipariş Atantı',$order->tracking_id.' takip nolu siparişiniz var');
-
+*/
                     if (OrdersHelper::getOrderSystem(3)) {
                         NotificationHelper::add([
                             'title' => 'Paket Kuryeye Atandı',
