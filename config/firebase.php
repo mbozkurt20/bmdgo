@@ -1,5 +1,5 @@
 <?php
-
+//bmdgo-39e83
 return [
     /*
      * ------------------------------------------------------------------------
@@ -44,7 +44,7 @@ return [
              *
              */
             'credentials' => [
-                'file' => env('FIREBASE_CREDENTIALS', base_path('config/ravelia-app-firebase.json')),
+                'file' => env('FIREBASE_CREDENTIALS', base_path('config/bmdgo-app-firebase.json')),
             ],
 
             /*
