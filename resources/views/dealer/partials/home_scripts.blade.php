@@ -164,8 +164,34 @@
 
         // Tab içeriğini kontrol et ve boşsa mesaj göster
         updateTableForStatus(order.status);
+
+
+        if (order.status === 'HANDOVER') {
+            await updateCourierOptions(order.id);
+        }
     }
 
+    async function updateCourierOptions(orderId) {
+        try {
+            const couriers = await fetchCouriers();
+            const selectElement = document.querySelector(`#Courier${orderId} select`);
+
+            if (selectElement) {
+                while (selectElement.options.length > 1) {
+                    selectElement.remove(1);
+                }
+
+                couriers.forEach(courier => {
+                    const option = document.createElement('option');
+                    option.value = courier.id;
+                    option.textContent = courier.name;
+                    selectElement.appendChild(option);
+                });
+            }
+        } catch (error) {
+            console.error('Kurye listesi güncellenirken hata:', error);
+        }
+    }
 
     function updateTables(data) {
         // Temizle

@@ -70,4 +70,4 @@
     </div>
 </div>
 
-@include('restaurant.partials.home_scripts')
+@include('partials.home_scripts',['key' => 'restaurant'])

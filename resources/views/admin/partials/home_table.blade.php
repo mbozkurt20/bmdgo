@@ -36,7 +36,6 @@
         ];
     @endphp
 
-
     <div class="card">
         <div class="card-body">
             <div class="tab-content" id="orderStatusTabsContent">
@@ -70,4 +69,4 @@
     </div>
 </div>
 
-@include('admin.partials.home_scripts')
+@include('partials.home_scripts', ['key' => 'admin'])

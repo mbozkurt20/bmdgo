@@ -103,29 +103,11 @@ class OrderObserver
         );
 
         $order = Order::where('id', $order->id)
-            ->with(['restaurant','courier'])
+            ->with(['restaurant', 'courier'])
             ->first();
 
-        if (Auth::guard('restaurant')->check()) {
-            // giriş yapan restoran
-            $authRestaurant = Auth::guard('restaurant')->user();
-
-            if ($order->restaurant_id == $authRestaurant->id) {
-                // sadece kendi order'ı ise tetikle
-                $channel = 'restaurant-' . $authRestaurant->id;
-                $pusher->trigger($channel, 'update-order', ['order' => $order]);
-            }
-
-        } elseif (Auth::guard('admin')->check()) {
-            // giriş yapan admin
-            $authAdmin = Auth::guard('admin')->user();
-
-            if ($order->restaurant->admin_id == $authAdmin->id) {
-                // siparişin restoranının admini ise tetikle
-                $channel = 'admin-' . $authAdmin->id;
-                $pusher->trigger($channel, 'update-order', ['order' => $order]);
-            }
-        }
+        $pusher->trigger("admin-{$restaurant->admin_id}", "update-order", ['order' => $order]);
+        $pusher->trigger("restaurant-{$restaurant->id}", "update-order", ['order' => $order]);
 
     }
 
@@ -150,7 +132,7 @@ class OrderObserver
         );
 
         $order = Order::where('id', $order->id)
-            ->with(['restaurant','courier'])
+            ->with(['restaurant', 'courier'])
             ->first();
 
         if (Auth::guard('restaurant')->check()) {

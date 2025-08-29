@@ -40,7 +40,7 @@
 
                   <div class="mb-3">
                       <label for="amount" class="form-label fw-semibold text-black">Sipariş Tutarı</label>
-                      <input type="number" step="0.01" name="amount" id="amount" class="form-control rounded-pill" required>
+                      <input placeholder="0.00" type="number" step="0.01" name="amount" id="amount" class="form-control rounded-pill" required>
                   </div>
 
                   <div class="mb-3">

@@ -40,6 +40,24 @@ class LoginController extends Controller
     {
         $this->middleware('guest')->except('logout');
     }
+
+    /**
+     * Get the failed login response instance.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    protected function sendFailedLoginResponse(Request $request)
+    {
+        // Önceki davranış yerine doğrudan yönlendirme yapıyoruz
+        return redirect()->route('login')
+            ->withInput($request->only($this->username(), 'remember'))
+            ->with('test', 'Giriş bilgileriniz hatalı. Lütfen tekrar deneyin.');
+    }
+
+
     public function logout(Request $request)
     {
         $this->guard()->logout();

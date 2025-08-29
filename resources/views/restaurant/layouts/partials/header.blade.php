@@ -19,7 +19,7 @@
                 </div>
 
                 <ul class="navbar-nav header-right">
-                    <li class="nav-item recipe">
+                    <li class="nav-item ">
                         <button id="openModalBtn2" class="special-button ">
                             Hızlı Sipariş Ver
                         </button>

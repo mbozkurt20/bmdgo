@@ -40,6 +40,7 @@ class PushNotificationService
                 ->withData(array_merge([
                     'title' => $title,
                     'message' => $body,
+                    'sound' => url('/voices/tehlike.mp3'), // özel ses
                 ], $data));
 
             $this->client->send($message);

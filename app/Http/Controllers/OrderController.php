@@ -90,7 +90,7 @@ class OrderController extends Controller
                     $courier->last_assigned_at = now();
                     $courier->update();
 
-                    $orderCourier = CourierOrder::where('courier_id',$courier->id)->where('order_id', $order->id)->first();
+                    $orderCourier = CourierOrder::where('courier_id', $courier->id)->where('order_id', $order->id)->first();
 
                     if (!$orderCourier) {
                         // Yeni siparişi kuryeye atama
@@ -106,9 +106,11 @@ class OrderController extends Controller
 
 
                     //mobil bildiri
-                  /*  $ser = new PushNotificationService();
-                    $ser->sendNotification($courier->fcm_token,'Yeni Sipariş Atantı',$order->tracking_id.' takip nolu siparişiniz var');
-*/
+                    if ($courier->fcm_token){
+                        $ser = new PushNotificationService();
+                        $ser->sendNotification($courier->fcm_token, 'Yeni Sipariş Atantı', $order->tracking_id . ' takip nolu siparişiniz var');
+                    }
+
                     if (OrdersHelper::getOrderSystem(3)) {
                         NotificationHelper::add([
                             'title' => 'Paket Kuryeye Atandı',
@@ -341,14 +343,14 @@ class OrderController extends Controller
         try {
             DB::beginTransaction();
 
-            $city =  City::find(Admin::find(auth()->user()->admin_id)->city_id);
+            $city = City::find(Admin::find(auth()->user()->admin_id)->city_id);
 
             $address = $request->mahalle . ' mah. ' .
                 $request->sokak_cadde . ' sokak. Bina No:' .
                 $request->bina_no . ' Kat:' .
                 $request->kat . ' Daire No:' .
                 $request->daire_no . ' ' .
-                District::find($request->ilce)->name . '/' .$city->name. ' Türkiye';
+                District::find($request->ilce)->name . '/' . $city->name . ' Türkiye';
 
             $location = GeoLocation::getLatLong($address);
 
@@ -389,7 +391,7 @@ class OrderController extends Controller
                 $address->kat = $request->kat;
                 $address->city_id = $city->id;
                 $address->district_id = $request->ilce;
-                $address->adress_tarifi = $request->adress_tarifi;
+                $address->adres_tarifi = $request->adress_tarifi;
                 $address->latitude = $location['lat'];
                 $address->longitude = $location['lon'];
                 $address->daire_no = $request->daire_no;
@@ -516,7 +518,7 @@ class OrderController extends Controller
 
         $data = $request->all();
 
-        $city =  City::find(Admin::find(auth()->user()->admin_id)->city_id);
+        $city = City::find(Admin::find(auth()->user()->admin_id)->city_id);
         $create = Customer::where('phone', $data['phone'])->where('restaurant_id', Auth::user()->id)->first();
 
         if (!$create) {
@@ -524,7 +526,7 @@ class OrderController extends Controller
             $create->restaurant_id = Auth::user()->id;
             $create->name = $data['name'];
             $create->phone = $data['phone'];
-            $create->mobile = $data['mobile'];
+            $create->mobile = $data['mobile']??'';
             $create->save();
         }
 
@@ -533,7 +535,7 @@ class OrderController extends Controller
             $request->bina_no . ' Apt.:' .
             $request->kat . ' Kat:' .
             $request->daire_no . ' Daire No' .
-            District::find($request->ilce)->name . '/' .$city->name. ' Türkiye';
+            District::find($request->ilce)->name . '/' . $city->name . ' Türkiye';
 
         $location = GeoLocation::getLatLong($address);
 
@@ -557,7 +559,7 @@ class OrderController extends Controller
         $adreses->adres_tarifi = $request->adres_tarifi;
         $adreses->save();
 
-        return response()->json(['customer' => $create, 'customerid' => $create->id,'message' => 'Müşteri Başarıyla Eklendi']);
+        return response()->json(['customer' => $create, 'customerid' => $create->id, 'message' => 'Müşteri Başarıyla Eklendi']);
     }
 
     public function addOrder(Request $request)

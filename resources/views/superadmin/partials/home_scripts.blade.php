@@ -65,32 +65,28 @@
         }
     });
 
-    /*
-    function StatusOrderChange(e, id) {
-        var action = e.target.value;
-        var tracking_id = $('#tracking_' + id).val();
-        var platform = $('#platform_' + id).val();
+    async function updateCourierOptions(orderId) {
+        try {
+            const couriers = await fetchCouriers();
+            const selectElement = document.querySelector(`#Courier${orderId} select`);
 
-        // İptal işlemi
-        if (action === 'UNSUPPLIED') {
-            $('#cancelModal').modal('show');
-
-            $('#confirmCancel').off('click').on('click', function () {
-                var cancelReason = $('#cancelReason' + id).val();
-
-                if (cancelReason.trim() === '') {
-                    Swal.fire('Lütfen iptal nedenini belirtin.');
-                    return;
+            if (selectElement) {
+                while (selectElement.options.length > 1) {
+                    selectElement.remove(1);
                 }
-                // Güncelle
-                sendOrderStatusUpdate(action, tracking_id, platform, cancelReason, id);
-            });
-        } else {
-            // Diğer durumlar
-            sendOrderStatusUpdate(action, tracking_id, platform, null, id);
+
+                couriers.forEach(courier => {
+                    const option = document.createElement('option');
+                    option.value = courier.id;
+                    option.textContent = courier.name;
+                    selectElement.appendChild(option);
+                });
+            }
+        } catch (error) {
+            console.error('Kurye listesi güncellenirken hata:', error);
         }
     }
- */
+
     function StatusOrderChange(e, id) {
         var action = e.target.value;
         var tracking_id = $('#tracking_' + id).val();
@@ -206,6 +202,11 @@
 
         // Tab boşsa mesaj göster
         updateTableForStatus(order.status);
+
+
+        if (order.status === 'HANDOVER') {
+            await updateCourierOptions(order.id);
+        }
     }
 
     function updateTables(data) {

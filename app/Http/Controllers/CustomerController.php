@@ -33,6 +33,23 @@ class CustomerController extends Controller
         return view('restaurant.customers.new', compact('cities'));
     }
 
+    public function getCustomers()
+    {
+        try {
+            $customers = \App\Models\Customer::where('restaurant_id', auth()->id())->get();
+
+            return response()->json([
+                'success' => true,
+                'customers' => $customers
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Müşteriler yüklenirken hata oluştu: ' . $e->getMessage()
+            ]);
+        }
+    }
+
     public function edit($id)
     {
         $customer = Customer::find($id);

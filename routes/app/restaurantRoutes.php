@@ -64,6 +64,7 @@ Route::group(['prefix' => 'restaurant'], function () {
         Route::post('/couriers/update', [App\Http\Controllers\CourierController::class, 'update'])->name('restaurant.couriers.update');
 
         /* Customers */
+        Route::get('/get-customers', [App\Http\Controllers\CustomerController::class, 'getCustomers'])->name('restaurant.getCustomers');
         Route::get('/customers', [App\Http\Controllers\CustomerController::class, 'index'])->name('restaurant.customers');
         Route::get('/customers/new', [App\Http\Controllers\CustomerController::class, 'new'])->name('restaurant.customers.new');
         Route::get('/customers/edit/{id}', [App\Http\Controllers\CustomerController::class, 'edit'])->name('restaurant.customers.edit');

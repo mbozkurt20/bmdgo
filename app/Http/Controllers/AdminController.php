@@ -49,6 +49,13 @@ class AdminController extends Controller
     {
         return redirect()->route('admin.login');
     }
+    protected function sendFailedLoginResponse(Request $request)
+    {
+        // Önceki davranış yerine doğrudan yönlendirme yapıyoruz
+        return redirect()->route('login')
+            ->withInput($request->only($this->username(), 'remember'))
+            ->with('test', 'Giriş bilgileriniz hatalı. Lütfen tekrar deneyin.');
+    }
     protected function guard()
     {
         return Auth::guard('admin');

@@ -68,4 +68,4 @@
     </div>
 </div>
 
-@include('superadmin.partials.home_scripts')
+@include('partials.home_scripts',['key' => 'superadmin'])

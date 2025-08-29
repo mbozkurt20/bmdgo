@@ -68,4 +68,4 @@
     </div>
 </div>
 
-@include('dealer.partials.home_scripts')
+@include('partials.home_scripts',['key' => 'dealer'])

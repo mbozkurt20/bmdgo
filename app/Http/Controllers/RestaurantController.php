@@ -21,6 +21,14 @@ class RestaurantController extends Controller
 {
     use AuthenticatesUsers;
 
+    protected function sendFailedLoginResponse(Request $request)
+    {
+        // Önceki davranış yerine doğrudan yönlendirme yapıyoruz
+        return redirect()->route('login')
+            ->withInput($request->only($this->username(), 'remember'))
+            ->with('test', 'Giriş bilgileriniz hatalı. Lütfen tekrar deneyin.');
+    }
+    
     protected function authenticated(Request $request, $user)
     {
         return redirect()->route('restaurant.index');

@@ -59,9 +59,7 @@
 <div class="login-container">
     <div class="login-box">
         <div class="logo">
-            <a href="{{route('restaurant.login')}}">
-                <img src="{{config('site.logo')}}" alt="Logo">
-            </a>
+            <img src="{{config('site.logo')}}" alt="Logo">
         </div>
 
         @if(session()->has('message'))

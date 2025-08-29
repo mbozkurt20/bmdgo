@@ -13,6 +13,7 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <style>
+
         .coupon-list {
             display: flex;
             flex-wrap: wrap;
@@ -668,7 +669,6 @@
              aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
-
                     <!-- Modal Header -->
                     <div class="modal-header">
                         <h5 class="modal-title" id="musteriAtaLabel">Müşteri Seçiniz</h5>
@@ -692,18 +692,13 @@
                                     class="form-control js-example-basic-single"
                                     onchange="customerSelect(event)">
                                 <option value="0">🔍 Müşteri Seçiniz...</option>
-                                @foreach($customers as $customer)
-                                    <option value="{{ $customer->id }}">
-                                        {{ $customer->name }} - {{ $customer->phone }}
-                                    </option>
-                                @endforeach
+                                <!-- Müşteri listesi JavaScript ile doldurulacak -->
                             </select>
                             <small class="form-text text-muted mt-2">
                                 Aramak için yazmaya başlayabilirsiniz. Seçim yapıldıktan sonra "Tamam" tuşuna basınız.
                             </small>
                         </div>
                     </div>
-
 
                     <!-- Modal Footer -->
                     <div class="modal-footer d-flex justify-content-between">
@@ -712,22 +707,9 @@
                         </button>
                         <button type="button" class="special-button" data-dismiss="modal">Tamam</button>
                     </div>
-
                 </div>
             </div>
         </div>
-
-        <!-- Select2 Script -->
-        <script>
-            $(document).ready(function () {
-                $('#customerSelect').select2({
-                    dropdownParent: $('#musteriAta'),
-                    width: '100%',
-                    placeholder: 'Müşteri Seçiniz'
-                });
-            });
-        </script>
-
 
         <!-- Yeni müşteri ekle -->
         <div class="modal fade" id="yeniMusteri" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
@@ -829,28 +811,17 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
-    function selectCoupon(element) {
-        var couponId = $(element).data('coupon-id');
-        var couponName = $(element).data('coupon-name');
-        var couponAmount = $(element).data('coupon-amount');
 
-        // Önce tüm kuponlardan seçili stilini kaldır
-        $('.coupon-item').removeClass('selected');
-
-        // Tıklanan kupona seçili stilini ekle
-        $(element).addClass('selected');
-
-        // Seçilen kuponu göster
-        $('#selectedCouponName').text(couponName);
-        $('#coupon_id').val(couponId);
-    }
-
-    $('form[name="formPos"]').on('submit', function (e) {
-        e.preventDefault(); // Sayfa yenilenmesin
-        CreateOrder(); // Siparişi oluştur
+    // Modal açıldığında input alanına odaklanma
+    $('#yeniMusteri').on('shown.bs.modal', function () {
+        $('#name').focus();
     });
-</script>
-<script>
+
+    // Modal kapatıldığında formu temizleme
+    $('#yeniMusteri').on('hidden.bs.modal', function () {
+        document.getElementById("customerForm").reset();
+    });
+
     function toggleDrawer() {
         const drawer = document.getElementById('drawer');
         const isOpen = drawer.classList.contains('open');
@@ -871,8 +842,36 @@
 </script>
 
 <script type="text/javascript">
+    function selectCoupon(element) {
+        var couponId = $(element).data('coupon-id');
+        var couponName = $(element).data('coupon-name');
+        var couponAmount = $(element).data('coupon-amount');
+
+        // Önce tüm kuponlardan seçili stilini kaldır
+        $('.coupon-item').removeClass('selected');
+
+        // Tıklanan kupona seçili stilini ekle
+        $(element).addClass('selected');
+
+        // Seçilen kuponu göster
+        $('#selectedCouponName').text(couponName);
+        $('#coupon_id').val(couponId);
+    }
+
+    $('form[name="formPos"]').on('submit', function (e) {
+        e.preventDefault(); // Sayfa yenilenmesin
+        CreateOrder(); // Siparişi oluştur
+    });
 
     $(document).ready(function () {
+        loadCustomers();
+
+        $('#customerSelect').select2({
+            dropdownParent: $('#musteriAta'),
+            width: '100%',
+            placeholder: 'Müşteri Seçiniz'
+        });
+
         $.ajax({
             type: 'GET', //THIS NEEDS TO BE GET
             url: '/restaurant/orders/removePOS',
@@ -1098,6 +1097,7 @@
             return; // AJAX çalışmaz
         }
 
+
         // AJAX işlemi
         $.ajax({
             type: 'POST',
@@ -1120,6 +1120,14 @@
                 // Modal kapat ve formu sıfırla
                 $('#yeniMusteri').modal('hide');
                 form.reset();
+
+                $('#customerSelect').select2({
+                    dropdownParent: $('#musteriAta'),
+                    width: '100%',
+                    placeholder: 'Müşteri Seçiniz'
+                });
+
+                loadCustomers();
             },
             error: function (xhr, status, error) {
                 console.error(xhr.responseText);
@@ -1356,6 +1364,54 @@
                 }
             })
         }
+    }
+
+    function loadCustomers() {
+        $.ajax({
+            type: 'GET',
+            url: '/restaurant/get-customers', // Bu endpoint'i oluşturmanız gerekecek
+            success: function(data) {
+                console.log({data:data})
+                $('#customerSelect').empty().append('<option value="0">🔍 Müşteri Seçiniz...</option>');
+
+                if (data.customers && data.customers.length > 0) {
+                    $.each(data.customers, function(index, customer) {
+                        $('#customerSelect').append(
+                            $('<option>', {
+                                value: customer.id,
+                                text: customer.name + ' - ' + customer.phone
+                            })
+                        );
+                    });
+                } else {
+                    $('#customerSelect').append(
+                        $('<option>', {
+                            value: '',
+                            text: 'Müşteri bulunamadı',
+                            disabled: true
+                        })
+                    );
+                }
+
+                // Select2'yi yeniden başlat
+                $('#customerSelect').select2({
+                    dropdownParent: $('#musteriAta'),
+                    width: '100%',
+                    placeholder: 'Müşteri Seçiniz'
+                });
+            },
+            error: function() {
+                console.log("Müşteri listesi yüklenirken hata oluştu.");
+                $('#customerSelect').empty().append('<option value="0">🔍 Müşteri Seçiniz...</option>');
+
+                // Select2'yi yeniden başlat
+                $('#customerSelect').select2({
+                    dropdownParent: $('#musteriAta'),
+                    width: '100%',
+                    placeholder: 'Müşteri Seçiniz'
+                });
+            }
+        });
     }
 </script>
 </body>

@@ -16,7 +16,7 @@ class SuperAdmin extends Controller
             return redirect()->route('superadmin.dashboards');
         }
 
-        return redirect()->route('superadmin.login')->withErrors(['error' => 'Giriş bilgileri hatalı.']);
+        return redirect()->route('superadmin.login')->withErrors(['test' => 'Giriş bilgileri hatalı.']);
     }
 
 
