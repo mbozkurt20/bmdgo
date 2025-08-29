@@ -29,7 +29,9 @@
         cluster: '{{ env("PUSHER_APP_CLUSTER") }}'
     });
 
-    var channel = pusher.subscribe('orders');
+    let restaurantId = "{{ auth('restaurant')->id() }}";
+
+    let channel = pusher.subscribe(`restaurant-${restaurantId}`);
 
     // Gelen veriyi konsolda görebilmek için
     channel.bind('new-order', function (data) {

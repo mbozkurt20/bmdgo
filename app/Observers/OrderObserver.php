@@ -26,26 +26,39 @@ class OrderObserver
     public function created(Order $order)
     {
         $order->verify_code = OrdersHelper::generateVerifyCode();
-        $order->saveQuietly(); // updated event TETİKLENMEZ
+        $order->saveQuietly();
 
+// Restoranı bul
         $restaurant = Restaurant::find($order->restaurant_id);
 
-        SendSms::send($order->phone, 'Sayın ' . $order->full_name . ', ' . $order->tracking_id . ' numaralı siparişiniz alınmıştır.' . '\n \n ' .
-            $order->verify_code . ' doğrulama kodu ile siparişinizi teslim alabilirsiniz.', $restaurant->admin_id);
-
-        $options = array(
-            'cluster' => 'mt1',
-            'useTLS' => true
+// SMS gönder
+        $message = sprintf(
+            "Sayın %s, %s numaralı siparişiniz alınmıştır.\n\n%s doğrulama kodu ile siparişinizi teslim alabilirsiniz.",
+            $order->full_name,
+            $order->tracking_id,
+            $order->verify_code
         );
 
-        $pusher = new Pusher (
+        SendSms::send($order->phone, $message, $restaurant->admin_id);
+
+// Pusher ayarları
+        $options = [
+            'cluster' => 'mt1',
+            'useTLS' => true,
+        ];
+
+        $pusher = new Pusher(
             env('PUSHER_APP_KEY'),
             env('PUSHER_APP_SECRET'),
             env('PUSHER_APP_ID'),
             $options
         );
 
-        $pusher->trigger('orders', 'new-order', ['order' => $order]);
+// Kanal belirleme
+// → Admin kanalı: admin-{admin_id}
+// → Restaurant kanalı: restaurant-{restaurant_id}
+        $pusher->trigger("admin-{$restaurant->admin_id}", "new-order", ['order' => $order]);
+        $pusher->trigger("restaurant-{$restaurant->id}", "new-order", ['order' => $order]);
     }
 
     public function updated(Order $order)
@@ -77,20 +90,43 @@ class OrderObserver
             $courier->update();
         }
 
-        $options = array(
+        $options = [
             'cluster' => 'mt1',
-            'useTLS' => true
-        );
+            'useTLS' => true,
+        ];
 
-        $pusher = new Pusher (
+        $pusher = new Pusher(
             env('PUSHER_APP_KEY'),
             env('PUSHER_APP_SECRET'),
             env('PUSHER_APP_ID'),
             $options
         );
 
-        $order = Order::where('id', $order->id)->with(['restaurant','courier'])->first();
-        $pusher->trigger('orders', 'update-order', ['order' => $order]);
+        $order = Order::where('id', $order->id)
+            ->with(['restaurant','courier'])
+            ->first();
+
+        if (Auth::guard('restaurant')->check()) {
+            // giriş yapan restoran
+            $authRestaurant = Auth::guard('restaurant')->user();
+
+            if ($order->restaurant_id == $authRestaurant->id) {
+                // sadece kendi order'ı ise tetikle
+                $channel = 'restaurant-' . $authRestaurant->id;
+                $pusher->trigger($channel, 'update-order', ['order' => $order]);
+            }
+
+        } elseif (Auth::guard('admin')->check()) {
+            // giriş yapan admin
+            $authAdmin = Auth::guard('admin')->user();
+
+            if ($order->restaurant->admin_id == $authAdmin->id) {
+                // siparişin restoranının admini ise tetikle
+                $channel = 'admin-' . $authAdmin->id;
+                $pusher->trigger($channel, 'update-order', ['order' => $order]);
+            }
+        }
+
     }
 
     /**
@@ -101,19 +137,41 @@ class OrderObserver
      */
     public function deleted(Order $order)
     {
-        $options = array(
+        $options = [
             'cluster' => 'mt1',
-            'useTLS' => true
-        );
+            'useTLS' => true,
+        ];
 
-        $pusher = new Pusher (
+        $pusher = new Pusher(
             env('PUSHER_APP_KEY'),
             env('PUSHER_APP_SECRET'),
             env('PUSHER_APP_ID'),
             $options
         );
 
-        $order = Order::where('id', $order->id)->with('restaurant')->first();
-        $pusher->trigger('orders-' . Auth::user()->id, 'update-orders-' . Auth::user()->id, ['order' => $order]);
+        $order = Order::where('id', $order->id)
+            ->with(['restaurant','courier'])
+            ->first();
+
+        if (Auth::guard('restaurant')->check()) {
+            // giriş yapan restoran
+            $authRestaurant = Auth::guard('restaurant')->user();
+
+            if ($order->restaurant_id == $authRestaurant->id) {
+                // sadece kendi order'ı ise tetikle
+                $channel = 'restaurant-' . $authRestaurant->id;
+                $pusher->trigger($channel, 'update-order', ['order' => $order]);
+            }
+
+        } elseif (Auth::guard('admin')->check()) {
+            // giriş yapan admin
+            $authAdmin = Auth::guard('admin')->user();
+
+            if ($order->restaurant->admin_id == $authAdmin->id) {
+                // siparişin restoranının admini ise tetikle
+                $channel = 'admin-' . $authAdmin->id;
+                $pusher->trigger($channel, 'update-order', ['order' => $order]);
+            }
+        }
     }
 }

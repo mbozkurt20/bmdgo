@@ -760,10 +760,10 @@
                                         </div>
 
                                         <div class="mb-3 col-md-6">
-                                            <label class="form-label">Şehir Seçiniz</label>
-                                            <select class="form-control" required name="sehir" id="">
-                                                @foreach(App\Models\City::all() as $city)
-                                                    <option value="{{$city->id}}">{{$city->name}}</option>
+                                            <label class="form-label">İlçe Seçiniz</label>
+                                            <select class="form-control" required name="ilce" id="">
+                                                @foreach(App\Models\District::where('city_id',\App\Models\Admin::find(auth()->user()->admin_id)->city_id)->get() as $d)
+                                                    <option value="{{$d->id}}">{{$d->name}}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -771,57 +771,39 @@
 
                                     <div class="card-body" style="border-top:1px solid #ddd;padding: 0px 0px">
                                         <div class="clearfix"></div>
-                                        <div class="repeater-heading">
-                                            <div class="row">
-                                                <div class="col-lg-10 mt-4">
-                                                    <h5 class="pull-left">Adres Ekle</h5>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="clearfix"></div>
-                                        <div class="item-content row"
-                                             style="background: #f4f4f4;margin: 15px 0px  10px;padding:10px 0px;border-radius: 10px">
-                                            <div class="mb-3 col-md-6">
-                                                <input required type="text" class="form-control" id="adres_name"
-                                                       name="adres_name"
-                                                       placeholder="Adres Başlğı">
-                                            </div>
-                                            <div class="mb-3 col-md-6">
-                                                <input required type="text" class="form-control" id="sokak_cadde"
-                                                       name="sokak_cadde"
-                                                       value=""
-                                                       placeholder="Sokak/Cadde">
+                                        <div class="mb-3">
+                                            <h5 class="fw-semibold text-black mb-3">Adres Bilgileri</h5>
+
+                                            <div class="d-flex align-items-center mb-2">
+                                                <span class="me-2 text-black">Mah.</span>
+                                                <input type="text" name="mahalle" class="flex-grow-1 border-0 border-bottom bg-transparent" placeholder="Örn: Ankara" required>
                                             </div>
 
-                                            <div class="mb-3 col-md-6">
-                                                <input required type="text" class="form-control" id="bina_no"
-                                                       name="bina_no"
-                                                       value=""
-                                                       placeholder="Bina No">
-                                            </div>
-                                            <div class="mb-3 col-md-6">
-                                                <input required type="text" class="form-control" id="kat" name="kat"
-                                                       value=""
-                                                       placeholder="Kat">
-                                            </div>
-                                            <div class="mb-3 col-md-6">
-                                                <input required type="text" class="form-control" id="daire_no"
-                                                       name="daire_no"
-                                                       value=""
-                                                       placeholder="Daire No">
-                                            </div>
-                                            <div class="mb-3 col-md-6">
-                                                <input required type="text" class="form-control" id="mahalle"
-                                                       name="mahalle"
-                                                       value=""
-                                                       placeholder="Mahalle">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <span class="me-2 text-black">Sok.</span>
+                                                <input type="text" name="sokak_cadde" class="flex-grow-1 border-0 border-bottom bg-transparent" placeholder="Örn: 5021" required>
                                             </div>
 
-
-                                            <div class="mb-3 col-md-12">
-                                                <textarea placeholder="Adres Tarifi" name="adres_tarifi"
-                                                          class="form-control" id="adres_tarifi"></textarea>
+                                            <div class="d-flex align-items-center mb-2">
+                                                <span class="me-2 text-black">Apt Adı.</span>
+                                                <input type="text" name="bina_no" class="flex-grow-1 border-0 border-bottom bg-transparent" placeholder="Örn: Deniz Apt." required>
                                             </div>
+
+                                            <div class="d-flex align-items-center mb-2">
+                                                <span class="me-2 text-black">Kat:</span>
+                                                <input type="text" name="kat" class="flex-grow-1 border-0 border-bottom bg-transparent" placeholder="Örn: 3" required>
+                                            </div>
+
+                                            <div class="d-flex align-items-center mb-2">
+                                                <span class="me-2 text-black">Daire:</span>
+                                                <input type="text" name="daire_no" class="flex-grow-1 border-0 border-bottom bg-transparent" placeholder="Örn: 5" required>
+                                            </div>
+
+                                            <div class="d-flex align-items-center mb-2">
+                                                <span class="me-2 text-black">Adres Tarifi (opsiyonel):</span>
+                                                <input type="text" name="adress_tarifi" class="flex-grow-1 border-0 border-bottom bg-transparent" placeholder="Örn: 5" required>
+                                            </div>
+
                                         </div>
                                     </div>
                                 </form>

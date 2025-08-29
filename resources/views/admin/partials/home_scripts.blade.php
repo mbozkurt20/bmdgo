@@ -29,7 +29,9 @@
         cluster: '{{ env("PUSHER_APP_CLUSTER") }}'
     });
 
-    var channel = pusher.subscribe('orders');
+    let adminId = "{{ auth('admin')->id() }}";
+
+    let channel = pusher.subscribe(`admin-${adminId}`);
 
     // Gelen veriyi konsolda görebilmek için
     channel.bind('new-order', function (data) {

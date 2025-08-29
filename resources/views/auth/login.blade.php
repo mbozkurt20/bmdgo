@@ -55,6 +55,7 @@
 </head>
 
 <body>
+
 <div class="login-container">
     <div class="login-box">
         <div class="logo">
@@ -77,7 +78,7 @@
             </div>
         @endif
 
-        <h2 class="form-title">Restaurant Girişi</h2>
+        <h2 class="form-title" id="formTitle">Restaurant Girişi</h2>
 
         <div class="user-type-selector">
             <p class="selector-label">Giriş Türünü Seçin:</p>
@@ -112,6 +113,7 @@
     const loginForm = document.getElementById('loginForm');
     const emailInput = document.getElementById('emailInput');
     const passwordInput = document.getElementById('passwordInput');
+    const formTitle = document.getElementById('formTitle');
 
     const routeMap = {
         admin: "{{ route('admin.auth') }}",
@@ -132,6 +134,14 @@
         }
     }
 
+    function updateFormTitle(type) {
+        const titles = {
+            admin: 'Yönetici Girişi',
+            restaurant: 'Restaurant Girişi'
+        };
+        formTitle.textContent = titles[type] || 'Giriş';
+    }
+
     // Sayfa yüklendiğinde restaurant varsayılan olarak seçilsin ve test bilgileri ayarlansın
     document.addEventListener('DOMContentLoaded', () => {
         setTestCredentials('restaurant');
@@ -146,6 +156,7 @@
             userTypeInput.value = selectedType;
 
             setTestCredentials(selectedType);
+            updateFormTitle(selectedType); // ← bunu ekle
         });
     });
 

@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\GeoLocation;
+use App\Models\Admin;
 use App\Models\City;
 use App\Models\Courier;
 use App\Models\Customer;
 use App\Models\CustomerAddress;
+use App\Models\District;
 use App\Models\Expenses;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -56,14 +58,22 @@ class CustomerController extends Controller
         $create->email = $request->input('email')??null;
         $create->save();
 
+        $city =  City::find(Admin::find(auth()->user()->admin_id)->city_id);
+
         // Check if address data is present
         if ($request->address) {
             $errors = [];
-
             foreach ($request->address as $adres) {
-                $city = City::find($adres['sehir']);
-                $addre = $adres['mahalle'].' mah. '.$adres['sokak_cadde'].' sokak. Bina No:'.$adres['bina_no'].' Kat:'.$adres['kat'].' Daire No:'.$adres['daire_no'].' '.$city->name;
-                $location = GeoLocation::getLatLong($addre);
+
+                $addres = $adres['mahalle'] . ' mah. ' .
+                    $adres['sokak_cadde'] . ' sokak. Bina No:' .
+                    $adres['kat'] . ' Kat:' .
+                    $adres['daire_no'] . ' Daire No:' .
+                    $adres['bina_no'] . ' Bina no' .
+                    District::find($adres['ilce'])->name . '/' .$city->name. ' Türkiye';
+
+                $location = GeoLocation::getLatLong($addres);
+
 
                 if (!isset($location['error'])) {
                     // Save each address for the customer
@@ -108,42 +118,68 @@ class CustomerController extends Controller
         $customer->phone = $request->phone;
         $customer->mobile = $request->mobile;
         $customer->save();
+        $city =  City::find(Admin::find(auth()->user()->admin_id)->city_id);
+
 
         if ($request->address) {
+            // Mevcut adresleri çek
+            $existingAddresses = CustomerAddress::where('customer_id', $customer->id)->pluck('id')->toArray();
+
+            // Request’ten gelen id’leri topla
+            $requestIds = collect($request->address)->pluck('id')->filter()->toArray();
+
+            // Silinmesi gereken adresler (veritabanında var ama request'te yok)
+            $toDelete = array_diff($existingAddresses, $requestIds);
+            CustomerAddress::whereIn('id', $toDelete)->delete();
+
             foreach ($request->address as $adres) {
-                if ($adres['type'] == "up") {
-                    $address = CustomerAddress::where('id', $adres['id'])->first();
-                    if ($address) {
-                        $address->name = $adres['name'];
-                        $address->sokak_cadde = $adres['sokak_cadde'];
-                        $address->bina_no = $adres['bina_no'];
-                        $address->kat = $adres['kat'];
-                        $address->daire_no = $adres['daire_no'];
-                        $address->mahalle = $adres['mahalle'];
-                        $address->adres_tarifi = $adres['adres_tarifi'];
-                        $address->latitude = $adres['latitude'];
-                        $address->longitude = $adres['longitude'];
-                        $address->save();
-                    }
+                $addres = $adres['mahalle'] . ' mah. ' .
+                    $adres['sokak_cadde'] . ' sokak. Bina No:' .
+                    $adres['kat'] . ' Kat:' .
+                    $adres['daire_no'] . ' Daire No:' .
+                    $adres['bina_no'] . ' Bina no ' .
+                    District::find($adres['ilce'])->name . '/' .$city->name. ' Türkiye';
+
+                $location = GeoLocation::getLatLong($addres);
+
+                if (isset($location['error'])) {
+                    return response()->json(['message' => 'Konumu doğru girip tekrar deneyiniz.']);
+                }
+
+                if (isset($adres['id']) && $findAddress = CustomerAddress::find($adres['id'])) {
+                    // Güncelle
+                    $findAddress->update([
+                        'name' => $adres['name'],
+                        'sokak_cadde' => $adres['sokak_cadde'],
+                        'bina_no' => $adres['bina_no'],
+                        'kat' => $adres['kat'],
+                        'daire_no' => $adres['daire_no'],
+                        'mahalle' => $adres['mahalle'],
+                        'adres_tarifi' => $adres['adres_tarifi'],
+                        'latitude' => $location['lat'],
+                        'longitude' => $location['lon'],
+                    ]);
                 } else {
-                    $newAddress = new CustomerAddress();
-                    $newAddress->restaurant_id = Auth::user()->id;
-                    $newAddress->customer_id = $customer->id;
-                    $newAddress->name = $adres['name'];
-                    $newAddress->sokak_cadde = $adres['sokak_cadde'];
-                    $newAddress->bina_no = $adres['bina_no'];
-                    $newAddress->kat = $adres['kat'];
-                    $newAddress->daire_no = $adres['daire_no'];
-                    $newAddress->mahalle = $adres['mahalle'];
-                    $newAddress->adres_tarifi = $adres['adres_tarifi'];
-                    $address->latitude = $adres['latitude'];
-                    $address->longitude = $adres['longitude'];
-                    $newAddress->save();
+                    // Yeni ekle
+                    CustomerAddress::create([
+                        'restaurant_id' => Auth::user()->id,
+                        'customer_id' => $customer->id,
+                        'name' => $adres['name'],
+                        'sokak_cadde' => $adres['sokak_cadde'],
+                        'bina_no' => $adres['bina_no'],
+                        'kat' => $adres['kat'],
+                        'daire_no' => $adres['daire_no'],
+                        'mahalle' => $adres['mahalle'],
+                        'adres_tarifi' => $adres['adres_tarifi'],
+                        'latitude' => $location['lat'],
+                        'longitude' => $location['lon'],
+                    ]);
                 }
             }
         }
 
-        return redirect()->back()->with('message', 'Müşteri Kaydı Başarıyla Güncellendi.');
+
+        return redirect()->back()->with('message', 'Müşteri ve Adresleri Başarıyla Güncellendi.');
     }
 
     public function delete($id)

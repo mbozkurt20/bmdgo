@@ -7,7 +7,9 @@ use App\Helpers\GeoLocation;
 use App\Helpers\NotificationHelper;
 use App\Helpers\OrdersHelper;
 use App\Helpers\OrderStatus;
+use App\Models\Admin;
 use App\Models\City;
+use App\Models\District;
 use App\Models\Restaurant;
 use App\Models\RestaurantCoupon;
 use App\Services\PushNotificationService;
@@ -339,13 +341,22 @@ class OrderController extends Controller
         try {
             DB::beginTransaction();
 
-            $location = GeoLocation::getLatLong($request->address);
+            $city =  City::find(Admin::find(auth()->user()->admin_id)->city_id);
+
+            $address = $request->mahalle . ' mah. ' .
+                $request->sokak_cadde . ' sokak. Bina No:' .
+                $request->bina_no . ' Kat:' .
+                $request->kat . ' Daire No:' .
+                $request->daire_no . ' ' .
+                District::find($request->ilce)->name . '/' .$city->name. ' Türkiye';
+
+            $location = GeoLocation::getLatLong($address);
 
             if (isset($location['error'])) {
                 return response()->json(['message' => 'Lütfen Adres Bilginizi Detaylı ve Anlaşılır Yazınız.'], 400);
             }
 
-            $customer = Customer::where('phone', $request->phone)->first();
+            $customer = Customer::where('phone', $request->phone)->where('restaurant_id', \auth()->id())->first();
 
             if (!$customer) {
                 $customer = new Customer();
@@ -355,28 +366,36 @@ class OrderController extends Controller
                 $customer->mobile = $request->input('mobile');
                 $customer->email = $request->input('email') ?? null;
                 $customer->save();
+            }
 
-                $address = CustomerAddress::where('customer_id', $customer->id)
-                    ->where('restaurant_id', Auth::guard('restaurant')->id())
-                    ->where('latitude', $location['lat'])
-                    ->where('longitude', $location['lon'])
-                    ->first();
+            $address = CustomerAddress::where('customer_id', $customer->id)
+                ->where('restaurant_id', Auth::guard('restaurant')->id())
+                ->where('daire_no', $request->daire_no)
+                ->where('mahalle', $request->mahalle)
+                ->where('sokak_cadde', $request->sokak_cadde)
+                ->where('kat', $request->kat)
+                ->where('daire_no', $request->daire_no)
+                ->where('latitude', $location['lat'])
+                ->where('longitude', $location['lon'])
+                ->first();
 
-                if (!$address) {
-                    $address = new CustomerAddress();
-                    $address->customer_id = $customer->id;
-                    $address->restaurant_id = Auth::guard('restaurant')->id();
-                    $address->name = 'Hızlı Sipariş';
-                    $address->sokak_cadde = ' ';
-                    $address->bina_no = ' ';
-                    $address->kat = ' ';
-                    $address->latitude = $location['lat'];
-                    $address->longitude = $location['lon'];
-                    $address->daire_no = ' ';
-                    $address->mahalle = ' ';
-                    $address->adres_tarifi = ' ';
-                    $address->save();
-                }
+            if (!$address) {
+                $address = new CustomerAddress();
+                $address->customer_id = $customer->id;
+                $address->restaurant_id = Auth::guard('restaurant')->id();
+                $address->name = 'Hızlı Sipariş';
+                $address->sokak_cadde = $request->sokak_cadde;
+                $address->bina_no = $request->bina_no;
+                $address->kat = $request->kat;
+                $address->city_id = $city->id;
+                $address->district_id = $request->ilce;
+                $address->adress_tarifi = $request->adress_tarifi;
+                $address->latitude = $location['lat'];
+                $address->longitude = $location['lon'];
+                $address->daire_no = $request->daire_no;
+                $address->mahalle = $request->mahalle;
+                $address->adres_tarifi = $request->adress_tarifi;
+                $address->save();
             }
 
             $restaurant = Restaurant::find($request->restaurant_id);
@@ -388,7 +407,7 @@ class OrderController extends Controller
                 'tracking_id' => "POS-" . rand(9, 99999),
                 'full_name' => $request->full_name,
                 'phone' => $request->phone,
-                'address' => $request->address,
+                'address' => $address,
                 'payment_method' => $request->payment_method,
                 'sub_amount' => $request->amount,
                 'discount' => 0.00,
@@ -495,54 +514,50 @@ class OrderController extends Controller
             }
         }
 
-        $data = $request->validate([
-            'name' => 'required',
-            'phone' => 'required'
-        ]);
+        $data = $request->all();
 
-        $custom = Customer::where('phone', $data['phone'])->where('restaurant_id', Auth::user()->id)->first();
+        $city =  City::find(Admin::find(auth()->user()->admin_id)->city_id);
+        $create = Customer::where('phone', $data['phone'])->where('restaurant_id', Auth::user()->id)->first();
 
-        if ($custom) {
-            $adres = CustomerAddress::where('customer_id', $custom->id)->first();
-            $customer = '<p class="logo-text text-white mr-2">' . $custom->name . '</p> ' . '<span class="ml-2 text-white"> - ' . $adres->phone . '</span>' . ' <br><span>' . $adres->mahalle . ' Mah.' . $adres->sokak_cadde . '.No:' . $request->bina_no . ' Kat:' . $request->kat . ' Daire:' . $request->daire_no . '</span>';
-
-            return response()->json(['customer' => $customer, 'customerid' => $custom->id]);
-        } else {
+        if (!$create) {
             $create = new Customer();
             $create->restaurant_id = Auth::user()->id;
             $create->name = $data['name'];
             $create->phone = $data['phone'];
-            $create->mobile = $request->mobile;
+            $create->mobile = $data['mobile'];
             $create->save();
-
-            if ($request->adres_name) {
-                $city = City::find($request->sehir);
-
-                $addre = $request->mahalle . ' mah. ' . $request->sokak_cadde . ' sokak. Bina No:' . $request->bina_no . ' Kat:' . $request->kat . ' Daire No:' . $request->daire_no . ' ' . $city->name;
-                $location = GeoLocation::getLatLong($addre);
-
-                if (isset($location['error'])) {
-                    return response()->json(['message' => 'Konumu doğru girip tekrar deneyiniz.']);
-                }
-
-                $adreses = new CustomerAddress();
-                $adreses->restaurant_id = Auth::user()->id;
-                $adreses->customer_id = $create->id;
-                $adreses->name = $request->adres_name;
-                $adreses->sokak_cadde = $request->sokak_cadde;
-                $adreses->bina_no = $request->bina_no;
-                $adreses->kat = $request->kat;
-                $adreses->latitude = $location['lat'];
-                $adreses->longitude = $location['lon'];
-                $adreses->daire_no = $request->daire_no;
-                $adreses->mahalle = $request->mahalle;
-                $adreses->adres_tarifi = $request->adres_tarifi;
-                $adreses->save();
-            }
-
-            $customer = '<p class="logo-text mr-2 text-white">' . $data['name'] . '</p> ' . '<span class="ml-2 text-white"> - ' . $data['phone'] . '</span>' . ' <br><span>' . $request->mahalle . ' Mah.' . $request->sokak_cadde . '.No:' . $request->bina_no . ' Kat:' . $request->kat . ' Daire:' . $request->daire_no . '</span>';
-            return response()->json(['customer' => $customer, 'customerid' => $create->id,'message' => 'Müşteri Başarıyla Eklendi']);
         }
+
+        $address = $request->mahalle . ' mah. ' .
+            $request->sokak_cadde . ' sokak. ' .
+            $request->bina_no . ' Apt.:' .
+            $request->kat . ' Kat:' .
+            $request->daire_no . ' Daire No' .
+            District::find($request->ilce)->name . '/' .$city->name. ' Türkiye';
+
+        $location = GeoLocation::getLatLong($address);
+
+        if (isset($location['error'])) {
+            return response()->json(['message' => 'Konumu doğru girip tekrar deneyiniz.']);
+        }
+
+        $adreses = new CustomerAddress();
+        $adreses->restaurant_id = Auth::user()->id;
+        $adreses->customer_id = $create->id;
+        $adreses->name = $request->adres_name;
+        $adreses->sokak_cadde = $request->sokak_cadde;
+        $adreses->bina_no = $request->bina_no;
+        $adreses->kat = $request->kat;
+        $adreses->city_id = $city->id;
+        $adreses->district_id = $request->ilce;
+        $adreses->latitude = $location['lat'];
+        $adreses->longitude = $location['lon'];
+        $adreses->daire_no = $request->daire_no;
+        $adreses->mahalle = $request->mahalle;
+        $adreses->adres_tarifi = $request->adres_tarifi;
+        $adreses->save();
+
+        return response()->json(['customer' => $create, 'customerid' => $create->id,'message' => 'Müşteri Başarıyla Eklendi']);
     }
 
     public function addOrder(Request $request)
@@ -587,7 +602,7 @@ class OrderController extends Controller
         $order->customer_id = $request->customer_id;
         $order->full_name = $customer->name;
         $order->coupon = json_encode($coupon);
-        $order->address = $customer_address->mahalle . " Mah. " . $customer_address->sokak_cadde . " Cad/Sk. No:" . $customer_address->bina_no . ". Kat:" . $customer_address->kat . ". D:" . $customer_address->daire_no . " / Adres Tarifi:" . $customer_address->adres_tarifi;
+        $order->address = $customer_address->mahalle . " Mah. " . $customer_address->sokak_cadde . " Cad/Sk. Apt." . $customer_address->bina_no . ". Kat:" . $customer_address->kat . ". Daire No:" . $customer_address->daire_no;
         $order->phone = $customer->phone;
         $order->discount = $discount;
         $order->sub_amount = $request->amount;

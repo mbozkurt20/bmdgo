@@ -54,65 +54,88 @@
 
                             <hr>
                             <!-- Adresler -->
-                            <div class="p-3" style="background: #f4f0f0">
-                                <div class="repeater-heading mb-3">
+                            <div class="p-3">
+                                <div class="repeater-heading mb-5">
+
                                     <div class="row">
                                         <div class="col-lg-10">
-                                            <h5>Adres Ekle <small class="text-danger">*</small></h5>
+                                            <h5 class="pull-left">Müşteri Adresleri Ekleyiniz</h5>
                                         </div>
-                                        <div class="col-lg-2 text-end">
-                                            <a id="new-add" class="special-ok-button-small btn-xs repeater-add-btn" data-repeater-create>+ Yeni Ekle
+                                        <div class="col-lg-2" style="text-align: right">
+                                            <a class="special-ok-button-small btn-xs repeater-add-btn" data-repeater-create>+ Yeni Ekle
                                             </a>
                                         </div>
                                     </div>
+
+                                    <p style="font-weight: bold" class="text-danger font-weight-bold">!!! Lütfen bilgilerinizi eksiksiz giriniz, bu bilgileri referans alınarak kuryelerimize yön veriyoruz....</p>
                                 </div>
 
                                 <div data-repeater-list="address">
-                                    <div data-repeater-item class="item-content row border p-3 mb-4 rounded">
-                                        <!-- Adres Başlığı -->
-                                        <div class="mb-3 col-md-5">
-                                            <input type="text" class="form-control" name="name" required placeholder="Adres Başlığı">
+                                    <div data-repeater-item class="item-content mb-3 border p-3 rounded">
+
+                                        <h5 class="fw-semibold text-black mb-3">Adres Bilgileri</h5>
+                                        <hr>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="me-3 fw-bold" style="color:#0d2646; font-size:1rem;">Adres Başlığı:</span>
+                                            <input type="text" class="flex-grow-1 border-0 border-bottom bg-transparent"
+                                                   name="name" placeholder="Adres Başlığı" required>
                                         </div>
 
-                                        <div class="mb-3 col-md-3">
-                                            <select class="form-control" required name="sehir" id="">
-                                                @foreach(App\Models\City::all() as $city)
-                                                    <option value="{{$city->id}}">{{$city->name}}</option>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="me-3 fw-bold" style="color:#0d2646; font-size:1rem;">İlçe:</span>
+                                            <select class="flex-grow-1 border-0 border-bottom bg-transparent" name="ilce" required>
+                                                @foreach(\App\Models\District::where('city_id', \App\Models\Admin::find(auth()->user()->admin_id)->city_id)->get() as $district)
+                                                    <option value="{{ $district->id }}">
+                                                        {{ $district->name }}
+                                                    </option>
                                                 @endforeach
                                             </select>
                                         </div>
 
-                                        <div class="mb-3 col-md-3">
-                                            <input type="text" class="form-control" name="mahalle" required placeholder="Mahalle">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="me-3 fw-bold" style="color:#0d2646; font-size:1rem;">Mah.</span>
+                                            <input type="text" class="flex-grow-1 border-0 border-bottom bg-transparent"
+                                                   name="mahalle" placeholder="Mahalle" required>
                                         </div>
-                                        <div class="mb-3 col-md-1 text-end">
+
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="me-3 fw-bold" style="color:#0d2646; font-size:1rem;">Sok.</span>
+                                            <input type="text" class="flex-grow-1 border-0 border-bottom bg-transparent"
+                                                   name="sokak_cadde" placeholder="Sokak / Cadde" required>
+                                        </div>
+
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="me-3 fw-bold" style="color:#0d2646; font-size:1rem;">Apt Adı.</span>
+                                            <input type="text" class="flex-grow-1 border-0 border-bottom bg-transparent"
+                                                   name="bina_no" placeholder="Bina No / Apartman Adı" required>
+                                        </div>
+
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="me-3 fw-bold" style="color:#0d2646; font-size:1rem;">Kat:</span>
+                                            <input type="text" class="flex-grow-1 border-0 border-bottom bg-transparent"
+                                                   name="kat" placeholder="Kat" required>
+                                        </div>
+
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="me-3 fw-bold" style="color:#0d2646; font-size:1rem;">Daire:</span>
+                                            <input type="text" class="flex-grow-1 border-0 border-bottom bg-transparent"
+                                                   name="daire_no" placeholder="Daire No" required>
+                                        </div>
+
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="me-3 fw-bold" style="color:#0d2646; font-size:1rem;">Adres Tarifi:</span>
+                                            <input type="text" class="flex-grow-1 border-0 border-bottom bg-transparent"
+                                                   name="adres_tarifi" placeholder="Adres Tarifi" required>
+                                        </div>
+
+                                        <!-- Silme butonu -->
+                                        <div class="text-end mt-2">
                                             <a style="font-size: 20px; cursor: pointer" class="text-danger" data-repeater-delete>
                                                 <i class="fa fa-trash"></i>
                                             </a>
                                         </div>
-
-                                        <div class="mb-3 col-md-3">
-                                            <input type="text" class="form-control" name="sokak_cadde" required placeholder="Sokak/Cadde">
-                                        </div>
-
-                                        <div class="mb-3 col-md-3">
-                                            <input type="text" class="form-control" name="bina_no" required placeholder="Bina No">
-                                        </div>
-
-                                        <div class="mb-3 col-md-3">
-                                            <input type="text" class="form-control" name="kat" required placeholder="Kat">
-                                        </div>
-
-                                        <div class="mb-3 col-md-3">
-                                            <input type="text" class="form-control" name="daire_no" required placeholder="Daire No">
-                                        </div>
-
-
-
-                                        <div class="mb-3 col-md-12">
-                                            <input type="text" name="adres_tarifi" class="form-control" required placeholder="Adres Tarifi">
-                                        </div>
                                     </div>
+
                                 </div>
                             </div>
 

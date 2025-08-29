@@ -24,15 +24,14 @@ Route::get('/partner', [App\Http\Controllers\HomeController::class, 'dealer'])->
 Route::post('/new-partner', [App\Http\Controllers\HomeController::class, 'createDealerRequest'])->name('createDealerRequest');
 Route::get('/get-districts/{cityId}', [App\Http\Controllers\HomeController::class, 'getDistricts']);
 
+Route::post('/payment/callback', [TamiPaymentController::class, 'callback'])->name('payment.callback');
+
 Auth::routes();
 
-Route::post('/payment/callback', [TamiPaymentController::class, 'callback'])->name('payment.callback');
 Route::get('/payment/success', [TamiPaymentController::class, 'successPage'])->name('payment.success');
 Route::get('/payment/fail', [TamiPaymentController::class, 'failPage'])->name('payment.fail');
 
-
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home.dashboard');
-Route::view('login', 'restaurant.login')->name('admin.login');
 
 include __DIR__ . '/app/superAdminRoutes.php';
 include __DIR__ . '/app/adminRoutes.php';

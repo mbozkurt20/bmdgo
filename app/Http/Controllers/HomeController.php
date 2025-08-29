@@ -14,11 +14,15 @@ class HomeController extends Controller
 {
     public function index()
     {
-        if(Auth::guard('restaurant')->check()){
+        if (Auth::guard('restaurant')->check()) {
             return redirect()->route('restaurant.index');
-        }else{
-            return view('restaurant.login');
         }
+
+        if (Auth::guard('admin')->check()) {
+            return redirect()->route('admin.index');
+        }
+
+        return view('auth.login');
     }
 
     public function dealer(){

@@ -7,6 +7,7 @@ use App\Helpers\OrderStatus;
 use App\Models\AdminSystemFeature;
 use App\Models\Courier;
 use App\Models\Customer;
+use App\Models\District;
 use App\Models\Notification;
 use App\Models\Order;
 use App\Models\Restaurant;
@@ -52,7 +53,11 @@ class AdminController extends Controller
     {
         return Auth::guard('admin');
     }
-
+    public function getDistricts($cityId)
+    {
+        $districts = District::where('city_id', $cityId)->get(['id', 'name']);
+        return response()->json($districts);
+    }
     public function ajax(Request $request)
     {
         $tumu = Order::whereDate('created_at', Carbon::today())
@@ -106,7 +111,7 @@ class AdminController extends Controller
 
     public function profileUpdate(Request $request)
     {
-        $auth = Auth::guard('admin')->user();
+        $auth = Admin::find(Auth::guard('admin')->id());
 
         if ($request->password){
             $auth->password = Hash::make($request->password);
@@ -116,7 +121,9 @@ class AdminController extends Controller
         $auth->longitude = $request->input('longitude');
         $auth->name = $request->input('name');
         $auth->phone = $request->input('phone');
-        $auth->save();
+        $auth->city_id = $request->input('city_id');
+        $auth->district_id = $request->input('district_id');
+        $auth->update();
 
         return redirect()->back()->with('message', 'Bilgileriniz Güncellenmiştir.');
     }

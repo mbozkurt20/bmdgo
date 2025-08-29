@@ -97,7 +97,24 @@
                                         <label class="form-label">Adres <small class="text-danger">*</small></label>
                                         <textarea required rows="8" cols="8" class="form-control"  name="address"  placeholder="İşyeri Adresi"></textarea>
                                     </div>
+                                    @php
+                                        $city = \App\Models\City::find(\App\Models\Admin::find(auth()->id())->city_id);
+                                    @endphp
+                                    <div class="mb-3 col-md-4 d-none">
+                                        <label class="form-label">Şehir</label>
+                                        <select class="form-control" name="city_id" id="city-select">
+                                            <option value="{{$city->id}}" data-lat="{{$city->lat}}" data-lng="{{$city->lng}}" selected>
+                                                {{$city->name}}
+                                            </option>
+                                        </select>
+                                    </div>
 
+                                    <div class="mb-3 col-md-4">
+                                        <label class="form-label">İlçe</label>
+                                        <select required class="form-control select2" name="district_id" id="district-select">
+                                            <option value="">İlçe Seç</option>
+                                        </select>
+                                    </div>
 
                                     <div class="mt-5 mb-3">
                                         <p class="text-danger fw-bold">Lütfen haritadan konum işaratlemesi yapınız.</p>
@@ -129,35 +146,50 @@
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
-        var existingLat = {{ auth()->user()->latitude ?? '37.15026069044849' }};
-        var existingLng = {{ auth()->user()->longitude ?? '38.77905463205474' }};
-        var map;
+        $(document).ready(function () {
+            var cityId = $('#city-select').val();
+            var selectedOption = $('#city-select').find('option:selected');
+            var lat = selectedOption.data('lat');
+            var lng = selectedOption.data('lng');
 
-        if (existingLat && existingLng) {
-            map = L.map('map').setView([existingLat, existingLng], 13);
-            marker = L.marker([existingLat, existingLng]).addTo(map);
-        } else {
-            map = L.map('map').setView([39.9208, 32.8541], 6); // Türkiye geneli
-        }
+            // Harita başlangıç
+            var map = L.map('map').setView([lat, lng], 13);
+            var marker = L.marker([lat, lng]).addTo(map);
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap'
-        }).addTo(map);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
 
-        map.on('click', function(e) {
-            var lat = e.latlng.lat;
-            var lng = e.latlng.lng;
+            $('#lat').val(lat);
+            $('#lng').val(lng);
 
-            if (marker) {
-                map.removeLayer(marker);
+            map.on('click', function(e) {
+                var lat = e.latlng.lat;
+                var lng = e.latlng.lng;
+
+                if (marker) {
+                    map.removeLayer(marker);
+                }
+                marker = L.marker([lat, lng]).addTo(map);
+
+                $('#lat').val(lat);
+                $('#lng').val(lng);
+            });
+
+            // İlçeleri otomatik getir
+            if (cityId) {
+                $.ajax({
+                    url: '/admin/get-districts/' + cityId,
+                    type: 'GET',
+                    success: function (data) {
+                        $('#district-select').empty().append('<option value="">İlçe Seç</option>');
+                        $.each(data, function (key, value) {
+                            $('#district-select').append('<option value="' + value.id + '">' + value.name + '</option>');
+                        });
+                    }
+                });
             }
-
-            marker = L.marker([lat, lng]).addTo(map);
-
-            document.getElementById('lat').value = lat;
-            document.getElementById('lng').value = lng;
         });
-
     </script>
 @endsection
 

@@ -4,7 +4,7 @@
     <style>
         #map {
             border: #0d2646 solid 2px;
-            height: 500px; /* ya da istediğin başka bir yükseklik */
+            height: 500px;
             width: 100%;
             border-radius: 15px;
             margin-bottom: 20px;
@@ -49,7 +49,6 @@
                     </div>
                     <div class="card-body">
 
-
                         <div class="basic-form">
                             <form action="{{ route('admin.profile.update') }}" method="POST">
                                 @csrf
@@ -71,15 +70,37 @@
                                         <input type="password" name="password" class="form-control">
                                     </div>
 
+                                    <div class="mb-3 col-md-6">
+                                        <label class="form-label">Şehir</label>
+                                        <select required class="form-control select2" name="city_id" id="city_id">
+                                            <option value="">Şehir Seç</option>
+                                            @foreach(\App\Models\City::all() as $city)
+                                                <option {{$city->id == auth()->user()->city_id ? 'selected' : '' }}
+                                                        value="{{$city->id}}"
+                                                        data-lat="{{$city->lat}}"
+                                                        data-lng="{{$city->lng}}">
+                                                    {{$city->name}}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3 col-md-6">
+                                        <label class="form-label">İlçe</label>
+                                        <select required class="form-control select2" name="district_id" id="district_id">
+                                            <option value="">İlçe Seç</option>
+                                        </select>
+                                    </div>
+
                                     <div class="col-md-6 mb-3">
                                         <label class="text-dark" for="latitude">Enlem (Latitude)</label>
-                                        <input type="text" name="latitude" id="lat" class="form-control"
+                                        <input type="text" name="latitude" id="latitude" class="form-control"
                                                value="{{ old('latitude', auth()->user()->latitude) }}">
                                     </div>
 
                                     <div class="col-md-6 mb-3">
                                         <label class="text-dark" for="longitude">Boylam (Longitude)</label>
-                                        <input type="text" name="longitude" id="lng" class="form-control"
+                                        <input type="text" name="longitude" id="longitude" class="form-control"
                                                value="{{ old('longitude', auth()->user()->longitude) }}">
                                     </div>
 
@@ -95,34 +116,85 @@
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
-        var existingLat = {{ auth()->user()->latitude ?? '37.15026069044849' }};
-        var existingLng = {{ auth()->user()->longitude ?? '38.77905463205474' }};
-        var map;
+        $(document).ready(function () {
 
-        if (existingLat && existingLng) {
-            map = L.map('map').setView([existingLat, existingLng], 13);
-            marker = L.marker([existingLat, existingLng]).addTo(map);
-        } else {
-            map = L.map('map').setView([39.9208, 32.8541], 6); // Türkiye geneli
-        }
+            var existingLat = {{ auth()->user()->latitude ?? '37.15026069044849' }};
+            var existingLng = {{ auth()->user()->longitude ?? '38.77905463205474' }};
+            var map, marker;
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap'
-        }).addTo(map);
-
-        map.on('click', function(e) {
-            var lat = e.latlng.lat;
-            var lng = e.latlng.lng;
-
-            if (marker) {
-                map.removeLayer(marker);
+            if (existingLat && existingLng) {
+                map = L.map('map').setView([existingLat, existingLng], 13);
+                marker = L.marker([existingLat, existingLng]).addTo(map);
+            } else {
+                map = L.map('map').setView([39.9208, 32.8541], 6);
             }
 
-            marker = L.marker([lat, lng]).addTo(map);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
 
-            document.getElementById('lat').value = lat;
-            document.getElementById('lng').value = lng;
+            map.on('click', function(e) {
+                var lat = e.latlng.lat;
+                var lng = e.latlng.lng;
+
+                if (marker) {
+                    map.removeLayer(marker);
+                }
+
+                marker = L.marker([lat, lng]).addTo(map);
+
+                $('#latitude').val(lat);
+                $('#longitude').val(lng);
+            });
+
+            $('.select2').select2();
+
+            function loadDistricts(cityId, selectedDistrictId = null) {
+                if (cityId) {
+                    $.ajax({
+                        url: '/admin/get-districts/' + cityId,
+                        type: 'GET',
+                        success: function (data) {
+                            $('#district_id').empty().append('<option value="">İlçe Seç</option>');
+                            $.each(data, function (key, value) {
+                                var selected = (value.id == selectedDistrictId) ? 'selected' : '';
+                                $('#district_id').append('<option value="' + value.id + '" ' + selected + '>' + value.name + '</option>');
+                            });
+                        }
+                    });
+                } else {
+                    $('#district_id').empty().append('<option value="">İlçe Seç</option>');
+                }
+            }
+
+            // şehir değişince ilçeleri getir
+            $('#city_id').on('change', function () {
+                var cityId = $(this).val();
+                var selectedOption = $(this).find('option:selected');
+                var lat = selectedOption.data('lat');
+                var lng = selectedOption.data('lng');
+
+                if (lat && lng && map) {
+                    map.setView([lat, lng], 13);
+
+                    if (marker) {
+                        map.removeLayer(marker);
+                    }
+                    marker = L.marker([lat, lng]).addTo(map);
+
+                    $('#latitude').val(lat);
+                    $('#longitude').val(lng);
+                }
+
+                loadDistricts(cityId);
+            });
+
+            // sayfa yüklenince otomatik seçili ilçeyi getir
+            var initialCityId = $('#city_id').val();
+            var initialDistrictId = "{{ auth()->user()->district_id }}";
+            if (initialCityId) {
+                loadDistricts(initialCityId, initialDistrictId);
+            }
         });
-
     </script>
 @endsection

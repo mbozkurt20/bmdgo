@@ -72,67 +72,108 @@
                                 <hr>
                                 <div class="mt-4">
                                     <!-- Repeater Heading -->
-                                    <div class="repeater-heading">
+                                    <div class="repeater-heading mb-5">
+
                                         <div class="row">
                                             <div class="col-lg-10">
-                                                <h5 class="pull-left">Adres Ekle</h5>
+                                                <h5 class="pull-left">Müşteri Adresleri Güncelleyiniz</h5>
                                             </div>
                                             <div class="col-lg-2" style="text-align: right">
                                                 <a class="special-ok-button-small btn-xs repeater-add-btn" data-repeater-create>+ Yeni Ekle
                                                 </a>
                                             </div>
                                         </div>
+
+                                        <p style="font-weight: bold" class="text-danger font-weight-bold">!!! Lütfen bilgilerinizi eksiksiz giriniz, bu bilgileri referans alınarak kuryelerimize yön veriyoruz....</p>
                                     </div>
 
                                     <div class="clearfix"></div>
+
                                     <!-- Repeater Items -->
                                     <div data-repeater-list="address">
                                         @foreach (\App\Models\CustomerAddress::where('customer_id', $customer->id)->get() as $index => $address)
-                                            <div data-repeater-item class="item-content row border p-3 mb-4 rounded">
-                                                <!-- Adres Başlığı -->
-                                                <div class="mb-3 col-md-5">
-                                                    <input type="text" class="form-control" name="address[{{ $index }}][name]" required placeholder="Adres Başlığı" value="{{ $address->name }}">
+                                            <div data-repeater-item class="item-content mb-3 border p-3 rounded">
+                                                <input name="id" value="{{$address->id}}" style="display: none" type="text">
+                                                <h5 style="color: #e7004d" class="fw-semibold  mb-3">Adres Bilgileri</h5>
+
+                                                <hr>
+
+                                                <div class="d-flex align-items-center mb-3">
+                                                    <span class="me-3 fw-bold" style="color:#0d2646; font-size:1rem;">Adres Başlığı:</span>
+                                                    <input type="text" class="flex-grow-1 border-0 border-bottom bg-transparent"
+                                                           name="address[{{ $index }}][name]"
+                                                           value="{{ $address->name }}"
+                                                           placeholder="Adres Başlığı" required>
                                                 </div>
 
-                                                <div class="mb-3 col-md-3">
-                                                    <select class="form-control" required name="address[{{ $index }}][sehir]" id="">
-                                                        @foreach(App\Models\City::all() as $city)
-                                                            <option value="{{ $city->id }}" {{ $city->id == $address->city_id ? 'selected' : '' }}>{{ $city->name }}</option>
+                                                <div class="d-flex align-items-center mb-3">
+                                                    <span class="me-3 fw-bold" style="color:#0d2646; font-size:1rem;">İlçe:</span>
+                                                    <select class="flex-grow-1 border-0 border-bottom bg-transparent"
+                                                            name="address[{{ $index }}][ilce]" required>
+                                                        @foreach(\App\Models\District::where('city_id', \App\Models\Admin::find(auth()->user()->admin_id)->city_id)->get() as $district)
+                                                            <option value="{{ $district->id }}" {{ $district->id == $address->district_id ? 'selected' : '' }}>
+                                                                {{ $district->name }}
+                                                            </option>
                                                         @endforeach
                                                     </select>
                                                 </div>
 
-                                                <div class="mb-3 col-md-3">
-                                                    <input value="{{ $address->mahalle }}" type="text" class="form-control" name="address[{{ $index }}][mahalle]" required placeholder="Mahalle">
+                                                <div class="d-flex align-items-center mb-3">
+                                                    <span class="me-3 fw-bold" style="color:#0d2646; font-size:1rem;">Mah.</span>
+                                                    <input type="text" class="flex-grow-1 border-0 border-bottom bg-transparent"
+                                                           name="address[{{ $index }}][mahalle]"
+                                                           value="{{ $address->mahalle }}"
+                                                           placeholder="Örn: Ankara" required>
                                                 </div>
 
-                                                <div class="mb-3 col-md-3">
-                                                    <input type="text" class="form-control" value="{{ $address->sokak_cadde }}" name="address[{{ $index }}][sokak_cadde]" required placeholder="Sokak/Cadde">
+                                                <div class="d-flex align-items-center mb-3">
+                                                    <span class="me-3 fw-bold" style="color:#0d2646; font-size:1rem;">Sok.</span>
+                                                    <input type="text" class="flex-grow-1 border-0 border-bottom bg-transparent"
+                                                           name="address[{{ $index }}][sokak_cadde]"
+                                                           value="{{ $address->sokak_cadde }}"
+                                                           placeholder="Örn: 5021" required>
                                                 </div>
 
-                                                <div class="mb-3 col-md-3">
-                                                    <input type="text" class="form-control" value="{{ $address->bina_no }}" name="address[{{ $index }}][bina_no]" required placeholder="Bina No">
+                                                <div class="d-flex align-items-center mb-3">
+                                                    <span class="me-3 fw-bold" style="color:#0d2646; font-size:1rem;">Apt Adı.</span>
+                                                    <input type="text" class="flex-grow-1 border-0 border-bottom bg-transparent"
+                                                           name="address[{{ $index }}][bina_no]"
+                                                           value="{{ $address->bina_no }}"
+                                                           placeholder="Örn: Deniz Apt." required>
                                                 </div>
 
-                                                <div class="mb-3 col-md-3">
-                                                    <input type="text" class="form-control" value="{{ $address->kat }}" name="address[{{ $index }}][kat]" required placeholder="Kat">
+                                                <div class="d-flex align-items-center mb-3">
+                                                    <span class="me-3 fw-bold" style="color:#0d2646; font-size:1rem;">Kat:</span>
+                                                    <input type="text" class="flex-grow-1 border-0 border-bottom bg-transparent"
+                                                           name="address[{{ $index }}][kat]"
+                                                           value="{{ $address->kat }}"
+                                                           placeholder="Örn: 3" required>
                                                 </div>
 
-                                                <div class="mb-3 col-md-3">
-                                                    <input type="text" class="form-control" value="{{ $address->daire_no }}" name="address[{{ $index }}][daire_no]" required placeholder="Daire No">
+                                                <div class="d-flex align-items-center mb-3">
+                                                    <span class="me-3 fw-bold" style="color:#0d2646; font-size:1rem;">Daire:</span>
+                                                    <input type="text" class="flex-grow-1 border-0 border-bottom bg-transparent"
+                                                           name="address[{{ $index }}][daire_no]"
+                                                           value="{{ $address->daire_no }}"
+                                                           placeholder="Örn: 5" required>
                                                 </div>
 
-                                                <div class="mb-3 col-md-12">
-                                                    <input type="text" name="address[{{ $index }}][adres_tarifi]" value="{{ $address->adres_tarifi }}" class="form-control" required placeholder="Adres Tarifi">
+                                                <div class="d-flex align-items-center mb-3">
+                                                    <span class="me-3 fw-bold" style="color:#0d2646; font-size:1rem;">Adres Tarifi:</span>
+                                                    <input type="text" class="flex-grow-1 border-0 border-bottom bg-transparent"
+                                                           name="address[{{ $index }}][adres_tarifi]"
+                                                           value="{{ $address->adres_tarifi }}"
+                                                           placeholder="Örn: Parkın karşısı">
                                                 </div>
 
                                                 <!-- Silme butonu -->
-                                                <div class="mb-3 col-md-1 text-end">
+                                                <div class="text-end mt-2">
                                                     <a style="font-size: 20px; cursor: pointer" class="text-danger" data-repeater-delete>
                                                         <i class="fa fa-trash"></i>
                                                     </a>
                                                 </div>
                                             </div>
+
                                         @endforeach
                                     </div>
                                 </div>
