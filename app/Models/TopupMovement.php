@@ -19,6 +19,7 @@ class TopupMovement extends Model
         'created_type',
         'is_approved',
         'is_paid',
+        'payment_details',
         'created_by_user_id',
     ];
 

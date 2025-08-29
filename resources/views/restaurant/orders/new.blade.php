@@ -472,7 +472,7 @@
                         </div>
 
                         <!-- SAĞ SEPET -->
-                        <div class="col-md-3 ">
+                        <div class="col-md-3">
                             <div class="card shadow-lg" style="border-radius: 10px;">
                                 <div class="row">
                                     <div class="col-md-6">

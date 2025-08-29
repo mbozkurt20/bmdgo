@@ -21,8 +21,6 @@
         {{-- Ödeme Kartı Formu --}}
         <div class="card shadow-sm w-100" style="max-width: 450px;">
             <div class="card-body">
-                <h3 class="card-title text-center mb-4">Garanti Ödeme Formu</h3>
-
                 {{-- Kart Görseli --}}
                 <div class="bg-success text-white rounded-3 p-3 mb-4 position-relative" style="height: 180px;">
                     <img src="/theme/images/Tami-bulten.png" alt="Garanti" class="position-absolute top-0 end-0 m-3" style="height: 30px;">
@@ -45,22 +43,22 @@
 
                     <div class="mb-3">
                         <label for="card_name" class="form-label">Kart Üzerindeki İsim</label>
-                        <input type="text" class="form-control" id="card_name" name="card_name" value="Mehmet Bozkurt">
+                        <input  required type="text" class="form-control" id="card_name" name="card_name" value="">
                     </div>
 
                     <div class="mb-3">
                         <label for="card_number" class="form-label">Kart Numarası</label>
-                        <input type="text" class="form-control" id="card_number" name="card_number" value="4824910501747014" maxlength="16">
+                        <input required type="text" class="form-control" id="card_number" name="card_number" value="" maxlength="16">
                     </div>
 
                     <div class="row mb-3">
                         <div class="col">
                             <label for="expire_month" class="form-label">Ay</label>
-                            <input type="text" class="form-control text-center" id="expire_month" name="expire_month" value="04" maxlength="2">
+                            <input required type="text" class="form-control text-center" id="expire_month" name="expire_month" value="" maxlength="2">
                         </div>
                         <div class="col">
                             <label for="expire_year" class="form-label">Yıl</label>
-                            <input type="text" class="form-control text-center" id="expire_year" name="expire_year" value="2026" maxlength="4">
+                            <input required type="text" class="form-control text-center" id="expire_year" name="expire_year" value="" maxlength="4">
                         </div>
                         <div class="col">
                             <label for="cvc" class="form-label">CVC</label>

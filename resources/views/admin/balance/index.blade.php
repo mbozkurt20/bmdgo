@@ -7,28 +7,34 @@
             <h2 class="mb-3 me-auto">Kontör Bakiyesi</h2>
         </div>
         <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
-            <div class="card card-body " >
+            <div class="card card-body ">
                 <div class="" style="max-width: 35vw">
-                    <p class="fw-bold size-2 text-dark">Merhaba, {{\Illuminate\Support\Facades\Auth::guard('admin')->user()->name}}</p>
+                    <p class="fw-bold size-2 text-dark">
+                        Merhaba, {{\Illuminate\Support\Facades\Auth::guard('admin')->user()->name}}</p>
 
-                    <p class="size-2 special-button mb-5 rounded-lg">Güncel Kontör Bakiyeniz: {{\Illuminate\Support\Facades\Auth::guard('admin')->user()->top_up_balance}}</p>
+                    <p class="size-2 special-button mb-5 rounded-lg">Güncel Kontör
+                        Bakiyeniz: {{\Illuminate\Support\Facades\Auth::guard('admin')->user()->top_up_balance}}</p>
 
                     <p class="text-primary">
-                        <strong> Bilgilendirme:: </strong> Kontör bakiyesini buradan ve üst alandan kontrol edebilirsiniz.
+                        <strong> Bilgilendirme:: </strong> Kontör bakiyesini buradan ve üst alandan kontrol
+                        edebilirsiniz.
                     </p>
 
                     <p class="text-danger">
-                        <strong>Dikkat:: Kontör bakiyeniz yetersiz olması durumunda siparişleriniz eklenmeyecektir, bu durumdan {{env('APP_NAME')}} olarak sorumluluk almadığımızı belirtmek isteriz.</strong>
+                        <strong>Dikkat:: Kontör bakiyeniz yetersiz olması durumunda siparişleriniz eklenmeyecektir, bu
+                            durumdan {{env('APP_NAME')}} olarak sorumluluk almadığımızı belirtmek isteriz.</strong>
                     </p>
 
                     <p class="text-success">
-                        <strong> Satın Alım:: </strong> Paketlerimizi <a class="text-primary" style="text-decoration: underline" href="https://bmdgo.com/fiyat/">BmdGo </a>  adresimizden inceleyebilirsiniz.
+                        <strong> Satın Alım:: </strong> Paketlerimizi <a class="text-primary"
+                                                                         style="text-decoration: underline"
+                                                                         href="https://bmdgo.com/fiyat/">BmdGo </a>
+                        adresimizden inceleyebilirsiniz.
                     </p>
                 </div>
 
-        {{--
 
-                  <div class="border border-dark p-3 rounded-2" style="max-width: 25%">
+                <div class="border border-dark p-3 rounded-2" style="max-width: 25%">
                     <form method="GET" action="{{ route('payment.form') }}">
                         @csrf
 
@@ -44,7 +50,8 @@
 
                         <div class="mb-3">
                             <label class="fw-bold text-black">Kontör Adet</label>
-                            <input required class="form-control" type="number" min="1" placeholder="Adet giriniz" id="top_up" name="top_up">
+                            <input required class="form-control" type="number" min="1" placeholder="Adet giriniz"
+                                   id="top_up" name="top_up">
                         </div>
 
                         <!-- Anlık hesaplanan tutar -->
@@ -55,13 +62,169 @@
 
                         <!-- Butonlar -->
                         <div class="d-flex gap-2">
-                            <button class="special-button" style="display: none" type="button" id="hesaplaBtn">Hesapla</button>
+                            <button class="special-button" style="display: none" type="button" id="hesaplaBtn">Hesapla
+                            </button>
                             <button class="special-button" type="submit">Ödeme Yap</button>
                         </div>
                     </form>
                 </div>
 
-         --}}
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h4 class="mb-0">Kontör Hareketleri</h4>
+                    </div>
+                    <div class="card-body table-responsive">
+                        <table class="table table-bordered table-striped align-middle">
+                            <thead style="background-color: #0d2646; color: #fff;">
+                            <tr>
+                                <th>#</th>
+                                <th>İşlem Sahibi</th>
+                                <th>Kontör Fiyatı</th>
+                                <th>Adet</th>
+                                <th>Toplam Tutar</th>
+                                <th>Tip</th>
+                                <th>Onay Durumu</th>
+                                <th>Ödeme Durumu</th>
+                                <th>Ödeme Detayları</th>
+                                <th>Tarih</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @forelse($movements as $key => $movement)
+                                <tr>
+                                    <td>{{ $key+1 }}</td>
+                                    <td>{{ $movement->created_type == 'admin' ? 'Siz' : 'Yönetici' }}</td>
+                                    <td>{{ $movement->top_up_price }} ₺</td>
+                                    <td>{{ $movement->top_up }}</td>
+                                    <td>{{ $movement->total_amount }} ₺</td>
+                                    <td>{{ ucfirst($movement->type) }}</td>
+
+                                    <td>
+                                        @if($movement->is_approved)
+                                            <span class="badge" style="background-color:#0d2646;">Onaylı</span>
+                                        @else
+                                            <span class="badge bg-warning text-dark">Bekliyor</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($movement->is_paid)
+                                            <span class="badge" style="background-color:#0d2646;">Ödendi</span>
+                                        @else
+                                            <span class="badge bg-danger">Ödenmedi</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($movement->payment_details)
+                                            <button class="btn btn-sm" style="background-color:#0d2646; color:#fff;"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#paymentDetailsModal{{ $movement->id }}">
+                                                Görüntüle
+                                            </button>
+
+                                            <!-- Modal -->
+                                            <div class="modal fade" id="paymentDetailsModal{{ $movement->id }}"
+                                                 tabindex="-1" aria-hidden="true">
+                                                <div class="modal-dialog modal-lg modal-dialog-centered">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header"
+                                                             style="background-color:#0d2646; color:#fff;">
+                                                            <h5 class="modal-title text-white">Ödeme Detayları</h5>
+                                                            <button type="button" class="btn-close"
+                                                                    data-bs-dismiss="modal" aria-label="Kapat"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            @php
+                                                                $details = json_decode($movement->payment_details, true);
+                                                            @endphp
+
+                                                            @if(is_array($details))
+                                                                <ul class="list-group">
+                                                                    @foreach($details as $key => $value)
+                                                                        @if($key=='card')
+                                                                            <li class="list-group-item d-flex justify-content-between"
+                                                                                style="border-left:5px solid #0d2646;">
+                                                                                <strong>Kart Tipi</strong>
+                                                                                <span>{{ $value['cardType'] }}</span>
+                                                                            </li>
+
+                                                                            <li class="list-group-item d-flex justify-content-between"
+                                                                                style="border-left:5px solid #0d2646;">
+                                                                                <strong>BIN Number</strong>
+                                                                                <span>{{ $value['binNumber'] }}</span>
+                                                                            </li>
+
+                                                                            <li class="list-group-item d-flex justify-content-between"
+                                                                                style="border-left:5px solid #0d2646;">
+                                                                                <strong>Banka</strong>
+                                                                                <span>{{ $value['cardBrand'] }}</span>
+                                                                            </li>
+
+                                                                            <li class="list-group-item d-flex justify-content-between"
+                                                                                style="border-left:5px solid #0d2646;">
+                                                                                <strong>Kart Organizasyonu</strong>
+                                                                                <span>{{ $value['cardOrganization'] }}</span>
+                                                                            </li>
+                                                                        @else
+
+                                                                            @switch($key)
+                                                                                @case('is3D')
+                                                                                    <li class="list-group-item d-flex justify-content-between"
+                                                                                        style="border-left:5px solid #0d2646;">
+                                                                                        <strong>3D Ödeme</strong>
+                                                                                        <span>{{ $value ? 'Evet' : 'Hayır' }}</span>
+                                                                                    </li>
+                                                                                    @break
+
+                                                                                @case('currency')
+                                                                                    <li class="list-group-item d-flex justify-content-between"
+                                                                                        style="border-left:5px solid #0d2646;">
+                                                                                        <strong>Birim</strong>
+                                                                                        <span>{{ $value }}</span>
+                                                                                    </li>
+                                                                                    @break
+                                                                                @case('currency')
+                                                                                    <li class="list-group-item d-flex justify-content-between"
+                                                                                        style="border-left:5px solid #0d2646;">
+                                                                                        <strong>Birim</strong>
+                                                                                        <span>{{ $value }}</span>
+                                                                                    </li>
+                                                                                    @break
+                                                                                @case('amount')
+                                                                                    <li class="list-group-item d-flex justify-content-between"
+                                                                                        style="border-left:5px solid #0d2646;">
+                                                                                        <strong>Toplam Tutar</strong>
+                                                                                        <span>{{ $value }}₺</span>
+                                                                                    </li>
+                                                                                    @break
+                                                                            @endswitch
+
+                                                                        @endif
+                                                                    @endforeach
+                                                                </ul>
+                                                            @else
+                                                                <p class="text-muted">Detay çözümlenemedi.</p>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
+
+                                    <td>{{ $movement->created_at->format('d.m.Y H:i') }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="12" class="text-center text-muted">Henüz hareket bulunmamaktadır.</td>
+                                </tr>
+                            @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
 
             </div>
         </div>
@@ -79,7 +242,7 @@
                 messaging_product: "whatsapp",
                 to: "905xxxxxxxxx", // Numaranız (ülke kodu ile)
                 type: "text",
-                text: { body: "Merhaba! Bu bir test mesajıdır." }
+                text: {body: "Merhaba! Bu bir test mesajıdır."}
             }, {
                 headers: {
                     'Authorization': `Bearer ${token}`,

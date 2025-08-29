@@ -10,6 +10,7 @@ use App\Services\Tami\JWTSignatureGenerator;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class TamiPaymentController extends Controller
 {
@@ -87,9 +88,9 @@ class TamiPaymentController extends Controller
             ],
             "buyer" => [
                 "ipAddress"          => $request->ip(),
-                "buyerId"            => "dc5d150f19ac475289c78bb24acc56bb",
-                "name"               =>  $admin->name??" ",
-                "surName"            =>  $admin->name??" ",
+                "buyerId"            => uniqid(),
+                "name"               => $admin->name??" ",
+                "surName"            => $admin->name??" ",
                 "identityNumber"     => 11111111111,
                 "city"               => $admin->city_id ? City::find($admin->city_id)->name:"",
                 "country"            => "Türkiye",
@@ -152,86 +153,111 @@ class TamiPaymentController extends Controller
         }
     }
 
-    /**
-     * 3. Callback → Başarılı
-     */
     public function callback(Request $request)
     {
-        $endpoint    = env('TAMI_ENDPOINT', 'https://sandbox-paymentapi.tami.com.tr');
-        $merchantId  = env('TAMI_MERCHANT_ID', '77006950');
-        $terminalId  = env('TAMI_TERMINAL_ID', '84006953');
-        $secretKey   = env('TAMI_SECRET_KEY', 'your-secret');
-        $kid         = env('TAMI_FIXED_KID', '00ff6ea8-3511-4d04-946c-ba569208306f');
-        $k           = env('TAMI_FIXED_K', '87919a8f-957b-427b-ae12-167622ab52b5');
+        try {
+            // Önce orderId ile kaydı bul
+            $orderId = $request->input('orderId');
 
-        // Body
+            $successUrl = route('payment.success') . '?order_id=' . $orderId . '&status=success';
+            return redirect($successUrl);
+        } catch (\Exception $e) {
+            Log::error('Tami callback hatası: ' . $e->getMessage());
+            $orderId = $request->input('orderId', 'unknown');
+            $failUrl = route('payment.fail') . '?order_id=' . $orderId . '&status=error';
+            return redirect($failUrl);
+        }
+    }
+
+    public function successPage(Request $request)
+    {
+        $orderId = $request->input('order_id');
+
+        $topUp = TopupMovement::where('order_id', $orderId)->first();
+
+        if (!$topUp) {
+            Log::error('TopupMovement bulunamadı: ' . $orderId);
+            // Session olmadan hata yönetimi
+            return response()->json(['error' => 'Ödeme kaydı bulunamadı.'], 404);
+        }
+
+        // Tami API sorgulama işlemleri...
+        $endpoint = env('TAMI_ENDPOINT');
+        $merchantId = env('TAMI_MERCHANT_ID');
+        $terminalId = env('TAMI_TERMINAL_ID');
+        $secretKey = env('TAMI_SECRET_KEY');
+        $kid = env('TAMI_FIXED_KID');
+        $k = env('TAMI_FIXED_K');
+
         $payload = [
-            'orderId'            => $request->input('orderId'),
-            'isTransactionDetail'=> false,
+            'orderId' => $orderId,
+            'isTransactionDetail' => false,
         ];
 
-        // Security hash ekle
         $payload['securityHash'] = JWTSignatureGenerator::generateJWKSignature(
-            $merchantId,
-            $terminalId,
-            $secretKey,
-            json_encode($payload),
-            $kid,
-            $k
+            $merchantId, $terminalId, $secretKey, json_encode($payload), $kid, $k
         );
 
-        // Headers
         $headers = [
-            'Content-Type'    => 'application/json',
+            'Content-Type' => 'application/json',
             'Accept-Language' => 'tr',
-            'PG-Api-Version'  => 'v2',
-            'PG-Auth-Token'   => $this->generateAuthToken($merchantId, $terminalId, $secretKey),
-            'correlationId'   => $this->generateGuid()
+            'PG-Api-Version' => 'v2',
+            'PG-Auth-Token' => $this->generateAuthToken($merchantId, $terminalId, $secretKey),
+            'correlationId' => $this->generateGuid()
         ];
 
-        // Guzzle POST
         $response = $this->client->post($endpoint.'/payment/query', [
             'headers' => $headers,
-            'json'    => $payload,
-            'verify'  => false, // sandbox için
+            'json' => $payload,
+            'verify' => false,
         ]);
 
         $data = json_decode($response->getBody(), true);
 
-        $topUp = TopupMovement::where('order_id', $request->input('orderId'))->first();
-
+        // Ödeme kaydını güncelle
         $topUp->update([
             'is_approved' => 1,
             'is_paid' => 1,
-            'payment_details'   => json_encode([
-                'success' => $data['success'],
-                'systemTime' => $data['systemTime'],
-                'amount' => $data['amount'],
+            'payment_details' => json_encode([
                 'orderDate' => $data['orderDate'],
+                'amount' => $data['amount'],
                 'currency' => $data['currency'],
-                'installmentCount' => $data['installmentCount'],
+                'orderId' => $data['orderId'],
+                'is3D' => $data['is3D'],
                 'card' => $data['card'],
             ])
         ]);
 
-        if ($topUp) {
-            $admin = Admin::where('id',$topUp->admin_id)->first();
-            $admin->increment('top_up_balance', $topUp->top_up);
+        // Admin bakiyesini güncelle
+        if ($topUp->is_approved) {
+            $admin = Admin::find($topUp->admin_id);
+            if ($admin) {
+                $admin->increment('top_up_balance', $topUp->top_up);
+            }
         }
 
-        return response()->json(['status'=>'ok']);
+        if (!$topUp) {
+            return redirect()->route('admin.index')->with('error', 'Ödeme kaydı bulunamadı.');
+        }
+
+        return view('admin.payment.tami.success', [
+            'message' => 'Ödeme başarılı! ' . $topUp->top_up . ' TL yüklendi.',
+            'orderId' => $orderId,
+            'amount' => $topUp->total_amount
+        ]);
     }
 
-    public function successPage()
+    public function failPage(Request $request)
     {
-        dd(12215);
-        return view('admin.payment.tami.success', [ 'message' => 'Ödeme Başarılı!']);
-    }
+        $orderId = $request->input('order_id');
 
-    public function failPage()
-    {
+        $topUp = TopupMovement::where('order_id', $orderId)->first();
 
-        return view('admin.payment.tami.fail', [ 'message' => 'Ödeme Başarısız!']);
+        $topUp->delete();
+
+        return view('admin.payment.tami.fail', [
+            'message' => 'Ödeme işlemi başarısız oldu.',
+        ]);
     }
 
     private function generateAuthToken(string $merchantId, string $terminalId, string $secretKey): string

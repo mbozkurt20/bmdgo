@@ -54,7 +54,7 @@ class AssignPendingOrders implements ShouldQueue
 
                 if ($courier->fcm_token){
                     $ser = new PushNotificationService();
-                    $ser->sendNotification($courier->fcm_token,'Yeni Sipariş Atantı',$order->tracking_id.' takip nolu siparişiniz var');
+                    $ser->sendNotification($courier->fcm_token,'Yeni Paketiniz Var',$order->tracking_id.' takip nolu siparişiniz var');
                 }
 
                 $orderCourier = CourierOrder::where('courier_id',$courier->id)->where('order_id', $order->id)->first();

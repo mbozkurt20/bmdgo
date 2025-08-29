@@ -16,27 +16,33 @@
         h1 {
             color: #28a745;
             font-size: 48px;
+            margin-bottom: 20px;
         }
-        pre {
-            text-align: left;
-            display: inline-block;
-            margin-top: 20px;
-            padding: 15px;
-            background: #e9ecef;
-            border-radius: 8px;
-            overflow-x: auto;
+        p {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+        .countdown {
+            font-weight: bold;
+            color: #e7004d;
+            font-size: 22px;
         }
     </style>
     <script>
-        // 4 saniye sonra admin sayfasına yönlendir
-        setTimeout(function() {
-            window.location.href = '/admin';
-        }, 4000);
+        let seconds = 4;
+        function updateCountdown() {
+            document.getElementById('countdown').textContent = seconds;
+            if (seconds <= 0) {
+                window.location.href = '/admin/top-up-balance';
+            }
+            seconds--;
+        }
+        setInterval(updateCountdown, 1000);
+        window.onload = updateCountdown;
     </script>
 </head>
 <body>
 <h1>Ödeme Başarılı ✅</h1>
-
-<p>Yönlendiriliyorsunuz...</p>
+<p><span id="countdown" class="countdown">4</span> saniye içinde yönlendirileceksiniz...</p>
 </body>
 </html>

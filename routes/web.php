@@ -24,7 +24,17 @@ Route::get('/partner', [App\Http\Controllers\HomeController::class, 'dealer'])->
 Route::post('/new-partner', [App\Http\Controllers\HomeController::class, 'createDealerRequest'])->name('createDealerRequest');
 Route::get('/get-districts/{cityId}', [App\Http\Controllers\HomeController::class, 'getDistricts']);
 
-Route::post('/payment/callback', [TamiPaymentController::class, 'callback'])->name('payment.callback');
+Route::post('/payment/callback', [TamiPaymentController::class, 'callback'])
+    ->name('payment.callback')
+    ->withoutMiddleware(['web']); // web middleware'ını tamamen kaldır
+
+Route::get('/payment/success', [TamiPaymentController::class, 'successPage'])
+    ->name('payment.success')
+    ->middleware('auth:admin'); // Sadece auth middleware ekle
+
+Route::get('/payment/fail', [TamiPaymentController::class, 'failPage'])
+    ->name('payment.fail')
+    ->middleware('auth:admin'); // Sadece auth middleware ekle
 
 Auth::routes();
 
