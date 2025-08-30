@@ -328,7 +328,7 @@ class CourierController extends Controller
         //mobil bildiri
         if ($courier->fcm_token){
             $ser = new PushNotificationService();
-            $ser->sendNotification($courier->fcm_token,$restaurant->restaurant_name.' Restorandan 1 Yeni Siparişiniz Var','Sipariş Takip Kodu:'. $order->tracking_id);
+            $ser->sendNotification($courier->fcm_token,$restaurant->restaurant_name.' Restorandan Yeni Siparişiniz Var','Sipariş Takip Kodu:'. $order->tracking_id);
         }
 
         if (OrdersHelper::getOrderSystem(3)){
