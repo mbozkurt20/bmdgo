@@ -40,7 +40,7 @@ class CourierController extends Controller
     public function getCourier()
     {
         $couriers = Courier::where('restaurant_id', 0)
-            ->where('admin_id', auth()->id())
+            ->where('admin_id', Auth::guard('admin')->id())
             ->where('status',CourierStatus::active)
             ->get();
 
