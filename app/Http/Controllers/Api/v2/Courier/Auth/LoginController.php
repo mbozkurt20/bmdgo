@@ -6,6 +6,7 @@ use App\Helpers\CourierStatus;
 use App\Helpers\Json;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CourierResource;
+use App\Models\Admin;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Courier;
@@ -58,6 +59,7 @@ class LoginController extends Controller
     {
         $requestData = Validator::make($request->all(), [
             'name' => 'required',
+            'code' => 'required',
             'phone' => 'required',
             'password' => 'required',
             'latitude' => 'required',
@@ -69,6 +71,10 @@ class LoginController extends Controller
 
         if ($requestData->fails()) {
             return Json::error($requestData->errors());
+        }
+
+        if (!Admin::where('code',$request->input('code'))->exists()) {
+            return Json::error('Üzgünüz, bu koda ait yönetici bulunamadı!');
         }
 
         if ($request->has('price_type') || $request->has('price') || $request->has('phone')) {
@@ -88,6 +94,7 @@ class LoginController extends Controller
         }
 
         $courier = Courier::create([
+            'admin_id' => Admin::where('code',$request->input('code'))->first()->id,
             'name' => $request->input('name'),
             'birthday' => $request->input('birthday'),
             'phone' => $request->input('phone'),

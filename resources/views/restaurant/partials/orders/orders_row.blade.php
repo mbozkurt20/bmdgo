@@ -1,32 +1,39 @@
 <tr id="data_{{ $order->id }}" class="msg">
     <td>
         @if ($order->platform == 'yemeksepeti' || $order->platform == 'Yemeksepeti')
-            <a class="btn btn-primary btn-rounded" style="padding: 5px;background: #fb0050;border-color: #fb0050; font-size:12px;">
+            <a class="btn btn-primary btn-rounded"
+               style="padding: 5px;background: #fb0050;border-color: #fb0050; font-size:12px;">
                 {{ $order->restaurant->restaurant_name }} /
                 <img src="{{ asset('theme/images/yemeksepeti.png') }}" style="height: 15px">
             </a>
         @elseif ($order->platform == 'getir' || $order->platform == 'Getir')
-            <a class="btn btn-primary btn-rounded" style="padding: 5px;background: #6244be;border-color: #6244be; font-size:12px;">
+            <a class="btn btn-primary btn-rounded"
+               style="padding: 5px;background: #6244be;border-color: #6244be; font-size:12px;">
                 {{ $order->restaurant->restaurant_name }} /
                 <img src="{{ asset('theme/images/getiryemek.png') }}" style="height: 15px">
             </a>
         @elseif ($order->platform == 'trendyol' || $order->platform == 'Trendyol')
-            <a style="width:100%;font-weight: bold;padding:10px 15px;font-size:12px;" class="btn btn-primary btn-rounded">
+            <a style="width:100%;font-weight: bold;padding:10px 15px;font-size:12px;"
+               class="btn btn-primary btn-rounded">
                 {{ $order->restaurant->restaurant_name }} /
                 <img src="{{ asset('theme/images/trendyolyemek.png') }}" style="height: 10px">
             </a>
         @elseif ($order->platform == 'migros' || $order->platform == 'Migros')
-            <a style="padding: 5px;background: #000080;border-color: #6244be; font-size: 14px" class="btn btn-primary btn-rounded">
+            <a style="padding: 5px;background: #000080;border-color: #6244be; font-size: 14px"
+               class="btn btn-primary btn-rounded">
                 {{ $order->restaurant->restaurant_name }} /
-                <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/aff9ed163620751.6556613f80c21.png" style="height: 25px;">
+                <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/aff9ed163620751.6556613f80c21.png"
+                     style="height: 25px;">
             </a>
         @elseif ($order->platform == 'adisyo' || $order->platform == 'Adisyo')
-            <a style="padding: 5px;background: #ff0a0a;border-color: #fff; font-size: 14px" class="btn btn-primary btn-rounded">
+            <a style="padding: 5px;background: #ff0a0a;border-color: #fff; font-size: 14px"
+               class="btn btn-primary btn-rounded">
                 {{ $order->restaurant->restaurant_name }} /
                 <img src="{{ asset('theme/images/adisyoFull.png') }}" style="height: 25px;">
             </a>
         @elseif ($order->platform == 'telefonsiparis')
-            <a class="special-ok-button btn-rounded" style="width:100%;font-weight: bold;padding:10px 15px;font-size:12px;">
+            <a class="special-ok-button btn-rounded"
+               style="width:100%;font-weight: bold;padding:10px 15px;font-size:12px;">
                 {{ $order->restaurant->restaurant_name }} / POS
             </a>
         @endif
@@ -38,12 +45,15 @@
     <td>
         @if ($order->courier)
             <div style="display:flex; align-items:center;">
-                <a class=" fw-bold" data-bs-toggle="modal" data-bs-target="#Courier{{ $order->id }}" style="cursor:pointer;color: #e7004d">
-                    <i class="fas fa-truck mr-1"></i> {{ $order->courier ? substr($order->courier->name,0,10) : 'Silinmiş Kurye' }}...
+                <a class=" fw-bold" data-bs-toggle="modal" data-bs-target="#Courier{{ $order->id }}"
+                   style="cursor:pointer;color: #e7004d">
+                    <i class="fas fa-truck mr-1"></i> {{ $order->courier ? substr($order->courier->name,0,10) : 'Silinmiş Kurye' }}
+                    ...
                 </a>
             </div>
         @else
-            <a data-bs-toggle="modal" data-bs-target="#Courier{{ $order->id }}" style="cursor: pointer" class="sharp text-secondary size-3 px-3 fw-bold">
+            <a data-bs-toggle="modal" data-bs-target="#Courier{{ $order->id }}" style="cursor: pointer"
+               class="sharp text-secondary size-3 px-3 fw-bold">
                 <i class="fas fa-truck mr-1"></i> <small>Kurye Ata</small>
             </a>
         @endif
@@ -64,11 +74,21 @@
         <select class="inline-order-select"
                 onchange="StatusOrderChange(event, {{ $order->id }})"
                 @if ($order->status == App\Helpers\OrderStatus::DELIVERED) disabled @endif>
-            <option value="{{ App\Helpers\OrderStatus::PENDING }}" @if ($order->status == App\Helpers\OrderStatus::PENDING) selected @endif>BEKLİYOR</option>
-            <option value="{{ App\Helpers\OrderStatus::PREPARED }}" @if ($order->status == App\Helpers\OrderStatus::PREPARED) selected @endif>HAZIRLANIYOR</option>
-            <option value="{{ App\Helpers\OrderStatus::HANDOVER }}" @if ($order->status == App\Helpers\OrderStatus::HANDOVER) selected @endif>KURYEYE VERİLDİ</option>
-            <option value="{{ App\Helpers\OrderStatus::DELIVERED }}" @if ($order->status == App\Helpers\OrderStatus::DELIVERED) selected @endif>TESLİM EDİLDİ</option>
-            <option value="{{ App\Helpers\OrderStatus::UNSUPPLIED }}" @if ($order->status == App\Helpers\OrderStatus::UNSUPPLIED) selected @endif>İPTAL EDİLDİ</option>
+            <option value="{{ App\Helpers\OrderStatus::PENDING }}"
+                    @if ($order->status == App\Helpers\OrderStatus::PENDING) selected @endif>BEKLİYOR
+            </option>
+            <option value="{{ App\Helpers\OrderStatus::PREPARED }}"
+                    @if ($order->status == App\Helpers\OrderStatus::PREPARED) selected @endif>HAZIRLANIYOR
+            </option>
+            <option value="{{ App\Helpers\OrderStatus::HANDOVER }}"
+                    @if ($order->status == App\Helpers\OrderStatus::HANDOVER) selected @endif>KURYEYE VERİLDİ
+            </option>
+            <option value="{{ App\Helpers\OrderStatus::DELIVERED }}"
+                    @if ($order->status == App\Helpers\OrderStatus::DELIVERED) selected @endif>TESLİM EDİLDİ
+            </option>
+            <option value="{{ App\Helpers\OrderStatus::UNSUPPLIED }}"
+                    @if ($order->status == App\Helpers\OrderStatus::UNSUPPLIED) selected @endif>İPTAL EDİLDİ
+            </option>
         </select>
     </td>
     <td>
@@ -134,14 +154,17 @@
                                         <thead>
                                         <tr>
                                             <th
-                                                style="font-size: 14px;font-weight: 600">
-                                                Ürün</th>
+                                                    style="font-size: 14px;font-weight: 600">
+                                                Ürün
+                                            </th>
                                             <th
-                                                style="font-size: 14px;font-weight: 600">
-                                                Adeti</th>
+                                                    style="font-size: 14px;font-weight: 600">
+                                                Adeti
+                                            </th>
                                             <th
-                                                style="font-size: 14px;font-weight: 600">
-                                                Fiyatı</th>
+                                                    style="font-size: 14px;font-weight: 600">
+                                                Fiyatı
+                                            </th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -167,10 +190,12 @@
                             <button type="button"
                                     class="btn btn-primary light"
                                     onclick="printOrder({{ $order->id }})"><i
-                                    class="fa fa-print"></i>Yazdır</button>
+                                        class="fa fa-print"></i>Yazdır
+                            </button>
                             <button type="button"
                                     class="btn btn-danger light"
-                                    data-bs-dismiss="modal">Kapat</button>
+                                    data-bs-dismiss="modal">Kapat
+                            </button>
                         </div>
 
                     </div>
@@ -232,13 +257,16 @@
                 <label for="cancelReason" class="form-label">Siparişi
                     neden
                     iptal etmek istiyorsunuz?</label>
-                <textarea class="form-control" id="message" rows="4" placeholder="Lütfen iptal nedeninizi yazın..."></textarea>
+                <textarea class="form-control" id="message" rows="4"
+                          placeholder="Lütfen iptal nedeninizi yazın..."></textarea>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary"
-                        data-bs-dismiss="modal">Geri Dön</button>
+                        data-bs-dismiss="modal">Geri Dön
+                </button>
                 <button type="button" class="btn btn-danger"
-                        id="confirmCancel">İptal Et</button>
+                        id="confirmCancel">İptal Et
+                </button>
             </div>
         </div>
     </div>
@@ -279,4 +307,4 @@
     }
 </style>
 
-@include('restaurant.partials.home_scripts')
+@include('restaurant.partials.old_scripts')

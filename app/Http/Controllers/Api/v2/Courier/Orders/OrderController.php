@@ -27,7 +27,7 @@ class OrderController extends Controller
         $orders = Order::where('courier_id', $courier->id)
             ->whereDate('created_at', Carbon::today())
             ->orderBy('created_at', 'asc')
-            ->whereIn('status', [OrderStatus::PENDING, OrderStatus::HANDOVER,OrderStatus::PREPARED])
+            ->whereIn('status', [OrderStatus::ASSIGNED, OrderStatus::HANDOVER])
             ->get();
 
         return Json::success('Siparişler', OrderResource::collection($orders));
@@ -46,6 +46,7 @@ class OrderController extends Controller
             return Json::error('Size atanmamış bir siparişi güncelleyemezsiniz', 401);
         }
 
+        //teslim edidi
         if ($request->input('order_status_id') == 1) {
             $status = OrderStatus::DELIVERED;
 
@@ -58,8 +59,41 @@ class OrderController extends Controller
             }
         }
 
+        //reddedildi edidi
         if ($request->input('order_status_id') == 2) {
-            $status = OrderStatus::UNSUPPLIED;
+           $courier->status = CourierStatus::active;
+           $courier->update();
+
+           $order->courier_id = -1;
+           $order->status = OrderStatus::PREPARED;
+           $order->update();
+
+           $courierOrder = CourierOrder::where('order_id',$order->id)->where('courier_id',$courier->id)->first();
+           if ($courierOrder) {
+               $courierOrder->delete();
+           }
+
+            if (OrdersHelper::getOrderSystem(3)) {
+                NotificationHelper::add([
+                    'title' => 'Kurye Paketi Reddetti',
+                    'description' => $order->tracking_id . ' takip numaralı paket ' . $courier->name . '  kurye tarafından teslim edildi.',
+                    'url' => route('admin.balance')
+                ]);
+            }
+        }
+
+        //kurye teslim aldı
+        if ($request->input('order_status_id') == 3) {
+            if ($courier->status == CourierStatus::service){
+                return Json::error('Teslim Edilmeyen Sipariş Bulunuyor');
+            }
+
+            $courier->status = CourierStatus::service;
+            $courier->update();
+
+            $order->courier_id = $courier->id;
+            $order->status = OrderStatus::HANDOVER;
+            $order->update();
         }
 
         $order = Order::where('id', $orderId)->first();

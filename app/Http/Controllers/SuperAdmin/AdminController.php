@@ -243,7 +243,7 @@ class AdminController extends Controller
 
         // Validasyon başarılı ise admin tablosuna kaydet
         Admin::create([
-            'created_by_id' => \auth()->id(),
+            'created_by_id' => auth()->id(),
             'created_by_type' => 'superadmin',
             'top_up_price' => $request->top_up_price,
             'name' => $request->name,

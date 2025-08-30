@@ -1,19 +1,39 @@
 <div class="col-xl-12 col-xxl-8 mt-4">
     <ul class="nav nav-tabs" id="orderStatusTabs" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab">Bekliyor</button>
+            <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending"
+                    type="button" role="tab">Bekliyor
+            </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="prepared-tab" data-bs-toggle="tab" data-bs-target="#prepared" type="button" role="tab">Hazırlanıyor</button>
+            <button class="nav-link" id="prepared-tab" data-bs-toggle="tab" data-bs-target="#prepared" type="button"
+                    role="tab">Hazırlanıyor
+            </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="handover-tab" data-bs-toggle="tab" data-bs-target="#handover" type="button" role="tab">Kuryeye Verildi</button>
+            <button class="nav-link" id="assigned-tab" data-bs-toggle="tab" data-bs-target="#assigned" type="button"
+                    role="tab">Kuryeye Atananlar
+            </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="delivered-tab" data-bs-toggle="tab" data-bs-target="#delivered" type="button" role="tab">Teslim Edildi</button>
+            <button class="nav-link" id="handover-tab" data-bs-toggle="tab" data-bs-target="#handover" type="button"
+                    role="tab">Kuryeye Verildi
+            </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="unsupplied-tab" data-bs-toggle="tab" data-bs-target="#unsupplied" type="button" role="tab">İptal Edildi</button>
+            <button class="nav-link" id="pickup-tab" data-bs-toggle="tab" data-bs-target="#pickup" type="button"
+                    role="tab">Yolda
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="delivered-tab" data-bs-toggle="tab" data-bs-target="#delivered" type="button"
+                    role="tab">Teslim Edildi
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="unsupplied-tab" data-bs-toggle="tab" data-bs-target="#unsupplied" type="button"
+                    role="tab">İptal Edildi
+            </button>
         </li>
 
         <li class="nav-item" role="presentation">
@@ -22,7 +42,8 @@
     </ul>
 
 
-    <h2 id="newOrder" class="mt-4 bg-white py-2 text-center mx-auto fw-bold mb-4" style="display:none;color: rgba(231,0,77,0.82)" >
+    <h2 id="newOrder" class="mt-4 bg-white py-2 text-center mx-auto fw-bold mb-4"
+        style="display:none;color: rgba(231,0,77,0.82)">
         Yeni Sipariş Geldi
     </h2>
 
@@ -30,12 +51,13 @@
         $statuses = [
             'PENDING' => 'pending',
             'PREPARED' => 'prepared',
+            'ASSIGNED' => 'assigned',
             'HANDOVER' => 'handover',
+            'PICKUP' => 'pickup',
             'DELIVERED' => 'delivered',
             'UNSUPPLIED' => 'unsupplied'
         ];
     @endphp
-
     <div class="card">
         <div class="card-body">
             <div class="tab-content" id="orderStatusTabsContent">

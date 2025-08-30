@@ -303,11 +303,10 @@ class CourierController extends Controller
         $courier = Courier::find($courierId);
 
         $order->courier_id = $courier->id;
-        $order->status = OrderStatus::HANDOVER;
+        $order->status = OrderStatus::ASSIGNED;
         $order->save();
 
         // Kuryeyi servide de yap ve son atama zamanını güncelle
-        $courier->status = CourierStatus::service;
         $courier->last_assigned_at = now();
         $courier->save();
 
@@ -319,8 +318,6 @@ class CourierController extends Controller
             $newOrderCourier->courier_id = $courier->id;
             $newOrderCourier->order_id = $order->id;
             $newOrderCourier->save();
-
-            Log::info("Kurye atandı ve durumu Serviste yapıldı. Sipariş ID: " . $order->id . " Kurye ID: " . $courier->id);
         }
 
         $restaurant = Restaurant::find($order->restaurant_id);
@@ -328,7 +325,7 @@ class CourierController extends Controller
         //mobil bildiri
         if ($courier->fcm_token){
             $ser = new PushNotificationService();
-            $ser->sendNotification($courier->fcm_token,$restaurant->restaurant_name.' Restorandan Yeni Siparişiniz Var','Sipariş Takip Kodu:'. $order->tracking_id);
+            $ser->sendNotification($courier->fcm_token,$restaurant->restaurant_name.' Restorandan Yeni Sipariş Atandı','Sipariş Takip Kodu:'. $order->tracking_id);
         }
 
         if (OrdersHelper::getOrderSystem(3)){

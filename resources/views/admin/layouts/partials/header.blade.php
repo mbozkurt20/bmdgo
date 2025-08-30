@@ -24,7 +24,11 @@
         <div class="d-flex align-items-center justify-content-end w-100" style="color: #e7004d;">
 
             <!-- Kalan Kontör -->
-            <p class="size-4 mb-0 me-4 fw-bold text-danger">
+            <p class="size-4 mb-0 me-4 fw-bold " style="color: #0d2646">
+                Davet Kodunuz:
+                <strong>[ {{\Illuminate\Support\Facades\Auth::guard('admin')->user()->code}} ]</strong>
+            </p>
+            <p class="size-4 mb-0 me-4 fw-bold " style="color: #0d2646">
                 Kontör Bakiyei:
                 <strong>{{\Illuminate\Support\Facades\Auth::guard('admin')->user()->top_up_balance}}</strong>
             </p>

@@ -12,6 +12,7 @@ use App\Models\Admin;
 use App\Models\Courier;
 use App\Models\Order;
 use App\Models\Restaurant;
+use App\Services\OrderStatusService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Pusher\Pusher;
@@ -63,11 +64,30 @@ class OrderObserver
 
     public function updated(Order $order)
     {
+        /*
+         * Şu anki status’u öğrenmek:
+         * $currentStatus = OrderStatusLog::where('order_id', $orderId)
+    ->orderByDesc('changed_at')
+    ->first();
+
+        Status sürelerini almak:
+$statusDurations = OrderStatusLog::where('order_id', $orderId)
+    ->get(['status', 'duration_seconds']);
+
+        Restoran bazlı ortalama süre raporu:
+$avgDurations = OrderStatusLog::select('restaurant_id', 'status', DB::raw('AVG(duration_seconds) as avg_time'))
+    ->groupBy('restaurant_id', 'status')
+    ->get();
+         */
         Log::info('✅ Order updated event tetiklendi', [
             'id' => $order->id,
             'phone' => $order->phone,
             'status' => $order->status
         ]);
+
+        $newStatus =$order->status;
+
+        app(OrderStatusService::class)->changeStatus($order, $newStatus);
 
         $restaurant = Restaurant::find($order->restaurant_id);
 

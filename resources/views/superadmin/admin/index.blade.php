@@ -34,6 +34,7 @@
                         <th>İsim Soyisim</th>
                         <th>Email</th>
                         <th>Telefon</th>
+                        <th>Kod</th>
                         <th>Şehir</th>
                         <th>İlçe</th>
                         <th>Kontör Ücreti</th>
@@ -48,6 +49,7 @@
                             <td>{{ $admin->name }}</td>
                             <td>{{ $admin->email }}</td>
                             <td>{{ $admin->phone }}</td>
+                            <td>{{ $admin->code }}</td>
                             <td>{{ $admin->city_id ? \App\Models\City::find($admin->city_id)->name : '-' }}</td>
                             <td>{{ $admin->district_id ? \App\Models\District::find($admin->district_id)->name : '-'}}</td>
                             <td>{{ number_format($admin->top_up_price,2) }}</td>

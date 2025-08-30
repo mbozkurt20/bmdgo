@@ -18,6 +18,7 @@ class CreateCourierOrdersTable extends Migration
             $table->unsignedBigInteger('courier_id');
             $table->unsignedBigInteger('order_id');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

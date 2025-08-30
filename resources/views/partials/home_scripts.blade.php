@@ -1,10 +1,19 @@
 <script>
+    const statusMap = {
+        'PENDING': 'pending',
+        'PREPARED': 'prepared',
+        'ASSIGNED': 'assigned',
+        'PICKUP': 'pickup',
+        'HANDOVER': 'handover',
+        'DELIVERED': 'delivered',
+        'UNSUPPLIED': 'unsupplied'
+    };
+
     document.addEventListener('DOMContentLoaded', () => {
         fetchOrders();
     });
 
     function fetchOrders() {
-
         $.ajax({
             url: '/{{$key}}/orders/ajax',
             method: 'GET', // veya 'POST' gerekiyorsa
@@ -149,14 +158,6 @@
     }
 
     async function refreshOrderTable(order) {
-        const statusMap = {
-            'PENDING': 'pending',
-            'PREPARED': 'prepared',
-            'HANDOVER': 'handover',
-            'DELIVERED': 'delivered',
-            'UNSUPPLIED': 'unsupplied'
-        };
-
         const tabId = statusMap[order.status];
         const rowId = 'data_' + order.id;
 
@@ -210,14 +211,6 @@
     }
 
     function updateTables(data) {
-        const statusMap = {
-            'PENDING': 'pending',
-            'PREPARED': 'prepared',
-            'HANDOVER': 'handover',
-            'DELIVERED': 'delivered',
-            'UNSUPPLIED': 'unsupplied'
-        };
-
         // Temizle
         Object.keys(data).forEach(status => {
             const tabId = statusMap[status];
@@ -323,14 +316,6 @@
     }
 
     function updateTableForStatus(status) {
-        const statusMap = {
-            'PENDING': 'pending',
-            'PREPARED': 'prepared',
-            'HANDOVER': 'handover',
-            'DELIVERED': 'delivered',
-            'UNSUPPLIED': 'unsupplied'
-        };
-
         const tableBody = document.querySelector(`#${statusMap[status]} tbody`);
         if (!tableBody || tableBody.children.length === 0) {
             tableBody.innerHTML = `<tr><td colspan="10" class="text-center">Sipariş bulunmuyor</td></tr>`;
@@ -567,7 +552,6 @@
         const statusOptions = `
         <option value="PENDING" ${status == 'PENDING' ? 'selected' : ''}>BEKLİYOR</option>
         <option value="PREPARED" ${status == 'PREPARED' ? 'selected' : ''}>HAZIRLANIYOR</option>
-        <option value="HANDOVER" ${status == 'HANDOVER' ? 'selected' : ''}>KURYEYE VERİLDİ</option>
         <option value="DELIVERED" ${status == 'DELIVERED' ? 'selected' : ''}>TESLİM EDİLDİ</option>
         <option value="UNSUPPLIED" ${status == 'UNSUPPLIED' ? 'selected' : ''}>İPTAL EDİLDİ</option>
     `;

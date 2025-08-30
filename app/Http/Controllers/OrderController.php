@@ -61,7 +61,7 @@ class OrderController extends Controller
 
         if (!$newCourier) {
             Log::error('Courier not found with ID ' . $courierId);
-            return response()->json(['error' => 'Courier not found'], 404);
+            return response()->json(['error' => 'Kurye Bulunamadı'], 404);
         }
 
         DB::beginTransaction();
@@ -81,11 +81,10 @@ class OrderController extends Controller
                 if ($courier) {
                     // Siparişi kuryeye ata
                     $order->courier_id = $courier->id;
-                    $order->status = OrderStatus::HANDOVER;
+                    $order->status = OrderStatus::ASSIGNED;
                     $order->update();
 
                     // Kuryeyi busy yap ve son atama zamanını güncelle
-                    $courier->status = CourierStatus::service;
                     $courier->last_assigned_at = now();
                     $courier->update();
 

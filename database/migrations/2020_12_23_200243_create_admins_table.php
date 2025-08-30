@@ -22,6 +22,7 @@ class CreateAdminsTable extends Migration
             $table->string('password');
             $table->boolean('auto_orders')->default(0);
             $table->string('phone')->nullable();
+            $table->integer('code')->nullable();
             $table->string('address')->nullable();
             $table->integer('city_id')->nullable();
             $table->integer('district_id')->nullable();

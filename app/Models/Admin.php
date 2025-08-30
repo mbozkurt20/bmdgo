@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasRandomCode;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -11,6 +12,7 @@ use Illuminate\Notifications\Notifiable;
 class Admin extends Authenticatable
 {
     use HasFactory, Notifiable,SoftDeletes;
+    use HasRandomCode;
 
     /**
      * The attributes that are mass assignable.
@@ -22,6 +24,7 @@ class Admin extends Authenticatable
         'created_by_type',
         'name',
         'email',
+        'code',
         'password',
         'phone',
         'address',
