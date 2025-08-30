@@ -105,10 +105,12 @@ class OrderController extends Controller
                     Log::info("Kurye atandı ve durumu Serviste yapıldı. Sipariş ID: " . $order->id . " Kurye ID: " . $courier->id);
 
 
+                    $restaurant = \App\Http\Controllers\Auth\Restaurant::find($order->restaurant_id);
+
                     //mobil bildiri
                     if ($courier->fcm_token){
                         $ser = new PushNotificationService();
-                        $ser->sendNotification($courier->fcm_token, 'Yeni Paketiniz Var', $order->tracking_id . ' takip nolu siparişiniz var');
+                        $ser->sendNotification($courier->fcm_token,$restaurant->restaurant_name.' Restorandan 1 Yeni Siparişiniz Var','Sipariş Takip Kodu:'. $order->tracking_id);
                     }
 
                     if (OrdersHelper::getOrderSystem(3)) {

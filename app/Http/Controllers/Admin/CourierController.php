@@ -7,6 +7,7 @@ use App\Helpers\NotificationHelper;
 use App\Helpers\OrdersHelper;
 use App\Helpers\OrderStatus;
 use App\Helpers\Pusher;
+use App\Http\Controllers\Auth\Restaurant;
 use App\Http\Controllers\Controller;
 use App\Models\Courier;
 use App\Models\Admin;
@@ -324,10 +325,12 @@ class CourierController extends Controller
             Log::info("Kurye atandı ve durumu Serviste yapıldı. Sipariş ID: " . $order->id . " Kurye ID: " . $courier->id);
         }
 
+        $restaurant = Restaurant::find($order->restaurant_id);
+
         //mobil bildiri
         if ($courier->fcm_token){
             $ser = new PushNotificationService();
-            $ser->sendNotification($courier->fcm_token,'Yeni Paketiniz Var',$order->tracking_id.' takip nolu siparişiniz var');
+            $ser->sendNotification($courier->fcm_token,$restaurant->restaurant_name.' Restorandan 1 Yeni Siparişiniz Var','Sipariş Takip Kodu:'. $order->tracking_id);
         }
 
         if (OrdersHelper::getOrderSystem(3)){

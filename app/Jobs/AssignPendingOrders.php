@@ -6,6 +6,7 @@ use App\Helpers\CourierStatus;
 use App\Helpers\NotificationHelper;
 use App\Helpers\OrdersHelper;
 use App\Helpers\OrderStatus;
+use App\Http\Controllers\Auth\Restaurant;
 use App\Models\CourierOrder;
 use App\Models\Notification;
 use App\Models\Order;
@@ -41,6 +42,7 @@ class AssignPendingOrders implements ShouldQueue
                 ->where('admin_id', $order->restaurant->admin_id)   // round robin için
                 ->first();
 
+
             if ($courier) {
                 // Siparişi kuryeye ata
                 $order->courier_id = $courier->id;
@@ -52,9 +54,12 @@ class AssignPendingOrders implements ShouldQueue
                 $courier->last_assigned_at = now();
                 $courier->save();
 
+                $restaurant = Restaurant::find($order->restaurant_id);
+
+                //mobil bildiri
                 if ($courier->fcm_token){
                     $ser = new PushNotificationService();
-                    $ser->sendNotification($courier->fcm_token,'Yeni Paketiniz Var',$order->tracking_id.' takip nolu siparişiniz var');
+                    $ser->sendNotification($courier->fcm_token,$restaurant->restaurant_name.' Restorandan 1 Yeni Siparişiniz Var','Sipariş Takip Kodu:'. $order->tracking_id);
                 }
 
                 $orderCourier = CourierOrder::where('courier_id',$courier->id)->where('order_id', $order->id)->first();
