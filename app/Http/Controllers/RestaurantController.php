@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 
@@ -98,6 +99,56 @@ class RestaurantController extends Controller
 
         $commonData = $this->getCommonData($startTime, $endTime);
 
+        $startDate = Carbon::now()->subDays(30)->format('Y-m-d');
+        $endDate = Carbon::now()->format('Y-m-d');
+
+        // Verileri al
+        $dailyPreparedSpeed = $this->getPreparedSpeed($userId, $startDate, $endDate);
+        $dailyHandoverSpeed = $this->getHandoverSpeed($userId, $startDate, $endDate);
+        $dailyDeliverySpeed = $this->getDeliverySpeed($userId, $startDate, $endDate);
+
+        // Tüm tarihleri içeren bir dizi oluştur
+        $allDates = [];
+        $currentDate = Carbon::parse($startDate);
+        $endDateObj = Carbon::parse($endDate);
+
+        while ($currentDate <= $endDateObj) {
+            $allDates[] = $currentDate->format('Y-m-d');
+            $currentDate->addDay();
+        }
+
+        // Chart verilerini hazırla
+        $chartData = [
+            'labels' => $allDates,
+            'datasets' => [
+                [
+                    'label' => 'Hazırlanma Hızı (dakika)',
+                    'data' => $this->mapDataToDates($dailyPreparedSpeed, $allDates),
+                    'backgroundColor' => 'rgba(54, 162, 235, 0.2)',
+                    'borderColor' => 'rgba(54, 162, 235, 1)',
+                ],
+                [
+                    'label' => 'Teslim Alma Hızı (dakika)',
+                    'data' => $this->mapDataToDates($dailyHandoverSpeed, $allDates),
+                    'backgroundColor' => 'rgba(255, 206, 86, 0.2)',
+                    'borderColor' => 'rgba(255, 206, 86, 1)',
+                ],
+                [
+                    'label' => 'Teslimat Hızı (dakika)',
+                    'data' => $this->mapDataToDates($dailyDeliverySpeed, $allDates),
+                    'backgroundColor' => 'rgba(75, 192, 192, 0.2)',
+                    'borderColor' => 'rgba(75, 192, 192, 1)',
+                ]
+            ]
+        ];
+
+        // İstatistikleri hesapla
+        $stats = [
+            'prepared' => $this->calculateStats($dailyPreparedSpeed),
+            'handover' => $this->calculateStats($dailyHandoverSpeed),
+            'delivery' => $this->calculateStats($dailyDeliverySpeed)
+        ];
+
         $tumu = Order::where('restaurant_id', $userId)
             ->whereDate('created_at', Carbon::today())
             ->orderBy('created_at', 'desc')
@@ -109,32 +160,206 @@ class RestaurantController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('restaurant.home', array_merge($commonData, compact('tumu', 'ActiveSiparisler')));
+        return view('restaurant.home', array_merge($commonData, compact(
+            'tumu',
+            'ActiveSiparisler',
+            'chartData',
+            'stats',
+            'startDate',
+            'endDate',
+            'userId',
+            'dailyPreparedSpeed',
+            'dailyHandoverSpeed',
+            'dailyDeliverySpeed'
+        )));
     }
+
+    /**
+     * PENDING to PREPARED hızını hesapla
+     */
+    private function getPreparedSpeed($userId, $startDate, $endDate)
+    {
+        return DB::table('order_status_logs as p')
+            ->join('order_status_logs as pr', function($join) {
+                $join->on('p.order_id', '=', 'pr.order_id')
+                    ->where('pr.status', 'PREPARED');
+            })
+            ->join('orders as o', 'o.id', '=', 'p.order_id')
+            ->select(
+                DB::raw('DATE(p.changed_at) as date'),
+                DB::raw('ROUND(AVG(TIMESTAMPDIFF(MINUTE, p.changed_at, pr.changed_at)), 2) as avg_minutes'),
+                DB::raw('COUNT(*) as order_count')
+            )
+            ->where('p.status', 'PENDING')
+            ->where('o.restaurant_id', $userId)
+            ->whereBetween('p.changed_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+    }
+
+    /**
+     * ASSIGNED to HANDOVER hızını hesapla
+     */
+    private function getHandoverSpeed($userId, $startDate, $endDate)
+    {
+        return DB::table('order_status_logs as a')
+            ->join('order_status_logs as h', function($join) {
+                $join->on('a.order_id', '=', 'h.order_id')
+                    ->where('h.status', 'HANDOVER');
+            })
+            ->join('orders as o', 'o.id', '=', 'a.order_id')
+            ->select(
+                DB::raw('DATE(a.changed_at) as date'),
+                DB::raw('ROUND(AVG(TIMESTAMPDIFF(MINUTE, a.changed_at, h.changed_at)), 2) as avg_minutes'),
+                DB::raw('COUNT(*) as order_count')
+            )
+            ->where('a.status', 'ASSIGNED')
+            ->where('o.restaurant_id', $userId)
+            ->whereBetween('a.changed_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+    }
+
+    /**
+     * HANDOVER to DELIVERED hızını hesapla
+     */
+    private function getDeliverySpeed($userId, $startDate, $endDate)
+    {
+        return DB::table('order_status_logs as h')
+            ->join('order_status_logs as d', function($join) {
+                $join->on('h.order_id', '=', 'd.order_id')
+                    ->where('d.status', 'DELIVERED');
+            })
+            ->join('orders as o', 'o.id', '=', 'h.order_id')
+            ->select(
+                DB::raw('DATE(h.changed_at) as date'),
+                DB::raw('ROUND(AVG(TIMESTAMPDIFF(MINUTE, h.changed_at, d.changed_at)), 2) as avg_minutes'),
+                DB::raw('COUNT(*) as order_count')
+            )
+            ->where('h.status', 'HANDOVER')
+            ->where('o.restaurant_id', $userId)
+            ->whereBetween('h.changed_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+    }
+
+    /**
+     * Verileri tarih bazında eşleştir
+     */
+    private function mapDataToDates($data, $allDates)
+    {
+        $mappedData = [];
+        $dataByDate = $data->keyBy('date');
+
+        foreach ($allDates as $date) {
+            $mappedData[] = $dataByDate->has($date) ? (float)$dataByDate[$date]->avg_minutes : 0;
+        }
+
+        return $mappedData;
+    }
+
+    /**
+     * İstatistikleri hesapla
+     */
+    private function calculateStats($data)
+    {
+        if ($data->isEmpty()) {
+            return ['avg' => 0, 'min' => 0, 'max' => 0, 'total_orders' => 0];
+        }
+
+        return [
+            'avg' => round($data->avg('avg_minutes'), 2),
+            'min' => round($data->min('avg_minutes'), 2),
+            'max' => round($data->max('avg_minutes'), 2),
+            'total_orders' => $data->sum('order_count')
+        ];
+    }
+
 
     public function filterByDate(Request $request)
     {
-        $startDate = Carbon::parse($request->start_date)->startOfDay();
-        $endDate = Carbon::parse($request->end_date)->endOfDay();
+        $startTime = Carbon::parse($request->start_date)->startOfDay();
+        $endTime = Carbon::parse($request->end_date)->endOfDay();
         $userId = Auth::user()->id;
 
-        $commonData = $this->getCommonData($startDate, $endDate);
+        $commonData = $this->getCommonData($startTime, $endTime);
 
-        $tumu = Order::where('status', '!=', 'UNSUPPLIED')
-            ->where('status', '!=', 'DELIVERED')
-            ->where('restaurant_id', $userId)
-            ->whereBetween('created_at', [$startDate, $endDate])
+        $startDate = Carbon::now()->subDays(30)->format('Y-m-d');
+        $endDate = Carbon::now()->format('Y-m-d');
+
+        // Verileri al
+        $dailyPreparedSpeed = $this->getPreparedSpeed($userId, $startDate, $endDate);
+        $dailyHandoverSpeed = $this->getHandoverSpeed($userId, $startDate, $endDate);
+        $dailyDeliverySpeed = $this->getDeliverySpeed($userId, $startDate, $endDate);
+
+        // Tüm tarihleri içeren bir dizi oluştur
+        $allDates = [];
+        $currentDate = Carbon::parse($startDate);
+        $endDateObj = Carbon::parse($endDate);
+
+        while ($currentDate <= $endDateObj) {
+            $allDates[] = $currentDate->format('Y-m-d');
+            $currentDate->addDay();
+        }
+
+        // Chart verilerini hazırla
+        $chartData = [
+            'labels' => $allDates,
+            'datasets' => [
+                [
+                    'label' => 'Hazırlanma Hızı (dakika)',
+                    'data' => $this->mapDataToDates($dailyPreparedSpeed, $allDates),
+                    'backgroundColor' => 'rgba(54, 162, 235, 0.2)',
+                    'borderColor' => 'rgba(54, 162, 235, 1)',
+                ],
+                [
+                    'label' => 'Teslim Alma Hızı (dakika)',
+                    'data' => $this->mapDataToDates($dailyHandoverSpeed, $allDates),
+                    'backgroundColor' => 'rgba(255, 206, 86, 0.2)',
+                    'borderColor' => 'rgba(255, 206, 86, 1)',
+                ],
+                [
+                    'label' => 'Teslimat Hızı (dakika)',
+                    'data' => $this->mapDataToDates($dailyDeliverySpeed, $allDates),
+                    'backgroundColor' => 'rgba(75, 192, 192, 0.2)',
+                    'borderColor' => 'rgba(75, 192, 192, 1)',
+                ]
+            ]
+        ];
+
+        // İstatistikleri hesapla
+        $stats = [
+            'prepared' => $this->calculateStats($dailyPreparedSpeed),
+            'handover' => $this->calculateStats($dailyHandoverSpeed),
+            'delivery' => $this->calculateStats($dailyDeliverySpeed)
+        ];
+
+        $tumu = Order::where('restaurant_id', $userId)
+            ->whereDate('created_at', Carbon::today())
             ->orderBy('created_at', 'desc')
             ->get();
 
         $ActiveSiparisler = Order::where('restaurant_id', $userId)
-            ->whereNotIn('status', ['DELIVERED', 'UNSUPPLIED'])
             ->whereDate('created_at', Carbon::today())
             ->whereNotIn('id', CourierOrder::pluck('order_id')->toArray())
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('restaurant.home', array_merge($commonData, compact('tumu', 'ActiveSiparisler')));
+        return view('restaurant.home', array_merge($commonData, compact(
+            'tumu',
+            'ActiveSiparisler',
+            'chartData',
+            'stats',
+            'startDate',
+            'endDate',
+            'userId',
+            'dailyPreparedSpeed',
+            'dailyHandoverSpeed',
+            'dailyDeliverySpeed'
+        )));
     }
 
     public function filterOrders(Request $request)

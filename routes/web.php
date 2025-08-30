@@ -18,7 +18,6 @@ use App\Http\Controllers\MahalleController;
 |
 */
 
-Route::get('/restaurant/orders/new', [MahalleController::class, 'create']);
 Route::get('/restaurant/couriers', [App\Http\Controllers\CourierController::class, 'index'])->name('restaurant.couriers.index');
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::get('/partner', [App\Http\Controllers\HomeController::class, 'dealer'])->name('dealer');

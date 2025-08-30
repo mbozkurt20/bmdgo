@@ -44,7 +44,6 @@ Route::group(['prefix' => 'restaurant'], function () {
         Route::post('/coupons/create', [App\Http\Controllers\CouponController::class, 'store'])->name('restaurant.coupons.create');
         Route::post('/coupons/update', [App\Http\Controllers\CouponController::class, 'update'])->name('restaurant.coupons.update');
 
-
         /* Categories */
         Route::get('/categories', [App\Http\Controllers\CategorieController::class, 'index'])->name('restaurant.categories');
         Route::get('/categories/new', [App\Http\Controllers\CategorieController::class, 'new'])->name('restaurant.categories.new');
@@ -102,7 +101,6 @@ Route::group(['prefix' => 'restaurant'], function () {
         Route::get('/menus', [App\Http\Controllers\MenuController::class, 'index'])->name('restaurant.menus');
         Route::get('/menu', [App\Http\Controllers\MenuController::class, 'show'])->name('restaurant.menu');
         Route::post('/menus/select', [App\Http\Controllers\MenuController::class, 'store'])->name('restaurant.menu.template.select');
-
 
         /* Menus */
         Route::get('/menus', [App\Http\Controllers\MenuController::class, 'index'])->name('restaurant.menus');

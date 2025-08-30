@@ -2,6 +2,20 @@
 @section('content')
     <link rel="stylesheet" href="{{asset('css/pages/home/index.css')}}">
     <link rel="stylesheet" href="{{asset('css/pages/admin/home/index.css')}}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.1/chartjs-adapter-moment.min.js"></script>
+    <style>
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+
+        .stats-card {
+            margin-bottom: 20px;
+        }
+    </style>
 
     <div class="container-fluid" style="padding-top: 1.5rem">
         <div class="row">
@@ -70,10 +84,12 @@
                         <!-- All Orders Button -->
                         <div class="col-md-6">
                             <button
-                                class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100" style="background: #e7004d">
+                                class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100"
+                                style="background: #e7004d">
 
                                 <span class="fw-bold">
-                                    <i class="fa-solid fa-box" style="color: #fffdfd;font-size:18px;padding-right:10px"></i>
+                                    <i class="fa-solid fa-box"
+                                       style="color: #fffdfd;font-size:18px;padding-right:10px"></i>
                                     Tüm Siparişler</span>
                                 <span class="badge bg-white text-dark order-number">{{ count($tumu) }}</span>
                             </button>
@@ -81,7 +97,8 @@
                         <!-- Getir Orders -->
                         <div class="col-md-6">
                             <button
-                                class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100" style="background: #4927b3">
+                                class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100"
+                                style="background: #4927b3">
                                 <img src="{{ asset('theme/images/GetirYemek_Logo.png') }}"
                                      style="background-repeat: no-repeat; background-position:center" width="77px"
                                      height="14px" alt="">
@@ -92,7 +109,8 @@
                         <!-- Trendyol Orders -->
                         <div class="col-md-6">
                             <button
-                                class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100" style="background: orangered">
+                                class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100"
+                                style="background: orangered">
                                 <img src="{{ asset('theme/images/trendyolyemek.png') }}"
                                      style="background-repeat: no-repeat; background-position:center" width="71px"
                                      height="14px" alt="">
@@ -137,10 +155,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Performance Section -->
-            <div class="col-lg-6">
                 <div class="performance-section mb-4">
                     <h4 class="mb-3">Satış Performansı</h4>
                     <div class="row g-3">
@@ -169,7 +183,121 @@
                 </div>
             </div>
 
+            <!-- Performance Section -->
+            <div class="col-lg-6">
+                @if($dailyPreparedSpeed->isEmpty() && $dailyHandoverSpeed->isEmpty() && $dailyDeliverySpeed->isEmpty())
+                    <div class="alert alert-warning">
+                        Bu tarih aralığında veri bulunamadı.
+                    </div>
+                @else
+                    <div class="row g-4">
+                        <!-- Hazırlanma Hızı -->
+                        <div class="col-md-4">
+                            <div class="card stats-card shadow-sm border-0">
+                                <div class="card-header  text-white text-center"
+                                     style="background: #4927b3;color: white">
+                                    <h6 class="text-white">Hazırlanma Hızı</h6>
+                                </div>
+                                <div class="card-body text-center">
+                                    <canvas id="preparedSpeedChart" height="150"></canvas>
+                                    <p class="mt-3 mb-0">Ortalama: <strong>{{ $stats['prepared']['avg'] }} dk</strong>
+                                    </p>
+                                    <p>En Hızlı: <strong>{{ $stats['prepared']['min'] }} dk</strong></p>
+                                    <p>En Yavaş: <strong>{{ $stats['prepared']['max'] }} dk</strong></p>
+                                    <p>Toplam Sipariş: <strong>{{ $stats['prepared']['total_orders'] }}</strong></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Teslim Alma Hızı -->
+                        <div class="col-md-4">
+                            <div class="card stats-card shadow-sm border-0">
+                                <div class="card-header text-white text-center"
+                                     style="background: #e7004d;color: white">
+                                    <h6 class="text-white">Teslim Alma Hızı</h6>
+                                </div>
+                                <div class="card-body text-center">
+                                    <canvas id="handoverSpeedChart" height="150"></canvas>
+                                    <p class="mt-3 mb-0">Ortalama: <strong>{{ $stats['handover']['avg'] }} dk</strong>
+                                    </p>
+                                    <p>En Hızlı: <strong>{{ $stats['handover']['min'] }} dk</strong></p>
+                                    <p>En Yavaş: <strong>{{ $stats['handover']['max'] }} dk</strong></p>
+                                    <p>Toplam Sipariş: <strong>{{ $stats['handover']['total_orders'] }}</strong></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Teslimat Hızı -->
+                        <div class="col-md-4">
+                            <div class="card stats-card shadow-sm border-0">
+                                <div class="card-header text-white text-center"
+                                     style="background: #30d760;color: white">
+                                    <h6 class="text-white">Teslimat Hızı</h6>
+                                </div>
+                                <div class="card-body text-center">
+                                    <canvas id="deliverySpeedChart" height="150"></canvas>
+                                    <p class="mt-3 mb-0">Ortalama: <strong>{{ $stats['delivery']['avg'] }} dk</strong>
+                                    </p>
+                                    <p>En Hızlı: <strong>{{ $stats['delivery']['min'] }} dk</strong></p>
+                                    <p>En Yavaş: <strong>{{ $stats['delivery']['max'] }} dk</strong></p>
+                                    <p>Toplam Sipariş: <strong>{{ $stats['delivery']['total_orders'] }}</strong></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+            </div>
+
             @include('restaurant.partials.home_table')
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function createSpeedChart(ctx, value, max, color) {
+            return new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [value, max - value],
+                        backgroundColor: [color, '#e9ecef'],
+                        borderWidth: 0,
+                        cutout: '75%'
+                    }]
+                },
+                options: {
+                    rotation: -90,
+                    circumference: 180,
+                    plugins: {
+                        legend: {display: false},
+                        tooltip: {enabled: false},
+                    }
+                }
+            });
+        }
+
+        // Hazırlanma Hızı
+        createSpeedChart(
+            document.getElementById('preparedSpeedChart'),
+            {{ $stats['prepared']['avg'] }},
+            60, // Maks dakika
+            '#4927b3'
+        );
+
+        // Teslim Alma Hızı
+        createSpeedChart(
+            document.getElementById('handoverSpeedChart'),
+            {{ $stats['handover']['avg'] }},
+            60,
+            '#e7004d'
+        );
+
+        // Teslimat Hızı
+        createSpeedChart(
+            document.getElementById('deliverySpeedChart'),
+            {{ $stats['delivery']['avg'] }},
+            60,
+            '#30d760'
+        );
+    </script>
 @endsection
