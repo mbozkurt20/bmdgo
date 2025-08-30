@@ -26,7 +26,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Yajra\DataTables\Facades\DataTables;
 
 class OrderController extends Controller
 {
@@ -105,7 +104,7 @@ class OrderController extends Controller
                     Log::info("Kurye atandı ve durumu Serviste yapıldı. Sipariş ID: " . $order->id . " Kurye ID: " . $courier->id);
 
 
-                    $restaurant = \App\Http\Controllers\Auth\Restaurant::find($order->restaurant_id);
+                    $restaurant = Restaurant::find($order->restaurant_id);
 
                     //mobil bildiri
                     if ($courier->fcm_token){
