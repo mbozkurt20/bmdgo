@@ -32,9 +32,11 @@ class LoginController extends Controller
         $courier = Courier::where('phone', $request->phone)->first();
 
         if (isset($courier->is_active) && !$courier->is_active) {
-            JWTAuth::invalidate(JWTAuth::getToken());
+            if ($token = JWTAuth::getToken()) {
+                JWTAuth::invalidate($token);
+            }
 
-            return Json::success('Hesabınız Aktif Edilmemiş, yöneticiniz ile iletişime geçiniz.', 401);
+            return Json::error('Hesabınız Aktif Edilmemiş, yöneticiniz ile iletişime geçiniz.', 401);
         }
 
         if (!$courier || !Hash::check($request->password, $courier->password)) {
@@ -85,7 +87,6 @@ class LoginController extends Controller
             }
         }
 
-
         $courier = Courier::create([
             'name' => $request->input('name'),
             'birthday' => $request->input('birthday'),
@@ -100,6 +101,7 @@ class LoginController extends Controller
             'fcm_token' => $request->input('fcm_token'),
             'code' => $this->generateCode(),
             'status' => CourierStatus::passive,
+            'is_active' => false
         ]);
 
         return Json::success('Kaydınız Başarıyla Alınmıştır', $courier);
