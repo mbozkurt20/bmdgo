@@ -69,19 +69,22 @@ class LoginController extends Controller
             return Json::error($requestData->errors());
         }
 
-        if ($request->input('price_type') == 'package' && (!$request->has('price') || $request->input('price') == null)) {
-            return Json::error('Lütfen Paket Başı Ücretinizi Giriniz!!');
-        }
+        if ($request->has('price_type') || $request->has('price') || $request->has('phone')) {
+            if ($request->input('price_type') == 'package' && (!$request->has('price') || $request->input('price') == null)) {
+                return Json::error('Lütfen Paket Başı Ücretinizi Giriniz!!');
+            }
 
-        if ($request->input('price_type') === 'fixed') {
-            if (empty($request->input('fixed_price')) || empty($request->input('km_price'))) {
-                return Json::error('Lütfen Sabit Ücret ve Km Başı Ücretinizi Giriniz');
+            if ($request->input('price_type') === 'fixed') {
+                if (empty($request->input('fixed_price')) || empty($request->input('km_price'))) {
+                    return Json::error('Lütfen Sabit Ücret ve Km Başı Ücretinizi Giriniz');
+                }
+            }
+
+            if (Courier::where('phone', $request->input('phone'))->exists()) {
+                return Json::error('Bu telefon numarasına ait bir kayıt zaten mevcut.');
             }
         }
 
-        if (Courier::where('phone', $request->input('phone'))->exists()) {
-            return Json::error('Bu telefon numarasına ait bir kayıt zaten mevcut.');
-        }
 
         $courier = Courier::create([
             'name' => $request->input('name'),
