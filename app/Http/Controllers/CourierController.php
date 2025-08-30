@@ -28,6 +28,19 @@ class CourierController extends Controller
 
         return view('restaurant.couriers.index', compact('couriers'));
     }
+
+    public function getCourier()
+    {
+        $adminId = Auth::guard('restaurant')->user()->admin_id;
+
+        $couriers = Courier::where('restaurant_id', 0)
+            ->where('admin_id', $adminId)
+            ->where('status',CourierStatus::active)
+            ->get();
+
+        return response()->json($couriers);
+    }
+
     public function maps()
     {
         $couriers = Courier::on('tenant')

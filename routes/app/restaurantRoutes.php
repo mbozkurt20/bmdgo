@@ -54,7 +54,7 @@ Route::group(['prefix' => 'restaurant'], function () {
         Route::post('/categories/update', [App\Http\Controllers\CategorieController::class, 'update'])->name('restaurant.categories.update');
 
         /* Courier */
-        Route::get('/get-couriers', [\App\Http\Controllers\Admin\CourierController::class, 'getCourier']);
+        Route::get('/get-couriers', [\App\Http\Controllers\CourierController::class, 'getCourier']);
         Route::get('/couriers', [App\Http\Controllers\CourierController::class, 'index'])->name('restaurant.couriers');
         Route::get('/couriers/new', [App\Http\Controllers\CourierController::class, 'new'])->name('restaurant.couriers.new');
         Route::get('/couriers/edit/{id}', [App\Http\Controllers\CourierController::class, 'edit'])->name('restaurant.couriers.edit');
