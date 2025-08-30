@@ -255,7 +255,7 @@
         <p class="orderProde">${order.address}</p>
       </div>
       <div class="mb-2 col-md-12">
-        <p class="orderTitle">Müşteri Notu</p>
+        <p class="">Müşteri Notu</p>
         <p class="orderProde">${order.notes??'Bulunmuyor.'}</p>
       </div>
     `;
@@ -263,8 +263,8 @@
         // Ürün tablosu
         const items = JSON.parse(order.items);
         let tableHTML = `
-      <div class="mb-3 col-md-12">
-        <table class="table table-danger table-responsive-sm" style="min-width: 28rem !important;">
+      <div class="mb-3 mt-4 col-md-12">
+        <table class="table table-border table-responsive-sm" style="min-width: 28rem !important;">
           <thead>
             <tr>
               <th style="font-size: 14px;font-weight: 600">Ürün</th>
@@ -277,9 +277,9 @@
         items.forEach(item => {
             tableHTML += `
           <tr>
-            <td class="orderProde">${item.name}</td>
-            <td class="orderProde">${item.items.length}</td>
-            <td class="orderProde">${item.price} ₺</td>
+            <td class="orderProde text-black">${item.name}</td>
+            <td class="orderProde text-black">${item.quantity}</td>
+            <td class="orderProde text-black">${item.price} ₺</td>
           </tr>
         `;
         });
@@ -534,20 +534,27 @@
 
         // Kurye bölümü
         let courierSection = '';
-        if (order.courier && order.courier.id) {
+        if (status === 'UNSUPPLIED' || status === 'DELIVERED' || status === 'HANDOVER') {
             courierSection = `
-        <div style="display:flex; align-items:center;">
-
-            <a data-bs-toggle="modal" data-bs-target="#Courier${order.id}" style="cursor:pointer;color: #e7004d">
-               <i class="fas fa-truck mr-1"></i> ${order.courier.name.substr(0, 10)}
-            </a>
-        </div>`;
-        } else {
-            courierSection = `
-        <a style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#Courier${order.id}" class="sharp text-secondary size-3 px-3 fw-bold">
-            <i class="fas fa-truck mr-1"></i> <small>Kurye Ata</small>
+        <a style="cursor:pointer;color: #e7004d">
+            <i class="fas fa-truck mr-1"></i> ${order.courier ? order.courier.name.substr(0, 10) : 'Kurye Yok'}
         </a>`;
+        } else {
+            if (order.courier && order.courier.id) {
+                courierSection = `
+            <div style="display:flex; align-items:center;">
+                <a data-bs-toggle="modal" data-bs-target="#Courier${order.id}" style="cursor:pointer;color: #e7004d">
+                   <i class="fas fa-truck mr-1"></i> ${order.courier.name.substr(0, 10)}
+                </a>
+            </div>`;
+            } else {
+                courierSection = `
+            <a style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#Courier${order.id}" class="sharp text-secondary size-3 px-3 fw-bold">
+                <i class="fas fa-truck mr-1"></i> <small>Kurye Ata</small>
+            </a>`;
+            }
         }
+
 
         // Durum seçenekleri
         const statusOptions = `
@@ -604,7 +611,7 @@
     <td>
         <input type="hidden" id="tracking_${order.id}" value="${trackingId}">
         <input type="hidden" id="platform_${order.id}" value="${platform}">
-        <select class="inline-order-select form-control" onchange="StatusOrderChange(event, ${order.id})" ${status == 4 ? 'disabled' : ''}>
+        <select class="inline-order-select form-control" onchange="StatusOrderChange(event, ${order.id})" ${status == 'DELIVERED' ? 'disabled' : ''}>
             ${statusOptions}
         </select>
         <!-- İptal modal -->
@@ -630,9 +637,12 @@
     <td>
         <!-- İşlem ikonları -->
         <div class="d-flex">
-        <a href="#" class="btn btn-secondary shadow btn-xs sharp me-1" onclick='openOrderModal(${JSON.stringify(order).replace(/'/g, "\\'")})'>
-            <i class="fas fa-eye"></i>
-        </a>
+     <a href="#"
+   class="btn btn-secondary shadow btn-xs sharp me-1"
+   data-order='${JSON.stringify(order)}'
+   onclick="openOrderModal(JSON.parse(this.dataset.order))">
+   <i class="fas fa-eye"></i>
+</a>
 
 <div class="modal fade" id="OrdersModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered" role="document">

@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 class OrderStatusService
 {
-    public function changeStatus(Order $order, string $newStatus)
+    public function changeStatus($order, string $newStatus)
     {
         DB::transaction(function () use ($order, $newStatus) {
             // 1. Önceki logu bul
@@ -31,9 +31,6 @@ class OrderStatusService
                 'status' => $newStatus,
                 'changed_at' => now(),
             ]);
-
-            // (Opsiyonel) Order tablosuna current status yaz
-            $order->update(['status' => $newStatus]);
         });
     }
 }

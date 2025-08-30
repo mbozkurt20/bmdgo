@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\OrderStatus;
 use App\Models\Order;
 use App\Models\Courier;
 use App\Models\CourierOrder;
@@ -43,7 +44,7 @@ class ReportController extends Controller
 
         // Order sorgusunu dinamik oluştur
         $query = Order::where('restaurant_id', $restaurantId)
-            ->where('status', '!=', 'UNSUPPLIED')
+            ->where('status', '!=', OrderStatus::UNSUPPLIED)
             ->whereBetween('created_at', [$startDate, $endDate]);
 
         if ($courierId > 0) {

@@ -57,6 +57,12 @@ class OrderController extends Controller
                     'url' => route('admin.balance')
                 ]);
             }
+
+            $order = Order::where('id', $orderId)->first();
+            $order->update(["status" => $status]);
+
+            $courier->status = CourierStatus::active;
+            $courier->update();
         }
 
         //reddedildi edidi
@@ -96,11 +102,6 @@ class OrderController extends Controller
             $order->update();
         }
 
-        $order = Order::where('id', $orderId)->first();
-        $order->update(["status" => $status]);
-
-        $courier->status = CourierStatus::active;
-        $courier->update();
 
         return Json::success('Sipariş Durumu Güncellendi', new OrderResource($order));
     }

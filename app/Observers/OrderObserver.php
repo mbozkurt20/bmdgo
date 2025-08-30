@@ -40,6 +40,11 @@ class OrderObserver
             $order->verify_code
         );
 
+        $newStatus = $order->status;
+
+        $or = new OrderStatusService();
+        $or->changeStatus($order, $newStatus);
+
         SendSms::send($order->phone, $message, $restaurant->admin_id);
 
 // Pusher ayarları
@@ -85,11 +90,11 @@ $avgDurations = OrderStatusLog::select('restaurant_id', 'status', DB::raw('AVG(d
             'status' => $order->status
         ]);
 
-      /*  $newStatus =$order->status;
+        $newStatus = $order->status;
 
         $or = new OrderStatusService();
         $or->changeStatus($order, $newStatus);
-*/
+
         $restaurant = Restaurant::find($order->restaurant_id);
 
         //sipariş kuryeye verildiyse

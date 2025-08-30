@@ -42,4 +42,9 @@ class Order extends Model
     {
         return $this->belongsTo(Courier::class, 'courier_id', 'id')->where('status', '!=',-1);
     }
+
+    public function logs()
+    {
+        return $this->hasMany(OrderStatusLog::class, 'order_id', 'id');
+    }
 }

@@ -28,7 +28,7 @@ class RestaurantController extends Controller
             ->withInput($request->only($this->username(), 'remember'))
             ->with('test', 'Giriş bilgileriniz hatalı. Lütfen tekrar deneyin.');
     }
-    
+
     protected function authenticated(Request $request, $user)
     {
         return redirect()->route('restaurant.index');
@@ -37,7 +37,7 @@ class RestaurantController extends Controller
     {
         $tumu = Order::whereDate('created_at', Carbon::today())
           ->where('restaurant_id',Auth::guard('restaurant')->id())
-            ->orderBy('created_at', 'asc')->with(['restaurant','courier'])->get();
+            ->orderBy('created_at', 'asc')->with(['restaurant','courier','logs'])->get();
 
         // Siparişleri duruma göre ayır
         $pending = $tumu->where('status', OrderStatus::PENDING);
@@ -98,9 +98,7 @@ class RestaurantController extends Controller
 
         $commonData = $this->getCommonData($startTime, $endTime);
 
-        $tumu = Order::where('status', '!=', 'UNSUPPLIED')
-            ->where('status', '!=', 'DELIVERED')
-            ->where('restaurant_id', $userId)
+        $tumu = Order::where('restaurant_id', $userId)
             ->whereDate('created_at', Carbon::today())
             ->orderBy('created_at', 'desc')
             ->get();
@@ -169,9 +167,7 @@ class RestaurantController extends Controller
         $userId = Auth::user()->id;
         $commonData = $this->getCommonData($startDate, $endDate);
 
-        $tumu = Order::where('status', '!=', 'UNSUPPLIED')
-            ->where('status', '!=', 'DELIVERED')
-            ->where('restaurant_id', $userId)
+        $tumu = Order::where('restaurant_id', $userId)
             ->whereBetween('created_at', [$startDate, $endDate])
             ->orderBy('created_at', 'desc')
             ->get();
@@ -182,7 +178,6 @@ class RestaurantController extends Controller
             ->get();
 
         $ActiveSiparisler = Order::where('restaurant_id', $userId)
-            ->whereNotIn('status', ['DELIVERED', 'UNSUPPLIED'])
             ->whereDate('created_at', Carbon::today())
             ->whereNotIn('id', CourierOrder::pluck('order_id')->toArray())
             ->orderBy('created_at', 'desc')
