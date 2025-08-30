@@ -3,7 +3,6 @@
         'PENDING': 'pending',
         'PREPARED': 'prepared',
         'ASSIGNED': 'assigned',
-        'PICKUP': 'pickup',
         'HANDOVER': 'handover',
         'DELIVERED': 'delivered',
         'UNSUPPLIED': 'unsupplied'
@@ -143,10 +142,6 @@
                 refreshOrderTable(data.order);
             },
             error: function (xhr, status, error) {
-                console.log('Failed to update order status');
-                console.log('Status:', status);
-                console.log('Error:', error);
-                console.log('Response Text:', xhr.responseText); // Daha detaylı hata mesajını gösterir
                 Swal.fire({
                     title: 'Hata oluştu!',
                     text: xhr.responseText, // Sunucudan gelen hata mesajını göstermek için
@@ -498,38 +493,44 @@
         // Platform ikonu ve renkleri
         let platformHtml = '';
         if (platform.toLowerCase() === 'yemeksepeti') {
-            platformHtml = `<a class="btn btn-primary btn-rounded" style="padding: 5px;background: #fb0050;border-color: #fb0050; font-size:12px;">
-            ${restaurantName} /
-            <img src="{{ asset('theme/images/yemeksepeti.png') }}" style="height: 15px">
-        </a>`;
+            platformHtml = `
+        <span class="d-inline-flex align-items-center border rounded-pill px-2 py-1 small">
+            <img src="{{ asset('theme/images/yemeksepeti.png') }}" style="height:14px;margin-right:4px;">
+            ${restaurantName}
+        </span>`;
         } else if (platform.toLowerCase() === 'getir') {
-            platformHtml = `<a class="btn btn-primary btn-rounded" style="padding: 5px;background: #6244be;border-color: #6244be; font-size:12px;">
-            ${restaurantName} /
-            <img src="{{ asset('theme/images/getiryemek.png') }}" style="height: 15px">
-        </a>`;
+            platformHtml = `
+        <span class="d-inline-flex align-items-center border rounded-pill px-2 py-1 small">
+            <img src="{{ asset('theme/images/getiryemek.png') }}" style="height:14px;margin-right:4px;">
+            ${restaurantName}
+        </span>`;
         } else if (platform.toLowerCase() === 'trendyol') {
-            platformHtml = `<a style="padding: 5px;background: #6244be;border-color: #6244be; font-size:12px;" class="btn btn-primary btn-rounded">
-            ${restaurantName} /
-            <img src="{{ asset('theme/images/trendyolyemek.png') }}" style="height: 15px">
-        </a>`;
+            platformHtml = `
+        <span class="d-inline-flex align-items-center border rounded-pill px-2 py-1 small">
+            <img src="{{ asset('theme/images/trendyolyemek.png') }}" style="height:14px;margin-right:4px;">
+            ${restaurantName}
+        </span>`;
         } else if (platform.toLowerCase() === 'migros') {
-            platformHtml = `<a style="padding: 5px;background: #000080;border-color: #6244be; font-size: 12px" class="btn btn-primary btn-rounded">
-            ${restaurantName} /
-            <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/aff9ed163620751.6556613f80c21.png" style="height: 25px;">
-        </a>`;
+            platformHtml = `
+        <span class="d-inline-flex align-items-center border rounded-pill px-2 py-1 small">
+            <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/aff9ed163620751.6556613f80c21.png" style="height:16px;margin-right:4px;">
+            ${restaurantName}
+        </span>`;
         } else if (platform.toLowerCase() === 'adisyo') {
-            platformHtml = `<a style="padding: 5px;background: #ff0a0a;border-color: #fff; font-size: 14px" class="btn btn-primary btn-rounded">
-            ${restaurantName} /
-            <img src="{{ asset('theme/images/adisyoFull.png') }}" style="height: 25px;">
-        </a>`;
+            platformHtml = `
+        <span class="d-inline-flex align-items-center border rounded-pill px-2 py-1 small">
+            <img src="{{ asset('theme/images/adisyoFull.png') }}" style="height:16px;margin-right:4px;">
+            ${restaurantName}
+        </span>`;
         } else if (platform.toLowerCase() === 'telefonsiparis') {
-            platformHtml = `<a class="special-ok-button btn-rounded" style="width:100%;font-weight: bold;padding:10px 15px;font-size:12px;">
+            platformHtml = `
+        <span class="d-inline-flex justify-content-center border rounded-pill px-2 py-1 small w-100 fw-bold">
             ${restaurantName} / POS
-        </a>`;
+        </span>`;
         } else {
-            // Varsayılan
-            platformHtml = `<span>${restaurantName}</span>`;
+            platformHtml = `<span class="badge bg-light text-dark small">${restaurantName}</span>`;
         }
+
 
         // Kurye bölümü
         let courierSection = '';

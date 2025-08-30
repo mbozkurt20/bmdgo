@@ -85,10 +85,11 @@ $avgDurations = OrderStatusLog::select('restaurant_id', 'status', DB::raw('AVG(d
             'status' => $order->status
         ]);
 
-        $newStatus =$order->status;
+      /*  $newStatus =$order->status;
 
-        app(OrderStatusService::class)->changeStatus($order, $newStatus);
-
+        $or = new OrderStatusService();
+        $or->changeStatus($order, $newStatus);
+*/
         $restaurant = Restaurant::find($order->restaurant_id);
 
         //sipariş kuryeye verildiyse

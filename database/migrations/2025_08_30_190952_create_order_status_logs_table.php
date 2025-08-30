@@ -20,7 +20,7 @@ class CreateOrderStatusLogsTable extends Migration
             $table->string('status');
             $table->integer('duration_seconds')->nullable(); // bir sonraki status'e kadar geçen süre
             $table->timestamp('changed_at')->useCurrent();
-
+            $table->timestamps();
             $table->index(['order_id', 'changed_at']);
         });
     }

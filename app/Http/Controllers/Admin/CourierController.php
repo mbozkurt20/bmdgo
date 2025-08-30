@@ -40,7 +40,7 @@ class CourierController extends Controller
     {
         $couriers = Courier::where('restaurant_id', 0)
             ->where('admin_id', Auth::guard('admin')->id())
-            ->where('status',CourierStatus::active)
+            ->whereIn('status', [CourierStatus::active,CourierStatus::service])
             ->get();
 
         return response()->json($couriers);

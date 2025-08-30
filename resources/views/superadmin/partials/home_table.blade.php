@@ -2,45 +2,53 @@
     <ul class="nav nav-tabs" id="orderStatusTabs" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending"
-                    type="button" role="tab">Bekliyor
+                    type="button" role="tab">
+                <i class="
+                fa fa-clock" aria-hidden="true"></i> Bekliyor
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="prepared-tab" data-bs-toggle="tab" data-bs-target="#prepared" type="button"
-                    role="tab">Hazırlanıyor
+                    role="tab">
+                <i class="
+                fa fa-cutlery" aria-hidden="true"></i> Hazırlanıyor
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="assigned-tab" data-bs-toggle="tab" data-bs-target="#assigned" type="button"
-                    role="tab">Kuryeye Atananlar
+                    role="tab">
+                <i class="
+                fa fa-battery-empty" aria-hidden="true"></i> Kuryeye Atananlar
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="handover-tab" data-bs-toggle="tab" data-bs-target="#handover" type="button"
-                    role="tab">Kuryeye Verildi
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="pickup-tab" data-bs-toggle="tab" data-bs-target="#pickup" type="button"
-                    role="tab">Yolda
+                    role="tab">
+                <i class="
+                fa fa-motorcycle" aria-hidden="true"></i> Kuryeye Verildi
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="delivered-tab" data-bs-toggle="tab" data-bs-target="#delivered" type="button"
-                    role="tab">Teslim Edildi
+                    role="tab">
+                <i class="
+                fa fa-check-circle" aria-hidden="true"></i> Teslim Edildi
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="unsupplied-tab" data-bs-toggle="tab" data-bs-target="#unsupplied" type="button"
-                    role="tab">İptal Edildi
+                    role="tab">
+                <i class="
+                fa fa-times-circle" aria-hidden="true"></i> İptal Edildi
             </button>
         </li>
-
         <li class="nav-item" role="presentation">
-            <button class="nav-link" onclick="fetchOrders()">Yenile</button>
+            <button class="nav-link" onclick="fetchOrders()">
+                <i class="
+                fa fa-refresh" aria-hidden="true"></i> Yenile
+            </button>
         </li>
     </ul>
-
 
     <h2 id="newOrder" class="mt-4 bg-white py-2 text-center mx-auto fw-bold mb-4"
         style="display:none;color: rgba(231,0,77,0.82)">
@@ -53,11 +61,11 @@
             'PREPARED' => 'prepared',
             'ASSIGNED' => 'assigned',
             'HANDOVER' => 'handover',
-            'PICKUP' => 'pickup',
             'DELIVERED' => 'delivered',
             'UNSUPPLIED' => 'unsupplied'
         ];
     @endphp
+
     <div class="card">
         <div class="card-body">
             <div class="tab-content" id="orderStatusTabsContent">

@@ -50,8 +50,6 @@
         </li>
     </ul>
 
-
-
     <h2 id="newOrder" class="mt-4 bg-white py-2 text-center mx-auto fw-bold mb-4"
         style="display:none;color: rgba(231,0,77,0.82)">
         Yeni Sipariş Geldi

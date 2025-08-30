@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Order;
 use App\Models\OrderStatusLog;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class OrderStatusService
@@ -19,7 +20,7 @@ class OrderStatusService
             if ($lastLog) {
                 // Duration hesapla
                 $lastLog->update([
-                    'duration_seconds' => $lastLog->changed_at->diffInSeconds(now()),
+                    'duration_seconds' => Carbon::parse($lastLog->changed_at)->diffInSeconds(now()),
                 ]);
             }
 
