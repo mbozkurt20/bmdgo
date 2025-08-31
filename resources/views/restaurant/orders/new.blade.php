@@ -223,14 +223,13 @@
         }
 
         .paymentRol {
-            padding: 12px;
+
             font-size: 18px;
             color: #fff;
             text-align: center;
             font-weight: bold;
             height: 80px;
             border-radius: 10px;
-            margin: 0px 2px;
             cursor: pointer;
         }
 
@@ -575,7 +574,7 @@
                                     </div>
                                     <div style="padding: 1rem 1.2rem;" class="">
 
-                                        <dl class="dlist-align">
+                                        <dl class="dlist-align" style="padding: 5px">
                                             <dt>Toplam:</dt>
                                             <dd class="text-right h4 b"
                                                 id="posTotal"> {{number_format(\Cart::session(\Illuminate\Support\Facades\Auth::user()->id)->getTotal(), 2, ',', '.')}}
@@ -583,7 +582,7 @@
                                             </dd>
 
                                             <dt>Kupon:</dt>
-                                            <dd class="fw-bold size-4 text-danger" id="selectedCoupon">
+                                            <dd class="fw-bold size-4 " id="selectedCoupon">
                                                 <span id="selectedCouponName">Bulunmuyor</span>
                                                 <input type="hidden" id="coupon_id" name="coupon_id" value="">
                                             </dd>
@@ -620,9 +619,9 @@
                                             </div>
 
                                             <div class="col-md-12" style="padding: 10px 0px">
-                                                <div class="paymentRol kayit" onclick="CreateOrder()">
+                                                <div style="justify-content: center" class="mx-auto text-white kayit" onclick="CreateOrder()">
                                                     <i class="fas fa-check"></i>
-                                                    Kaydet
+                                                    Sipariş Ekle
                                                 </div>
                                             </div>
                                         </div>
@@ -1151,7 +1150,6 @@
         var coupon_id = $('#coupon_id').val();
         var total = $('#totalPrice').val();
 
-        console.log({coupon_id: coupon_id})
         let products = [];
 
         $('.item').each(function () {
@@ -1164,7 +1162,7 @@
         console.log({payment_control: payment_control})
         console.log({products: products})
 
-        if (payment_control != 0) {
+        if (payment_control !== 0) {
             if (customer_id > 0) {
                 if (products.length > 0) {
 
@@ -1182,6 +1180,7 @@
                         },
                         success: function (response) {
                             console.log({sgf: response})
+
                             if (response.status === "BalanceError") {
                                 console.log('balance girdi')
                                 Swal.fire({
@@ -1230,15 +1229,21 @@
                             }
 
                             if (response.status === "OK") {
-                                var divToPrint = response.printed;
-                                var mywindow = window.open('', 'PRINT', 'height=600,width=800');
-                                mywindow.document.write('<html><head><title>' + document.title + '</title>');
-                                mywindow.document.write('</head><body >');
-                                mywindow.document.write(divToPrint);
-                                mywindow.document.write('</body></html>');
-                                mywindow.document.close(); // necessary for IE >= 10
-                                mywindow.focus(); // necessary for IE >= 10*/
-                                mywindow.print();
+                                $.ajax({
+                                    type: "POST",
+                                    url: `/restaurant/order/${orde}/print`,
+                                    data: {
+                                        _token: '{{ csrf_token() }}',
+                                        html: response.printed
+                                    },
+                                    success: function(res) {
+                                        if(res.status === "OK") {
+                                            console.log("Adisyon yazıcıya gönderildi");
+                                        } else {
+                                            console.error(res.message);
+                                        }
+                                    }
+                                });
 
                                 // Seçili müşteriyi sıfırla
                                 $('#customerSelect').val('0').trigger('change');

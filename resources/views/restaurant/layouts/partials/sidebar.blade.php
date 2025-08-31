@@ -81,6 +81,7 @@
                 </a>
                 <ul aria-expanded="false">
                     <li><a class="text-white" href="{{ route('restaurant.entegrations') }}">Platformlar</a></li>
+                    <li><a class="text-white" href="{{ route('restaurant.prints') }}">Yazıcılar</a></li>
                 </ul>
             </li>
 

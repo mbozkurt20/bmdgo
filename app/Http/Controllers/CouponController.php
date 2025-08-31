@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Categorie;
 use App\Models\Product;
 use App\Models\RestaurantCoupon;
 use Illuminate\Http\Request;
@@ -63,14 +64,15 @@ class CouponController extends Controller
         return redirect()->back()->with('message', 'Kupon Başarıyla Güncellendi');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
+
+    public function delete($id)
     {
-        //
+        $del = RestaurantCoupon::find($id);
+        $del->delete();
+        if ($del) {
+            echo "OK";
+        } else {
+            echo "ERR";
+        }
     }
 }

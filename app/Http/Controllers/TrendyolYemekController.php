@@ -2,11 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\GeoLocation;
 use App\Helpers\OrdersHelper;
+use App\Helpers\OrderStatus;
 use App\Jobs\AssignPendingOrders;
+use App\Models\City;
+use App\Models\Customer;
+use App\Models\CustomerAddress;
+use App\Models\District;
 use Illuminate\Http\Request;
 use App\Models\Restaurant;
 use App\Models\Order;
+use Illuminate\Support\Facades\Auth;
 
 class TrendyolYemekController extends Controller
 {
@@ -49,6 +56,31 @@ class TrendyolYemekController extends Controller
             $address = $row->address;
             $orderAddress = $address->city . " " . $address->district . " " . $address->address1 . " Kat: " . $address->floor . " Kapi no:" . $address->doorNumber . " Adres Detay:" . $address->addressDescription;
 
+            $create = new Customer();
+            $create->restaurant_id = Auth::user()->id; // Assuming the authenticated user is the restaurant
+            $create->name = $address->firstName . " " . $address->lastName;
+            $create->phone = $address->phone;
+            $create->mobile = " ";
+            $create->email =$address->email??null;
+            $create->save();
+
+            if ($create){
+                $addr = new CustomerAddress();
+                $addr->customer_id = $create->id;
+                $addr->restaurant_id = $restaurant->id;
+                $addr->name =  $address->firstName . " " . $address->lastName. '-Trendyol';
+                $addr->sokak_cadde = ' ';
+                $addr->bina_no =  $address->doorNumber;
+                $addr->city_id = City::where('name',$address->city)->first()->id;
+                $addr->kat = $address->floor;
+                $addr->latitude = $address->latitude;
+                $addr->longitude = $address->longitude;
+                $addr->daire_no =  $address->doorNumber;
+                $addr->mahalle = ' ';
+                $addr->adres_tarifi = $address->addressDescription ?? '';
+                $addr->save();
+            }
+
             $promotionsAmount = 0;
             if (isset($row->promotions) && is_array($row->promotions)) {
                 foreach ($row->promotions as $promotion) {
@@ -63,15 +95,16 @@ class TrendyolYemekController extends Controller
 
             $orderData = [
                 'platform'       => 'trendyol',
-                'courier_id'     => 0,
-                'status'         => 'PENDING',
+                'customer_id'    => $create->id,
                 'restaurant_id'  => $restaurant->id,
+                'courier_id'     => -1,
+                'status'         => OrderStatus::PENDING,
                 'tracking_id'    => $row->orderId,
                 'full_name'      => $address->firstName . " " . $address->lastName,
                 'phone'          => $address->phone . '/' . substr($row->orderId, -11 ,11),
                 'payment_method' => $row->payment->paymentType == 'PAY_WITH_CARD'
-                    ? 'Kredi Kart ile Ödeme'
-                    : ($row->payment->paymentType == 'PAY_WITH_ON_DELIVERY' ? 'Kapıda Ödeme' : $row->payment->paymentType),
+                    ? 'Kapıda Kredi Kartı İle Ödeme'
+                    : ($row->payment->paymentType == 'PAY_WITH_ON_DELIVERY' ? 'Kapıda Nakit ile Ödeme' : $row->payment->paymentType),
                 'items'          => json_encode($row->lines),
                 'address'        => $orderAddress,
    				'promotions'     => isset($row->promotions) ? json_encode($row->promotions) : json_encode([]),
@@ -88,12 +121,11 @@ class TrendyolYemekController extends Controller
                 )
             ];
 
-            $order = Order::create($orderData);
-            AssignPendingOrders::dispatch();
+            Order::create($orderData);
         }
     }
 
-    public function orderStatus(Request $request)
+    public function updateOrderStatus(Request $request)
     {
         $action = $request->action;
 

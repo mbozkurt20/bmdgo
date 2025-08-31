@@ -16,11 +16,6 @@ class RestaurantFactory extends Factory
      */
     protected $model = Restaurant::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array
-     */
     public function definition()
     {
       if (env('TEST_MODE')){
@@ -35,5 +30,7 @@ class RestaurantFactory extends Factory
               'remember_token' => Str::random(10),
           ];
       }
+
+        return [];
     }
 }

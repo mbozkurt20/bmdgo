@@ -101,6 +101,7 @@ class CustomerController extends Controller
                     $address->sokak_cadde = $adres['sokak_cadde'];
                     $address->bina_no = $adres['bina_no'];
                     $address->city_id = $city->id;
+                    $address->district_id = $adres['ilce'];
                     $address->kat = $adres['kat'];
                     $address->latitude = $location['lat'];
                     $address->longitude = $location['lon'];

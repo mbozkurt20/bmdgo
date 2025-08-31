@@ -149,30 +149,19 @@ class AdisyoController extends Controller
 
 	public function updateOrder(Request $request)
 	{
-		// Debugging: Gelen istek verilerini kontrol edin
-		Log::info('Gelen istek verileri:', ['tracking_id' => $request->input('tracking_id'), 'action' => $request->input('action')]);
-
-		// İstekten gelen veriler
 		$trackingId = $request->input('tracking_id');
 		$action = $request->input('action');
 		$message = $request->input('message');
-		// Siparişi bul
+
         $order = Order::where('tracking_id', $trackingId)->with(['restaurant','courier'])->first();
+
 		if (!$order) {
 			Log::error('Sipariş bulunamadı', ['tracking_id' => $trackingId]);
-			return response()->json(['message' => 'Sipariş bulunamadı'], 404);
+			return response()->json(['message' => 'Sipariş Bulunamadı'], 404);
 		}
 
-		// Sipariş durumunu güncelle
 		$order->status = $action;
 		$order->message = $message;
-		// Sipariş içindeki ürünlerin kontrolü
-		$items = json_decode($order->items, true);
-
-        if (!isset($items[0]['items'][0]['orderId'])) {
-			Log::error('OrderId bulunamadı', ['order' => $order->id]);
-			return response()->json(['message' => 'OrderId bulunamadı'], 400);
-		}
 
 		$orderId = $order->id;
 

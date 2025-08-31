@@ -11,6 +11,9 @@ Route::group(['prefix' => 'restaurant'], function () {
         Route::post('register', [App\Http\Controllers\RestaurantController::class, 'register'])->name('restaurant.create');
     });
 
+    Route::get('/order/{orderId}/print', [App\Http\Controllers\OrderController::class, 'print']);
+
+
     Route::group(['middleware' => ['restaurant.auth']], function () {
         Route::get('/printed/{orderId}', [App\Http\Controllers\OrderController::class, 'printed']);
         Route::get('/orders/ajax', [App\Http\Controllers\RestaurantController::class, 'ajax'])->name('restaurant.orders.ajax');
@@ -43,6 +46,14 @@ Route::group(['prefix' => 'restaurant'], function () {
         Route::get('/coupons/delete/{id}', [App\Http\Controllers\CouponController::class, 'delete'])->name('restaurant.coupons.delete');
         Route::post('/coupons/create', [App\Http\Controllers\CouponController::class, 'store'])->name('restaurant.coupons.create');
         Route::post('/coupons/update', [App\Http\Controllers\CouponController::class, 'update'])->name('restaurant.coupons.update');
+
+        /* prints */
+        Route::get('/prints', [App\Http\Controllers\PrinterController::class, 'index'])->name('restaurant.prints');
+        Route::get('/prints/new', [App\Http\Controllers\PrinterController::class, 'create'])->name('restaurant.prints.new');
+        Route::get('/prints/edit/{id}', [App\Http\Controllers\PrinterController::class, 'edit'])->name('restaurant.prints.edit');
+        Route::get('/prints/delete/{id}', [App\Http\Controllers\PrinterController::class, 'delete'])->name('restaurant.prints.delete');
+        Route::post('/prints/create', [App\Http\Controllers\PrinterController::class, 'store'])->name('restaurant.prints.create');
+        Route::post('/prints/update', [App\Http\Controllers\PrinterController::class, 'update'])->name('restaurant.prints.update');
 
         /* Categories */
         Route::get('/categories', [App\Http\Controllers\CategorieController::class, 'index'])->name('restaurant.categories');
@@ -119,13 +130,13 @@ Route::group(['prefix' => 'restaurant'], function () {
         Route::post('/reports/globalFilterOrder', [App\Http\Controllers\ReportController::class, 'globalFilterOrder']);
 
         Route::get('/check-orders', [App\Http\Controllers\OrderController::class, 'checkOrders']);
-        Route::post('/telefonsiparis/updateOrderStatus', [App\Http\Controllers\OrderController::class, 'updateOrderStatus']);
 
-        Route::post('/trendyol/updateOrderStatus', [App\Http\Controllers\AdisyoController::class, 'updateOrder']);
-        Route::post('/yemeksepeti/updateOrderStatus', [App\Http\Controllers\AdisyoController::class, 'updateOrder']);
-        Route::post('/getir/updateOrderStatus', [App\Http\Controllers\AdisyoController::class, 'updateOrder']);
+        Route::post('/telefonsiparis/updateOrderStatus', [App\Http\Controllers\OrderController::class, 'updateOrderStatus']);
+        Route::post('/trendyol/updateOrderStatus', [App\Http\Controllers\TrendyolYemekController::class, 'updateOrderStatus']);
+        Route::post('/yemeksepeti/updateOrderStatus', [App\Http\Controllers\YemekSepetiController::class, 'updateOrder']);
+        Route::post('/getir/updateOrderStatus', [App\Http\Controllers\GetirYemekController::class, 'updateOrder']);
         Route::post('/adisyo/updateOrderStatus', [App\Http\Controllers\AdisyoController::class, 'updateOrder']);
-        Route::post('/migros/updateOrderStatus', [App\Http\Controllers\AdisyoController::class, 'updateOrder']);
+
 
         Route::get('/orders/printed/{id}', [App\Http\Controllers\OrderController::class, 'printed']);
         //Get Adisyo Orders

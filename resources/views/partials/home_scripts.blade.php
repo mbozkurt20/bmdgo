@@ -531,7 +531,6 @@
             platformHtml = `<span class="badge bg-light text-dark small">${restaurantName}</span>`;
         }
 
-
         // Kurye bölümü
         let courierSection = '';
         if (status === 'UNSUPPLIED' || status === 'DELIVERED' || status === 'HANDOVER') {

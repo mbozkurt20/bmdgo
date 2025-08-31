@@ -74,7 +74,7 @@
 
                       <div class="d-flex align-items-center mb-2">
                           <span class="me-2 text-black">Adres Tarifi (opsiyonel):</span>
-                          <input type="text" name="adress_tarifi" class="flex-grow-1 border-0 border-bottom bg-transparent" placeholder="Örn: 5" required>
+                          <input type="text" name="adress_tarifi" class="flex-grow-1 border-0 border-bottom bg-transparent" placeholder="Örn: 5">
                       </div>
 
                   </div>

@@ -36,11 +36,9 @@ class AssignPendingOrders implements ShouldQueue
         foreach ($orders as $order) {
             // Müsait kurye bul
             $courier = Courier::where('status', CourierStatus::active)
-                ->where('online', true)
                 ->orderBy('last_assigned_at', 'asc')
                 ->where('admin_id', $order->restaurant->admin_id)   // round robin için
                 ->first();
-
 
             if ($courier) {
                 // Siparişi kuryeye ata

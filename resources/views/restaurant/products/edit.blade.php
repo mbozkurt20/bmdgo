@@ -48,7 +48,8 @@
                                                 </svg>
                                                 Resim Seç veya Sürükle
                                             </label>
-                                            <input type="file" id="imageInput" name="image" accept="image/*" required>
+                                            <input type="file" id="imageInput" name="image" accept="image/*"
+                                            >
                                             <img id="imagePreview" alt="Seçilen Resim">
                                         </div>
                                     </div>

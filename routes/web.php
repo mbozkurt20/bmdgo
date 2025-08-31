@@ -17,14 +17,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('sound',function (){
-    $fcm = '';
-
-        $ser = new PushNotificationService();
-        $ser->sendNotification($fcm,'İstinye'.' Restorandan Yeni Siparişiniz Var','Sipariş Takip Kodu:'. 'POS-3456');
-
-});
-
 Route::get('/restaurant/couriers', [App\Http\Controllers\CourierController::class, 'index'])->name('restaurant.couriers.index');
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::get('/partner', [App\Http\Controllers\HomeController::class, 'dealer'])->name('dealer');

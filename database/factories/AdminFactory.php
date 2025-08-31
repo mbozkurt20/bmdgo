@@ -16,11 +16,6 @@ class AdminFactory extends Factory
      */
     protected $model = Admin::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array
-     */
     public function definition()
     {
         if (env('TEST_MODE')){
@@ -28,17 +23,13 @@ class AdminFactory extends Factory
                 'name' => 'Admin',
                 'email' => 'test@admin.com',
                 'top_up_balance'  => 100,
+                'city_id'  => 71,
                 'top_up_price'  => 3,
                 'password' => Hash::make('test'),
                 'remember_token' => Str::random(10),
             ];
-        }else{
-            return [
-                'name' => 'Admin',
-                'email' => 'admin@admin.com',
-                'password' => Hash::make('123456'),
-                'remember_token' => Str::random(10),
-            ];
         }
+
+        return [];
     }
 }

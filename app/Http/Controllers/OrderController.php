@@ -396,7 +396,6 @@ class OrderController extends Controller
                 $address->longitude = $location['lon'];
                 $address->daire_no = $request->daire_no;
                 $address->mahalle = $request->mahalle;
-                $address->adres_tarifi = $request->adress_tarifi;
                 $address->save();
             }
 
@@ -665,25 +664,20 @@ class OrderController extends Controller
 
     public function updateOrderStatus(Request $request)
     {
-        // İstekten gelen veriler
         $trackingId = $request->input('tracking_id');
         $action = $request->input('action');
         $message = $request->input('message');
 
-        // Siparişi bul
         $order = Order::where('tracking_id', $trackingId)->with(['restaurant', 'courier'])->first();
 
         if (!$order) {
             return response()->json(['error' => 'Order not found'], 404);
         }
 
-        // Siparişin durumunu ve mesajını güncelle
         $order->status = $action;
         $order->message = $message;
         $saveStatus = $order->update();
 
-
-        // Güncelleme işlemi başarılıysa yanıt ver
         if ($saveStatus) {
             return response()->json(['status' => "OK", 'order' => $order]);
         } else {

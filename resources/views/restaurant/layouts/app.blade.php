@@ -27,7 +27,6 @@
 
     @include('restaurant.orders.new')
 
-
     <div id="app" class="content-body" >
         @yield('content')
     </div>
