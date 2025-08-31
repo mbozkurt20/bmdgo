@@ -6,6 +6,8 @@ use Exception;
 use Kreait\Firebase\Exception\FirebaseException;
 use Kreait\Firebase\Exception\MessagingException;
 use Kreait\Firebase\Messaging;
+use Kreait\Firebase\Messaging\AndroidConfig;
+use Kreait\Firebase\Messaging\ApnsConfig;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\MulticastSendReport;
 use Kreait\Firebase\Messaging\Notification;
@@ -38,14 +40,42 @@ class PushNotificationService
                     Notification::create($title, $body)
                 )
                 ->withData(array_merge([
-                    'title' => $title,
+                    'title'   => $title,
                     'message' => $body,
-                    'sound' => 'tehlike',
-                ], $data));
+                    'sound'   => 'notification_sound',
+                ], $data))
+                ->withAndroidConfig(AndroidConfig::fromArray([
+                    'priority' => 'high',
+                    'notification' => [
+                        // Dosya adı: android/app/src/main/res/raw/notification_sound.wav
+                        // Android'de uzantı YAZILMAZ
+                        'sound' => 'notification_sound',
+                        // Android 8+ için: uygulamada bu channel'ı oluşturmalısın
+                        'channel_id' => 'custom_sound_channel',
+                    ],
+                ]))
+
+                // iOS (APNs)
+                ->withApnsConfig(ApnsConfig::fromArray([
+                    'headers' => [
+                        // iOS 13+ için önerilen push-type
+                        'apns-push-type' => 'alert',
+                    ],
+                    'payload' => [
+                        'aps' => [
+                            // Dosya adı: Xcode projesine ekli "notification_sound.caf" (veya .wav)
+                            'sound' => 'notification_sound.caf',
+                            'alert' => [
+                                'title' => $title,
+                                'body'  => $body,
+                            ],
+                        ],
+                    ],
+                ]));
 
             $this->client->send($message);
-
             return true;
+
         } catch (MessagingException|FirebaseException $e) {
             throw new \Exception('Failed to send push notification: '.$e->getMessage());
         }
