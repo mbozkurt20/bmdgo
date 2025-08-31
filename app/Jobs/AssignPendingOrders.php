@@ -45,13 +45,12 @@ class AssignPendingOrders implements ShouldQueue
             if ($courier) {
                 // Siparişi kuryeye ata
                 $order->courier_id = $courier->id;
-                $order->status = OrderStatus::HANDOVER;
-                $order->save();
+                $order->status = OrderStatus::ASSIGNED;
+                $order->update();
 
                 // Kuryeyi busy yap ve son atama zamanını güncelle
-                $courier->status = CourierStatus::service;
                 $courier->last_assigned_at = now();
-                $courier->save();
+                $courier->update();
 
                 $restaurant = Restaurant::find($order->restaurant_id);
 

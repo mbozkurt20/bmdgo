@@ -5,7 +5,6 @@ use App\Http\Controllers\TamiPaymentController;
 use App\Services\PushNotificationService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\MahalleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,6 +16,14 @@ use App\Http\Controllers\MahalleController;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+Route::get('sound',function (){
+    $fcm = '';
+
+        $ser = new PushNotificationService();
+        $ser->sendNotification($fcm,'İstinye'.' Restorandan Yeni Siparişiniz Var','Sipariş Takip Kodu:'. 'POS-3456');
+
+});
 
 Route::get('/restaurant/couriers', [App\Http\Controllers\CourierController::class, 'index'])->name('restaurant.couriers.index');
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
