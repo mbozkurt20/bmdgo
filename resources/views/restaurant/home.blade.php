@@ -186,7 +186,7 @@
             <!-- Performance Section -->
             <div class="col-lg-6">
                 @if($dailyPreparedSpeed->isEmpty() && $dailyHandoverSpeed->isEmpty() && $dailyDeliverySpeed->isEmpty())
-                    <div class="alert alert-warning">
+                    <div class="alert" style="background: #0d2646;color: white">
                         Bu tarih aralığında veri bulunamadı.
                     </div>
                 @else
