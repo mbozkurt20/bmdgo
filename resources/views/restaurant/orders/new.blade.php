@@ -18,7 +18,19 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <style>
-
+        .toast-success {
+            background-color: #30d760 !important; /* koyu yeşil */
+            color: #fff !important;
+            font-weight: 600;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        }
+        .toast-success .toast-title {
+            font-size: 15px;
+        }
+        .toast-success .toast-message {
+            font-size: 14px;
+        }
         .coupon-list {
             display: flex;
             flex-wrap: wrap;
