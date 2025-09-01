@@ -43,6 +43,7 @@ class RestaurantController extends Controller
         // Siparişleri duruma göre ayır
         $pending = $tumu->where('status', OrderStatus::PENDING);
         $prepared = $tumu->where('status',  OrderStatus::PREPARED);
+        $assigned = $tumu->where('status',  OrderStatus::ASSIGNED);
         $handover = $tumu->where('status',  OrderStatus::HANDOVER);
         $delivered = $tumu->where('status',  OrderStatus::DELIVERED);
         $unsupplied = $tumu->where('status',  OrderStatus::UNSUPPLIED);
@@ -50,6 +51,7 @@ class RestaurantController extends Controller
         return response()->json([
             'pending' => $pending->values()->all(),
             'prepared' => $prepared->values()->all(),
+            'assigned' => $assigned->values()->all(),
             'handover' => $handover->values()->all(),
             'delivered' => $delivered->values()->all(),
             'unsupplied' => $unsupplied->values()->all(),
