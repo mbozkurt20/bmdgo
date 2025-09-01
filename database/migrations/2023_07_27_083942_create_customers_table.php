@@ -22,6 +22,7 @@ class CreateCustomersTable extends Migration
             $table->string('email')->nullable()->unique();
             $table->enum('status',['active','deactive'])->default('active');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
