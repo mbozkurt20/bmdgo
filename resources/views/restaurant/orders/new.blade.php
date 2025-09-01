@@ -619,7 +619,7 @@
                                             </div>
 
                                             <div class="col-md-12" style="padding: 10px 0px">
-                                                <div style="justify-content: center" class="mx-auto text-white kayit" onclick="CreateOrder()">
+                                                <div style="justify-content: center;cursor: pointer" class="mx-auto text-white kayit" onclick="CreateOrder()">
                                                     <i class="fas fa-check"></i>
                                                     Sipariş Ekle
                                                 </div>
@@ -1229,6 +1229,28 @@
                             }
 
                             if (response.status === "OK") {
+
+                                Swal.fire({
+                                    title: response.message,
+                                    text: 'Siparişiniz Eklendi',
+                                    icon: 'success',
+                                    confirmButtonText: 'Tamam',
+                                    background: '#ffffff', // senin rengin
+                                    color: '#fff',
+                                    iconColor: '#30d760', // modern yeşil
+                                    confirmButtonColor: '#30d760', // modern yeşil düğme
+                                    customClass: {
+                                        popup: 'rounded-xl shadow-2xl',
+                                        confirmButton: 'px-6 py-3 text-lg font-semibold',
+                                    },
+                                    showClass: {
+                                        popup: 'animate__animated animate__fadeInDown',
+                                    },
+                                    hideClass: {
+                                        popup: 'animate__animated animate__fadeOutUp',
+                                    }
+                                })
+
                                 $.ajax({
                                     type: "POST",
                                     url: `/restaurant/order/${orde}/print`,
