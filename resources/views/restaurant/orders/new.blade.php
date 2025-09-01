@@ -1234,9 +1234,9 @@
                             }
 
                             if (response.status === "OK") {
-                                $.ajax({
+                               /* $.ajax({
                                     type: "POST",
-                                    url: `/restaurant/order/${orde}/print`,
+                                    url: `/restaurant/order/${order}/print`,
                                     data: {
                                         _token: '{{ csrf_token() }}',
                                         html: response.printed
@@ -1249,7 +1249,7 @@
                                         }
                                     }
                                 });
-
+*/
                                 // Seçili müşteriyi sıfırla
                                 $('#customerSelect').val('0').trigger('change');
 
