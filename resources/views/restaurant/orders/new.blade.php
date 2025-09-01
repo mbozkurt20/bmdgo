@@ -1234,6 +1234,14 @@
                             }
 
                             if (response.status === "OK") {
+                                toastr.success("Sipariş Eklendi!", "Başarılı", {
+                                    positionClass: "toast-top-right",
+                                    closeButton: true,
+                                    progressBar: true,
+                                    timeOut: 1500
+                                });
+
+                                removePos(1)
                                /* $.ajax({
                                     type: "POST",
                                     url: `/restaurant/order/${order}/print`,
@@ -1250,33 +1258,7 @@
                                     }
                                 });
 */
-                                // Seçili müşteriyi sıfırla
-                                $('#customerSelect').val('0').trigger('change');
 
-                                // Müşteri bilgilerini temizle
-                                $('.customer').html('');
-                                $('#customer_id').val('');
-
-                                $.ajax({
-                                    type: 'GET', //THIS NEEDS TO BE GET
-                                    url: '/restaurant/orders/removePOS',
-                                    success: function (data) {
-                                        let src = '{{url('pos/audio/trash.mp3')}}';
-                                        let audio = new Audio(src);
-                                        audio.play();
-
-                                        toastr.success("Sipariş Eklendi!", "Başarılı", {
-                                            positionClass: "toast-top-right",
-                                            closeButton: true,
-                                            progressBar: true,
-                                            timeOut: 3000
-                                        });
-                                        this.disabled = false;
-                                    },
-                                    error: function () {
-                                        console.log(data);
-                                    }
-                                });
                             }
                         },
                         error: function (response) {
