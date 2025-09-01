@@ -1159,14 +1159,10 @@
             })
         })
 
-        console.log({payment_control: payment_control})
-        console.log({products: products})
-
         if (payment_control !== 0) {
             if (customer_id > 0) {
                 if (products.length > 0) {
 
-                    //İşlemleriburada yapacağız
                     $.ajax({
                         type: 'POST',
                         url: '/restaurant/orders/addOrder' + '?_token=' + '{{ csrf_token() }}',
@@ -1179,144 +1175,54 @@
                             amount: total
                         },
                         success: function (response) {
-                            console.log({sgf: response})
-
-                            if (response.status === "BalanceError") {
-                                console.log('balance girdi')
-                                Swal.fire({
-                                    title: response.message,
-                                    text: 'Üzgünüz, Kontör Bakiyeniz Yetersiz Olduğundan Ürün Eklenemiyor !',
-                                    icon: 'warning',
-                                    confirmButtonText: 'Tamam',
-                                    background: '#ffffff', // senin rengin
-                                    color: '#fff',
-                                    iconColor: '#e7004d', // modern yeşil
-                                    confirmButtonColor: '#e7004d', // modern yeşil düğme
-                                    customClass: {
-                                        popup: 'rounded-xl shadow-2xl',
-                                        confirmButton: 'px-6 py-3 text-lg font-semibold',
-                                    },
-                                    showClass: {
-                                        popup: 'animate__animated animate__fadeInDown',
-                                    },
-                                    hideClass: {
-                                        popup: 'animate__animated animate__fadeOutUp',
-                                    }
-                                })
-                            }
-
-                            if (response.status === 'ERR') {
-                                Swal.fire({
-                                    title: response.message,
-                                    text: '',
-                                    icon: 'warning',
-                                    confirmButtonText: 'Tamam',
-                                    background: '#ffffff', // senin rengin
-                                    color: '#fff',
-                                    iconColor: '#e7004d', // modern yeşil
-                                    confirmButtonColor: '#e7004d', // modern yeşil düğme
-                                    customClass: {
-                                        popup: 'rounded-xl shadow-2xl',
-                                        confirmButton: 'px-6 py-3 text-lg font-semibold',
-                                    },
-                                    showClass: {
-                                        popup: 'animate__animated animate__fadeInDown',
-                                    },
-                                    hideClass: {
-                                        popup: 'animate__animated animate__fadeOutUp',
-                                    }
-                                })
-                            }
-
                             if (response.status === "OK") {
-
-                                Swal.fire({
-                                    title: response.message,
-                                    text: 'Siparişiniz Eklendi',
-                                    icon: 'success',
-                                    confirmButtonText: 'Tamam',
-                                    background: '#ffffff', // senin rengin
-                                    color: '#fff',
-                                    iconColor: '#30d760', // modern yeşil
-                                    confirmButtonColor: '#30d760', // modern yeşil düğme
-                                    customClass: {
-                                        popup: 'rounded-xl shadow-2xl',
-                                        confirmButton: 'px-6 py-3 text-lg font-semibold',
-                                    },
-                                    showClass: {
-                                        popup: 'animate__animated animate__fadeInDown',
-                                    },
-                                    hideClass: {
-                                        popup: 'animate__animated animate__fadeOutUp',
-                                    }
-                                })
-
-                                $.ajax({
-                                    type: "POST",
-                                    url: `/restaurant/order/${orde}/print`,
-                                    data: {
-                                        _token: '{{ csrf_token() }}',
-                                        html: response.printed
-                                    },
-                                    success: function(res) {
-                                        if(res.status === "OK") {
-                                            console.log("Adisyon yazıcıya gönderildi");
-                                        } else {
-                                            console.error(res.message);
-                                        }
-                                    }
+                                // ✅ Swal yerine toast
+                                toastr.success("Siparişiniz başarıyla eklendi!", "Başarılı", {
+                                    positionClass: "toast-top-right",
+                                    closeButton: true,
+                                    progressBar: true,
+                                    timeOut: 3000
                                 });
 
-                                // Seçili müşteriyi sıfırla
+                                // ✅ Datayı sıfırla
                                 $('#customerSelect').val('0').trigger('change');
-
-                                // Müşteri bilgilerini temizle
                                 $('.customer').html('');
                                 $('#customer_id').val('');
+                                $('#courier_id').val('');
+                                $('#coupon_id').val('');
+                                $('#totalPrice').val('0');
 
-                                $.ajax({
-                                    type: 'GET', //THIS NEEDS TO BE GET
-                                    url: '/restaurant/orders/removePOS',
-                                    success: function (data) {
-                                        let src = '{{url('pos/audio/trash.mp3')}}';
-                                        let audio = new Audio(src);
-                                        audio.play();
-                                        $('#productItemListp').html("");
-                                        $('#productItemLista').html("");
-                                        $('#posTotalItem').html("0");
-                                        $('.customer').html('<div style="text-align: center;padding: 15px">Müşteri Seçin</div>');
-                                        $('#posTotal').html("0,00 TL");
+                                $('#productItemListp').html("");
+                                $('#productItemLista').html("");
+                                $('#posTotalItem').html("0");
+                                $('#posTotal').html("0,00 TL");
 
-                                        $('.nakit').css('background', '#1f49d3');
-                                        $('.kkarti').css('background', '#0077b8');
-                                        $('.kkkarti').css('background', '#183785');
+                                $('.nakit').css('background', '#1f49d3');
+                                $('.kkarti').css('background', '#0077b8');
+                                $('.kkkarti').css('background', '#183785');
 
-                                        Swal.fire({
-                                            title: 'Sipariş Tamamlandı',
-                                            text: 'Siparişiniz başarıyla alındı!',
-                                            icon: 'success',
-                                            confirmButtonText: 'Tamam',
-                                            background: '#ffffff', // senin rengin
-                                            color: '#fff',
-                                            iconColor: '#30d760', // modern yeşil
-                                            confirmButtonColor: '#1fde74', // modern yeşil düğme
-                                            customClass: {
-                                                popup: 'rounded-xl shadow-2xl',
-                                                confirmButton: 'px-6 py-3 text-lg font-semibold',
-                                            },
-                                            showClass: {
-                                                popup: 'animate__animated animate__fadeInDown',
-                                            },
-                                            hideClass: {
-                                                popup: 'animate__animated animate__fadeOutUp',
-                                            }
-                                        })
-                                        this.disabled = false;
-                                    },
-                                    error: function () {
-                                        console.log(data);
+                                // Ses çalsın
+                                let src = '{{url('pos/audio/trash.mp3')}}';
+                                let audio = new Audio(src);
+                                audio.play();
+
+                                this.disabled = false;
+                            }
+
+                            if (response.status === "BalanceError" || response.status === "ERR") {
+                                Swal.fire({
+                                    title: response.message,
+                                    icon: 'warning',
+                                    confirmButtonText: 'Tamam',
+                                    background: '#ffffff',
+                                    color: '#fff',
+                                    iconColor: '#e7004d',
+                                    confirmButtonColor: '#e7004d',
+                                    customClass: {
+                                        popup: 'rounded-xl shadow-2xl',
+                                        confirmButton: 'px-6 py-3 text-lg font-semibold',
                                     }
-                                });
+                                })
                             }
                         },
                         error: function (response) {
@@ -1326,72 +1232,28 @@
 
                 } else {
                     Swal.fire({
-                        title: 'Sepetinizde ürün Bulunmuyor!!',
-                        text: '',
+                        title: 'Sepetinizde ürün bulunmuyor!',
                         icon: 'warning',
-                        confirmButtonText: 'Tamam',
-                        background: '#ffffff', // senin rengin
-                        color: '#fff',
-                        iconColor: '#e7004d', // modern yeşil
-                        confirmButtonColor: '#e7004d', // modern yeşil düğme
-                        customClass: {
-                            popup: 'rounded-xl shadow-2xl',
-                            confirmButton: 'px-6 py-3 text-lg font-semibold',
-                        },
-                        showClass: {
-                            popup: 'animate__animated animate__fadeInDown',
-                        },
-                        hideClass: {
-                            popup: 'animate__animated animate__fadeOutUp',
-                        }
+                        confirmButtonText: 'Tamam'
                     })
                 }
             } else {
                 Swal.fire({
                     title: 'Lütfen Bir Müşteri Seçiniz',
-                    text: '',
                     icon: 'warning',
-                    confirmButtonText: 'Tamam',
-                    background: '#ffffff', // senin rengin
-                    color: '#fff',
-                    iconColor: '#e7004d', // modern yeşil
-                    confirmButtonColor: '#e7004d', // modern yeşil düğme
-                    customClass: {
-                        popup: 'rounded-xl shadow-2xl',
-                        confirmButton: 'px-6 py-3 text-lg font-semibold',
-                    },
-                    showClass: {
-                        popup: 'animate__animated animate__fadeInDown',
-                    },
-                    hideClass: {
-                        popup: 'animate__animated animate__fadeOutUp',
-                    }
+                    confirmButtonText: 'Tamam'
                 })
                 $('#musteriAta').modal('show');
             }
         } else {
             Swal.fire({
                 title: 'Lütfen Bir Ödeme Methodu Seçiniz',
-                text: '',
                 icon: 'warning',
-                confirmButtonText: 'Tamam',
-                background: '#ffffff', // senin rengin
-                color: '#fff',
-                iconColor: '#e7004d', // modern yeşil
-                confirmButtonColor: '#e7004d', // modern yeşil düğme
-                customClass: {
-                    popup: 'rounded-xl shadow-2xl',
-                    confirmButton: 'px-6 py-3 text-lg font-semibold',
-                },
-                showClass: {
-                    popup: 'animate__animated animate__fadeInDown',
-                },
-                hideClass: {
-                    popup: 'animate__animated animate__fadeOutUp',
-                }
+                confirmButtonText: 'Tamam'
             })
         }
     }
+
 
     function loadCustomers() {
         $.ajax({
