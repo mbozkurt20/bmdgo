@@ -476,10 +476,8 @@ class OrderController extends Controller
     {
         $userId = Auth::user()->id;
         \Cart::session($userId)->clear();
-        $TotalQuantity = 0;
-        $TotalMoney = number_format(0, 2, ',', '.') . " TL";
 
-        return response()->json(['TotalQuantity' => $TotalQuantity, 'TotalMoney' => $TotalMoney]);
+        return response()->json(['message' => 'Temizlendi']);
     }
 
     public function customerpos($id)
