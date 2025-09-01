@@ -1246,14 +1246,14 @@
                             }
 
                             if (response.status === "OK") {
-                                toastr.success("Sipariş Eklendi!", "Başarılı", {
+                                removePos(1)
+
+                                toastr.success("1 Yeni Sipariş Eklendi ", "Sipariş Başarıyla Eklendi", {
                                     positionClass: "toast-top-right",
                                     closeButton: true,
                                     progressBar: true,
                                     timeOut: 1500
                                 });
-
-                                removePos(1)
                                /* $.ajax({
                                     type: "POST",
                                     url: `/restaurant/order/${order}/print`,
