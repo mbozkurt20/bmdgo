@@ -165,6 +165,6 @@ class OrdersHelper
             ],
         ];
 
-        return collect($data);
+        return $data;
     }
 }

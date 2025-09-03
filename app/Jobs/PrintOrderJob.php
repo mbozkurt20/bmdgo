@@ -53,7 +53,7 @@ class PrintOrderJob implements ShouldQueue
                 "printer-{$printer}",   // kanal adı
                 "print-order",          // event adı
                 [
-                    'order'     => OrdersHelper::getOrderData($this->order->id),
+                    'order'     => $this->order,
                     'printer'   => $printer,
                     'restaurant'=> $this->restaurantId,
                 ]
