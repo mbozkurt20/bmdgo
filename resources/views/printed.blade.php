@@ -111,18 +111,6 @@
             <td class="text-right">Tutar</td>
         </tr>
         @foreach($items as $item)
-            @php
-                if ($order->platform == "yemeksepeti") {
-                    $adet = $item->amount;
-                    $tutar = $item->total;
-                } elseif ($order->platform == "getir") {
-                    $adet = $item->amount;
-                    $tutar = (int)$item->amount * (int)$item->price;
-                } else {
-                    $adet = count($item->items);
-                    $tutar = (int)count($item->items) * (int)$item->price;
-                }
-            @endphp
             <tr>
                 <td>{{ $adet }}</td>
                 <td>{{ $item->name }}</td>

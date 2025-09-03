@@ -8,9 +8,11 @@ use App\Helpers\OrderStatus;
 use App\Helpers\SendSms;
 use App\Jobs\AssignOrderToCourier;
 use App\Jobs\AssignPendingOrders;
+use App\Jobs\PrintOrderJob;
 use App\Models\Admin;
 use App\Models\Courier;
 use App\Models\Order;
+use App\Models\Printer;
 use App\Models\Restaurant;
 use App\Services\OrderStatusService;
 use Illuminate\Support\Facades\Auth;
@@ -46,6 +48,14 @@ class OrderObserver
         $or->changeStatus($order, $newStatus);
 
         SendSms::send($order->phone, $message, $restaurant->admin_id);
+
+        if (Auth::guard('restaurant')->check()) {
+            $printers = Printer::where('payable_type', 'restaurant')->where('payable_id', $restaurant->id)->pluck('name')->toArray();
+            if (count($printers) > 0) {
+                $orderData = OrdersHelper::getOrderData($order->id);
+                PrintOrderJob::dispatch($orderData, $printers)->onQueue('restaurant_' . $order->restaurant_id);;
+            }
+        }
 
 // Pusher ayarları
         $options = [

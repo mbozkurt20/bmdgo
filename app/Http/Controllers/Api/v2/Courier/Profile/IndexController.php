@@ -130,6 +130,10 @@ class IndexController extends Controller
 
         $courier = Courier::find($id);
 
+        if ($courier->status == CourierStatus::service){
+            return Json::error('Teslim Edilmeyen Siarişiniz Bulunuyor.');
+        }
+
         $courier->update([
             'status' => $request->input('status'),
         ]);

@@ -318,35 +318,17 @@
     }
 
     function printOrder(orderId) {
-        fetch('/{{$key}}/printed/' + orderId)
-            .then(response => response.json())
-            .then(data => {
-                const printWindow = window.open('', '', 'height=600,width=800');
-                printWindow.document.write(`
-                <html>
-                <head>
-                    <title>Sipariş Yazdır</title>
-                    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-                    <style>
-                        body { font-family: Arial, sans-serif; margin: 20px; }
-                        h1 { text-align: center; margin-bottom: 20px; }
-                        table { width: 100%; border-collapse: collapse; }
-                        th, td { border: 1px solid #000; padding: 8px; text-align: left; font-size: 14px; }
-                        th { background-color: #f8f9fa; }
-                    </style>
-                </head>
-                <body>
-                    <h1 class="fw-bold text-black text-center">Sipariş Bilgileri</h1>
-                    ${data.printed}
-                </body>
-                </html>
-            `);
-                printWindow.document.close();
-                printWindow.focus();
-                printWindow.print();
-                printWindow.close();
+       window.location.href = '/{{$key}}/printed/' + orderId;
+      /*  fetch('/{{$key}}/printed/' + orderId)
+            .then(response => () => {
+                toastr.success("1 Yeni Sipariş Eklendi ", "Sipariş Başarıyla Eklendi", {
+                    positionClass: "toast-top-right",
+                    closeButton: true,
+                    progressBar: true,
+                    timeOut: 1500
+                });
             })
-            .catch(err => console.error(err));
+            .catch(err => console.error(err)); */
     }
 
     const selectBox = document.getElementById("selectedCourier");

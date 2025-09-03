@@ -9,6 +9,7 @@ use App\Models\Categorie;
 use App\Models\Courier;
 use App\Models\CourierOrder;
 use App\Models\Customer;
+use App\Models\CustomerAddress;
 use App\Models\Notification;
 use App\Models\Order;
 use App\Models\Restaurant;
@@ -50,7 +51,7 @@ class OrdersHelper
     {
         $code = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
 
-        if (Order::where('verify_code',$code)->exists()){
+        if (Order::where('verify_code', $code)->exists()) {
             $code = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
         }
 
@@ -140,5 +141,29 @@ class OrdersHelper
         return RestaurantSystemFeature::where('restaurant_id', Auth::guard('admin')->id())
             ->where('system_feature_id', $id)
             ->exists();
+    }
+
+    static function getOrderData($orderId)
+    {
+        $order = Order::where('id', $orderId)->firstOrFail();
+
+        $data = [
+            'restaurant' => [
+                'name' => Restaurant::find($order->restaurant_id)->restaurant_name,
+                'logo' => url('theme/images/bmdGo.png'),
+            ],
+            'platform' => $order->platform,
+            'note' => $order->notes,
+            'items' => json_decode($order->items),
+            'discount' => $order->discount,
+            'sub_amount' => $order->sub_amount,
+            'amount' => $order->amount,
+            'customer' => [
+                'name' => $order->full_name,
+                'phone' => $order->phone,
+            ],
+        ];
+
+        return $data;
     }
 }

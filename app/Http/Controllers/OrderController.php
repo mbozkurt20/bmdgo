@@ -7,9 +7,11 @@ use App\Helpers\GeoLocation;
 use App\Helpers\NotificationHelper;
 use App\Helpers\OrdersHelper;
 use App\Helpers\OrderStatus;
+use App\Jobs\PrintOrderJob;
 use App\Models\Admin;
 use App\Models\City;
 use App\Models\District;
+use App\Models\Printer;
 use App\Models\Restaurant;
 use App\Models\RestaurantCoupon;
 use App\Services\PushNotificationService;
@@ -53,7 +55,6 @@ class OrderController extends Controller
             }
         }
     }
-
     public function sendCourier(Request $request, $orderId, $courierId)
     {
         // Check if the courier exists
@@ -686,17 +687,28 @@ class OrderController extends Controller
     public function printed($id)
     {
         $order = Order::where('id', $id)->firstOrFail();
-        $customer_address = CustomerAddress::where('customer_id', $order->customer_id)->first();
+
+       $customerAddress = CustomerAddress::where('customer_id', $order->customer_id)->first();
         $items = json_decode($order->items, false);
 
-        $html = view('receipt', [
+
+        $html = view('printer.single.index', [
             'order' => $order,
-            'customer_address' => $customer_address,
+            'customer' => $customerAddress,
             'items' => $items,
             'restaurant' => Restaurant::find($order->restaurant_id),
-        ])->render(); // render() ile HTML stringi alın
+        ]); // render() ile HTML stringi alın
 
-        return response()->json(['printed' => $html]);
+       return $html;
+
+
+       /* $order = Order::where('id', $id)->firstOrFail();
+        $orderData = OrdersHelper::getOrderData($id);
+
+        $printers = Printer::where('payable_type', 'restaurant')->where('payable_id', $order->restaurant_id)->pluck('name')->toArray();
+
+        // Kuyruğa at
+        PrintOrderJob::dispatch($orderData, $printers); */
     }
 
     public function deleteOrder($id)
