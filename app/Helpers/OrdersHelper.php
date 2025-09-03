@@ -148,6 +148,7 @@ class OrdersHelper
         $order = Order::where('id', $orderId)->firstOrFail();
 
         $data = [
+            'id' => $order->id,
             'restaurant' => [
                 'name' => Restaurant::find($order->restaurant_id)->restaurant_name,
                 'logo' => url('theme/images/bmdGo.png'),
