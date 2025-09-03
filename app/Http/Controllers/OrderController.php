@@ -693,7 +693,7 @@ class OrderController extends Controller
         $printers = Printer::where('payable_type', 'restaurant')->where('payable_id', $order->restaurant_id)->pluck('name')->toArray();
 
         // Kuyruğa at
-        PrintOrderJob::dispatch($orderData, $printers)->onQueue('restaurant_' . $order->restaurant_id);
+        PrintOrderJob::dispatch($orderData, $printers, $order->restaurant_id)->onQueue('restaurant_' . $order->restaurant_id);
     }
 
     public function deleteOrder($id)
