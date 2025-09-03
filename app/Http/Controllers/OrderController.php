@@ -55,6 +55,7 @@ class OrderController extends Controller
             }
         }
     }
+
     public function sendCourier(Request $request, $orderId, $courierId)
     {
         // Check if the courier exists
@@ -107,9 +108,9 @@ class OrderController extends Controller
                     $restaurant = Restaurant::find($order->restaurant_id);
 
                     //mobil bildiri
-                    if ($courier->fcm_token){
+                    if ($courier->fcm_token) {
                         $ser = new PushNotificationService();
-                        $ser->sendNotification($courier->fcm_token,$restaurant->restaurant_name.' Restorandan Yeni Siparişiniz Var','Sipariş Takip Kodu:'. $order->tracking_id);
+                        $ser->sendNotification($courier->fcm_token, $restaurant->restaurant_name . ' Restorandan Yeni Siparişiniz Var', 'Sipariş Takip Kodu:' . $order->tracking_id);
                     }
 
                     if (OrdersHelper::getOrderSystem(3)) {
@@ -524,7 +525,7 @@ class OrderController extends Controller
             $create->restaurant_id = Auth::user()->id;
             $create->name = $data['name'];
             $create->phone = $data['phone'];
-            $create->mobile = $data['mobile']??'';
+            $create->mobile = $data['mobile'] ?? '';
             $create->save();
         }
 
@@ -687,28 +688,12 @@ class OrderController extends Controller
     public function printed($id)
     {
         $order = Order::where('id', $id)->firstOrFail();
-
-       $customerAddress = CustomerAddress::where('customer_id', $order->customer_id)->first();
-        $items = json_decode($order->items, false);
-
-
-        $html = view('printer.single.index', [
-            'order' => $order,
-            'customer' => $customerAddress,
-            'items' => $items,
-            'restaurant' => Restaurant::find($order->restaurant_id),
-        ]); // render() ile HTML stringi alın
-
-       return $html;
-
-
-       /* $order = Order::where('id', $id)->firstOrFail();
         $orderData = OrdersHelper::getOrderData($id);
 
         $printers = Printer::where('payable_type', 'restaurant')->where('payable_id', $order->restaurant_id)->pluck('name')->toArray();
 
         // Kuyruğa at
-        PrintOrderJob::dispatch($orderData, $printers); */
+        PrintOrderJob::dispatch($orderData, $printers)->onQueue('restaurant_' . $order->restaurant_id);
     }
 
     public function deleteOrder($id)

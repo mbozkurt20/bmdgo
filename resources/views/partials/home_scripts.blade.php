@@ -318,8 +318,7 @@
     }
 
     function printOrder(orderId) {
-       window.location.href = '/{{$key}}/printed/' + orderId;
-      /*  fetch('/{{$key}}/printed/' + orderId)
+        fetch('/{{$key}}/printed/' + orderId)
             .then(response => () => {
                 toastr.success("1 Yeni Sipariş Eklendi ", "Sipariş Başarıyla Eklendi", {
                     positionClass: "toast-top-right",
@@ -328,7 +327,7 @@
                     timeOut: 1500
                 });
             })
-            .catch(err => console.error(err)); */
+            .catch(err => console.error(err));
     }
 
     const selectBox = document.getElementById("selectedCourier");

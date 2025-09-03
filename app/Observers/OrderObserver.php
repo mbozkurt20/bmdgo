@@ -53,7 +53,7 @@ class OrderObserver
             $printers = Printer::where('payable_type', 'restaurant')->where('payable_id', $restaurant->id)->pluck('name')->toArray();
             if (count($printers) > 0) {
                 $orderData = OrdersHelper::getOrderData($order->id);
-                PrintOrderJob::dispatch($orderData, $printers)->onQueue('restaurant_' . $order->restaurant_id);;
+                PrintOrderJob::dispatch($orderData, $printers)->onQueue('restaurant_' . $order->restaurant_id);
             }
         }
 
