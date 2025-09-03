@@ -138,7 +138,7 @@ Route::group(['prefix' => 'restaurant'], function () {
         Route::post('/adisyo/updateOrderStatus', [App\Http\Controllers\AdisyoController::class, 'updateOrder']);
 
 
-        Route::get('/orders/printed/{id}', [App\Http\Controllers\OrderController::class, 'printed']);
+        Route::get('/printed/{orderId}', [App\Http\Controllers\OrderController::class, 'printed']);
         //Get Adisyo Orders
         //Route::get('/getAdisyoOrders', [App\Http\Controllers\AdisyoController::class, 'GetOrders'])->name('getOrders');
         Route::get('/getAdisyoOrders', [App\Http\Controllers\AdisyoController::class, 'index'])->name('getOrders');

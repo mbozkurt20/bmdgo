@@ -320,6 +320,7 @@
     function printOrder(orderId) {
         fetch('/{{$key}}/printed/' + orderId)
             .then(response => () => {
+                console.log({printOrder: response})
                 toastr.success("1 Yeni Sipariş Eklendi ", "Sipariş Başarıyla Eklendi", {
                     positionClass: "toast-top-right",
                     closeButton: true,

@@ -685,10 +685,10 @@ class OrderController extends Controller
         }
     }
 
-    public function printed($id)
+    public function printed($orderId)
     {
-        $order = Order::where('id', $id)->firstOrFail();
-        $orderData = OrdersHelper::getOrderData($id);
+        $order = Order::where('id', $orderId)->firstOrFail();
+        $orderData = OrdersHelper::getOrderData($orderId);
 
         $printers = Printer::where('payable_type', 'restaurant')->where('payable_id', $order->restaurant_id)->pluck('name')->toArray();
 
