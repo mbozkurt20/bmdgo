@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Helpers\OrdersHelper;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -24,7 +23,7 @@ class PrintOrderJob implements ShouldQueue
     public function __construct($order, $printers, $restaurantId)
     {
         $this->order        = $order;
-        $this->printers     = $printers;
+        $this->printers     = $printers;     // ["Mutfak", "Kasa"]
         $this->restaurantId = $restaurantId;
     }
 
@@ -33,31 +32,29 @@ class PrintOrderJob implements ShouldQueue
      */
     public function handle(): void
     {
-        // Eğer worker yanlış kuyruğu dinliyorsa, bu job'u atla
-        if ($this->queue !== 'restaurant_' . $this->restaurantId) {
-            return;
-        }
+        $options = [
+            'cluster' => env('PUSHER_APP_CLUSTER'),
+            'useTLS'  => true,
+        ];
 
         $pusher = new Pusher(
-            config('broadcasting.connections.pusher.key'),
-            config('broadcasting.connections.pusher.secret'),
-            config('broadcasting.connections.pusher.app_id'),
-            [
-                'cluster' => config('broadcasting.connections.pusher.options.cluster'),
-                'useTLS'  => true,
-            ]
+            env('PUSHER_APP_KEY'),
+            env('PUSHER_APP_SECRET'),
+            env('PUSHER_APP_ID'),
+            $options
         );
 
-        foreach ($this->printers as $printer) {
-            $pusher->trigger(
-                "printer-{$printer}",   // kanal adı
-                "print-order",          // event adı
-                [
-                    'order'     => $this->order,
-                    'printer'   => $printer,
-                    'restaurant'=> $this->restaurantId,
-                ]
-            );
+        $payload = [
+            "restaurant_id" => $this->restaurantId,
+            "order"         => $this->order,      // array olarak gönder
+            "printers"      => $this->printers,   // ["Mutfak", "Kasa"]
+        ];
+
+        foreach ($this->printers as $printerName) {
+            // 👇 Kanal formatı: printer-{restaurantId}-{printerName}
+            $channel = "printer-{$this->restaurantId}-{$printerName}";
+
+            $pusher->trigger($channel, "print-order", $payload);
         }
     }
 }
