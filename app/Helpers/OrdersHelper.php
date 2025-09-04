@@ -151,7 +151,10 @@ class OrdersHelper
 
         $mapsUrl = "https://www.openstreetmap.org/?mlat={$lat}&mlon={$lng}&zoom=18";
 
-        $qrCode = QrCode::create($mapsUrl)->setSize(50);
+        $qrCode = QrCode::create($mapsUrl)
+            ->setSize(200)       // 50 biraz küçük olabilir, büyütebilirsin
+            ->setMargin(0);      // Beyaz kenarlıkları kaldırır
+
         $writer = new PngWriter();
         $result = $writer->write($qrCode);
 
