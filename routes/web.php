@@ -70,7 +70,7 @@ Route::get('test', function () {
         "printers"      => ['Mutfak'],   // ["Mutfak", "Kasa"]
     ];
 
-    $channel = "printer-1";
+    $channel = "BmdGo-1";
 
     $pusher->trigger($channel, "print-order", $payload);
 

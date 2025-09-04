@@ -166,7 +166,7 @@ class OrdersHelper
             'restaurant' => [
                 'id' => $order->restaurant_id,
                 'name' => Restaurant::find($order->restaurant_id)->restaurant_name,
-                'logo' => 'https://app.bmdgo.com/theme/images/bmdGo.png',
+                'logo' => asset('/theme/images/bmdGo.png'),
             ],
             'platform' => $order->platform,
             'note' => $order->notes,
