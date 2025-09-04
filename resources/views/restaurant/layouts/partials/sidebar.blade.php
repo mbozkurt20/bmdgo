@@ -103,6 +103,11 @@
                     <li><a  class="text-white" href="https://download.anydesk.com/AnyDesk.exe">Teknik Destek</a></li>
                 </ul>
             </li>
+            <li><a class="ai-icon text-white" href="{{ url('/restaurant/apps') }}" aria-expanded="false">
+                    <i class="flaticon-381-news text-white"></i>
+                    <span class="nav-text text-white">Ugulamalar</span>
+                </a>
+            </li>
 
         </ul>
     </div>

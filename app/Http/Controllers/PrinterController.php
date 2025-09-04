@@ -15,6 +15,10 @@ class PrinterController extends Controller
        $prints = Printer::where('payable_type','restaurant')->where('payable_id',Auth::guard('restaurant')->id())->get();
        return view('restaurant.prints.index',compact('prints'));
     }
+    public function apps()
+    {
+        return view('restaurant.apps.index');
+    }
     public function create()
     {
         return view('restaurant.prints.new');

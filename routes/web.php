@@ -50,29 +50,3 @@ include __DIR__ . '/app/partnerRoutes.php';
 
 Route::post('/order/add-online-order', [App\Http\Controllers\Api\OrderController::class, 'addOnlineOrder']);
 Route::post('/order/cancel-order', [App\Http\Controllers\Api\OrderController::class, 'cancelEntegraOrder']);
-
-Route::get('test', function () {
-    $options = [
-        'cluster' => env('PUSHER_APP_CLUSTER'),
-        'useTLS'  => true,
-    ];
-
-    $pusher = new Pusher(
-        env('PUSHER_APP_KEY'),
-        env('PUSHER_APP_SECRET'),
-        env('PUSHER_APP_ID'),
-        $options
-    );
-
-    $payload = [
-        "restaurant_id" => 1,
-        "order"         => \App\Helpers\OrdersHelper::getOrderData(1),      // array olarak gönder
-        "printers"      => ['Mutfak'],   // ["Mutfak", "Kasa"]
-    ];
-
-    $channel = "BmdGo-1";
-
-    $pusher->trigger($channel, "print-order", $payload);
-
-    dd($channel);
-});

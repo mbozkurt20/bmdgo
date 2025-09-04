@@ -48,6 +48,7 @@ Route::group(['prefix' => 'restaurant'], function () {
         Route::post('/coupons/update', [App\Http\Controllers\CouponController::class, 'update'])->name('restaurant.coupons.update');
 
         /* prints */
+        Route::get('/apps', [App\Http\Controllers\PrinterController::class, 'apps'])->name('restaurant.apps');
         Route::get('/prints', [App\Http\Controllers\PrinterController::class, 'index'])->name('restaurant.prints');
         Route::get('/prints/new', [App\Http\Controllers\PrinterController::class, 'create'])->name('restaurant.prints.new');
         Route::get('/prints/edit/{id}', [App\Http\Controllers\PrinterController::class, 'edit'])->name('restaurant.prints.edit');
