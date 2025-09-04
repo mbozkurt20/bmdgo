@@ -159,7 +159,13 @@ class OrdersHelper
         $result = $writer->write($qrCode);
 
         $fileName = 'qr_' . $order->id . '.png';
-        $filePath = public_path('qr/' . $fileName); // public/qr/ klasörüne kaydet
+        $filePath = public_path('qr/' . $fileName);
+
+// Klasörün varlığını kontrol edip yoksa oluştur
+        if (!file_exists(public_path('qr'))) {
+            mkdir(public_path('qr'), 0775, true);
+        }
+
         $result->saveToFile($filePath);
 
         $qrUrl = asset('qr/' . $fileName);
