@@ -152,17 +152,17 @@ class OrdersHelper
         $mapsUrl = "https://www.openstreetmap.org/?mlat={$lat}&mlon={$lng}&zoom=18";
 
         $qrCode = QrCode::create($mapsUrl)
-            ->setSize(200)       // 50 biraz küçük olabilir, büyütebilirsin
+            ->setSize(75)       // 50 biraz küçük olabilir, büyütebilirsin
             ->setMargin(0);      // Beyaz kenarlıkları kaldırır
 
         $writer = new PngWriter();
         $result = $writer->write($qrCode);
 
         $fileName = 'qr_' . $order->id . '.png';
-        $filePath = storage_path('app/public/' . $fileName);
+        $filePath = public_path('qr/' . $fileName); // public/qr/ klasörüne kaydet
         $result->saveToFile($filePath);
 
-        $qrUrl = asset('storage/' . $fileName);
+        $qrUrl = asset('qr/' . $fileName);
 
         $data = [
             'id' => $order->id,
