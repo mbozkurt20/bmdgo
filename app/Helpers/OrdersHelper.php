@@ -5,18 +5,15 @@ namespace App\Helpers;
 use App\Events\OrderNotification;
 use App\Models\Admin;
 use App\Models\AdminSystemFeature;
-use App\Models\Categorie;
-use App\Models\Courier;
-use App\Models\CourierOrder;
-use App\Models\Customer;
 use App\Models\CustomerAddress;
-use App\Models\Notification;
 use App\Models\Order;
+use App\Models\Printer;
 use App\Models\Restaurant;
 use App\Models\RestaurantSystemFeature;
-use App\Models\Topup;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Writer\PngWriter;
+use Pusher\Pusher;
 
 class OrdersHelper
 {
@@ -110,7 +107,6 @@ class OrdersHelper
         }
     }
 
-
     static function haversineDistance($lat1, $lon1, $lat2, $lon2, $earthRadius = 6371)
     {
         // Dereceleri radyana çevir
@@ -146,25 +142,72 @@ class OrdersHelper
     static function getOrderData($orderId)
     {
         $order = Order::where('id', $orderId)->firstOrFail();
+        $customerAddress = CustomerAddress::where('customer_id', $order->customer_id)
+            ->where('restaurant_id', $order->restaurant_id)
+            ->firstOrFail();
+
+        $lat = $customerAddress->latitude;
+        $lng = $customerAddress->longitude;
+
+        $mapsUrl = "https://www.openstreetmap.org/?mlat={$lat}&mlon={$lng}&zoom=18";
+
+        $qrCode = QrCode::create($mapsUrl)->setSize(50);
+        $writer = new PngWriter();
+        $result = $writer->write($qrCode);
+
+        $fileName = 'qr_' . $order->id . '.png';
+        $filePath = storage_path('app/public/' . $fileName);
+        $result->saveToFile($filePath);
+
+        $qrUrl = asset('storage/' . $fileName);
 
         $data = [
             'id' => $order->id,
             'restaurant' => [
+                'id' => $order->restaurant_id,
                 'name' => Restaurant::find($order->restaurant_id)->restaurant_name,
-                'logo' => url('theme/images/bmdGo.png'),
+                'logo' => 'https://app.bmdgo.com/theme/images/bmdGo.png',
             ],
             'platform' => $order->platform,
             'note' => $order->notes,
-            'items' => json_decode($order->items),
+            'items' => json_decode($order->items, true),
             'discount' => $order->discount,
             'sub_amount' => $order->sub_amount,
             'amount' => $order->amount,
+            'payment_method' => $order->payment_method,
             'customer' => [
                 'name' => $order->full_name,
                 'phone' => $order->phone,
-            ],
+                'address' => $order->address,
+                'karekod' => $qrUrl
+            ]
         ];
 
         return $data;
+    }
+
+    static function nowPrint($orderId, $printers)
+    {
+        $pusher = new Pusher(
+            config('broadcasting.connections.pusher.key'),
+            config('broadcasting.connections.pusher.secret'),
+            config('broadcasting.connections.pusher.app_id'),
+            config('broadcasting.connections.pusher.options')
+        );
+
+        $orderData = self::getOrderData($orderId);
+        $restaurant = Restaurant::where('id', $orderData['restaurant']['id'])->firstOrFail();
+
+        $payload = [
+            "restaurant_id" => $restaurant->id,
+            "order" => $orderData,
+            "printers" => $printers
+        ];
+
+        $channel = "BmdGo-" . $restaurant->id;
+
+        $pusher->trigger($channel, "print-order", $payload);
+
+        return true;
     }
 }

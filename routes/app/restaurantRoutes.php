@@ -92,7 +92,6 @@ Route::group(['prefix' => 'restaurant'], function () {
 
         Route::get('/orders/{link}', [App\Http\Controllers\OrderController::class, 'index'])->name('restaurant.orders');
         Route::get('/orders/sendCourier/{orderID}/{courierID}', [App\Http\Controllers\OrderController::class, 'sendCourier'])->name('restaurant.orders.sendCourier');
-       // Route::post('/orders/sendCourier', [App\Http\Controllers\OrderController::class, 'sendCourier'])->name('restaurant.orders.sendCourier');
         Route::get('/orders/addPOS/{id}', [App\Http\Controllers\OrderController::class, 'addPOS'])->name('restaurant.addPOS');
         Route::get('/get-pos-items', [App\Http\Controllers\OrderController::class, 'getPosItems']);
 

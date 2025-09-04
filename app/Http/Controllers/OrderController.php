@@ -7,7 +7,6 @@ use App\Helpers\GeoLocation;
 use App\Helpers\NotificationHelper;
 use App\Helpers\OrdersHelper;
 use App\Helpers\OrderStatus;
-use App\Jobs\PrintOrderJob;
 use App\Models\Admin;
 use App\Models\City;
 use App\Models\District;
@@ -58,87 +57,44 @@ class OrderController extends Controller
 
     public function sendCourier(Request $request, $orderId, $courierId)
     {
-        // Check if the courier exists
-        $newCourier = Courier::find($courierId);
+        $order = Order::find($orderId);
+        $courier = Courier::find($courierId);
 
-        if (!$newCourier) {
-            Log::error('Courier not found with ID ' . $courierId);
-            return response()->json(['error' => 'Kurye Bulunamadı'], 404);
+        $order->courier_id = $courier->id;
+        $order->status = OrderStatus::ASSIGNED;
+        $order->save();
+
+        // Kuryeyi servide de yap ve son atama zamanını güncelle
+        $courier->last_assigned_at = now();
+        $courier->save();
+
+        $orderCourier = CourierOrder::where('courier_id',$courier->id)->where('order_id', $order->id)->first();
+
+        if (!$orderCourier) {
+            // Yeni siparişi kuryeye atama
+            $newOrderCourier = new CourierOrder();
+            $newOrderCourier->courier_id = $courier->id;
+            $newOrderCourier->order_id = $order->id;
+            $newOrderCourier->save();
         }
 
-        DB::beginTransaction();
+        $restaurant = Restaurant::find($order->restaurant_id);
 
-        try {
-            Log::info('Processing order ID: ' . $orderId);
-
-            $order = Order::find($orderId);
-
-            if ($order) {
-                // Müsait kurye bul
-                $courier = Courier::where('status', CourierStatus::active)
-                    ->orderBy('last_assigned_at', 'asc')
-                    ->where('admin_id', $order->restaurant->admin_id)   // round robin için
-                    ->first();
-
-                if ($courier) {
-                    // Siparişi kuryeye ata
-                    $order->courier_id = $courier->id;
-                    $order->status = OrderStatus::ASSIGNED;
-                    $order->update();
-
-                    // Kuryeyi busy yap ve son atama zamanını güncelle
-                    $courier->last_assigned_at = now();
-                    $courier->update();
-
-                    $orderCourier = CourierOrder::where('courier_id', $courier->id)->where('order_id', $order->id)->first();
-
-                    if (!$orderCourier) {
-                        // Yeni siparişi kuryeye atama
-                        $newOrderCourier = new CourierOrder();
-                        $newOrderCourier->courier_id = $courier->id;
-                        $newOrderCourier->order_id = $order->id;
-                        $newOrderCourier->save();
-
-                        Log::info("Kurye atandı ve durumu Serviste yapıldı. Sipariş ID: " . $order->id . " Kurye ID: " . $courier->id);
-                    }
-
-                    Log::info("Kurye atandı ve durumu Serviste yapıldı. Sipariş ID: " . $order->id . " Kurye ID: " . $courier->id);
-
-
-                    $restaurant = Restaurant::find($order->restaurant_id);
-
-                    //mobil bildiri
-                    if ($courier->fcm_token) {
-                        $ser = new PushNotificationService();
-                        $ser->sendNotification($courier->fcm_token, $restaurant->restaurant_name . ' Restorandan Yeni Siparişiniz Var', 'Sipariş Takip Kodu:' . $order->tracking_id);
-                    }
-
-                    if (OrdersHelper::getOrderSystem(3)) {
-                        NotificationHelper::add([
-                            'title' => 'Paket Kuryeye Atandı',
-                            'description' => $order->tracking_id . ' takip numaralı paket ' . $courier->name . ' isimli kuryeye atandı.',
-                            'url' => route('admin.balance')
-                        ]);
-                    }
-
-                    Log::info("Sipariş #{$order->id} kurye #{$courier->id} ile eşlendi.");
-                } else {
-                    Log::info("Sipariş #{$order->id} için müsait kurye yok.");
-                }
-            } else {
-                Log::error('Order ID ' . $orderId . ' not found in orders table');
-                throw new \Exception('Order ID ' . $orderId . ' not found in orders table');
-            }
-
-
-            DB::commit();
-            Log::info('Transaction committed successfully');
-            return response()->json('OK');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Transaction failed: ' . $e->getMessage());
-            return response()->json(['error' => 'Transaction failed: ' . $e->getMessage()], 500);
+        //mobil bildiri
+        if ($courier->fcm_token){
+            $ser = new PushNotificationService();
+            $ser->sendNotification($courier->fcm_token,$restaurant->restaurant_name.' Restorandan Yeni Sipariş Atandı','Sipariş Takip Kodu:'. $order->tracking_id);
         }
+
+        if (OrdersHelper::getOrderSystem(3)){
+            NotificationHelper::add([
+                'title' => 'Paket Kuryeye Atandı',
+                'description' => $order->tracking_id. ' takip numaralı paket '.$courier->name. ' isimli kuryeye atandı.',
+                'url' => route('admin.balance')
+            ]);
+        }
+
+        echo 'OK';
     }
 
     public function new()
@@ -688,12 +644,12 @@ class OrderController extends Controller
     public function printed($orderId)
     {
         $order = Order::where('id', $orderId)->firstOrFail();
-        $orderData = OrdersHelper::getOrderData($orderId);
 
         $printers = Printer::where('payable_type', 'restaurant')->where('payable_id', $order->restaurant_id)->pluck('name')->toArray();
 
-        // Kuyruğa at
-        PrintOrderJob::dispatch($orderData, $printers, $order->restaurant_id)->onQueue('restaurant_' . $order->restaurant_id);
+        if (count($printers) > 0) {
+            OrdersHelper::nowPrint($order->id,$printers);
+        }
     }
 
     public function deleteOrder($id)

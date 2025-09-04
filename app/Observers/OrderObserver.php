@@ -6,9 +6,7 @@ use App\Helpers\CourierStatus;
 use App\Helpers\OrdersHelper;
 use App\Helpers\OrderStatus;
 use App\Helpers\SendSms;
-use App\Jobs\AssignOrderToCourier;
 use App\Jobs\AssignPendingOrders;
-use App\Jobs\PrintOrderJob;
 use App\Models\Admin;
 use App\Models\Courier;
 use App\Models\Order;
@@ -52,27 +50,17 @@ class OrderObserver
         if (Auth::guard('restaurant')->check()) {
             $printers = Printer::where('payable_type', 'restaurant')->where('payable_id', $restaurant->id)->pluck('name')->toArray();
             if (count($printers) > 0) {
-                $orderData = OrdersHelper::getOrderData($order->id);
-                PrintOrderJob::dispatch($orderData, $printers,$order->restaurant_id)->onQueue('restaurant_' . $order->restaurant_id);
+               OrdersHelper::nowPrint($order->id,$printers);
             }
         }
 
-// Pusher ayarları
-        $options = [
-            'cluster' => 'mt1',
-            'useTLS' => true,
-        ];
-
         $pusher = new Pusher(
-            env('PUSHER_APP_KEY'),
-            env('PUSHER_APP_SECRET'),
-            env('PUSHER_APP_ID'),
-            $options
+            config('broadcasting.connections.pusher.key'),
+            config('broadcasting.connections.pusher.secret'),
+            config('broadcasting.connections.pusher.app_id'),
+            config('broadcasting.connections.pusher.options')
         );
 
-// Kanal belirleme
-// → Admin kanalı: admin-{admin_id}
-// → Restaurant kanalı: restaurant-{restaurant_id}
         $pusher->trigger("admin-{$restaurant->admin_id}", "new-order", ['order' => $order]);
         $pusher->trigger("restaurant-{$restaurant->id}", "new-order", ['order' => $order]);
     }
@@ -126,16 +114,11 @@ $avgDurations = OrderStatusLog::select('restaurant_id', 'status', DB::raw('AVG(d
             $courier->update();
         }
 
-        $options = [
-            'cluster' => 'mt1',
-            'useTLS' => true,
-        ];
-
         $pusher = new Pusher(
-            env('PUSHER_APP_KEY'),
-            env('PUSHER_APP_SECRET'),
-            env('PUSHER_APP_ID'),
-            $options
+            config('broadcasting.connections.pusher.key'),
+            config('broadcasting.connections.pusher.secret'),
+            config('broadcasting.connections.pusher.app_id'),
+            config('broadcasting.connections.pusher.options')
         );
 
         $order = Order::where('id', $order->id)
@@ -155,16 +138,11 @@ $avgDurations = OrderStatusLog::select('restaurant_id', 'status', DB::raw('AVG(d
      */
     public function deleted(Order $order)
     {
-        $options = [
-            'cluster' => 'mt1',
-            'useTLS' => true,
-        ];
-
         $pusher = new Pusher(
-            env('PUSHER_APP_KEY'),
-            env('PUSHER_APP_SECRET'),
-            env('PUSHER_APP_ID'),
-            $options
+            config('broadcasting.connections.pusher.key'),
+            config('broadcasting.connections.pusher.secret'),
+            config('broadcasting.connections.pusher.app_id'),
+            config('broadcasting.connections.pusher.options')
         );
 
         $order = Order::where('id', $order->id)
