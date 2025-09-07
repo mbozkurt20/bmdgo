@@ -1,10 +1,10 @@
-<div class="nav-header" style="background:  #0d2646">
+<div class="nav-header" style="background:  #efd5ab">
     <a href="{{ url('/restaurant') }}" class="brand-logo">
         <div class="logo-abbr" style="width: 56px; height:56px">
-            <img alt="" src="" style="height: 40px">
+            <img alt="" src="" style="height: 50px">
         </div>
         <div class="brand-title">
-            <img src="{{config('site.logo')}}" style="height: 100px" alt="">
+            <img src="{{config('site.logo')}}" style="height: 50px" alt="">
         </div>
     </a>
     <div class="nav-control">
@@ -14,7 +14,7 @@
     </div>
 </div>
 
-<div class="deznav" style="background:  #0d2646">
+<div class="deznav" style="background:  #259a38">
     <div class="deznav-scroll">
         <ul class="metismenu" id="menu">
             <li><a class="ai-icon text-white" href="{{ url('/restaurant') }}" aria-expanded="false">

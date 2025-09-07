@@ -109,8 +109,8 @@
                 text: "Güncellemek istediğinizden emin misiniz?",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#0d2646',
-                cancelButtonColor: '#e7004d',
+                confirmButtonColor: '#259a38',
+                cancelButtonColor: '#ec691e',
                 cancelButtonText: 'Hayır',
                 confirmButtonText: 'Evet, Güncellemek istiyorum!'
             }).then((result) => {
@@ -143,8 +143,8 @@
                 text: "Bu işlemi geri alamazsınız!",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#0d2646',
-                cancelButtonColor: '#e7004d',
+                confirmButtonColor: '#259a38',
+                cancelButtonColor: '#ec691e',
                 cancelButtonText: 'Hayır',
                 confirmButtonText: 'Evet, Silmek istiyorum!'
             }).then((result) => {

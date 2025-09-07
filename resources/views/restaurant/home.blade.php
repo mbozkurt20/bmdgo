@@ -31,7 +31,7 @@
                             <input type="date" class="form-control custom-input" id="end_date" name="end_date" required>
                         </div>
                         <div class="d-flex align-items-end">
-                            <button style="background: #e7004d;color:#fff;font-size: 0.8rem" type="submit"
+                            <button style="background: #ec691e;color:#fff;font-size: 0.8rem" type="submit"
                                     class="btn custom-btn">
                                 <i class="fas fa-calendar-day" style="padding-right:5px"></i>
                                 Filtrele
@@ -85,7 +85,7 @@
                         <div class="col-md-6">
                             <button
                                 class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100"
-                                style="background: #e7004d">
+                                style="background: #ec691e">
 
                                 <span class="fw-bold">
                                     <i class="fa-solid fa-box"
@@ -147,7 +147,7 @@
                         <div class="col-md-6">
                             <button
                                 class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100"
-                                style="background: #0d2646">
+                                style="background: #259a38">
                                 <i class="fa-solid fa-phone" style="color: #fff;font-size:18px;padding-left:10px"></i>
                                 <span class="fw-bold">Telefonla Gelen Sipariş</span>
                                 <span class="badge bg-white text-dark order-number">{{ count($telefonsiparis) }}</span>
@@ -186,7 +186,7 @@
             <!-- Performance Section -->
             <div class="col-lg-6">
                 @if($dailyPreparedSpeed->isEmpty() && $dailyHandoverSpeed->isEmpty() && $dailyDeliverySpeed->isEmpty())
-                    <div class="alert" style="background: #0d2646;color: white">
+                    <div class="alert" style="background: #259a38;color: white">
                         Bu tarih aralığında veri bulunamadı.
                     </div>
                 @else
@@ -213,7 +213,7 @@
                         <div class="col-md-4">
                             <div class="card stats-card shadow-sm border-0">
                                 <div class="card-header text-white text-center"
-                                     style="background: #e7004d;color: white">
+                                     style="background: #ec691e;color: white">
                                     <h6 class="text-white">Teslim Alma Hızı</h6>
                                 </div>
                                 <div class="card-body text-center">
@@ -289,7 +289,7 @@
             document.getElementById('handoverSpeedChart'),
             {{ $stats['handover']['avg'] }},
             60,
-            '#e7004d'
+            '#ec691e'
         );
 
         // Teslimat Hızı

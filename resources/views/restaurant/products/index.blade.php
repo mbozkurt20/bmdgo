@@ -86,8 +86,8 @@
                 text: "Bu işlemi geri alamazsınız!",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#0d2646',
-                cancelButtonColor: '#e7004d',
+                confirmButtonColor: '#259a38',
+                cancelButtonColor: '#ec691e',
                 cancelButtonText: 'Hayır',
                 confirmButtonText: 'Evet, Silmek istiyorum!',
             }).then(function(result) {

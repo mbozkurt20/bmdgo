@@ -41,7 +41,7 @@
             color: white !important;
         }
         #map {
-            border: #0d2646 solid 2px;
+            border: #259a38 solid 2px;
             height: 500px; /* ya da istediğin başka bir yükseklik */
             width: 100%;
             border-radius: 15px;

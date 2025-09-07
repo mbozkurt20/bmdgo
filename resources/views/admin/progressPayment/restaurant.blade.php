@@ -25,7 +25,7 @@
         }
 
         .bg-ok {
-            background: #e7004d;
+            background: #ec691e;
         }
     </style>
 
@@ -300,8 +300,8 @@
                 text: "Bu işlemi geri alamazsınız!",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#0d2646',
-                cancelButtonColor: '#e7004d',
+                confirmButtonColor: '#259a38',
+                cancelButtonColor: '#ec691e',
                 cancelButtonText: 'Hayır',
                 confirmButtonText: 'Evet, Silmek istiyorum!'
             }).then((result) => {

@@ -1,8 +1,8 @@
 <div class="header">
     @if(env('TEST_MODE') === true)
-        <div class="row relative" style="background-color: #f3eded; color: #e7004d;">
+        <div class="row relative" style="background-color: #f3eded; color: #ec691e;">
             <div class="text-lg absolute text-center fw-bold py-2" >
-                <strong>BmdGo</strong> Test Modu Hesabı Kullanmaktasınız !!
+                <strong>{{env('APP_NAME')}}</strong> Test Modu Hesabı Kullanmaktasınız !!
             </div>
         </div>
     @endif

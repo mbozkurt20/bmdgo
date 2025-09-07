@@ -151,7 +151,7 @@ class OrderController extends Controller
                        style="width: 40px; height: 30px; text-align: center; font-weight: bold; font-size: 13px; border: 1px solid #ccc; border-radius: 4px; background-color: white;">
 
                 <button type="button" onclick="updatePlus(' . $product->id . ')"
-                        style="background-color: #0d2646; border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer;">
+                        style="background-color: #259a38; border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer;">
                     <i class="fa fa-plus"></i>
                 </button>
             </div>
@@ -203,7 +203,7 @@ class OrderController extends Controller
                        style="width: 40px; height: 30px; text-align: center; font-weight: bold; font-size: 13px; border: 1px solid #ccc; border-radius: 4px; background-color: white;">
 
                 <button type="button" onclick="updatePlus(' . $product->id . ')"
-                        style="background-color: #0d2646; border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer;">
+                        style="background-color: #259a38; border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer;">
                     <i class="fa fa-plus"></i>
                 </button>
             </div>
@@ -263,7 +263,7 @@ class OrderController extends Controller
                        style="width: 40px; height: 30px; text-align: center; font-weight: bold; font-size: 13px; border: 1px solid #ccc; border-radius: 4px; background-color: white;">
 
                 <button type="button" onclick="updatePlus(' . $product->id . ')"
-                        style="background-color: #0d2646; border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer;">
+                        style="background-color: #259a38; border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer;">
                     <i class="fa fa-plus"></i>
                 </button>
             </div>

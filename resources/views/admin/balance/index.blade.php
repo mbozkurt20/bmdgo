@@ -28,7 +28,7 @@
                     <p class="text-success">
                         <strong> Satın Alım:: </strong> Paketlerimizi <a class="text-primary"
                                                                          style="text-decoration: underline"
-                                                                         href="https://bmdgo.com/fiyat/">BmdGo </a>
+                                                                         href="https://gpskurye.com/fiyat/">{{env('APP_NAME')}} </a>
                         adresimizden inceleyebilirsiniz.
                     </p>
                 </div>
@@ -75,7 +75,7 @@
                     </div>
                     <div class="card-body table-responsive">
                         <table class="table table-bordered table-striped align-middle">
-                            <thead style="background-color: #0d2646; color: #fff;">
+                            <thead style="background-color: #259a38; color: #fff;">
                             <tr>
                                 <th>#</th>
                                 <th>İşlem Sahibi</th>
@@ -101,21 +101,21 @@
 
                                     <td>
                                         @if($movement->is_approved)
-                                            <span class="badge" style="background-color:#0d2646;">Onaylı</span>
+                                            <span class="badge" style="background-color:#259a38;">Onaylı</span>
                                         @else
                                             <span class="badge bg-warning text-dark">Bekliyor</span>
                                         @endif
                                     </td>
                                     <td>
                                         @if($movement->is_paid)
-                                            <span class="badge" style="background-color:#0d2646;">Ödendi</span>
+                                            <span class="badge" style="background-color:#259a38;">Ödendi</span>
                                         @else
                                             <span class="badge bg-danger">Ödenmedi</span>
                                         @endif
                                     </td>
                                     <td>
                                         @if($movement->payment_details)
-                                            <button class="btn btn-sm" style="background-color:#0d2646; color:#fff;"
+                                            <button class="btn btn-sm" style="background-color:#259a38; color:#fff;"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#paymentDetailsModal{{ $movement->id }}">
                                                 Görüntüle
@@ -127,7 +127,7 @@
                                                 <div class="modal-dialog modal-lg modal-dialog-centered">
                                                     <div class="modal-content">
                                                         <div class="modal-header"
-                                                             style="background-color:#0d2646; color:#fff;">
+                                                             style="background-color:#259a38; color:#fff;">
                                                             <h5 class="modal-title text-white">Ödeme Detayları</h5>
                                                             <button type="button" class="btn-close"
                                                                     data-bs-dismiss="modal" aria-label="Kapat"></button>
@@ -142,25 +142,25 @@
                                                                     @foreach($details as $key => $value)
                                                                         @if($key=='card')
                                                                             <li class="list-group-item d-flex justify-content-between"
-                                                                                style="border-left:5px solid #0d2646;">
+                                                                                style="border-left:5px solid #259a38;">
                                                                                 <strong>Kart Tipi</strong>
                                                                                 <span>{{ $value['cardType'] }}</span>
                                                                             </li>
 
                                                                             <li class="list-group-item d-flex justify-content-between"
-                                                                                style="border-left:5px solid #0d2646;">
+                                                                                style="border-left:5px solid #259a38;">
                                                                                 <strong>BIN Number</strong>
                                                                                 <span>{{ $value['binNumber'] }}</span>
                                                                             </li>
 
                                                                             <li class="list-group-item d-flex justify-content-between"
-                                                                                style="border-left:5px solid #0d2646;">
+                                                                                style="border-left:5px solid #259a38;">
                                                                                 <strong>Banka</strong>
                                                                                 <span>{{ $value['cardBrand'] }}</span>
                                                                             </li>
 
                                                                             <li class="list-group-item d-flex justify-content-between"
-                                                                                style="border-left:5px solid #0d2646;">
+                                                                                style="border-left:5px solid #259a38;">
                                                                                 <strong>Kart Organizasyonu</strong>
                                                                                 <span>{{ $value['cardOrganization'] }}</span>
                                                                             </li>
@@ -169,7 +169,7 @@
                                                                             @switch($key)
                                                                                 @case('is3D')
                                                                                     <li class="list-group-item d-flex justify-content-between"
-                                                                                        style="border-left:5px solid #0d2646;">
+                                                                                        style="border-left:5px solid #259a38;">
                                                                                         <strong>3D Ödeme</strong>
                                                                                         <span>{{ $value ? 'Evet' : 'Hayır' }}</span>
                                                                                     </li>
@@ -177,21 +177,21 @@
 
                                                                                 @case('currency')
                                                                                     <li class="list-group-item d-flex justify-content-between"
-                                                                                        style="border-left:5px solid #0d2646;">
+                                                                                        style="border-left:5px solid #259a38;">
                                                                                         <strong>Birim</strong>
                                                                                         <span>{{ $value }}</span>
                                                                                     </li>
                                                                                     @break
                                                                                 @case('currency')
                                                                                     <li class="list-group-item d-flex justify-content-between"
-                                                                                        style="border-left:5px solid #0d2646;">
+                                                                                        style="border-left:5px solid #259a38;">
                                                                                         <strong>Birim</strong>
                                                                                         <span>{{ $value }}</span>
                                                                                     </li>
                                                                                     @break
                                                                                 @case('amount')
                                                                                     <li class="list-group-item d-flex justify-content-between"
-                                                                                        style="border-left:5px solid #0d2646;">
+                                                                                        style="border-left:5px solid #259a38;">
                                                                                         <strong>Toplam Tutar</strong>
                                                                                         <span>{{ $value }}₺</span>
                                                                                     </li>

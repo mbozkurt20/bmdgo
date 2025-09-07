@@ -75,18 +75,18 @@
                             <table class="order-table shadow-hover card-table table table-bordered table-hover shadow-hover card-table text-black" style="min-width: 845px">
                                 <thead>
                                 <tr>
-                                    <th style="color:#0d2646;width:12%;font-size: 14px;font-weight: bold">Restaurant</th>
-                                    <th style="color:#0d2646;width:8%;font-size: 14px;font-weight: bold">Sipariş No</th>
-                                    <th style="color:#0d2646;font-size: 14px;font-weight: bold">Saati</th>
-                                    <th style="color:#0d2646;width:8%;font-size: 14px;font-weight: bold">Müşteri</th>
-                                    <th style="color:#0d2646;width:10%;font-size: 14px;font-weight: bold">Kurye</th>
-                                    <th style="color:#0d2646;font-size: 14px;font-weight: bold">Ara Tutar</th>
-                                    <th style="color:#0d2646;font-size: 14px;font-weight: bold">İndirim</th>
-                                    <th style="color:#0d2646;font-size: 14px;font-weight: bold">Tutar</th>
-                                    <th style="color:#0d2646;font-size: 14px;font-weight: bold">Ödeme Türü</th>
-                                    <th style="color:#0d2646;width:8%;font-size: 14px;font-weight: bold">Paket Mesafesi</th>
-                                    <th style="color:#0d2646;font-size: 14px;font-weight: bold">Durum</th>
-                                    <th style="color:#0d2646;font-size: 14px;font-weight: bold">İşlem</th>
+                                    <th style="color:#259a38;width:12%;font-size: 14px;font-weight: bold">Restaurant</th>
+                                    <th style="color:#259a38;width:8%;font-size: 14px;font-weight: bold">Sipariş No</th>
+                                    <th style="color:#259a38;font-size: 14px;font-weight: bold">Saati</th>
+                                    <th style="color:#259a38;width:8%;font-size: 14px;font-weight: bold">Müşteri</th>
+                                    <th style="color:#259a38;width:10%;font-size: 14px;font-weight: bold">Kurye</th>
+                                    <th style="color:#259a38;font-size: 14px;font-weight: bold">Ara Tutar</th>
+                                    <th style="color:#259a38;font-size: 14px;font-weight: bold">İndirim</th>
+                                    <th style="color:#259a38;font-size: 14px;font-weight: bold">Tutar</th>
+                                    <th style="color:#259a38;font-size: 14px;font-weight: bold">Ödeme Türü</th>
+                                    <th style="color:#259a38;width:8%;font-size: 14px;font-weight: bold">Paket Mesafesi</th>
+                                    <th style="color:#259a38;font-size: 14px;font-weight: bold">Durum</th>
+                                    <th style="color:#259a38;font-size: 14px;font-weight: bold">İşlem</th>
                                 </tr>
                                 </thead>
                                 <tbody id="order-tbody-{{ $statusId }}"></tbody>

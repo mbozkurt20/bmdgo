@@ -1,7 +1,7 @@
 
 
 
-<div class="deznav" style="background:  #0d2646">
+<div class="deznav" style="background: #259a38">
     <div class="deznav-scroll">
         <ul class="metismenu" id="menu">
             <li><a class="ai-icon" href="{{ route('superadmin.dashboards') }}" aria-expanded="false">

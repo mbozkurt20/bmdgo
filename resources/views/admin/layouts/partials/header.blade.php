@@ -1,4 +1,4 @@
-<div class="nav-header" style="background:  #0d2646">
+<div class="nav-header" style="background:  #259a38">
     <a href="{{ url('/admin') }}" class="d-flex justify-content-center align-items-center mt-3">
         <div class="brand-title" style="width: 185px; height:50px">
             <img src="{{ config('site.logo') }}" alt="Logo" style="height: 100px;">
@@ -13,22 +13,22 @@
 
 <div class="header">
     @if(env('TEST_MODE') === true)
-        <div class="row" style="background-color: #f3eded; color: #e7004d;">
+        <div class="row" style="background-color: #f3eded; color: #ec691e;">
             <div class="text-center fw-bold py-2">
-                <strong>BmdGo</strong> Test Modu Hesabı Kullanmaktasınız.
+                <strong>{{env('APP_NAME')}}</strong> Test Modu Hesabı Kullanmaktasınız.
             </div>
         </div>
     @endif
 
     <div class="container-fluid py-2 px-3">
-        <div class="d-flex align-items-center justify-content-end w-100" style="color: #e7004d;">
+        <div class="d-flex align-items-center justify-content-end w-100" style="color: #ec691e;">
 
             <!-- Kalan Kontör -->
-            <p class="size-4 mb-0 me-4 fw-bold " style="color: #0d2646">
+            <p class="size-4 mb-0 me-4 fw-bold " style="color: #259a38">
                 Davet Kodunuz:
                 <strong>[ {{\Illuminate\Support\Facades\Auth::guard('admin')->user()->code}} ]</strong>
             </p>
-            <p class="size-4 mb-0 me-4 fw-bold " style="color: #0d2646">
+            <p class="size-4 mb-0 me-4 fw-bold " style="color: #259a38">
                 Kontör Bakiyei:
                 <strong>{{\Illuminate\Support\Facades\Auth::guard('admin')->user()->top_up_balance}}</strong>
             </p>
@@ -50,7 +50,7 @@
                      style="width: 400px; border-radius: 10px; overflow: hidden;">
 
                     <div class="d-flex justify-content-between align-items-center text-white px-3 py-2"
-                         style="background: #e7004d">
+                         style="background: #ec691e">
                         <div class="d-flex align-items-center">
                             <i class="bi bi-bell me-2"></i>
                             <strong>Bildirimler</strong>
@@ -91,7 +91,7 @@
             <div class="dropdown">
                 <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" data-bs-toggle="dropdown">
                     <img src="/theme/images/avatar.jpg" class="rounded-circle border border-2"
-                         style="height: 45px; width: 45px; border-color: #e7004d;" alt="Avatar">
+                         style="height: 45px; width: 45px; border-color: #ec691e;" alt="Avatar">
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li>
@@ -248,8 +248,8 @@
                     confirmButtonText: 'Tamam',
                     background: '#ffffff',
                     color: '#fff',
-                    iconColor: '#e7004d',
-                    confirmButtonColor: '#e7004d',
+                    iconColor: '#ec691e',
+                    confirmButtonColor: '#ec691e',
                     customClass: {
                         popup: 'rounded-xl shadow-2xl',
                         confirmButton: 'px-6 py-3 text-lg font-semibold',

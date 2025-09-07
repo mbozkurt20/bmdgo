@@ -147,7 +147,7 @@
         transition: border-color 0.2s, box-shadow 0.2s;
     }
     .custom-select:focus {
-        border-color: #e7004d;
+        border-color: #ec691e;
         box-shadow: 0 0 0 0.25rem rgb(231, 0, 77);
         outline: none;
     }

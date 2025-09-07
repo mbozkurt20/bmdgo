@@ -16,17 +16,17 @@
                 <div class="card text-center shadow-sm border-0">
 
                     <div class="card-body">
-                        <img src="/theme/images/print.jpg" class="img-fluid card-img-top p-4" alt="BmdGo Yazıcı">
-                        <h5 class="card-title">BmdGo Yazıcı</h5>
+                        <img src="/theme/images/print.jpg" class="img-fluid card-img-top p-4" alt="{{env('APP_NAME')}} Yazıcı">
+                        <h5 class="card-title">{{env('APP_NAME')}} Yazıcı</h5>
                         <p class="card-text">
-                            BmdGo yazıcınızı indirip kurun. Kurulum sırasında sizden <strong>Restaurant ID</strong> istenecektir.
+                            {{env('APP_NAME')}} yazıcınızı indirip kurun. Kurulum sırasında sizden <strong>Restaurant ID</strong> istenecektir.
                             Lütfen aşağıdaki ID’yi giriniz:
                         </p>
                         <p class="bg-black text-white rounded-circle d-inline-block p-3 fw-bold" style="font-size: 2rem; min-width: 50px; text-align: center;">
                             {{ auth()->id() }}
                         </p>
                         <br><br>
-                        <a href="/apps/BmdGo.exe" download class="btn btn-primary btn-lg">
+                        <a href="/apps/gpsKurye.exe" download class="btn btn-primary btn-lg">
                             İndir
                         </a>
                     </div>
@@ -51,7 +51,7 @@
             color: #555;
         }
         .btn-primary {
-            background-color: #0d2646;
+            background-color: #259a38;
             border: none;
         }
         .btn-primary:hover {

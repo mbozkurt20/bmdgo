@@ -36,14 +36,14 @@
         }
 
         .btn-primary {
-            background-color: #e7004d;
+            background-color: #ec691e;
             border: none;
             border-radius: 8px;
             font-weight: 600;
         }
 
         .bg-primary2 {
-            background: #0d2646;
+            background: #259a38;
             color: white;
         }
         .btn-primary:hover {
@@ -56,7 +56,7 @@
         }
 
         .table thead {
-            background: #0d2646;
+            background: #259a38;
             color: white;
         }
 
@@ -65,7 +65,7 @@
         }
 
         .summary-box {
-            background: #e7004d;
+            background: #ec691e;
             color: white;
             border-radius: 12px;
             padding: 16px;

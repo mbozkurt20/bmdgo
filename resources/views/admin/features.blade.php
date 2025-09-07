@@ -62,8 +62,8 @@
                         confirmButtonText: 'Tamam',
                         background: '#ffffff',
                         color: '#fff',
-                        iconColor: '#e7004d',
-                        confirmButtonColor: '#e7004d',
+                        iconColor: '#ec691e',
+                        confirmButtonColor: '#ec691e',
                         customClass: {
                             popup: 'rounded-xl shadow-2xl',
                             confirmButton: 'px-6 py-3 text-lg font-semibold',

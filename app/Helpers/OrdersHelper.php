@@ -174,7 +174,7 @@ class OrdersHelper
             'restaurant' => [
                 'id' => $order->restaurant_id,
                 'name' => Restaurant::find($order->restaurant_id)->restaurant_name,
-                'logo' => asset('/theme/images/bmdGo.png'),
+                'logo' => asset('/theme/images/logo.png'),
             ],
             'platform' => $order->platform,
             'note' => $order->notes,
@@ -212,7 +212,7 @@ class OrdersHelper
             "printers" => $printers
         ];
 
-        $channel = "BmdGo-" . $restaurant->id;
+        $channel = "GpsKurye-" . $restaurant->id;
 
         $pusher->trigger($channel, "print-order", $payload);
 

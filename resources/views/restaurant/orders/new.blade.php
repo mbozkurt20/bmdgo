@@ -46,7 +46,7 @@
             cursor: pointer;
             box-sizing: border-box;
             background-color: #fce9ef;
-            color: #e7004d;,
+            color: #ec691e;,
             transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
             user-select: none;
         }
@@ -57,7 +57,7 @@
         }
 
         .coupon-item.selected {
-            background-color: #e7004d;
+            background-color: #ec691e;
             color: white;
             border-color: #a3003b;
         }
@@ -70,11 +70,11 @@
     </style>
     <style>
         .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
-            background: #e7004d;
+            background: #ec691e;
         }
 
         .special-button {
-            background-color: #0d2646; /* Indigo-600 */
+            background-color: #259a38; /* Indigo-600 */
             color: white;
             padding: 0.75rem 1.5rem;
             font-size: 1rem;
@@ -95,7 +95,7 @@
 
 
         .special-ok-button {
-            background-color: #e7004d; /* Indigo-600 */
+            background-color: #ec691e; /* Indigo-600 */
             color: white;
             padding: 0.75rem 1.5rem;
             font-size: 1rem;
@@ -115,7 +115,7 @@
         }
 
         .special-ok-button-small {
-            background-color: #e7004d; /* Indigo-600 */
+            background-color: #ec691e; /* Indigo-600 */
             color: white;
             padding: 0.35rem 1rem;
             font-size: 0.76rem;
@@ -138,7 +138,7 @@
 
     <style>
         #map {
-            border: #0d2646 solid 2px;
+            border: #259a38 solid 2px;
             height: 300px; /* ya da istediğin başka bir yükseklik */
             width: 100%;
             border-radius: 15px;
@@ -188,7 +188,7 @@
         }
 
         .tabs input[type="radio"]:checked + label {
-            background: #0d2646;
+            background: #259a38;
             color: #fff;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
@@ -326,7 +326,7 @@
         }
 
         .in::placeholder {
-            color: #e7004d;
+            color: #ec691e;
         }
 
         .drawer {
@@ -364,7 +364,7 @@
             border: none;
             font-size: 20px;
             cursor: pointer;
-            color: #e7004d;
+            color: #ec691e;
         }
 
         /* Drawer İçeriği */
@@ -389,7 +389,7 @@
         <button onclick="toggleDrawer()" class="drawer-close"><i class="fas fa-times"></i></button>
     </div>
     <div class="drawer-body">
-        <section class="header-main" style="background:#0d2646">
+        <section class="header-main" style="background:#259a38">
             <div class="container-fluid">
                 <div class="row align-items-center">
                     <!-- Ortalanmış başlık -->
@@ -439,7 +439,7 @@
                                 @foreach($categories as $cat)
                                     @php $checked++; @endphp
                                     <button
-                                        style="background: #0d2646"
+                                        style="background: #259a38"
                                         class="size-3 text-white nav-link {{ $checked == 1 ? 'active  text-dark' : '' }}"
                                         id="tabProduct_{{$cat->id}}_tab"
                                         data-bs-toggle="tab"
@@ -467,7 +467,7 @@
 
                                                 <div class="col-md-3 mb-4" onclick="productAdd({{$pro->id}})"
                                                      style="cursor: pointer">
-                                                    <div class="card text-white" style="background:#e7004d">
+                                                    <div class="card text-white" style="background:#ec691e">
                                                         <div class="card-body text-center">
                                                             <h5 class="card-title text-white"
                                                                 style="font-size: 24px">{{$pro->name}}</h5>
@@ -577,7 +577,7 @@
                                                                style="width: 40px; height: 30px; text-align: center; font-weight: bold; font-size: 13px; border: 1px solid #ccc; border-radius: 4px; background-color: white;">
 
                                                         <button type="button" onclick="updatePlus({{$basket->id}})"
-                                                                style="background-color: #0d2646; border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer;">
+                                                                style="background-color: #259a38; border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer;">
                                                             <i class="fa fa-plus"></i>
                                                         </button>
                                                     </div>
@@ -1060,7 +1060,7 @@
             let src = '{{url('pos/audio/beep.mp3')}}';
             let audio = new Audio(src);
             audio.play();
-            $('.nakit').css('background', '#e7004d');
+            $('.nakit').css('background', '#ec691e');
             $('.kkarti').css('background', '#0077b8');
             $('.kkkarti').css('background', '#183785');
         }
@@ -1069,7 +1069,7 @@
             let audio = new Audio(src);
             audio.play();
             $('.nakit').css('background', '#1f49d3');
-            $('.kkarti').css('background', '#e7004d');
+            $('.kkarti').css('background', '#ec691e');
             $('.kkkarti').css('background', '#183785');
         }
         if (e === "Kapıda Kredi Kartı ile Ödeme") {
@@ -1078,7 +1078,7 @@
             audio.play();
             $('.nakit').css('background', '#1f49d3');
             $('.kkarti').css('background', '#0077b8');
-            $('.kkkarti').css('background', '#e7004d');
+            $('.kkkarti').css('background', '#ec691e');
         }
     }
 
@@ -1207,8 +1207,8 @@
                                     confirmButtonText: 'Tamam',
                                     background: '#ffffff', // senin rengin
                                     color: '#fff',
-                                    iconColor: '#e7004d', // modern yeşil
-                                    confirmButtonColor: '#e7004d', // modern yeşil düğme
+                                    iconColor: '#ec691e', // modern yeşil
+                                    confirmButtonColor: '#ec691e', // modern yeşil düğme
                                     customClass: {
                                         popup: 'rounded-xl shadow-2xl',
                                         confirmButton: 'px-6 py-3 text-lg font-semibold',
@@ -1230,8 +1230,8 @@
                                     confirmButtonText: 'Tamam',
                                     background: '#ffffff', // senin rengin
                                     color: '#fff',
-                                    iconColor: '#e7004d', // modern yeşil
-                                    confirmButtonColor: '#e7004d', // modern yeşil düğme
+                                    iconColor: '#ec691e', // modern yeşil
+                                    confirmButtonColor: '#ec691e', // modern yeşil düğme
                                     customClass: {
                                         popup: 'rounded-xl shadow-2xl',
                                         confirmButton: 'px-6 py-3 text-lg font-semibold',
@@ -1286,8 +1286,8 @@
                         confirmButtonText: 'Tamam',
                         background: '#ffffff', // senin rengin
                         color: '#fff',
-                        iconColor: '#e7004d', // modern yeşil
-                        confirmButtonColor: '#e7004d', // modern yeşil düğme
+                        iconColor: '#ec691e', // modern yeşil
+                        confirmButtonColor: '#ec691e', // modern yeşil düğme
                         customClass: {
                             popup: 'rounded-xl shadow-2xl',
                             confirmButton: 'px-6 py-3 text-lg font-semibold',
@@ -1308,8 +1308,8 @@
                     confirmButtonText: 'Tamam',
                     background: '#ffffff', // senin rengin
                     color: '#fff',
-                    iconColor: '#e7004d', // modern yeşil
-                    confirmButtonColor: '#e7004d', // modern yeşil düğme
+                    iconColor: '#ec691e', // modern yeşil
+                    confirmButtonColor: '#ec691e', // modern yeşil düğme
                     customClass: {
                         popup: 'rounded-xl shadow-2xl',
                         confirmButton: 'px-6 py-3 text-lg font-semibold',
@@ -1331,8 +1331,8 @@
                 confirmButtonText: 'Tamam',
                 background: '#ffffff', // senin rengin
                 color: '#fff',
-                iconColor: '#e7004d', // modern yeşil
-                confirmButtonColor: '#e7004d', // modern yeşil düğme
+                iconColor: '#ec691e', // modern yeşil
+                confirmButtonColor: '#ec691e', // modern yeşil düğme
                 customClass: {
                     popup: 'rounded-xl shadow-2xl',
                     confirmButton: 'px-6 py-3 text-lg font-semibold',
