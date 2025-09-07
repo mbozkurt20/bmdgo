@@ -1,4 +1,4 @@
-<div class="col-xl-12 col-xxl-8 mt-4">
+<div class=" mt-4">
     <ul class="nav nav-tabs" id="orderStatusTabs" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending"
