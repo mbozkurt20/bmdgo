@@ -105,7 +105,7 @@
             </li>
             <li><a class="ai-icon text-white" href="{{ url('/restaurant/apps') }}" aria-expanded="false">
                     <i class="flaticon-381-news text-white"></i>
-                    <span class="nav-text text-white">Ugulamalar</span>
+                    <span class="nav-text text-white">Uygulamalar</span>
                 </a>
             </li>
 
