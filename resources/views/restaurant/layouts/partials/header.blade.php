@@ -30,7 +30,7 @@
                     <li class="nav-item dropdown header-profile">
                         <a class="nav-link" href="javascript:void(0);" role="button"
                            data-bs-toggle="dropdown">
-                            <img alt="" style="height: 45px;width: 45px" class="img-fluid" src="{{asset('/theme/images/resLogo.png')}}">
+                            <img alt="" style="height: 45px;width: 45px" class="img-fluid" src="{{asset('/theme/images/resLogo.svg')}}">
                         </a>
                         <div class="dropdown-menu dropdown-menu-end">
                             <a class="dropdown-item" href="{{route('restaurant.profile')}}">

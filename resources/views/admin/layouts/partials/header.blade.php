@@ -25,11 +25,11 @@
 
             <!-- Kalan Kontör -->
             <p class="size-4 mb-0 me-4 fw-bold " style="color: #0d2646">
-                Davet Kodunuz:
+                Kurye Kodunuz:
                 <strong>[ {{\Illuminate\Support\Facades\Auth::guard('admin')->user()->code}} ]</strong>
             </p>
             <p class="size-4 mb-0 me-4 fw-bold " style="color: #0d2646">
-                Kontör Bakiyei:
+                Kontör Bakiyesi:
                 <strong>{{\Illuminate\Support\Facades\Auth::guard('admin')->user()->top_up_balance}}</strong>
             </p>
 
