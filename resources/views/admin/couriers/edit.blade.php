@@ -54,7 +54,7 @@
                                     </div>
                                     <div class="col-lg-4 mb-3">
                                         <label for="form-password" class="form-label fs-14 text-dark">Telefonu</label>
-                                        <input required type="text" class="form-control" value="{{$courier->phone}}" name="phone" id="form-text" placeholder="0532 532 0000">
+                                        @include('components.phone',['key' => 'phone', 'required' => true, 'value' => null])
                                     </div>
                                     <div class="col-lg-4 mb-3">
                                         <label for="form-password" class="form-label fs-14 text-dark">Şifresi</label>

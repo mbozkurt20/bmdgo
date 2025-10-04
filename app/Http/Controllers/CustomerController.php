@@ -138,7 +138,6 @@ class CustomerController extends Controller
         $customer->save();
         $city =  City::find(Admin::find(auth()->user()->admin_id)->city_id);
 
-
         if ($request->address) {
             // Mevcut adresleri çek
             $existingAddresses = CustomerAddress::where('customer_id', $customer->id)->pluck('id')->toArray();

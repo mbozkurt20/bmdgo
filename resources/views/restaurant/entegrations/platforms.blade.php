@@ -35,6 +35,26 @@
             <div class="row">
                 <div class="col-xl-4 col-lg-12">
                     <div class="card">
+                        <div class="card-header" style="background: #ead9e1;color:#fff">
+                            <h4 class="card-title"><img src="{{ asset('theme/images/gpsyemek.png') }}"
+                                    style="border-radius:5px;height: 34px"> </h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="basic-form">
+                                <div class="row">
+                                    <div class="mb-3 col-md-12">
+                                        <label class="form-label">Api Key</label>
+                                        <input type="email" class="form-control" name="gpsyemek_api_key"
+                                            placeholder="Api Key" value="{{ $restaurant->gpsyemek_api_key }}">
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-12">
+                    <div class="card">
                         <div class="card-header" style="background: #fb0050;color:#fff">
                             <h4 class="card-title"><img src="{{ asset('theme/images/yemeksepeti.png') }}"
                                     style="border-radius:5px;height: 24px;width: auto"> </h4>

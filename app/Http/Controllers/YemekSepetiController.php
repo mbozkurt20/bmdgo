@@ -2,11 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Restaurant;
 use App\Models\Order;
-use App\Jobs\AssignOrderToCourier;
 
 class YemekSepetiController extends Controller
 {
