@@ -65,8 +65,7 @@
                                     </div>
                                     <div class="mb-3 col-md-6">
                                         <label class="form-label">Telefon</label>
-                                        <input type="text" class="form-control" name="phone"
-                                            value="{{ $restaurant->phone }}" placeholder="Telefon">
+                                        @include('components.phone',['key' => 'phone', 'required' => true, 'value' => $restaurant->phone])
                                     </div>
                                     <div class="mb-3 col-md-6">
                                         <label class="form-label">Şifre</label>

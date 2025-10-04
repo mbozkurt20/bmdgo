@@ -753,8 +753,7 @@
                                         </div>
                                         <div class="mb-3 col-md-6">
                                             <label class="form-label">Telefon Numarası</label>
-                                            <input type="text" class="form-control" name="phone"
-                                                   placeholder="Telefon Numarası" id="phoneNumber" required>
+                                            @include('components.phone',['key' => 'phone', 'required' => true, 'value' => null])
                                         </div>
 
                                         <div class="mb-3 col-md-6">

@@ -55,28 +55,28 @@
 
                                     <div class="col-md-4 mb-3">
                                         <label class="text-dark" for="name">İsim</label>
-                                        <input type="text" name="name" class="form-control"
+                                        <input type="text" name="name" class="form-control border border-light"
                                                value="{{ old('name', auth()->user()->name) }}">
                                     </div>
 
                                     <div class="col-md-4 mb-3">
                                         <label class="text-dark" for="phone">Telefon</label>
-                                        <input type="text" value="{{ old('latitude', auth()->user()->phone) }}" name="phone" class="form-control">
+                                        @include('components.phone',['key' => 'phone', 'required' => true, 'value' => auth()->user()->phone])
                                     </div>
 
                                     <div class="col-md-4 mb-3">
                                         <label class="text-dark" for="password">Yeni Şifre</label>
-                                        <input type="password" name="password" class="form-control">
+                                        <input type="password" name="password" class="form-control border border-light">
                                     </div>
 
                                     <div class="col-md-6 mb-3">
                                         <label class="text-dark" for="latitude">Enlem (Latitude)</label>
-                                        <input required type="text" name="latitude" id="latitude" class="form-control">
+                                        <input required type="text" name="latitude" id="latitude" class="form-control border border-light">
                                     </div>
 
                                     <div class="col-md-6 mb-3">
                                         <label class="text-dark" for="longitude">Boylam (Longitude)</label>
-                                        <input required type="text" name="longitude" id="longitude" class="form-control">
+                                        <input required type="text" name="longitude" id="longitude" class="form-control border border-light">
                                     </div>
 
                                     <button type="submit" class="special-button mt-3">Güncelle</button>

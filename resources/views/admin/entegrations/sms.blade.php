@@ -96,7 +96,7 @@
                                 <p class="bg-danger-light text-danger">Uyarı:: Test mesajı size ulaşmadan sms aktif etmeyiniz!!!</p>
                                 <form method="post" action="{{route('admin.sms.entegrations.test')}}">
                                     @csrf
-                                    <input required name="phone" type="tel" id="phone-input" maxlength="10" placeholder="5xx xxx xx xx">
+                                    @include('components.phone',['key' => 'phone', 'required' => true, 'value' => null])
                                     <button class="special-button" type="submit">Gönder</button>
                                 </form>
 

@@ -45,6 +45,7 @@ class CreateRestaurantsTable extends Migration
             $table->string('trendyol_secret_key')->nullable();
             $table->string('entegra_id')->nullable();
             $table->string('entegra_token')->nullable();
+            $table->string('gpsyemek_api_key')->nullable();
             $table->string('menu_template')->nullable();
             $table->string('remember_token')->nullable();
             $table->boolean('email_verified_at')->nullable();
