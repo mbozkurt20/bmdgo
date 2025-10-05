@@ -44,7 +44,7 @@
                                 <div class="row">
                                     <div class="mb-3 col-md-12">
                                         <label class="form-label">Api Key</label>
-                                        <input type="email" class="form-control" name="gpsyemek_api_key"
+                                        <input type="text" class="form-control" name="gpsyemek_api_key"
                                             placeholder="Api Key" value="{{ $restaurant->gpsyemek_api_key }}">
                                     </div>
 
