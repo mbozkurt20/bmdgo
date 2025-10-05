@@ -15,7 +15,7 @@
                             <input type="date" class="form-control custom-input" id="end_date" name="end_date" required>
                         </div>
                         <div class="d-flex align-items-end">
-                            <button style="background: #e7004d;color:#fff;font-size: 0.8rem" type="submit"
+                            <button style="background: #ec691e;color:#fff;font-size: 0.8rem" type="submit"
                                     class="btn custom-btn">
                                 <i class="fas fa-calendar-day" style="padding-right:5px"></i>
                                 Filtrele</button>
@@ -60,7 +60,7 @@
                         <!-- All Orders Button -->
                         <div class="col-md-6">
                             <button
-                                class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100" style="background: #e7004d">
+                                class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100" style="background: #ec691e">
 
                                 <span class="fw-bold">
                                     <i class="fa-solid fa-box" style="color: #fffdfd;font-size:18px;padding-right:10px"></i>
@@ -71,7 +71,7 @@
                         <div class="col-md-6">
                             <button
                                 class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100"
-                                style="background: #0d2646">
+                                style="background: #259a38">
                                 <i class="fa-solid fa-phone" style="color: #fff;font-size:18px;padding-left:10px"></i>
                                 <span class="fw-bold">Telefon Sipariş</span>
                                 <span class="badge bg-white text-dark order-number">{{ count($telefonsiparis) }}</span>

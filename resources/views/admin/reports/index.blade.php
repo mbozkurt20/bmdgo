@@ -34,7 +34,7 @@
         }
 
         .btn-primary {
-            background-color: #e7004d;
+            background-color: #ec691e;
             border: none;
             border-radius: 8px;
             font-weight: 600;
@@ -50,12 +50,12 @@
         }
 
         .table thead {
-            background: #0d2646;
+            background: #259a38;
             color: white;
         }
 
         .summary-box {
-            background: #e7004d;
+            background: #ec691e;
             color: white;
             border-radius: 12px;
             padding: 16px;
@@ -206,7 +206,7 @@
                     icon: 'warning',
                     title: 'Eksik Seçim!',
                     text: 'Lütfen hem kurye hem de restoran seçiniz.',
-                    confirmButtonColor: '#e7004d',
+                    confirmButtonColor: '#ec691e',
                     confirmButtonText: 'Tamam'
                 });
                 return;
@@ -264,7 +264,7 @@
                         icon: 'error',
                         title: 'Hata!',
                         text: 'Veriler alınırken bir hata oluştu.',
-                        confirmButtonColor: '#e7004d'
+                        confirmButtonColor: '#ec691e'
                     });
                 }
             });

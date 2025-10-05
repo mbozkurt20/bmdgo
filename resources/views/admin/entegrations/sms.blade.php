@@ -41,7 +41,7 @@
         <div class="row">
             <div class="col-xl-4 col-lg-12">
                 <div class="card">
-                    <div class="card-header" style="background: #e7004d;color:#fff">
+                    <div class="card-header" style="background: #ec691e;color:#fff">
                         <h4 class="card-title text-white">Vatan Sms Bilgileri</h4>
                     </div>
                     <div class="card-body">
@@ -84,7 +84,7 @@
             </div>
             <div class="col-xl-4 col-lg-12">
                 <div class="card">
-                    <div class="card-header" style="background: #e7004d;color:#fff">
+                    <div class="card-header" style="background: #ec691e;color:#fff">
                         <h4 class="card-title text-white">Vatan Sms Test</h4>
                     </div>
                     <div class="card-body">
@@ -134,7 +134,7 @@
                 title: `${willActivate ? 'Aktif' : 'Pasif'} etmek istediğinizden emin misiniz?`,
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#0d2646',
+                confirmButtonColor: '#259a38',
                 cancelButtonColor: '#3057d7',
                 cancelButtonText: 'Hayır',
                 confirmButtonText: 'Evet İstiyorum!',

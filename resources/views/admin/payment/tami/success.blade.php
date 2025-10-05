@@ -24,7 +24,7 @@
         }
         .countdown {
             font-weight: bold;
-            color: #e7004d;
+            color: #ec691e;
             font-size: 22px;
         }
     </style>

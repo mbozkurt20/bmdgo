@@ -1,4 +1,4 @@
-<div class="nav-header" style="background:  #0d2646">
+<div class="nav-header" style="background:  #259a38">
     <a href="{{ url('/dealer/dashboard') }}" class="d-flex justify-content-center align-items-center mt-3">
         <div class="brand-title" style="width: 185px; height:50px">
             <img src="{{ config('site.logo') }}" alt="Logo" style="height: 100px;">
@@ -12,19 +12,19 @@
 </div>
 
 <div class="header">
-    <div class="row" style="background-color: #f3eded; color: #e7004d;">
+    <div class="row" style="background-color: #f3eded; color: #ec691e;">
         <div class="text-center fw-bold py-2">
-            <strong>BmdGo</strong> Partner Paneli
+            <strong>{{env('APP_NAME')}}</strong> Partner Paneli
         </div>
     </div>
 
     <div class="container-fluid py-2 px-3">
-        <div class="d-flex align-items-center justify-content-end w-100" style="color: #e7004d;">
+        <div class="d-flex align-items-center justify-content-end w-100" style="color: #ec691e;">
             <!-- Profil -->
             <div class="dropdown">
                 <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" data-bs-toggle="dropdown">
                     <img src="/theme/images/avatar.jpg" class="rounded-circle border border-2"
-                         style="height: 45px; width: 45px; border-color: #e7004d;" alt="Avatar">
+                         style="height: 45px; width: 45px; border-color: #ec691e;" alt="Avatar">
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li>

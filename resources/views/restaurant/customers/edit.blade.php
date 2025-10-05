@@ -92,12 +92,12 @@
                                         @foreach (\App\Models\CustomerAddress::where('customer_id', $customer->id)->get() as $index => $address)
                                             <div data-repeater-item class="item-content mb-3 border p-3 rounded">
                                                 <input name="id" value="{{$address->id}}" style="display: none" type="text">
-                                                <h5 style="color: #e7004d" class="fw-semibold  mb-3">Adres Bilgileri</h5>
+                                                <h5 style="color: #ec691e" class="fw-semibold  mb-3">Adres Bilgileri</h5>
 
                                                 <hr>
 
                                                 <div class="d-flex align-items-center mb-3">
-                                                    <span class="me-3 fw-bold" style="color:#0d2646; font-size:1rem;">Adres Başlığı:</span>
+                                                    <span class="me-3 fw-bold" style="color:#259a38; font-size:1rem;">Adres Başlığı:</span>
                                                     <input type="text" class="flex-grow-1 border-0 border-bottom bg-transparent"
                                                            name="address[{{ $index }}][name]"
                                                            value="{{ $address->name }}"
@@ -105,7 +105,7 @@
                                                 </div>
 
                                                 <div class="d-flex align-items-center mb-3">
-                                                    <span class="me-3 fw-bold" style="color:#0d2646; font-size:1rem;">İlçe:</span>
+                                                    <span class="me-3 fw-bold" style="color:#259a38; font-size:1rem;">İlçe:</span>
                                                     <select class="flex-grow-1 border-0 border-bottom bg-transparent"
                                                             name="address[{{ $index }}][ilce]" required>
                                                         @foreach(\App\Models\District::where('city_id', \App\Models\Admin::find(auth()->user()->admin_id)->city_id)->get() as $district)
@@ -117,7 +117,7 @@
                                                 </div>
 
                                                 <div class="d-flex align-items-center mb-3">
-                                                    <span class="me-3 fw-bold" style="color:#0d2646; font-size:1rem;">Mah.</span>
+                                                    <span class="me-3 fw-bold" style="color:#259a38; font-size:1rem;">Mah.</span>
                                                     <input type="text" class="flex-grow-1 border-0 border-bottom bg-transparent"
                                                            name="address[{{ $index }}][mahalle]"
                                                            value="{{ $address->mahalle }}"
@@ -125,7 +125,7 @@
                                                 </div>
 
                                                 <div class="d-flex align-items-center mb-3">
-                                                    <span class="me-3 fw-bold" style="color:#0d2646; font-size:1rem;">Sok.</span>
+                                                    <span class="me-3 fw-bold" style="color:#259a38; font-size:1rem;">Sok.</span>
                                                     <input type="text" class="flex-grow-1 border-0 border-bottom bg-transparent"
                                                            name="address[{{ $index }}][sokak_cadde]"
                                                            value="{{ $address->sokak_cadde }}"
@@ -133,7 +133,7 @@
                                                 </div>
 
                                                 <div class="d-flex align-items-center mb-3">
-                                                    <span class="me-3 fw-bold" style="color:#0d2646; font-size:1rem;">Apt Adı.</span>
+                                                    <span class="me-3 fw-bold" style="color:#259a38; font-size:1rem;">Apt Adı.</span>
                                                     <input type="text" class="flex-grow-1 border-0 border-bottom bg-transparent"
                                                            name="address[{{ $index }}][bina_no]"
                                                            value="{{ $address->bina_no }}"
@@ -141,7 +141,7 @@
                                                 </div>
 
                                                 <div class="d-flex align-items-center mb-3">
-                                                    <span class="me-3 fw-bold" style="color:#0d2646; font-size:1rem;">Kat:</span>
+                                                    <span class="me-3 fw-bold" style="color:#259a38; font-size:1rem;">Kat:</span>
                                                     <input type="text" class="flex-grow-1 border-0 border-bottom bg-transparent"
                                                            name="address[{{ $index }}][kat]"
                                                            value="{{ $address->kat }}"
@@ -149,7 +149,7 @@
                                                 </div>
 
                                                 <div class="d-flex align-items-center mb-3">
-                                                    <span class="me-3 fw-bold" style="color:#0d2646; font-size:1rem;">Daire:</span>
+                                                    <span class="me-3 fw-bold" style="color:#259a38; font-size:1rem;">Daire:</span>
                                                     <input type="text" class="flex-grow-1 border-0 border-bottom bg-transparent"
                                                            name="address[{{ $index }}][daire_no]"
                                                            value="{{ $address->daire_no }}"
@@ -157,7 +157,7 @@
                                                 </div>
 
                                                 <div class="d-flex align-items-center mb-3">
-                                                    <span class="me-3 fw-bold" style="color:#0d2646; font-size:1rem;">Adres Tarifi:</span>
+                                                    <span class="me-3 fw-bold" style="color:#259a38; font-size:1rem;">Adres Tarifi:</span>
                                                     <input type="text" class="flex-grow-1 border-0 border-bottom bg-transparent"
                                                            name="address[{{ $index }}][adres_tarifi]"
                                                            value="{{ $address->adres_tarifi }}"

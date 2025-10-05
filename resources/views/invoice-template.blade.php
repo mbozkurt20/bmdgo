@@ -29,7 +29,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 2px solid #0d2646;
+            border-bottom: 2px solid #259a38;
             padding-bottom: 15px;
             margin-bottom: 30px;
         }
@@ -41,7 +41,7 @@
         .company-name {
             font-size: 1.8rem;
             font-weight: 700;
-            color: #0d2646;
+            color: #259a38;
             letter-spacing: 2px;
             text-transform: uppercase;
         }
@@ -85,7 +85,7 @@
         }
 
         th {
-            background-color: #0d2646;
+            background-color: #259a38;
             color: white;
             padding: 12px;
             font-weight: 600;

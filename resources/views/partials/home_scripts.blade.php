@@ -134,8 +134,8 @@
                     title: 'Sipariş durumu başarıyla değiştirildi.',
                     icon: 'success',
                     confirmButtonText: 'Tamam',
-                    confirmButtonColor: '#0d2646',
-                    cancelButtonColor: '#e7004d',
+                    confirmButtonColor: '#259a38',
+                    cancelButtonColor: '#ec691e',
                 })
                 $('#cancelModal').modal('hide');
 
@@ -524,14 +524,14 @@
         let courierSection = '';
         if (status === 'UNSUPPLIED' || status === 'DELIVERED' || status === 'HANDOVER') {
             courierSection = `
-        <a style="cursor:pointer;color: #e7004d">
+        <a style="cursor:pointer;color: #ec691e">
             <i class="fas fa-truck mr-1"></i> ${order.courier ? order.courier.name.substr(0, 10) : 'Kurye Yok'}
         </a>`;
         } else {
             if (order.courier && order.courier.id) {
                 courierSection = `
             <div style="display:flex; align-items:center;">
-                <a data-bs-toggle="modal" data-bs-target="#Courier${order.id}" style="cursor:pointer;color: #e7004d">
+                <a data-bs-toggle="modal" data-bs-target="#Courier${order.id}" style="cursor:pointer;color: #ec691e">
                    <i class="fas fa-truck mr-1"></i> ${order.courier.name.substr(0, 10)}
                 </a>
             </div>`;

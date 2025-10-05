@@ -11,7 +11,7 @@
         <div class="paper">
             <div class="meta">
                 <div class="text-bold">
-                    <img class="logo" src="{{url('/theme/images/bmdGo.png')}}" alt="{{ env('APP_NAME') }}">
+                    <img class="logo" src="{{url('/theme/images/logo.png')}}" alt="{{ env('APP_NAME') }}">
                 </div>
                 <div class="" style="float: right">
                     <div class="hourly">

@@ -76,13 +76,13 @@
                                         <h5 class="fw-semibold text-black mb-3">Adres Bilgileri</h5>
                                         <hr>
                                         <div class="d-flex align-items-center mb-3">
-                                            <span class="me-3 fw-bold" style="color:#0d2646; font-size:1rem;">Adres Başlığı:</span>
+                                            <span class="me-3 fw-bold" style="color:#259a38; font-size:1rem;">Adres Başlığı:</span>
                                             <input type="text" class="flex-grow-1 border-0 border-bottom bg-transparent"
                                                    name="name" placeholder="Adres Başlığı" required>
                                         </div>
 
                                         <div class="d-flex align-items-center mb-3">
-                                            <span class="me-3 fw-bold" style="color:#0d2646; font-size:1rem;">İlçe:</span>
+                                            <span class="me-3 fw-bold" style="color:#259a38; font-size:1rem;">İlçe:</span>
                                             <select class="flex-grow-1 border-0 border-bottom bg-transparent" name="ilce" required>
                                                 @foreach(\App\Models\District::where('city_id', \App\Models\Admin::find(auth()->user()->admin_id)->city_id)->get() as $district)
                                                     <option value="{{ $district->id }}">
@@ -93,37 +93,37 @@
                                         </div>
 
                                         <div class="d-flex align-items-center mb-3">
-                                            <span class="me-3 fw-bold" style="color:#0d2646; font-size:1rem;">Mah.</span>
+                                            <span class="me-3 fw-bold" style="color:#259a38; font-size:1rem;">Mah.</span>
                                             <input type="text" class="flex-grow-1 border-0 border-bottom bg-transparent"
                                                    name="mahalle" placeholder="Mahalle" required>
                                         </div>
 
                                         <div class="d-flex align-items-center mb-3">
-                                            <span class="me-3 fw-bold" style="color:#0d2646; font-size:1rem;">Sok.</span>
+                                            <span class="me-3 fw-bold" style="color:#259a38; font-size:1rem;">Sok.</span>
                                             <input type="text" class="flex-grow-1 border-0 border-bottom bg-transparent"
                                                    name="sokak_cadde" placeholder="Sokak / Cadde" required>
                                         </div>
 
                                         <div class="d-flex align-items-center mb-3">
-                                            <span class="me-3 fw-bold" style="color:#0d2646; font-size:1rem;">Apt Adı.</span>
+                                            <span class="me-3 fw-bold" style="color:#259a38; font-size:1rem;">Apt Adı.</span>
                                             <input type="text" class="flex-grow-1 border-0 border-bottom bg-transparent"
                                                    name="bina_no" placeholder="Bina No / Apartman Adı" required>
                                         </div>
 
                                         <div class="d-flex align-items-center mb-3">
-                                            <span class="me-3 fw-bold" style="color:#0d2646; font-size:1rem;">Kat:</span>
+                                            <span class="me-3 fw-bold" style="color:#259a38; font-size:1rem;">Kat:</span>
                                             <input type="text" class="flex-grow-1 border-0 border-bottom bg-transparent"
                                                    name="kat" placeholder="Kat" required>
                                         </div>
 
                                         <div class="d-flex align-items-center mb-3">
-                                            <span class="me-3 fw-bold" style="color:#0d2646; font-size:1rem;">Daire:</span>
+                                            <span class="me-3 fw-bold" style="color:#259a38; font-size:1rem;">Daire:</span>
                                             <input type="text" class="flex-grow-1 border-0 border-bottom bg-transparent"
                                                    name="daire_no" placeholder="Daire No" required>
                                         </div>
 
                                         <div class="d-flex align-items-center mb-3">
-                                            <span class="me-3 fw-bold" style="color:#0d2646; font-size:1rem;">Adres Tarifi:</span>
+                                            <span class="me-3 fw-bold" style="color:#259a38; font-size:1rem;">Adres Tarifi:</span>
                                             <input type="text" class="flex-grow-1 border-0 border-bottom bg-transparent"
                                                    name="adres_tarifi" placeholder="Adres Tarifi" required>
                                         </div>

@@ -6,13 +6,13 @@
             padding: 15px 10px;
             font-weight: bold;
             color: #fff;
-            background: #0d2646;
+            background: #259a38;
         }
         .tops span {
             font-size: 15px;
         }
         .table thead tr {
-            background: #e7004d; /* bg-primary rengi */
+            background: #ec691e; /* bg-primary rengi */
         }
         .table thead tr th {
             color: #fff;
