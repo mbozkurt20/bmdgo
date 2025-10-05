@@ -57,41 +57,6 @@ class RestaurantController extends Controller
             'unsupplied' => $unsupplied->values()->all(),
         ]);
     }
-    private function getCommonData($startDate, $endDate)
-    {
-        $userId = Auth::user()->id;
-
-        $ResActiveCouriers = Courier::where('status', CourierStatus::active)
-            ->where('restaurant_id', $userId)
-            ->get();
-
-        $AcitegenelCouriers = Courier::where('status', CourierStatus::active)
-            ->where('restaurant_id', 0)
-            ->get();
-
-        $ActiveCouriers = $ResActiveCouriers->merge($AcitegenelCouriers);
-
-        return [
-            'couriers' => Courier::where('status', 'active')->where('restaurant_id', $userId)->get(),
-            'genelCouriers' => Courier::where('status', 'active')->where('restaurant_id', 0)->get(),
-            'ResActiveCouriers' => $ResActiveCouriers,
-            'AcitegenelCouriers' => $AcitegenelCouriers,
-            'ActiveCouriers' => $ActiveCouriers,
-            'restaurant' => Restaurant::where('id', $userId)->get(),
-            'yemeksepeti' => Order::where('platform', 'yemeksepeti')->where('restaurant_id', $userId)->whereBetween('created_at', [$startDate, $endDate])->orderBy('id', 'desc')->get(),
-            'getiryemek' => Order::where('platform', 'getir')->where('restaurant_id', $userId)->whereBetween('created_at', [$startDate, $endDate])->orderBy('id', 'desc')->get(),
-            'trendyol' => Order::where('platform', 'trendyol')->where('restaurant_id', $userId)->whereBetween('created_at', [$startDate, $endDate])->orderBy('id', 'desc')->get(),
-            'telefonsiparis' => Order::where('platform', 'telefonsiparis')->where('restaurant_id', $userId)->whereBetween('created_at', [$startDate, $endDate])->orderBy('id', 'desc')->get(),
-            'migros' => Order::where('platform', 'migros')->where('restaurant_id', $userId)->whereBetween('created_at', [$startDate, $endDate])->count(),
-            'customers' => Customer::where('status', 'active')->where('restaurant_id', $userId)->get(),
-            'categories' => Categorie::where('status', 'active')->where('restaurant_id', $userId)->get(),
-            'formattedExpense' => number_format(Order::where('restaurant_id', $userId)->whereBetween('created_at', [$startDate, $endDate])->sum('amount'), 2, '.', ','),
-            'formattedAverageExpense' => number_format(Order::where('restaurant_id', $userId)->whereBetween('created_at', [$startDate, $endDate])->avg('amount'), 2, '.', ','),
-            'totalCouriers' => Courier::count(),
-            'idleCouriers' => Courier::where('status', CourierStatus::active)->count(),
-            'breakCouriers' => Courier::where('status', CourierStatus::break)->count(),
-        ];
-    }
 
     public function home()
     {
@@ -176,9 +141,6 @@ class RestaurantController extends Controller
         )));
     }
 
-    /**
-     * PENDING to PREPARED hızını hesapla
-     */
     private function getPreparedSpeed($userId, $startDate, $endDate)
     {
         return DB::table('order_status_logs as p')
@@ -198,6 +160,43 @@ class RestaurantController extends Controller
             ->groupBy('date')
             ->orderBy('date')
             ->get();
+    }
+
+    private function getCommonData($startDate, $endDate)
+    {
+        $userId = Auth::user()->id;
+
+        $ResActiveCouriers = Courier::where('status', CourierStatus::active)
+            ->where('restaurant_id', $userId)
+            ->get();
+
+        $AcitegenelCouriers = Courier::where('status', CourierStatus::active)
+            ->where('restaurant_id', 0)
+            ->get();
+
+        $ActiveCouriers = $ResActiveCouriers->merge($AcitegenelCouriers);
+
+        return [
+            'couriers' => Courier::where('status', 'active')->where('restaurant_id', $userId)->get(),
+            'genelCouriers' => Courier::where('status', 'active')->where('restaurant_id', 0)->get(),
+            'ResActiveCouriers' => $ResActiveCouriers,
+            'AcitegenelCouriers' => $AcitegenelCouriers,
+            'ActiveCouriers' => $ActiveCouriers,
+            'restaurant' => Restaurant::where('id', $userId)->get(),
+            'yemeksepeti' => Order::where('platform', 'yemeksepeti')->where('restaurant_id', $userId)->whereBetween('created_at', [$startDate, $endDate])->orderBy('id', 'desc')->get(),
+            'getiryemek' => Order::where('platform', 'getir')->where('restaurant_id', $userId)->whereBetween('created_at', [$startDate, $endDate])->orderBy('id', 'desc')->get(),
+            'gpsyemek' => Order::where('platform', 'gpsyemek')->where('restaurant_id', $userId)->whereBetween('created_at', [$startDate, $endDate])->orderBy('id', 'desc')->get(),
+            'trendyol' => Order::where('platform', 'trendyol')->where('restaurant_id', $userId)->whereBetween('created_at', [$startDate, $endDate])->orderBy('id', 'desc')->get(),
+            'telefonsiparis' => Order::where('platform', 'telefonsiparis')->where('restaurant_id', $userId)->whereBetween('created_at', [$startDate, $endDate])->orderBy('id', 'desc')->get(),
+            'migros' => Order::where('platform', 'migros')->where('restaurant_id', $userId)->whereBetween('created_at', [$startDate, $endDate])->count(),
+            'customers' => Customer::where('status', 'active')->where('restaurant_id', $userId)->get(),
+            'categories' => Categorie::where('status', 'active')->where('restaurant_id', $userId)->get(),
+            'formattedExpense' => number_format(Order::where('restaurant_id', $userId)->whereBetween('created_at', [$startDate, $endDate])->sum('amount'), 2, '.', ','),
+            'formattedAverageExpense' => number_format(Order::where('restaurant_id', $userId)->whereBetween('created_at', [$startDate, $endDate])->avg('amount'), 2, '.', ','),
+            'totalCouriers' => Courier::count(),
+            'idleCouriers' => Courier::where('status', CourierStatus::active)->count(),
+            'breakCouriers' => Courier::where('status', CourierStatus::break)->count(),
+        ];
     }
 
     /**
@@ -279,7 +278,6 @@ class RestaurantController extends Controller
             'total_orders' => $data->sum('order_count')
         ];
     }
-
 
     public function filterByDate(Request $request)
     {
@@ -410,7 +408,66 @@ class RestaurantController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('restaurant.home', array_merge($commonData, compact('tumu', 'orders', 'ActiveSiparisler')));
+
+        // Verileri al
+        $dailyPreparedSpeed = $this->getPreparedSpeed($userId, $startDate, $endDate);
+        $dailyHandoverSpeed = $this->getHandoverSpeed($userId, $startDate, $endDate);
+        $dailyDeliverySpeed = $this->getDeliverySpeed($userId, $startDate, $endDate);
+
+        // Tüm tarihleri içeren bir dizi oluştur
+        $allDates = [];
+        $currentDate = Carbon::parse($startDate);
+        $endDateObj = Carbon::parse($endDate);
+
+        while ($currentDate <= $endDateObj) {
+            $allDates[] = $currentDate->format('Y-m-d');
+            $currentDate->addDay();
+        }
+
+        // Chart verilerini hazırla
+        $chartData = [
+            'labels' => $allDates,
+            'datasets' => [
+                [
+                    'label' => 'Hazırlanma Hızı (dakika)',
+                    'data' => $this->mapDataToDates($dailyPreparedSpeed, $allDates),
+                    'backgroundColor' => 'rgba(54, 162, 235, 0.2)',
+                    'borderColor' => 'rgba(54, 162, 235, 1)',
+                ],
+                [
+                    'label' => 'Teslim Alma Hızı (dakika)',
+                    'data' => $this->mapDataToDates($dailyHandoverSpeed, $allDates),
+                    'backgroundColor' => 'rgba(255, 206, 86, 0.2)',
+                    'borderColor' => 'rgba(255, 206, 86, 1)',
+                ],
+                [
+                    'label' => 'Teslimat Hızı (dakika)',
+                    'data' => $this->mapDataToDates($dailyDeliverySpeed, $allDates),
+                    'backgroundColor' => 'rgba(75, 192, 192, 0.2)',
+                    'borderColor' => 'rgba(75, 192, 192, 1)',
+                ]
+            ]
+        ];
+
+        // İstatistikleri hesapla
+        $stats = [
+            'prepared' => $this->calculateStats($dailyPreparedSpeed),
+            'handover' => $this->calculateStats($dailyHandoverSpeed),
+            'delivery' => $this->calculateStats($dailyDeliverySpeed)
+        ];
+
+        return view('restaurant.home', array_merge($commonData, compact('tumu', 'orders',
+            'tumu',
+            'ActiveSiparisler',
+            'chartData',
+            'stats',
+            'startDate',
+            'endDate',
+            'userId',
+            'dailyPreparedSpeed',
+            'dailyHandoverSpeed',
+            'dailyDeliverySpeed'
+        )));
     }
 
     //auth process

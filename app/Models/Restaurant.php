@@ -40,6 +40,7 @@ class Restaurant extends Authenticatable
         'adisyo_api_key',
         'adisyo_secret_key',
         'adisyo_consumer_adi',
+        'gpsyemek_api_key',
         'remember_token',
         'getir_restaurant_id',
         'getir_app_secret_key',

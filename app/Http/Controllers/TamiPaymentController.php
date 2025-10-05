@@ -27,7 +27,7 @@ class TamiPaymentController extends Controller
     public function showForm(Request $req)
     {
         $topup = $req->top_up;
-        $amount = \auth()->user()->top_up_price * $topup;
+        $amount = auth()->user()->top_up_price * $topup;
 
         return view('admin.payment.tami.form',compact('topup','amount'));
     }

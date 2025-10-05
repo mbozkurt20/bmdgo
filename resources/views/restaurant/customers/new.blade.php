@@ -37,18 +37,18 @@
                                 <!-- Müşteri Adı -->
                                 <div class="mb-3 col-md-12">
                                     <label class="form-label text-dark">Müşteri Adı <small class="text-danger">*</small></label>
-                                    <input type="text" class="form-control" name="name" placeholder="Müşteri Adı" required>
+                                    <input type="text" class="form-control border border-light" name="name" placeholder="Müşteri Adı" required>
                                 </div>
 
                                 <!-- Telefon -->
                                 <div class="mb-3 col-md-6">
                                     <label class="form-label text-dark">Telefon Numarası <small class="text-danger">*</small></label>
-                                    <input type="text" class="form-control" name="phone" placeholder="Telefon Numarası" required>
+                                    @include('components.phone',['key' => 'phone', 'required' => true, 'value' => null])
                                 </div>
 
                                 <div class="mb-3 col-md-6">
                                     <label class="form-label text-dark">Telefon Numarası (opsiyonel)</label>
-                                    <input type="text" class="form-control" name="mobile" placeholder="Diğer Telefon Numarası">
+                                    @include('components.phone',['key' => 'mobile', 'required' => false,'value' => null])
                                 </div>
                             </div>
 
@@ -146,4 +146,6 @@
             </div>
         </div>
     </div>
+
+
 @endsection

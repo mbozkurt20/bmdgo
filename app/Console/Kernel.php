@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Http\Controllers\GpsYemekController;
 use App\Http\Controllers\TrendyolYemekController;
 use App\Jobs\AssignPendingOrders;
 use Illuminate\Console\Scheduling\Schedule;
@@ -33,6 +34,11 @@ class Kernel extends ConsoleKernel
 
         $schedule->call(function () {
             $tyc = app(TrendyolYemekController::class);
+            $tyc->index();
+        })->everyMinute();
+
+        $schedule->call(function () {
+            $tyc = app(GpsYemekController::class);
             $tyc->index();
         })->everyMinute();
     }

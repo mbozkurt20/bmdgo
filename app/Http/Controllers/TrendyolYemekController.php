@@ -57,7 +57,7 @@ class TrendyolYemekController extends Controller
             $orderAddress = $address->city . " " . $address->district . " " . $address->address1 . " Kat: " . $address->floor . " Kapi no:" . $address->doorNumber . " Adres Detay:" . $address->addressDescription;
 
             $create = new Customer();
-            $create->restaurant_id = Auth::user()->id; // Assuming the authenticated user is the restaurant
+            $create->restaurant_id = $restaurant->id; // Assuming the authenticated user is the restaurant
             $create->name = $address->firstName . " " . $address->lastName;
             $create->phone = $address->phone;
             $create->mobile = " ";

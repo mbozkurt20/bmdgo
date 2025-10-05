@@ -62,7 +62,7 @@
 
                                     <div class="col-md-4 mb-3">
                                         <label class="text-dark" for="phone">Telefon</label>
-                                        <input type="text" value="{{ old('phone', auth()->user()->phone) }}" name="phone" class="form-control">
+                                        @include('components.phone',['key' => 'phone', 'required' => true, 'value' => auth()->user()->phone])
                                     </div>
 
                                     <div class="col-md-4 mb-3">

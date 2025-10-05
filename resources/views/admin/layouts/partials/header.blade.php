@@ -24,6 +24,7 @@
         <div class="d-flex align-items-center justify-content-end w-100" style="color: #ec691e;">
 
             <!-- Kalan Kontör -->
+
             <p class="size-4 mb-0 me-4 fw-bold " style="color: #259a38">
                 Davet Kodunuz:
                 <strong>[ {{\Illuminate\Support\Facades\Auth::guard('admin')->user()->code}} ]</strong>

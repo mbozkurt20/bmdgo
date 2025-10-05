@@ -39,40 +39,32 @@
                         </div>
                     </form>
                     <div class="date-filters d-flex align-items-center gap-1 ">
-                        <a style="font-size:0.8rem;font-weight: 300"
+                        <a style="font-size:0.8rem;font-weight: 300;{{request()->date == 'today' ? 'background-color: #e7004d;color:white' : '' }}"
                            href="{{ route('orders.filter', ['date' => 'today']) }}" class="date-filter custom-link">
                             <i class="fas fa-calendar-day text-danger"></i>
                             <span>Bugün</span>
                         </a>
-                        <a style="font-size:0.8rem;font-weight: 300"
+                        <a style="font-size:0.8rem;font-weight: 300;{{request()->date == 'yesterday' ? 'background-color: #e7004d;color:white' : '' }}"
                            href="{{ route('orders.filter', ['date' => 'yesterday']) }}" class="date-filter custom-link">
                             <i class="fas fa-calendar-day text-danger"></i>
                             <span>Dün</span>
                         </a>
-                        <a style="font-size:0.8rem;font-weight: 300"
+                        <a style="font-size:0.8rem;font-weight: 300;{{request()->date == 'this_week' ? 'background-color: #e7004d;color:white' : '' }}"
                            href="{{ route('orders.filter', ['date' => 'this_week']) }}" class="date-filter custom-link">
                             <i class="fas fa-calendar-week text-danger"></i>
                             <span>Bu Hafta</span>
                         </a>
-                        <a style="font-size:0.8rem;font-weight: 300"
+                        <a style="font-size:0.8rem;font-weight: 300;{{request()->date == 'last_week' ? 'background-color: #e7004d;color:white' : '' }}"
                            href="{{ route('orders.filter', ['date' => 'last_week']) }}" class="date-filter custom-link">
                             <i class="fas fa-calendar-week text-danger"></i>
                             <span>Geçen Hafta</span>
                         </a>
-                        <a style="font-size:0.8rem;font-weight: 300"
+                        <a style="font-size:0.8rem;font-weight: 300;{{request()->date == 'last_month' ? 'background-color: #e7004d;color:white' : '' }}"
                            href="{{ route('orders.filter', ['date' => 'last_month']) }}"
                            class="date-filter custom-link">
                             <i class="fas fa-calendar-week text-danger"></i>
                             <span>Geçen Ay</span>
                         </a>
-                    </div>
-                    <div class="customer-search mb-sm-0 ">
-                        <div class="input-group search-area">
-                            <input style="font-size: 0.8rem;width:200px" type="text" class="form-control"
-                                   id="custom-filter" placeholder="Sipariş ara..">
-                            <span class="input-group-text"><a href="javascript:void(0)"><i
-                                        class="flaticon-381-search-2"></i></a></span>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -94,27 +86,44 @@
                                 <span class="badge bg-white text-dark order-number">{{ count($tumu) }}</span>
                             </button>
                         </div>
-                        <!-- Getir Orders -->
+
                         <div class="col-md-6">
                             <button
                                 class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100"
-                                style="background: #4927b3">
+                                style="background: #0d2646">
+                                <i class="fa-solid fa-phone" style="color: #fff;font-size:18px;padding-left:10px"></i>
+                                <span class="fw-bold">Telefonla Gelen Sipariş</span>
+                                <span class="badge bg-white text-dark order-number">{{ count($telefonsiparis) }}</span>
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button
+                                class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100" style="background: #4927b3">
                                 <img src="{{ asset('theme/images/GetirYemek_Logo.png') }}"
-                                     style="background-repeat: no-repeat; background-position:center" width="77px"
-                                     height="14px" alt="">
-                                <span class="fw-bold">Getir Siparişleri</span>
+                                     style="background-repeat: no-repeat; background-position:center"
+                                     height="20px" alt="">
                                 <span class="badge bg-white text-dark order-number">{{ count($getiryemek) }}</span>
                             </button>
                         </div>
+
+                        <div class="col-md-6">
+                            <button
+                                class="order-card btn-group-custom fw-bold order-btn d-flex justify-content-between align-items-center w-100"
+                                style="background: #d7cbcb">
+                                <img src="{{ asset('theme/images/gpsyemek.png') }}"
+                                     style="background-repeat: no-repeat; background-position:center"
+                                     height="35px" alt="">
+                                <span class="badge bg-white text-dark order-number">{{ count($gpsyemek) }}</span>
+                            </button>
+                        </div>
+
                         <!-- Trendyol Orders -->
                         <div class="col-md-6">
                             <button
-                                class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100"
-                                style="background: orangered">
+                                class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100" style="background: orangered">
                                 <img src="{{ asset('theme/images/trendyolyemek.png') }}"
-                                     style="background-repeat: no-repeat; background-position:center" width="71px"
-                                     height="14px" alt="">
-                                <span class="fw-bold">Trendyol Siparişleri</span>
+                                     style="background-repeat: no-repeat; background-position:center"
+                                     height="20px" alt="">
                                 <span class="badge bg-white text-dark order-number">{{ count($trendyol) }}</span>
                             </button>
                         </div>
@@ -125,9 +134,8 @@
                                 class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100"
                                 style="background: #F90050">
                                 <img src="{{ asset('theme/images/Yemeksepeti_Logo.png') }}"
-                                     style="background-repeat: no-repeat; background-position:center" width="79px"
-                                     height="15px" alt="">
-                                <span class="fw-bold">Yemeksepeti Siparişleri</span>
+                                     style="background-repeat: no-repeat; background-position:center"
+                                     height="25px" alt="">
                                 <span class="badge bg-white text-dark order-number">{{ count($yemeksepeti) }}</span>
                             </button>
                         </div>
@@ -137,13 +145,13 @@
                                 class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100"
                                 style="background: #363A86">
                                 <img src="{{ asset('theme/images/MigrosYemek_logo.png') }}"
-                                     style="background-repeat: no-repeat; background-position:center" width="69px"
-                                     height="28px" alt="">
-                                <span class="fw-bold">Migros Yemek Siparişleri</span>
+                                     style="background-repeat: no-repeat; background-position:center"
+                                     height="30px" alt="">
                                 <span class="badge bg-white text-dark order-number">{{ $migros }}</span>
                             </button>
                         </div>
                         <!-- Phone Orders -->
+
                         <div class="col-md-6">
                             <button
                                 class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100"

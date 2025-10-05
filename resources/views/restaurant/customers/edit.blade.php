@@ -54,18 +54,16 @@
                                     <input type="hidden" name="id" value="{{ $customer->id }}">
                                     <div class="mb-3 col-md-12">
                                         <label class="form-label">Müşteri Adı</label>
-                                        <input type="text" class="form-control" name="name" placeholder="Müşteri Adı"
+                                        <input type="text" class="form-control border border-light" name="name" placeholder="Müşteri Adı"
                                                value="{{ $customer->name }}" required>
                                     </div>
                                     <div class="mb-3 col-md-6">
                                         <label class="form-label">Telefon Numarası</label>
-                                        <input type="text" class="form-control" name="phone"
-                                               value="{{ $customer->phone }}" placeholder="Telefon Numarası" required>
+                                        @include('components.phone',['key' => 'phone', 'required' => true,'value' => $customer->phone])
                                     </div>
                                     <div class="mb-3 col-md-6">
                                         <label class="form-label">Telefon Numarası 2</label>
-                                        <input type="text" class="form-control" name="mobile"
-                                               value="{{ $customer->mobile }}" placeholder="Diğer Telefon Numarası 2">
+                                        @include('components.phone',['key' => 'mobile', 'required' => false,'value' => $customer->mobile])
                                     </div>
 
                                 </div>

@@ -61,8 +61,7 @@
 
                                     <div class="col-lg-4 mb-3">
                                         <label for="form-password" class="form-label fs-14 text-dark">Telefonu</label>
-                                        <input required type="text" class="form-control" name="phone" id="form-text"
-                                               placeholder="0532 532 0000">
+                                        @include('components.phone',['key' => 'phone', 'required' => true, 'value' => null])
                                     </div>
                                     <div class="col-lg-4 mb-3">
                                         <label for="price-type" class="form-label fs-14 text-dark">Ödeme Türü </label>
