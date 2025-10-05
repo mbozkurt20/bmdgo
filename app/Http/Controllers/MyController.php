@@ -22,6 +22,7 @@ class MyController extends Controller
     public function entegrastion_update(Request $request)
     {
         $restaurant = Restaurant::find(Auth::user()->id);
+        $restaurant->gpsyemek_api_key = $request->gpsyemek_api_key;
         $restaurant->yemeksepeti_email = $request->yemeksepeti_email;
         $restaurant->yemeksepeti_password = $request->yemeksepeti_password;
         $restaurant->getir_restaurant_id = $request->getir_restaurant_id;

@@ -19,7 +19,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/gpsyemek', [App\Http\Controllers\GpsYemekController::class, 'index']);
+Route::get('/getPlatformGpsyemek', [App\Http\Controllers\GpsYemekController::class, 'index']);
 Route::get('/getPlatformYemekSepeti', [App\Http\Controllers\YemekSepetiController::class, 'index']);
 Route::get('/getPlatformGetirYemek', [App\Http\Controllers\GetirYemekController::class, 'index']);
 Route::get('/getPlatformTrendyolYemek', [App\Http\Controllers\TrendyolYemekController::class, 'index']);
