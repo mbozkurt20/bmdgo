@@ -94,6 +94,16 @@ class OrderController extends Controller
             ]);
         }
 
+        //kurye atanınca platform order status update et
+        if ($order->platform === 'gpsyemek') {
+            $request = new Request([
+                'action' => OrderStatus::ASSIGNED,
+                'tracking_id' => $order->tracking_id,
+            ]);
+
+            app(GpsYemekController::class)->updateOrder($request);
+        }
+
         echo 'OK';
     }
 

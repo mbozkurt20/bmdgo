@@ -31,6 +31,8 @@ class Order extends Model
         'message',
         'discount',
         'distance',
+        'platform_date',
+        'created_at',
     ];
 
     public function restaurant(): BelongsTo

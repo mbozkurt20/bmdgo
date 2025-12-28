@@ -125,6 +125,7 @@
             requestData.message = message;
         }
 
+        console.log({platform:platform})
         $.ajax({
             type: 'POST',
             url: '/{{$key}}/' + platform + '/updateOrderStatus',
@@ -466,7 +467,6 @@
             year: 'numeric',
             hour: '2-digit',
             minute: '2-digit',
-            second: '2-digit'
         }) : '';
         const courierName = order.courier ? order.courier.name : 'Kurye Bulunmuyor';
         const status = order.status; // varsayılan
@@ -558,7 +558,7 @@
         <input type="hidden" value="${trackingId}" id="tracking_${order.id}">
     </td>
     <td>${trackingId}</td>
-    <td>${createdAt}</td>
+    <td>${order.platform_date ?? createdAt}</td>
     <td style="width:200px;overflow: hidden;">${fullName}</td>
     <td>
         ${courierSection}

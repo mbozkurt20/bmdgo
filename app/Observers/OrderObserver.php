@@ -45,7 +45,9 @@ class OrderObserver
         $or = new OrderStatusService();
         $or->changeStatus($order, $newStatus);
 
-        SendSms::send($order->phone, $message, $restaurant->admin_id);
+        if ($order->restaurant->admin->is_sms) {
+            SendSms::send($order->phone, $message, $restaurant->admin_id);
+        }
 
         if (Auth::guard('restaurant')->check()) {
             $printers = Printer::where('payable_type', 'restaurant')->where('payable_id', $restaurant->id)->pluck('name')->toArray();
@@ -96,8 +98,10 @@ $avgDurations = OrderStatusLog::select('restaurant_id', 'status', DB::raw('AVG(d
         $restaurant = Restaurant::find($order->restaurant_id);
 
         //sipariş kuryeye verildiyse
-        if ($order->status == OrderStatus::HANDOVER) {
-            SendSms::send($order->phone, 'Sayın ' . $order->full_name . ', ' . $order->tracking_id . ' numaralı siparişiniz yola çıkmıştır.', $restaurant->admin_id);
+        if ($order->status == OrderStatus::PREPARED) {
+            if ($order->restaurant->admin->is_sms){
+                SendSms::send($order->phone, 'Sayın ' . $order->full_name . ', ' . $order->tracking_id . ' numaralı siparişiniz yola çıkmıştır.', $restaurant->admin_id);
+            }
 
             if (Admin::where('id', $restaurant->admin_id)->first()->auto_orders) {
                 if ($order) {
