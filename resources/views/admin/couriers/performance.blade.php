@@ -5,7 +5,7 @@
             <i class="material-icons align-middle">
                 {{request('courier_id') ? App\Models\Courier::find(request('courier_id'))->name : ''}}
             </i>
-           <strong> Kurye Performansı</strong>
+            <strong> Kurye Performansı</strong>
         </p>
 
         {{-- 🔍 Filtreleme Formu --}}
@@ -18,7 +18,8 @@
                             <select name="courier_id" class="form-select">
                                 <option value="">Tümü</option>
                                 @foreach($couriers as $courier)
-                                    <option value="{{ $courier->id }}" {{ request('courier_id') == $courier->id ? 'selected' : '' }}>
+                                    <option
+                                        value="{{ $courier->id }}" {{ request('courier_id') == $courier->id ? 'selected' : '' }}>
                                         {{ $courier->name }}
                                     </option>
                                 @endforeach
@@ -26,14 +27,18 @@
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Tarih</label>
-                            <input type="date" name="date" class="form-control" value="{{ request('date', now()->toDateString()) }}">
+                            <input type="date" name="date" class="form-control"
+                                   value="{{ request('date', now()->toDateString()) }}">
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Zaman Aralığı</label>
                             <select name="period" class="form-select">
-                                <option value="daily" {{ request('period') == 'daily' ? 'selected' : '' }}>Günlük</option>
-                                <option value="weekly" {{ request('period') == 'weekly' ? 'selected' : '' }}>Haftalık</option>
-                                <option value="monthly" {{ request('period') == 'monthly' ? 'selected' : '' }}>Aylık</option>
+                                <option value="daily" {{ request('period') == 'daily' ? 'selected' : '' }}>Günlük
+                                </option>
+                                <option value="weekly" {{ request('period') == 'weekly' ? 'selected' : '' }}>Haftalık
+                                </option>
+                                <option value="monthly" {{ request('period') == 'monthly' ? 'selected' : '' }}>Aylık
+                                </option>
                             </select>
                         </div>
                         <div class="col-md-3 d-flex align-items-end">
@@ -57,7 +62,8 @@
             <div class="tab-pane fade show active" id="summary">
                 <div class="card shadow-sm">
                     <div class="card-body">
-                        <h5>📅 Seçilen Aralık: <strong>{{ $startDate->format('Y-m-d') }} - {{ $endDate->format('Y-m-d') }}</strong></h5>
+                        <h5>📅 Seçilen Aralık: <strong>{{ $startDate->format('Y-m-d') }}
+                                - {{ $endDate->format('Y-m-d') }}</strong></h5>
 
                         <div class="table-responsive mt-3">
                             <table class="table table-bordered align-middle text-center">
@@ -69,22 +75,31 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                @foreach ($statusSummary as $row)
+                                @if($statusSummary->isEmpty())
                                     <tr>
-                                        <td>
-                                            <a href="#" data-bs-toggle="modal" data-bs-target="#courierModal{{ $row->courier_id }}">
-                                                {{ $couriers->firstWhere('id', $row->courier_id)?->name ?? 'Bilinmiyor' }}
-                                            </a>
+                                        <td colspan="3" class="text-center text-muted py-4">
+                                            🔍 Kurye Teslimat Performans Verileri Bulunmuyor...
                                         </td>
-                                        <td>
-                                            @php
-                                                $statuses = ['break' => 'Molada', 'service' => 'Serviste', 'active' => 'Müsait', 'passive' => 'Pasif'];
-                                            @endphp
-                                            {{ $statuses[$row->status] ?? ucfirst($row->status) }}
-                                        </td>
-                                        <td>{{ round($row->total_duration / 60, 2) }}</td>
                                     </tr>
-                                @endforeach
+                                @else
+                                    @foreach ($statusSummary as $row)
+                                        <tr>
+                                            <td>
+                                                <a href="#" data-bs-toggle="modal"
+                                                   data-bs-target="#courierModal{{ $row->courier_id }}">
+                                                    {{ $couriers->firstWhere('id', $row->courier_id)?->name ?? 'Bilinmiyor' }}
+                                                </a>
+                                            </td>
+                                            <td>
+                                                @php
+                                                    $statuses = ['break' => 'Molada', 'service' => 'Serviste', 'active' => 'Müsait', 'passive' => 'Pasif'];
+                                                @endphp
+                                                {{ $statuses[$row->status] ?? ucfirst($row->status) }}
+                                            </td>
+                                            <td>{{ round($row->total_duration / 60, 2) }}</td>
+                                        </tr>
+                                    @endforeach
+                                @endif
                                 </tbody>
                             </table>
                         </div>
@@ -124,7 +139,8 @@
                                 @foreach ($topStatusList as $row)
                                     <tr>
                                         <td>
-                                            <a href="#" data-bs-toggle="modal" data-bs-target="#courierModal{{ $row->courier_id }}">
+                                            <a href="#" data-bs-toggle="modal"
+                                               data-bs-target="#courierModal{{ $row->courier_id }}">
                                                 {{ $couriers->firstWhere('id', $row->courier_id)?->name ?? 'Bilinmiyor' }}
                                             </a>
                                         </td>
@@ -147,7 +163,8 @@
 
         {{-- 🔍 Kurye Modalları --}}
         @foreach ($couriers as $courier)
-            <div class="modal fade" id="courierModal{{ $courier->id }}" tabindex="-1" aria-labelledby="courierModalLabel{{ $courier->id }}" aria-hidden="true">
+            <div class="modal fade" id="courierModal{{ $courier->id }}" tabindex="-1"
+                 aria-labelledby="courierModalLabel{{ $courier->id }}" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content shadow">
                         <div class="modal-header">
@@ -157,13 +174,17 @@
                         <div class="modal-body">
                             <ul class="list-group">
                                 <li class="list-group-item"><strong>Telefon:</strong> {{ $courier->phone }}</li>
-                                <li class="list-group-item"><strong>Doğum Tarihi:</strong> {{ $courier->birthday ?? '-' }}</li>
+                                <li class="list-group-item"><strong>Doğum
+                                        Tarihi:</strong> {{ $courier->birthday ?? '-' }}</li>
                                 <li class="list-group-item"><strong>Fiyat Tipi:</strong> {{ $courier->price_type }}</li>
                                 <li class="list-group-item"><strong>Fiyat:</strong> {{ $courier->price }}</li>
-                                <li class="list-group-item"><strong>Online Durum:</strong> {{ $courier->online ? 'Online' : 'Offline' }}</li>
+                                <li class="list-group-item"><strong>Online
+                                        Durum:</strong> {{ $courier->online ? 'Online' : 'Offline' }}</li>
                                 <li class="list-group-item"><strong>Durum:</strong> {{ ucfirst($courier->status) }}</li>
-                                <li class="list-group-item"><strong>Son Atama:</strong> {{ $courier->last_assigned_at }}</li>
-                                <li class="list-group-item"><strong>Konum:</strong> {{ $courier->latitude }}, {{ $courier->longitude }}</li>
+                                <li class="list-group-item"><strong>Son Atama:</strong> {{ $courier->last_assigned_at }}
+                                </li>
+                                <li class="list-group-item"><strong>Konum:</strong> {{ $courier->latitude }}
+                                    , {{ $courier->longitude }}</li>
                             </ul>
                         </div>
                         <div class="modal-footer">
@@ -176,45 +197,43 @@
     </div>
 
     {{-- Chart.js --}}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const statusChart = new Chart(document.getElementById('statusChart'), {
+            type: 'pie',
+            data: {
+                labels: {!! json_encode($statusSummary->pluck('status')->map(fn($s) => $statuses[$s] ?? ucfirst($s))) !!},
+                datasets: [{
+                    label: 'Durum Süreleri',
+                    data: {!! json_encode($statusSummary->pluck('total_duration')->map(fn($s) => round($s / 60, 2))) !!},
+                    backgroundColor: ['#4caf50', '#2196f3', '#ff9800', '#9c27b0'],
+                    borderWidth: 1
+                }]
+            }
+        });
 
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script>
-            const statusChart = new Chart(document.getElementById('statusChart'), {
-                type: 'pie',
-                data: {
-                    labels: {!! json_encode($statusSummary->pluck('status')->map(fn($s) => $statuses[$s] ?? ucfirst($s))) !!},
-                    datasets: [{
-                        label: 'Durum Süreleri',
-                        data: {!! json_encode($statusSummary->pluck('total_duration')->map(fn($s) => round($s / 60, 2))) !!},
-                        backgroundColor: ['#4caf50', '#2196f3', '#ff9800', '#9c27b0'],
-                        borderWidth: 1
-                    }]
-                }
-            });
-
-            const topStatusChart = new Chart(document.getElementById('topStatusChart'), {
-                type: 'bar',
-                data: {
-                    labels: {!! json_encode($topStatusList->map(fn($row) => $couriers->firstWhere('id', $row->courier_id)?->name . ' - ' . ($statuses[$row->status] ?? ucfirst($row->status)))) !!},
-                    datasets: [{
-                        label: 'Süre (dk)',
-                        data: {!! json_encode($topStatusList->pluck('total_duration')->map(fn($s) => round($s / 60, 2))) !!},
-                        backgroundColor: '#03a9f4'
-                    }]
+        const topStatusChart = new Chart(document.getElementById('topStatusChart'), {
+            type: 'bar',
+            data: {
+                labels: {!! json_encode($topStatusList->map(fn($row) => $couriers->firstWhere('id', $row->courier_id)?->name . ' - ' . ($statuses[$row->status] ?? ucfirst($row->status)))) !!},
+                datasets: [{
+                    label: 'Süre (dk)',
+                    data: {!! json_encode($topStatusList->pluck('total_duration')->map(fn($s) => round($s / 60, 2))) !!},
+                    backgroundColor: '#03a9f4'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {display: false},
                 },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { display: false },
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: { display: true, text: 'Dakika' }
-                        }
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {display: true, text: 'Dakika'}
                     }
                 }
-            });
-        </script>
-
+            }
+        });
+    </script>
 @endsection

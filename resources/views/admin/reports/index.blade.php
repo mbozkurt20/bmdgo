@@ -57,7 +57,7 @@
         .summary-box {
             background: #ec691e;
             color: white;
-            border-radius: 12px;
+            gap: 5px;
             padding: 16px;
             text-align: center;
             font-weight: 600;
@@ -132,7 +132,7 @@
         <div class="card card-custom">
             <div class="card-body" id="reportList">
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover">
+                    <table class="table table-striped">
                         <thead class="table-bordered">
                         <tr>
                             <th>Platform</th>

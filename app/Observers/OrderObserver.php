@@ -69,6 +69,8 @@ class OrderObserver
 
     public function updated(Order $order)
     {
+        $order = Order::find($order->id);
+
         /*
          * Şu anki status’u öğrenmek:
          * $currentStatus = OrderStatusLog::where('order_id', $orderId)
@@ -111,11 +113,15 @@ $avgDurations = OrderStatusLog::select('restaurant_id', 'status', DB::raw('AVG(d
         }
 
         if ($order->status == OrderStatus::DELIVERED) {
-            SendSms::send($order->phone, 'Sayın ' . $order->full_name . ', ' . $order->tracking_id . ' numaralı siparişiniz teslim edilmiştir. \n \n Bizi tercih ettiğiniz için teşekkür ederiz.', $restaurant->admin_id);
+            if ($order->restaurant->admin->is_sms){
+                SendSms::send($order->phone, 'Sayın ' . $order->full_name . ', ' . $order->tracking_id . ' numaralı siparişiniz teslim edilmiştir. \n \n Bizi tercih ettiğiniz için teşekkür ederiz.', $restaurant->admin_id);
+            }
 
-            $courier = Courier::find($order->courier_id);
-            $courier->status = CourierStatus::active;
-            $courier->update();
+            if ($order->courier_id != -1){
+                $courier = Courier::find($order->courier_id);
+                $courier->status = CourierStatus::active;
+                $courier->update();
+            }
         }
 
         $pusher = new Pusher(

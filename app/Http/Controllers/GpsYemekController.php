@@ -182,6 +182,13 @@ class GpsYemekController extends Controller
             ];
 
             Order::create($orderData);
+
+            dd($restaurant,$row,OrdersHelper::haversineDistance(
+                $restaurant->latitude,
+                $restaurant->longitude,
+                $row['lat'],
+                $row['long']
+            ));
         }
     }
 }

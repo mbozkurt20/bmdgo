@@ -44,7 +44,7 @@ return [
              *
              */
             'credentials' => [
-                'file' => env('FIREBASE_CREDENTIALS', base_path('config/bmdgo-39e83-firebase-adminsdk-fbsvc-08d0d45b62.json')),
+                'file' => env('FIREBASE_CREDENTIALS', base_path('config/gpskurye-firebase-adminsdk-fbsvc-757a0bd381.json')),
             ],
 
             /*

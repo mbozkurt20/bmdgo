@@ -313,12 +313,9 @@ class OrderController extends Controller
 
             $city = City::find(Admin::find(auth()->user()->admin_id)->city_id);
 
-            $address = $request->mahalle . ' mah. ' .
-                $request->sokak_cadde . ' sokak. Bina No:' .
-                $request->bina_no . ' Kat:' .
-                $request->kat . ' Daire No:' .
-                $request->daire_no . ' ' .
-                District::find($request->ilce)->name . '/' . $city->name . ' Türkiye';
+            $address = $request->mahalle . ' mah., ' .
+                $request->sokak_cadde . ', '.
+                District::find($request->ilce)->name . '/' . $city->name . ', Türkiye';
 
             $location = GeoLocation::getLatLong($address);
 
@@ -495,12 +492,9 @@ class OrderController extends Controller
             $create->save();
         }
 
-        $address = $request->mahalle . ' mah. ' .
-            $request->sokak_cadde . ' sokak. ' .
-            $request->bina_no . ' Apt.:' .
-            $request->kat . ' Kat:' .
-            $request->daire_no . ' Daire No' .
-            District::find($request->ilce)->name . '/' . $city->name . ' Türkiye';
+        $address = $request->mahalle . ' mah., ' .
+            $request->sokak_cadde . ', '.
+            District::find($request->ilce)->name . '/' . $city->name . ', Türkiye';
 
         $location = GeoLocation::getLatLong($address);
 

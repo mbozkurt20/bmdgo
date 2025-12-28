@@ -53,6 +53,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('/yemeksepeti/updateOrderStatus', [App\Http\Controllers\OrderController::class, 'updateOrderStatus']);
         Route::post('/getir/updateOrderStatus', [App\Http\Controllers\OrderController::class, 'updateOrderStatus']);
         Route::post('/adisyo/updateOrderStatus', [App\Http\Controllers\AdisyoController::class, 'updateOrder']);
+        Route::post('/gpsyemek/updateOrderStatus', [App\Http\Controllers\GpsYemekController::class, 'updateOrder']);
+
         Route::post('/orders/message', [App\Http\Controllers\OrderController::class, 'message']);
 
         /* Restaurants */
