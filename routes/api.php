@@ -27,10 +27,6 @@ Route::get('/getPlatformAdisyo', [App\Http\Controllers\AdisyoController::class, 
 
 Route::post('/getPlatformGetirYemek/create', [App\Http\Controllers\GetirYemekController::class, 'createExe']);
 
-
-Route::get('/getCourierOrder', [App\Http\Controllers\ApiController::class, 'getCourierOrder']);
-
-
 //Kurye App
 /*
 Route::post('/verify/order-code', [App\Http\Controllers\ApiController::class, 'verifyOrderCode']);
