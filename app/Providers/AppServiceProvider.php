@@ -44,6 +44,12 @@ class AppServiceProvider extends ServiceProvider
 
         View::composer('*', function ($view) {
             if (Auth::guard('restaurant')->check()) {
+                if (!isset(Auth::user()->id)){
+                    Auth::guard('restaurant')->logout();
+                    Auth::guard('admin')->logout();
+                    Auth::guard('superadmin')->logout();
+                }
+
                 $restaurantId = Auth::user()->id;
 
                 $courierses = Courier::where('status', 'active')
