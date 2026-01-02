@@ -93,6 +93,10 @@ class GpsYemekController extends Controller
 
     private function orders($restaurant)
     {
+        if ($restaurant->admin->top_up_balance <= 0) {
+            return;
+        }
+
         $api_token = $restaurant->gpsyemek_api_key;
 
         $response = Http::withHeaders([
