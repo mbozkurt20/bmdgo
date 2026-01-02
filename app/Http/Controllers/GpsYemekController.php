@@ -110,7 +110,7 @@ class GpsYemekController extends Controller
             }
 
             $address = json_decode($row['address']);
-            $create  = Customer::where('email',$row['customer']['email'])->where('name',  $row['customer']['first_name']." ". $row['customer']['last_name'])->where('restaurant_id',$restaurant->id)->where('phone',$row['customer']['phone'])->first();
+            $create  = Customer::where('email',$row['customer']['email'])->where('restaurant_id',$restaurant->id)->where('phone',$row['customer']['phone'])->first();
             if (!$create) {
                 $create = new Customer();
                 $create->restaurant_id = $restaurant->id; // Assuming the authenticated user is the restaurant
