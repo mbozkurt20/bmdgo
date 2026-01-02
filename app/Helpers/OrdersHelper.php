@@ -84,7 +84,7 @@ class OrdersHelper
                 'title' => 'Yetersiz Kontör Bakiyesi',
                 'description' => 'Üzgünüz, Kontor bakiyeniz yetersiz olduğu için ürün eklemesi yapılamıyor!!',
                 'url' => route('admin.balance'),
-                'adömin_id' => $adminId ?? $admin->id,
+                'admin_id' => $adminId ?? $admin->id,
             ]);
 
             return false;
