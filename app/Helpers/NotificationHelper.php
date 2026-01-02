@@ -25,6 +25,6 @@ class NotificationHelper
         );
 
 
-        $pusher->trigger('notifications-'.Auth::user()->id, 'new-notify-'.Auth::user()->id, $data);
+        $pusher->trigger('notifications-'.Auth::user()->id, 'new-notify-'.$data['admin_id'] ?? Auth::user()->id, $data);
     }
 }
