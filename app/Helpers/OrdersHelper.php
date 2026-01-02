@@ -83,7 +83,8 @@ class OrdersHelper
             NotificationHelper::add([
                 'title' => 'Yetersiz Kontör Bakiyesi',
                 'description' => 'Üzgünüz, Kontor bakiyeniz yetersiz olduğu için ürün eklemesi yapılamıyor!!',
-                'url' => route('admin.balance')
+                'url' => route('admin.balance'),
+                'adömin_id' => $adminId ?? $admin->id,
             ]);
 
             return false;

@@ -21,7 +21,7 @@ class OrderObserver
 {
     public function creating(Order $order)
     {
-        OrdersHelper::updateTopup(null, $order->restaurant_id);
+        OrdersHelper::updateTopup($order->restaurant->admin->id, $order->restaurant_id);
     }
 
     public function created(Order $order)
