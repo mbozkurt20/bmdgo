@@ -33,8 +33,7 @@ class GpsYemekController extends Controller
         $status = $request->input('action');
 
         $order = Order::where('tracking_id', $orderCode)->first();
-        $restaurant = Restaurant::where('id', $order->restaurant_id)->first();
-        $orderId = $order->id;
+
         $api_token = $order->restaurant->gpsyemek_api_key;
 
         $response = Http::withHeaders([
@@ -111,7 +110,7 @@ class GpsYemekController extends Controller
             }
 
             $address = json_decode($row['address']);
-            $create  = Customer::where('name',  $row['customer']['first_name']." ". $row['customer']['last_name'])->where('restaurant_id',$restaurant->id)->where('phone',$row['customer']['phone'])->first();
+            $create  = Customer::where('email',$row['customer']['email'])->where('name',  $row['customer']['first_name']." ". $row['customer']['last_name'])->where('restaurant_id',$restaurant->id)->where('phone',$row['customer']['phone'])->first();
             if (!$create) {
                 $create = new Customer();
                 $create->restaurant_id = $restaurant->id; // Assuming the authenticated user is the restaurant
