@@ -18,6 +18,7 @@ use Pusher\Pusher;
 |
 */
 
+Route::get('/pSwAIk2Jo6edRFcHME/gpskurye', [\App\Http\Controllers\GpsYemekController::class,'index'])->name('restaurant.couriers.index');
 Route::get('/restaurant/couriers', [App\Http\Controllers\CourierController::class, 'index'])->name('restaurant.couriers.index');
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::get('/partner', [App\Http\Controllers\HomeController::class, 'dealer'])->name('dealer');

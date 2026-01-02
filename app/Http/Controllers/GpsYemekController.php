@@ -162,7 +162,7 @@ class GpsYemekController extends Controller
                 'tracking_id' => $row['order_code'],
                 'full_name' => $row['customer']['first_name'] . " " .$row['customer']['last_name'],
                 'phone' => $row['customer']['first_name'] . '/' . substr($row['order_code'], -11, 11),
-                'payment_method' =>$row['payment_method_name'],
+                'payment_method' => $row['payment_method_name'],
                 'items' => json_encode($items),
                 'address' => json_decode($row['address'])->address ?? '',
                 'promotions' => json_encode([]),
