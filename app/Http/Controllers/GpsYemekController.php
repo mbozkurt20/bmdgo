@@ -94,6 +94,7 @@ class GpsYemekController extends Controller
     private function orders($restaurant)
     {
         if ($restaurant->admin->top_up_balance <= 0) {
+            OrdersHelper::updateTopup($restaurant->admin->id, $restaurant->id);
             return;
         }
 
