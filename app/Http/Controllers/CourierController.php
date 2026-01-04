@@ -102,6 +102,7 @@ class CourierController extends Controller
             'latitude' => $request->input('latitude'),
             'longitude' => $request->input('longitude'),
             'code' => $this->generateCode(),
+            'is_active' => 1,
             'admin_id' => Auth::guard('admin')->user()->id,
         ]);
 

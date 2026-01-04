@@ -17,7 +17,7 @@ class CourierObserver
      */
     public function created(Courier $courier)
     {
-        //
+
     }
 
     /**
