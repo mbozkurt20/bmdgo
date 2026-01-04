@@ -43,6 +43,7 @@ class GpsYemekController extends Controller
             'event' => 'order_updated',
             'order_code' => $orderCode,
             'status' => $status,
+            'token' => $api_token,
         ]);
 
         $response = json_decode($response->body());
@@ -118,7 +119,8 @@ class GpsYemekController extends Controller
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $api_token
         ])->post('https://gpsyemek.com/api/v1/webhook/orders', [
-            'event' => 'get_orders'
+            'event' => 'get_orders',
+            'token' => $api_token,
         ]);
 
         $orders = $response->json()['orders'] ?? [];

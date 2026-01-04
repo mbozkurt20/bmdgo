@@ -103,6 +103,7 @@ class OrderController extends Controller
             $order->update();
         }
 
+
         return Json::success('Sipariş Durumu Güncellendi', new OrderResource($order));
     }
 
