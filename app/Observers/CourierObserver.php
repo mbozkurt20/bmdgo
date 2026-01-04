@@ -28,7 +28,7 @@ class CourierObserver
      */
     public function updated(Courier $courier)
     {
-        Log::info('geldi');
+        Log::info('coureir geldi');
         // 🔒 Sadece status değiştiyse devam et
         if (!$courier->wasChanged('status')) {
             return;

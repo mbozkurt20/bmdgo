@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\CourierStatus;
+use App\Helpers\NotificationHelper;
 use App\Helpers\OrdersHelper;
 use App\Helpers\OrderStatus;
 use App\Models\City;
@@ -71,7 +72,21 @@ class GpsYemekController extends Controller
                             // Kuryenin durumunu güncelle
                             $courier->status = CourierStatus::active;;
                             $courier->save();
+
+                            $order->courier_id = -1;
+                            $order->assigned_at = null;
+                            $order->status = OrderStatus::PREPARED;
+                            $order->update();
+
                             Log::info('Kurye durumu güncellendi', ['courier_id' => $courier->id]);
+
+                            if (OrdersHelper::getOrderSystem(3)) {
+                                NotificationHelper::add([
+                                    'title' => 'Kurye Paketi Reddetti',
+                                    'description' => $order->tracking_id . ' takip numaralı paket ' . $courier->name . '  kurye tarafından teslim edildi.',
+                                    'url' => route('admin.balance')
+                                ]);
+                            }
                         }
                     }
                     break;

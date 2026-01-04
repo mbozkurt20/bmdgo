@@ -36,6 +36,7 @@ class CreateOrdersTable extends Migration
             $table->string('message')->nullable(); //iptal mesajı
             $table->string('distance')->nullable();
             $table->string('status');
+            $table->string('assigned_at')->nullable();
             $table->timestamps();
         });
     }

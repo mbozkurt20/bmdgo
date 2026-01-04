@@ -8,6 +8,7 @@ use App\Helpers\OrdersHelper;
 use App\Helpers\OrderStatus;
 use App\Helpers\Pusher;
 use App\Http\Controllers\Controller;
+use App\Jobs\CheckCourierTimeoutJob;
 use App\Models\Courier;
 use App\Models\Admin;
 use App\Models\Order;
@@ -303,8 +304,12 @@ class CourierController extends Controller
         $courier = Courier::find($courierId);
 
         $order->courier_id = $courier->id;
+        $order->assigned_at = Carbon::now();
         $order->status = OrderStatus::ASSIGNED;
         $order->save();
+
+        CheckCourierTimeoutJob::dispatch($order->id)
+            ->delay(now()->addMinutes(2));
 
         // Kuryeyi servide de yap ve son atama zamanını güncelle
         $courier->last_assigned_at = now();

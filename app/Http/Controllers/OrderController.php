@@ -7,6 +7,7 @@ use App\Helpers\GeoLocation;
 use App\Helpers\NotificationHelper;
 use App\Helpers\OrdersHelper;
 use App\Helpers\OrderStatus;
+use App\Jobs\CheckCourierTimeoutJob;
 use App\Models\Admin;
 use App\Models\City;
 use App\Models\District;
@@ -61,8 +62,13 @@ class OrderController extends Controller
         $courier = Courier::find($courierId);
 
         $order->courier_id = $courier->id;
+        $order->assigned_at = Carbon::now();
         $order->status = OrderStatus::ASSIGNED;
         $order->save();
+
+        // 2 dakika sonra kuryenin siparişi alıp almadığını kontrol et
+        CheckCourierTimeoutJob::dispatch($order->id)
+            ->delay(now()->addMinutes(2));
 
         // Kuryeyi servide de yap ve son atama zamanını güncelle
         $courier->last_assigned_at = now();
@@ -632,6 +638,30 @@ class OrderController extends Controller
 
         if (!$order) {
             return response()->json(['error' => 'Order not found'], 404);
+        }
+
+        if ($action == OrderStatus::UNSUPPLIED) {
+            $courier = Order::where('tracking_id', $trackingId)->where('courier_id','!=',-1)->with('courier')->first();
+            if ($courier) {
+                $courier->status = CourierStatus::active;
+                $courier->update();
+
+                $order->courier_id = -1;
+                $order->update();
+
+                $courierOrder = CourierOrder::where('order_id',$order->id)->where('courier_id',$courier->id)->first();
+                if ($courierOrder) {
+                    $courierOrder->delete();
+                }
+
+                if (OrdersHelper::getOrderSystem(3)) {
+                    NotificationHelper::add([
+                        'title' => 'Restaurant Paketi İptal Etti',
+                        'description' => $order->tracking_id . ' takip numaralı paket ' . $courier->name . '  Restaurant tarafından iptal edildi.',
+                        'url' => route('admin.balance')
+                    ]);
+                }
+            }
         }
 
         $order->status = $action;

@@ -83,8 +83,8 @@ class RestaurantsController extends Controller
         $create->name = $data['name'];
         $create->email = $data['email'];
         $create->phone = $data['phone'];
-        if (isset($data->password)) {
-            $create->password = Hash::make($data['password']);
+        if ($request->password) {
+            $create->password = Hash::make($request->password);
         }
         $create->tax_name = $request->tax_name;
         $create->tax_number = $request->tax_number;
@@ -95,8 +95,7 @@ class RestaurantsController extends Controller
         $create->status = $request->status;
         $create->latitude = $request->latitude;
         $create->longitude = $request->longitude;
-
-        $create->save();
+        $create->update();
 
         return redirect()->back()->with('message', 'İşyeri bilgileri güncellendi.');
     }

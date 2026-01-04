@@ -405,7 +405,17 @@
 
                 if (data == "OK") {
                     $('#Courier' + order).modal('hide'); // modalı gizle
-                    Swal.fire('Kurye Başarıyla Atandı');
+                    Swal.fire({
+                        title: 'Kurye Başarıyla Atandı',
+                        icon: 'success',
+                        confirmButtonText: 'Tamam',
+                        background: '#fff',
+                        customClass: {
+                            popup: 'swal-radius',
+                            confirmButton: 'swal-btn'
+                        }
+                    });
+
 
                     fetchOrders();
                 } else if (data == "ERR") {

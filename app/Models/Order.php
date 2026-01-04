@@ -33,6 +33,7 @@ class Order extends Model
         'distance',
         'platform_date',
         'created_at',
+        'assigned_at',
     ];
 
     public function restaurant(): BelongsTo

@@ -11,6 +11,7 @@ use App\Models\Order;
 use App\Models\Courier;
 use App\Models\Restaurant;
 use App\Services\PushNotificationService;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -43,8 +44,12 @@ class AssignPendingOrders implements ShouldQueue
             if ($courier) {
                 // Siparişi kuryeye ata
                 $order->courier_id = $courier->id;
+                $order->assigned_at = Carbon::now();
                 $order->status = OrderStatus::ASSIGNED;
                 $order->update();
+
+                CheckCourierTimeoutJob::dispatch($order->id)
+                    ->delay(now()->addMinutes(2));
 
                 // Kuryeyi busy yap ve son atama zamanını güncelle
                 $courier->last_assigned_at = now();

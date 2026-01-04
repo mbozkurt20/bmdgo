@@ -137,7 +137,6 @@ $avgDurations = OrderStatusLog::select('restaurant_id', 'status', DB::raw('AVG(d
 
         $pusher->trigger("admin-{$restaurant->admin_id}", "update-order", ['order' => $order]);
         $pusher->trigger("restaurant-{$restaurant->id}", "update-order", ['order' => $order]);
-
     }
 
     /**

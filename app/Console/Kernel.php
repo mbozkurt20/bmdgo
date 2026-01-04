@@ -30,7 +30,7 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')->hourly();
         // $schedule->command('adisyo:getOrders')->everyMinute();
 
-        $schedule->job(new AssignPendingOrders)->everyMinute();
+        //$schedule->job(new AssignPendingOrders)->everyMinute();
 
         $schedule->call(function () {
             $tyc = app(TrendyolYemekController::class);

@@ -71,6 +71,7 @@ class OrderController extends Controller
            $courier->update();
 
            $order->courier_id = -1;
+           $order->assigned_at = null;
            $order->status = OrderStatus::PREPARED;
            $order->update();
 
@@ -82,7 +83,7 @@ class OrderController extends Controller
             if (OrdersHelper::getOrderSystem(3)) {
                 NotificationHelper::add([
                     'title' => 'Kurye Paketi Reddetti',
-                    'description' => $order->tracking_id . ' takip numaralı paket ' . $courier->name . '  kurye tarafından teslim edildi.',
+                    'description' => $order->tracking_id . ' takip numaralı paket ' . $courier->name . '  kurye tarafından reddedildi..',
                     'url' => route('admin.balance')
                 ]);
             }
@@ -101,7 +102,6 @@ class OrderController extends Controller
             $order->status = OrderStatus::HANDOVER;
             $order->update();
         }
-
 
         return Json::success('Sipariş Durumu Güncellendi', new OrderResource($order));
     }
