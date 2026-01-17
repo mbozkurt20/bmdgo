@@ -49,5 +49,5 @@ include __DIR__ . '/app/adminRoutes.php';
 include __DIR__ . '/app/restaurantRoutes.php';
 include __DIR__ . '/app/partnerRoutes.php';
 
-Route::post('/order/add-online-order', [App\Http\Controllers\Api\OrderController::class, 'addOnlineOrder']);
-Route::post('/order/cancel-order', [App\Http\Controllers\Api\OrderController::class, 'cancelEntegraOrder']);
+Route::post('/entegra/add-order', [App\Http\Controllers\Api\OrderController::class, 'addOrder']);
+Route::post('/entegra/cancel-order', [App\Http\Controllers\Api\OrderController::class, 'cancelOrder']);
