@@ -100,6 +100,14 @@ class OrderController extends Controller
 
     public function cancelOrder(Request $request)
     {
-        Log::info('İptal Edilen Data', (array)json_encode($request->all()));
+        $orderData = $request->json()->all();
+
+        $order = Order::where('tracking_id' , $orderData['shortCode'])->first();
+
+        $order->update([
+            'status' => OrderStatus::UNSUPPLIED
+        ]);
+
+        return response()->json(['success' => true, 'order' => $order]);
     }
 }
