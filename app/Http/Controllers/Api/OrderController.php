@@ -93,7 +93,9 @@ class OrderController extends Controller
             )
         ];
 
-        Order::create($orderData);
+        $order = Order::create($orderData);
+
+        return response()->json(['success' => true, 'order' => $order]);
     }
 
     public function cancelOrder(Request $request)
