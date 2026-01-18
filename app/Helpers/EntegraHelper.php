@@ -56,45 +56,56 @@ class EntegraHelper {
         return json_decode($response);
     }
 
-    public static function patchProvider($restaurant,$platform)
+    public static function patchProvider($restaurant, $platform)
     {
-        $curl = curl_init();
+        $providerMap = [
+            'yemeksepeti' => 1,
+            'trendyol'    => 2,
+            'getir'       => 3,
+            'migros'      => 4,
+        ];
 
-        $providerId = "";
-        switch ($platform) {
-            case 'yemeksepeti':
-                $providerId = 1;
-                break;
-            case 'trendyol':
-                $providerId = 2;
-                break;
-            case 'getir':
-                $providerId = 3;
-                break;
-            case 'migros':
-                $providerId = 4;
-                break;
+        if (!isset($providerMap[$platform])) {
+            throw new \Exception('Geçersiz platform');
         }
 
-        curl_setopt_array($curl, array(
+        $providerId = $providerMap[$platform];
+
+        $fet = json_decode($restaurant->$platform);
+
+        // 🔥 JSON olarak düzgün payload
+        $payload = [
+            'status'        => (bool) ($fet->status ?? false),
+            'otomatikOnay'  => (bool) ($fet->otomatikOnay ?? false),
+            'information'   => $fet->information ?? [],
+            'service'       => $fet->service ?? null,
+            'doNotKnock'    => $fet->doNotKnock ?? null,
+            'dropOffAtDoor' => $fet->dropOffAtDoor ?? null,
+            'isEcoFriendly' => $fet->isEcoFriendly ?? null,
+        ];
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, [
             CURLOPT_URL => "https://integration.emisoft.com.tr/api/v1/restaurant/{$restaurant->entegra_restaurant_id}/provider/{$providerId}",
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS => $restaurant->$platform,
-            CURLOPT_HTTPHEADER => array(
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_CUSTOMREQUEST => 'POST', // ❗ PATCH ise PATCH
+            CURLOPT_POSTFIELDS => json_encode($payload, JSON_UNESCAPED_UNICODE),
+            CURLOPT_HTTPHEADER => [
                 'Content-Type: application/json',
-            ),
-        ));
+                'Accept: application/json',
+            ],
+        ]);
 
         $response = curl_exec($curl);
 
+        if ($response === false) {
+            throw new \Exception(curl_error($curl));
+        }
+
         curl_close($curl);
 
-        return json_decode($response);
+        return json_decode($response, true);
     }
 }

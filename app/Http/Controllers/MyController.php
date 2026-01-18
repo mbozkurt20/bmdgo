@@ -40,7 +40,7 @@ class MyController extends Controller
                 'password' => $restaurant->name.'.'.$restaurant->code
             ]);
 
-            if ($businessRes->success){
+            if ($businessRes['success']){
                 $restaurantRes = EntegraHelper::newRestaurant([
                     'name' => $restaurant->name,
                     'businessId' => $businessRes->data->id,
@@ -55,7 +55,7 @@ class MyController extends Controller
 
         $providerRes = EntegraHelper::patchProvider($restaurant,$platform);
 
-        if ($providerRes->success){
+        if ($providerRes['success']){
             $restaurant->update();
             return redirect()->back()->with('message', 'Entegrasyon Güncellenmesi Tamamlandı.');
         }

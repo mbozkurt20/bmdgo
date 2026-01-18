@@ -11,7 +11,6 @@ use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use App\Jobs\AssignOrderToCourier;
 
 class OrderController extends Controller
 {
@@ -19,79 +18,77 @@ class OrderController extends Controller
     {
         Log::info('Gelen Data', (array)json_encode($request->all()));
 
-        $order = Order::where('tracking_id', $row['order_code'])->first();
-        if ($order) {
-            continue;
-        }
+        $orderData = $request->json()->all();
 
-        $address = json_decode($row['address']);
-        $create  = Customer::where('email',$row['customer']['email'])->first();
+        $address = $orderData['client']['deliveryAddress'];
+        $restaurant = Restaurant::where('entegra_restaurant_id',$orderData['restaurantId'])->first();
+
+        $create  = Customer::where('phone',$orderData['client']['phone'])->first();
         if (!$create) {
             $create = new Customer();
             $create->restaurant_id = $restaurant->id; // Assuming the authenticated user is the restaurant
-            $create->name = $row['customer']['first_name'] . " " . $row['customer']['last_name'];
-            $create->phone = $row['customer']['phone'];
-            $create->mobile = $row['mobile'];
-            $create->email = $row['customer']['email'] ?? null;
+            $create->name =  $orderData['client']['name'];
+            $create->phone = $orderData['client']['clientPhoneNumber'];
+            $create->mobile = $orderData['client']['contactPhoneNumber'];
+            $create->email =$orderData['client']['id'] ?? null;
             $create->save();
 
             if ($create) {
                 $addr = new CustomerAddress();
                 $addr->customer_id = $create->id;
                 $addr->restaurant_id = $restaurant->id;
-                $addr->name = $row['customer']['first_name'] . " " . $row['customer']['last_name'] . '-GpsYemek';
-                $addr->sokak_cadde = ' ';
-                $addr->bina_no = $address->apartment;
+                $addr->name = $orderData['client']['name'];
+                $addr->sokak_cadde =  $orderData['client']['deliveryAddress']['street'] ?? " ";
+                $addr->bina_no = $orderData['client']['deliveryAddress']['aptNo'] ?? " ";
                 $addr->city_id = ' ';
-                $addr->kat = ' ';
-                $addr->latitude = $row['lat'];
-                $addr->longitude = $row['long'];
-                $addr->daire_no = ' ';
+                $addr->kat = $orderData['client']['deliveryAddress']['floor'];;
+                $addr->latitude = $orderData['client']['location']['lat'];
+                $addr->longitude =$orderData['client']['location']['lon'];
+                $addr->daire_no = $orderData['client']['deliveryAddress']['doorNo'];
                 $addr->mahalle = ' ';
-                $addr->adres_tarifi = $address->address ?? '';
+                $addr->adres_tarifi = $orderData['client']['deliveryAddress']['address'] ?? '';
                 $addr->save();
             }
         }
 
         $items = [];
 
-        foreach ($row['items'] as $item) {
+        foreach ($orderData['products'] as $item) {
             $items[] = [
-                'price' => $item['item_total'],              // toplam fiyat
-                'unitSellingPrice' => $item['unit_price'],   // birim fiyat
+                'price' => $item['totalPrice'],              // toplam fiyat
+                'unitSellingPrice' => $item['price'],   // birim fiyat
                 'discountedPrice' => $item['discounted_price'],   // birim fiyat
-                'quantity' => (string) $item['quantity'],    // string isteniyorsa
-                'name' => $item['menu_item']['name'],        // ürün adı
-                'image' => $item['menu_item']['image'],        // ürün adı
-                'restaurant_id' => $item['restaurant_id'],        // ürün adı
+                'quantity' => (string) $item['count'],    // string isteniyorsa
+                'name' => $item['name']['tr'],        // ürün adı
+                'image' => " ",        // ürün adı
             ];
         }
 
         $orderData = [
-            'platform' => 'gpsyemek',
+            'platform' => $orderData['provider']['slug'],
             'customer_id' => $create->id,
             'restaurant_id' => $restaurant->id,
             'courier_id' => -1,
             'status' => OrderStatus::PENDING,
-            'tracking_id' => $row['order_code'],
-            'full_name' => $row['customer']['first_name'] . " " .$row['customer']['last_name'],
-            'phone' => $row['customer']['first_name'] . '/' . substr($row['order_code'], -11, 11),
-            'payment_method' => $row['payment_method_name'],
+            'tracking_id' => $orderData['shortCode'],
+            'full_name' => $orderData['client']['name'],
+            'phone' =>  $orderData['client']['contactPhoneNumber'],
+            'payment_method' => $orderData['paymentMethodText']['tr'],
             'items' => json_encode($items),
-            'address' => json_decode($row['address'])->address ?? '',
+            'address' => $orderData['client']['deliveryAddress']['address'],
             'promotions' => json_encode([]),
             'coupon' => json_encode([]),
-            'sub_amount' => $row['sub_total'],
-            'discount' => 0,
-            'amount' => $row['total'],
-            'notes' => $row['customerNote']??null,
-            'platform_date' => date('d-m-Y, H:i', strtotime($row['created_at'])),
+            'sub_amount' => $orderData['totalPrice'],
+            'discount' => $orderData['totalDiscount'],
+            'amount' => $orderData['totalDiscountedPrice'],
+            'notes' => $orderData['clientNote']??null,
+            'platform_date' => date('d-m-Y, H:i', strtotime($orderData['created_at'])),
 
             'distance' => OrdersHelper::haversineDistance(
                 $restaurant->latitude,
                 $restaurant->longitude,
-                $row['lat'],
-                $row['long']
+                $orderData['client']['location']['lat'],
+                $orderData['client']['location']['lon']
             )
         ];
 
