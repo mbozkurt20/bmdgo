@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\EntegraHelper;
 use App\Models\Admin;
 use App\Models\Restaurant;
 use App\Models\RestaurantSystemFeature;
@@ -22,22 +23,44 @@ class MyController extends Controller
     public function entegrastion_update(Request $request)
     {
         $restaurant = Restaurant::find(Auth::user()->id);
-        $restaurant->gpsyemek_api_key = $request->gpsyemek_api_key;
-        $restaurant->yemeksepeti_email = $request->yemeksepeti_email;
-        $restaurant->yemeksepeti_password = $request->yemeksepeti_password;
-        $restaurant->getir_restaurant_id = $request->getir_restaurant_id;
-        $restaurant->getir_app_secret_key = $request->getir_app_secret_key;
-        $restaurant->getir_restaurant_secret_key = $request->getir_restaurant_secret_key;
-        $restaurant->trendyol_satici_id = $request->trendyol_satici_id;
-        $restaurant->trendyol_sube_id = $request->trendyol_sube_id;
-        $restaurant->trendyol_api_key = $request->trendyol_api_key;
-        $restaurant->trendyol_secret_key = $request->trendyol_secret_key;
-        $restaurant->adisyo_api_key = $request->adisyo_api_key;
-        $restaurant->adisyo_secret_key = $request->adisyo_secret_key;
-        $restaurant->adisyo_consumer_adi = $request->adisyo_consumer_adi;
-        $restaurant->save();
+        $platform = $request->input('platform');
 
-        return redirect()->back()->with('message', 'Entegrasyon Güncellenmesi Tamamlandı.');
+        $data = $request->input('data');
+
+        if ($platform == 'gpsyemek') {
+            $restaurant->gpsyemek_api_key = $data['api_key'];
+        } else {
+            $restaurant->$platform = json_encode($data);
+        }
+
+        if (!$restaurant->entegra_restaurant_id){
+            $businessRes = EntegraHelper::newBusiness([
+                'name' => $restaurant->name,
+                'email' => $restaurant->email,
+                'password' => $restaurant->name.'.'.$restaurant->code
+            ]);
+
+            if ($businessRes->success){
+                $restaurantRes = EntegraHelper::newRestaurant([
+                    'name' => $restaurant->name,
+                    'businessId' => $businessRes->data->id,
+                    'website' => 'https://app.gpskurye.com',
+                    'website_restaurant_id' => $restaurant->id,
+                ]);
+
+                $restaurant->entegra_restaurant_id = $restaurantRes->data->restaurant_id;
+                $restaurant->save();
+            }
+        }
+
+        $providerRes = EntegraHelper::patchProvider($restaurant,$platform);
+
+        if ($providerRes->success){
+            $restaurant->update();
+            return redirect()->back()->with('message', 'Entegrasyon Güncellenmesi Tamamlandı.');
+        }
+
+        return redirect()->back()->with('message', 'Üzgünüz, bir hata meydana geldi, lütfen tekrar deneyiniz.');
     }
 
     public function smsEntegrations()
