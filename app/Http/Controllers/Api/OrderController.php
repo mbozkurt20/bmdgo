@@ -23,14 +23,14 @@ class OrderController extends Controller
         $address = $orderData['client']['deliveryAddress'];
         $restaurant = Restaurant::where('entegra_restaurant_id',$orderData['restaurantId'])->first();
 
-        $create  = Customer::where('phone',$orderData['client']['contactPhoneNumber'])->first();
+        $create  = Customer::where('email',$orderData['client']['id'])->first();
         if (!$create) {
             $create = new Customer();
             $create->restaurant_id = $restaurant->id; // Assuming the authenticated user is the restaurant
             $create->name =  $orderData['client']['name'];
             $create->phone = $orderData['client']['clientPhoneNumber'];
             $create->mobile = $orderData['client']['contactPhoneNumber'];
-            $create->email =$orderData['client']['id'] ?? null;
+            $create->email = $orderData['client']['id'] ?? null;
             $create->save();
 
             if ($create) {
