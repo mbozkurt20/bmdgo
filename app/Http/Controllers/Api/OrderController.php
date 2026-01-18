@@ -57,7 +57,8 @@ class OrderController extends Controller
             $items[] = [
                 'price' => $item['totalPrice'],              // toplam fiyat
                 'unitSellingPrice' => $item['price'],   // birim fiyat
-                'discountedPrice' => $item['discounted_price'],   // birim fiyat
+                'totalOptionPrice' => $item['totalOptionPrice'],   // birim fiyat
+                'totalPriceWithOption' => $item['totalPriceWithOption'],   // birim fiyat
                 'quantity' => (string) $item['count'],    // string isteniyorsa
                 'name' => $item['name']['tr'],        // ürün adı
                 'image' => " ",        // ürün adı
