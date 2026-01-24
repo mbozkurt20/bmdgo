@@ -80,7 +80,7 @@
                                     </div>
                                     <div class="mb-3 col-md-6">
                                         <label class="form-label">Entegra ID</label>
-                                        <input type="text" class="form-control" name="entegra_id"
+                                        <input type="text" class="form-control" name="entegra_restaurant_id"
                                                placeholder="Entegra Id">
                                     </div>
                                     <div class="mb-3 col-md-6">

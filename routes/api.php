@@ -50,7 +50,3 @@ Route::get('/caller/phoneNumber/{userId}/{phone}', [App\Http\Controllers\CallerC
 
 
 
-
-
-
-
