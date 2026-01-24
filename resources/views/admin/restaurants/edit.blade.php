@@ -83,16 +83,6 @@
                                             value="{{ $restaurant->tax_number }}" placeholder="Vergi Numarası">
                                     </div>
                                     <div class="mb-3 col-md-6">
-                                        <label class="form-label">Entegra ID</label>
-                                        <input type="text" class="form-control" name="entegra_restaurant_id"
-                                            value="{{ $restaurant->entegra_restaurant_id }}" placeholder="Entegra Id">
-                                    </div>
-                                    <div class="mb-3 col-md-6">
-                                        <label class="form-label">Entegra Token</label>
-                                        <input type="text" class="form-control" name="entegra_token"
-                                            value="{{ $restaurant->entegra_token }}" placeholder="Entegra Token">
-                                    </div>
-                                    <div class="mb-3 col-md-6">
                                         <label class="form-label">Paket Fiyatı</label>
                                         <input type="text" class="form-control" name="package_price"
                                             value="{{ $restaurant->package_price }}" placeholder="Paket Fiyatı">

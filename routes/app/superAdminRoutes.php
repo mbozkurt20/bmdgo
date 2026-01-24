@@ -22,8 +22,8 @@ Route::group(['prefix' => 'superadmin'], function () {
         Route::get('/get-districts/{cityId}', [DashboardController::class, 'getDistricts'])->name('superadmin.get_districts');
         Route::get('/dashboard', [DashboardController::class, 'home'])->name('superadmin.dashboards');
 
-        Route::get('/payment/entegrations', [App\Http\Controllers\MyController::class, 'paymentEntegrations'])->name('admin.payment.entegrations');
-        Route::post('/payment/paytr', [App\Http\Controllers\MyController::class, 'paymentUpdateEntegrations'])->name('admin.payment.paytr.update');
+        Route::get('/payment/entegrations', [App\Http\Controllers\MyController::class, 'paymentEntegrations'])->name('superadmin.payment.entegrations');
+        Route::post('/payment/paytr', [App\Http\Controllers\MyController::class, 'paymentUpdateEntegrations'])->name('superadmin.payment.paytr.update');
 
         Route::prefix('dealer')->group(function () {
             Route::get('/', [DashboardController::class, 'dealer'])->name('superadmin.dealer');

@@ -57,8 +57,6 @@ class RestaurantsController extends Controller
         $create->password = Hash::make($request->password);
         $create->tax_name = $request->tax_name;
         $create->tax_number = $request->tax_number;
-        $create->entegra_restaurant_id = $request->entegra_restaurant_id;
-        $create->entegra_token = $request->entegra_token;
         $create->package_price = $request->package_price;
         $create->address = $request->address;
         $create->latitude = $request->latitude;
@@ -89,8 +87,6 @@ class RestaurantsController extends Controller
         $create->tax_name = $request->tax_name;
         $create->tax_number = $request->tax_number;
         $create->address = $request->address;
-        $create->entegra_restaurant_id = $request->entegra_restaurant_id;
-        $create->entegra_token = $request->entegra_token;
         $create->package_price = $request->package_price;
         $create->status = $request->status;
         $create->latitude = $request->latitude;
