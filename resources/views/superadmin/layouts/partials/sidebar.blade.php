@@ -20,6 +20,14 @@
                 </a>
             </li>
             <li><a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
+                    <i class="flaticon-381-settings-5 text-white"></i>
+                    <span class="nav-text text-white">Entegrasyonlar</span>
+                </a>
+                <ul aria-expanded="false">
+                    <li><a  class="text-white" href="{{ route('superadmin.payment.entegrations') }}">Sanal Pos</a></li>
+                </ul>
+            </li>
+            <li><a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
                     <i class="flaticon-381-user text-white"></i>
                     <span class="nav-text text-white">Yöneticiler</span>
                 </a>

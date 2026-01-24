@@ -51,3 +51,7 @@ include __DIR__ . '/app/partnerRoutes.php';
 
 Route::post('/entegra/add-order', [App\Http\Controllers\Api\OrderController::class, 'addOrder']);
 Route::post('/entegra/cancel-order', [App\Http\Controllers\Api\OrderController::class, 'cancelOrder']);
+
+Route::post('/paytr/callback', [\App\Http\Controllers\PayTrPaymentController::class, 'paytrCallback'])->name('paytr.callback');
+Route::get('/paytr/success', [\App\Http\Controllers\PayTrPaymentController::class, 'payTrSuccess'])->name('paytr.success');
+Route::get('/paytr/fail',    [\App\Http\Controllers\PayTrPaymentController::class, 'payTrFail'])->name('paytr.fail');

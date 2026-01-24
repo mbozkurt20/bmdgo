@@ -5,12 +5,11 @@ namespace App\Http\Controllers;
 use App\Helpers\EntegraHelper;
 use App\Models\Admin;
 use App\Models\Restaurant;
-use App\Models\RestaurantSystemFeature;
-use App\Models\SystemFeature;
 use App\Services\VatanSmsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Artisan;
 
 class MyController extends Controller
 {
@@ -29,6 +28,8 @@ class MyController extends Controller
 
         if ($platform == 'gpsyemek') {
             $restaurant->gpsyemek_api_key = $data['api_key'];
+            $restaurant->update();
+            return redirect()->back()->with('message', 'Entegrasyon Güncellenmesi Tamamlandı.');
         } else {
             $restaurant->$platform = json_encode($data);
         }
@@ -63,6 +64,25 @@ class MyController extends Controller
         return redirect()->back()->with('message', 'Üzgünüz, bir hata meydana geldi, lütfen tekrar deneyiniz.');
     }
 
+    public function paymentEntegrations()
+    {
+        $admin = Admin::find(Auth::user()->id);
+        return view('admin.entegrations.payment', compact('admin'));
+    }
+
+    public function paymentUpdateEntegrations(REquest $request)
+    {
+        $this->setEnv([
+            'PAYTR_MERCHANT_ID'   => $request->merchant_id,
+            'PAYTR_MERCHANT_KEY'  => $request->merchant_key,
+            'PAYTR_MERCHANT_SALT' => $request->merchant_salt,
+            'PAYTR_SANDBOX'       => $request->sandbox ? 'true' : 'false',
+        ]);
+
+        Artisan::call('config:clear');
+
+        return redirect()->back()->with(['message' => 'Bilgiler Güncellendi']);
+    }
     public function smsEntegrations()
     {
         $admin = Admin::find(Auth::user()->id);
@@ -131,5 +151,26 @@ class MyController extends Controller
         $auth->save();
 
         return redirect()->back()->with('message', 'Bilgileriniz Güncellenmiştir.');
+    }
+
+    private function setEnv(array $values)
+    {
+        $envPath = base_path('.env');
+
+        $env = file_get_contents($envPath);
+
+        foreach ($values as $key => $value) {
+            if (preg_match("/^{$key}=.*/m", $env)) {
+                $env = preg_replace(
+                    "/^{$key}=.*/m",
+                    "{$key}=\"{$value}\"",
+                    $env
+                );
+            } else {
+                $env .= "\n{$key}=\"{$value}\"";
+            }
+        }
+
+        file_put_contents($envPath, $env);
     }
 }

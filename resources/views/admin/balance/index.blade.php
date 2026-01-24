@@ -25,50 +25,54 @@
                             durumdan {{env('APP_NAME')}} olarak sorumluluk almadığımızı belirtmek isteriz.</strong>
                     </p>
 
-                    <p class="text-success">
-                        <strong> Satın Alım:: </strong> Paketlerimizi <a class="text-primary"
-                                                                         style="text-decoration: underline"
-                                                                         href="https://gpskurye.com/fiyat/">{{env('APP_NAME')}} </a>
+                   {{--  <p class="text-success">
+                        <strong> Satın Alım:: </strong> Paketlerimizi
+                        <a class="text-primary" style="text-decoration: underline"
+                           href="https://gpskurye.com/fiyat/">{{env('APP_NAME')}} </a>
                         adresimizden inceleyebilirsiniz.
-                    </p>
+                    </p> --}}
                 </div>
 
+                <!-- tami için route('admin.payment.tami.form') GET yap paytr için POST route('payment.paytr.form')  -->
+              @if(auth()->check() && !auth()->user()->phone)
+                    <p class="py-2 font-weight-bold">Bakiye yüklemek için lütfen telefon numaranızı doğrulayınız.</p>
+                    <a class="btn btn-spotify w-25" href="/admin/profile">Profilime Git</a>
+                @else
+                    <div class="border border-dark p-3 rounded-2" style="max-width: 25%">
+                        <form method="POST" action="{{ route('admin.payment.paytr.form') }}">
+                            @csrf
 
-                <div class="border border-dark p-3 rounded-2" style="max-width: 25%">
-                    <form method="GET" action="{{ route('payment.form') }}">
-                        @csrf
+                            <!-- Kullanıcıya tanımlı kontör fiyatı -->
+                            <input type="hidden" id="top_up_price" value="{{ auth()->user()->top_up_price }}">
 
-                        <!-- Kullanıcıya tanımlı kontör fiyatı -->
-                        <input type="hidden" id="top_up_price" value="{{ auth()->user()->top_up_price }}">
-
-                        <div class="mb-3">
-                            <label class="fw-bold text-black">Kontör Fiyatı</label>
-                            <div class="form-control bg-secondary text-white fw-bold">
-                                1 Kontör = <span class="text-white fw-bold">{{ auth()->user()->top_up_price }} ₺</span>
+                            <div class="mb-3">
+                                <label class="fw-bold text-black">Kontör Fiyatı</label>
+                                <div class="form-control bg-secondary text-white fw-bold">
+                                    1 Kontör = <span class="text-white fw-bold">{{ auth()->user()->top_up_price }} ₺</span>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="mb-3">
-                            <label class="fw-bold text-black">Kontör Adet</label>
-                            <input required class="form-control" type="number" min="1" placeholder="Adet giriniz"
-                                   id="top_up" name="top_up">
-                        </div>
+                            <div class="mb-3">
+                                <label class="fw-bold text-black">Kontör Adet</label>
+                                <input required class="form-control" type="number" min="1" placeholder="Adet giriniz"
+                                       id="top_up" name="top_up">
+                            </div>
 
-                        <!-- Anlık hesaplanan tutar -->
-                        <div class="alert alert-info" id="hesaplamaBox" style="display: none;">
-                            <span class="fw-bold">Ödemeniz Gereken Tutar:</span>
-                            <span id="toplamTutar" class="text-success"></span> ₺
-                        </div>
+                            <!-- Anlık hesaplanan tutar -->
+                            <div class="alert alert-info" id="hesaplamaBox" style="display: none;">
+                                <span class="fw-bold">Ödemeniz Gereken Tutar:</span>
+                                <span id="toplamTutar" class="text-success"></span> ₺
+                            </div>
 
-                        <!-- Butonlar -->
-                        <div class="d-flex gap-2">
-                            <button class="special-button" style="display: none" type="button" id="hesaplaBtn">Hesapla
-                            </button>
-                            <button class="special-button" type="submit">Ödeme Yap</button>
-                        </div>
-                    </form>
-                </div>
-
+                            <!-- Butonlar -->
+                            <div class="d-flex gap-2">
+                                <button class="special-button" style="display: none" type="button" id="hesaplaBtn">Hesapla
+                                </button>
+                                <button class="special-button" type="submit">Ödeme Yap</button>
+                            </div>
+                        </form>
+                    </div>
+                @endif
                 <div class="card mt-4">
                     <div class="card-header">
                         <h4 class="mb-0">Kontör Hareketleri</h4>

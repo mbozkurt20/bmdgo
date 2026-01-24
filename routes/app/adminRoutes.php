@@ -13,7 +13,11 @@ Route::group(['prefix' => 'admin'], function () {
     Route::group(['middleware' => ['admin.auth']], function () {
         Route::get('/get-districts/{cityId}', [App\Http\Controllers\AdminController::class, 'getDistricts'])->name('admin.get_districts');
 
-        Route::get('/payment/form', [TamiPaymentController::class, 'showForm'])->name('payment.form');
+        //paytr
+        Route::post('/payment/paytr', [\App\Http\Controllers\PayTrPaymentController::class, 'payTrPayment'])->name('admin.payment.paytr.form');
+
+        //tami
+        Route::get('/payment/form', [TamiPaymentController::class, 'showForm'])->name('admin.payment.tami.form');
         Route::post('/payment/start', [TamiPaymentController::class, 'start'])->name('payment.start');
 
         Route::get('/printed/{orderId}', [App\Http\Controllers\OrderController::class, 'printed']);
