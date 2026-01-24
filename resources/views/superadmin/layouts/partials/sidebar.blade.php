@@ -1,6 +1,3 @@
-
-
-
 <div class="deznav" style="background: #259a38">
     <div class="deznav-scroll">
         <ul class="metismenu" id="menu">

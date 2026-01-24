@@ -4,7 +4,7 @@
     <div class="container">
         <h4>PayTR Entegrasyon Ayarları</h4>
 
-        <form method="POST" action="{{ route('admin.payment.paytr.update') }}">
+        <form method="POST" action="{{ route('superadmin.payment.paytr.update') }}">
             @csrf
 
             <div class="mb-3">
