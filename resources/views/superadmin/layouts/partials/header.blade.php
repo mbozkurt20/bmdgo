@@ -1,4 +1,4 @@
-<div class="nav-header" style="background:  #259a38">
+<div class="nav-header" style="background:  #ffffff">
     <a href="{{ url('/superadmin/dashboard') }}" class="d-flex justify-content-center align-items-center mt-3">
         <div class="brand-title" style="width: 185px; height:40px">
             <img src="{{ config('site.logo') }}" alt="Logo" style="height: 50px;width: auto">
