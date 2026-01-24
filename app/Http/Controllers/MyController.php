@@ -66,8 +66,7 @@ class MyController extends Controller
 
     public function paymentEntegrations()
     {
-        $admin = Admin::find(Auth::user()->id);
-        return view('admin.entegrations.payment', compact('admin'));
+        return view('superadmin.payment');
     }
 
     public function paymentUpdateEntegrations(REquest $request)
