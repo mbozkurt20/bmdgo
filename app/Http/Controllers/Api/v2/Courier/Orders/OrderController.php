@@ -18,6 +18,7 @@ use App\Models\ProgressPaymentRecord;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class OrderController extends Controller
 {
@@ -31,6 +32,73 @@ class OrderController extends Controller
             ->get();
 
         return Json::success('Siparişler', OrderResource::collection($orders));
+    }
+
+    public function oldOrders(Request $request)
+    {
+        $startDate = $request->query('startDate')
+            ? Carbon::parse($request->query('startDate'))->startOfDay() // Change to startOfDay
+            : Carbon::today()->startOfDay();
+
+        $endDate = $request->query('endDate')
+            ? Carbon::parse($request->query('endDate'))->endOfDay()
+            : Carbon::today()->endOfDay();
+
+        $courier = auth('courier')->user();
+        $orders = Order::query()->where('courier_id', $courier->id)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->orderBy('created_at', 'asc')
+            ->whereNotIn('status', [OrderStatus::ASSIGNED, OrderStatus::HANDOVER])
+            ->get();
+
+        return Json::success('Siparişler', OrderResource::collection($orders));
+    }
+
+    public function transfer(Request $request, $orderId)
+    {
+        $courier = auth('courier')->user();
+        $order = Order::find($orderId);
+
+        if (!$order) {
+            return response()->json(['message' => 'Sipariş Bulunamadı'], 404);
+        }
+
+        if ($order->courier_id != $courier->id) {
+            return Json::error('Size atanmamış bir siparişi güncelleyemezsiniz', 401);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'reason' => 'required|string|max:255',
+            'status' => 'required|in:accident,fault,other',
+        ]);
+
+        if ($validator->fails()) {
+            return Json::error($validator->errors());
+        }
+
+        $order->update([
+            'courier_id' => -1,
+            'assigned_at' => null,
+            'status' => OrderStatus::PREPARED,
+        ]);
+
+       $fi = CourierOrder::query()->whereHas('order',function ($q){
+           $q->where('status',OrderStatus::HANDOVER);
+       })->where('order_id',$order->id)
+           ->where('courier_id',$courier->id)
+           ->whereNull('status')
+           ->whereNull('reason')
+           ->first();
+
+        $fi->update([
+           'reason' => $request->reason,
+           'status' => $request->status,
+        ]);
+
+        $courier->status = CourierStatus::passive;
+        $courier->update();
+
+        return Json::success('Sipariş boşa çıkarıldı, kurye müsait kuryeye atanıcaktır.');
     }
 
     public function status(Request $request, $orderId)

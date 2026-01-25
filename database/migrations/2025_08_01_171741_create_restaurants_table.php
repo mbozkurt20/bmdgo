@@ -24,7 +24,6 @@ class CreateRestaurantsTable extends Migration
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();
             $table->string('password');
-            $table->string('package_price');
             $table->tinyText('address')->nullable();
             $table->string('tax_name')->nullable();
             $table->string('tax_number')->nullable();

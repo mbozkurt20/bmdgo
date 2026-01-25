@@ -17,6 +17,8 @@ class CreateCourierOrdersTable extends Migration
             $table->id();
             $table->unsignedBigInteger('courier_id');
             $table->unsignedBigInteger('order_id');
+            $table->text('reason')->nullable();
+            $table->enum('status', ['accident', 'fault', 'other'])->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

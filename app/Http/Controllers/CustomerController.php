@@ -36,7 +36,7 @@ class CustomerController extends Controller
     public function getCustomers()
     {
         try {
-            $customers = \App\Models\Customer::where('restaurant_id', auth()->id())->get();
+            $customers = \App\Models\Customer::where('status','active')->where('restaurant_id', auth()->id())->get();
 
             return response()->json([
                 'success' => true,
@@ -81,16 +81,11 @@ class CustomerController extends Controller
         if ($request->address) {
             $errors = [];
             foreach ($request->address as $adres) {
-
                 $addres = $adres['mahalle'] . ' mah. ' .
                     $adres['sokak_cadde'] . ' sokak. Bina No:' .
-                    $adres['kat'] . ' Kat:' .
-                    $adres['daire_no'] . ' Daire No:' .
-                    $adres['bina_no'] . ' Bina no' .
                     District::find($adres['ilce'])->name . '/' .$city->name. ' Türkiye';
 
                 $location = GeoLocation::getLatLong($addres);
-
 
                 if (!isset($location['error'])) {
                     // Save each address for the customer
@@ -152,9 +147,6 @@ class CustomerController extends Controller
             foreach ($request->address as $adres) {
                 $addres = $adres['mahalle'] . ' mah. ' .
                     $adres['sokak_cadde'] . ' sokak. Bina No:' .
-                    $adres['kat'] . ' Kat:' .
-                    $adres['daire_no'] . ' Daire No:' .
-                    $adres['bina_no'] . ' Bina no ' .
                     District::find($adres['ilce'])->name . '/' .$city->name. ' Türkiye';
 
                 $location = GeoLocation::getLatLong($addres);
