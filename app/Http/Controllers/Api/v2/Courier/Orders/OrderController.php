@@ -76,7 +76,7 @@ class OrderController extends Controller
             return Json::error($validator->errors());
         }
 
-       $fi = CourierOrder::query()->whereIn('order_id', $order->id)
+       $fi = CourierOrder::query()->where('order_id', $order->id)
            ->where('courier_id',$courier->id)
            ->whereNull('status')
            ->whereNull('reason')
