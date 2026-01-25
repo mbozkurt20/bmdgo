@@ -75,5 +75,4 @@ class ReportController extends Controller
             'totals' => $totals
         ]);
     }
-    }
 }
