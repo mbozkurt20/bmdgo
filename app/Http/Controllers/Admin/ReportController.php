@@ -34,9 +34,9 @@ class ReportController extends Controller
 
         $getData = [];
         $online = $kapida_nakit = $kapida_ticket = $kapida_k_karti = 0;
+        $topCiro = 0; // Toplam ciro için yeni değişken
         $topsiparis = 0;
 
-// Sorguyu dinamik olarak oluştur
         $query = Order::query();
 
         if ($courierId > 0) {
@@ -50,26 +50,29 @@ class ReportController extends Controller
 
         $query->whereBetween('created_at', [$startDate, $endDate]);
 
-        $orders = $query->get();
+// Performans için: İlişkileri tek seferde çek (Eager Loading)
+        $orders = $query->with('courierOrder.courier')->get();
 
         foreach ($orders as $order) {
-            // Kurye bilgisi
-            $courierOrder = CourierOrder::where('order_id', $order->id)->first();
-            $courierName = $courierOrder ? (Courier::find($courierOrder->courier_id)->name ?? 'Bilinmiyor') : 'Bilinmiyor';
+            // Kurye adını ilişkiler üzerinden al (veya eski yöntemi kullanacaksanız kalsın)
+            $courierName = $order->courierOrder->courier->name ?? 'Bilinmiyor';
 
-            // Ödeme toplamlarını güncelle
+            // Ödeme toplamlarını ve genel ciroyu güncelle
+            $currentAmount = (float)$order->amount;
+            $topCiro += $currentAmount; // Her siparişi toplam ciroya ekle
+
             switch ($order->payment_method) {
                 case "Online Kredi/Banka Kartı":
-                    $online += $order->amount;
+                    $online += $currentAmount;
                     break;
                 case "Kapıda Nakit ile Ödeme":
-                    $kapida_nakit += $order->amount;
+                    $kapida_nakit += $currentAmount;
                     break;
                 case "Kapıda Ticket ile Ödeme":
-                    $kapida_ticket += $order->amount;
+                    $kapida_ticket += $currentAmount;
                     break;
                 case "Kapıda Kredi Kartı ile Ödeme":
-                    $kapida_k_karti += $order->amount;
+                    $kapida_k_karti += $currentAmount;
                     break;
             }
 
@@ -82,16 +85,9 @@ class ReportController extends Controller
                 "full_name" => $order->full_name,
                 "phone" => $order->phone,
                 "payment" => $order->payment_method,
-                "amount" => number_format($order->amount, 2) . " TL",
-                "topsiparis" => $topsiparis,
-                "online" => number_format($online, 2) . " TL",
-                "kapida_nakit" => number_format($kapida_nakit, 2) . " TL",
-                "kapida_ticket" => number_format($kapida_ticket, 2) . " TL",
-                "kapida_k_karti" => number_format($kapida_k_karti, 2) . " TL",
+                "amount" => number_format($currentAmount, 2) . " TL",
                 "time" => Carbon::parse($order->created_at)->translatedFormat('d-m-Y H:i'),
-                "distance" => number_format($order->distance, 3),
-                "message" => $order->message ?? null,
-                "message2" => $order->message2 ?? null,
+                "distance" => number_format($order->distance, 3) . " mt",
             ];
         }
 
@@ -102,7 +98,8 @@ class ReportController extends Controller
                 'kapida_nakit' => number_format($kapida_nakit, 2),
                 'kapida_ticket' => number_format($kapida_ticket, 2),
                 'kapida_k_karti' => number_format($kapida_k_karti, 2),
-                'topsiparis' => $topsiparis
+                'topsiparis' => $topsiparis,
+                'top_ciro' => number_format($topCiro, 2) // Frontend'de "Top. Ciro" kısmına bunu bağlayın
             ]
         ]);
     }
