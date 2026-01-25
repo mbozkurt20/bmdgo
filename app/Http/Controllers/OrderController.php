@@ -379,7 +379,7 @@ class OrderController extends Controller
                 'tracking_id' => "POS-" . rand(9, 99999),
                 'full_name' => $request->full_name,
                 'phone' => $request->phone,
-                'address' => $address,
+                'address' => $address->adress_tarifi,
                 'payment_method' => $request->payment_method,
                 'sub_amount' => $request->amount,
                 'discount' => 0.00,
