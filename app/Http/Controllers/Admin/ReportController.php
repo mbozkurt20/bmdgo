@@ -101,12 +101,14 @@ class ReportController extends Controller
         return response()->json([
             'data' => $getData,
             'totals' => [
-                'online' => number_format($online, 2),
-                'kapida_nakit' => number_format($kapida_nakit, 2),
-                'kapida_ticket' => number_format($kapida_ticket, 2),
-                'kapida_k_karti' => number_format($kapida_k_karti, 2),
-                'topsiparis' => $topsiparis
+                'topsiparis'     => $topsiparis,
+                'online'         => $online,
+                'kapida_nakit'   => $kapida_nakit,
+                'kapida_ticket'  => $kapida_ticket,
+                'kapida_k_karti' => $kapida_k_karti,
+                'topciro'        => $online + $kapida_nakit + $kapida_ticket + $kapida_k_karti,
             ]
         ]);
+
     }
 }

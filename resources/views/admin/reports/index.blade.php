@@ -196,70 +196,94 @@
         document.getElementById("excelBtn").addEventListener("click", generateExcel);
 
         function ReportFilter() {
-            var courier = $('#courier').val();
-            var restaurant = $('#restaurant').val();
-            var start = $('#start_date').val();
-            var end = $('#end_date').val();
+            let courier    = $('#courier').val();
+            let restaurant = $('#restaurant').val();
+            let start      = $('#start_date').val();
+            let end        = $('#end_date').val();
 
             if (courier == 0 || restaurant == 0) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Eksik Seçim!',
                     text: 'Lütfen hem kurye hem de restoran seçiniz.',
-                    confirmButtonColor: '#ec691e',
-                    confirmButtonText: 'Tamam'
+                    confirmButtonColor: '#ec691e'
                 });
                 return;
             }
 
             $.ajax({
                 type: 'POST',
-                url: '/admin/reports/globalFilter?_token={{ csrf_token() }}',
-                data: { courier, restaurant, start, end },
-                success: function(response) {
-                    $('#report').html("");
-                    if(response.data.length === 0) {
+                url: '/admin/reports/globalFilter',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    courier: courier,
+                    restaurant: restaurant,
+                    start: start,
+                    end: end
+                },
+                beforeSend: function () {
+                    $('#report').html('');
+                    $('#no-data').show();
+                },
+                success: function (response) {
+
+                    // TABLO
+                    if (response.data.length === 0) {
                         $('#no-data').show();
                     } else {
                         $('#no-data').hide();
-                        response.data.forEach((element) => {
-                            $('#report').append(
-                                `<tr>
-                                    <td class="text-black font-weight-bold">${element.platform}</td>
-                                    <td class="text-black font-weight-bold">${element.tracking_id}</td>
-                                    <td class="text-black font-weight-bold">${element.courier}</td>
-                                    <td class="text-black font-weight-bold">${element.full_name}</td>
-                                    <td class="text-black font-weight-bold">${element.phone}</td>
-                                    <td class="text-black font-weight-bold">${element.payment}</td>
-                                    <td class="text-black font-weight-bold">${element.amount}</td>
-                                    <td class="text-black font-weight-bold">${element.time}</td>
-                                    <td class="text-black font-weight-bold">${element.distance ?? "Belirtilmemiş"} mt</td>
-                                </tr>`
-                            );
 
-                            $('#topnakit').html(element.kapida_nakit);
-                            $('#topkkarti').html(element.kapida_k_karti);
-                            $('#topticket').html(element.kapida_ticket);
-                            $('#toponline').html(element.online);
-                            $('#topsiparis').html(element.topsiparis);
+                        response.data.forEach((item) => {
+                            $('#report').append(`
+                            <tr>
+                                <td>${item.platform}</td>
+                                <td>${item.tracking_id}</td>
+                                <td>${item.courier}</td>
+                                <td>${item.full_name}</td>
+                                <td>${item.phone}</td>
+                                <td>${item.payment}</td>
+                                <td>${item.amount}</td>
+                                <td>${item.time}</td>
+                                <td>${item.distance ?? 'Belirtilmemiş'} mt</td>
+                            </tr>
+                        `);
                         });
-
-                        var topciro = parseFloat($('#topnakit').html() || 0) +
-                            parseFloat($('#topkkarti').html() || 0) +
-                            parseFloat($('#topticket').html() || 0) +
-                            parseFloat($('#toponline').html() || 0);
-                        $('#topciro').html(topciro.toFixed(2));
                     }
+
+                    // ÖZET ALANI (TURUNCU KUTULAR)
+                    let t = response.totals;
+
+                    $('#topsiparis').html(t.topsiparis);
+
+                    $('#topnakit').html(
+                        Number(t.kapida_nakit).toLocaleString('tr-TR', { minimumFractionDigits: 2 }) + ' TL'
+                    );
+
+                    $('#topkkarti').html(
+                        Number(t.kapida_k_karti).toLocaleString('tr-TR', { minimumFractionDigits: 2 }) + ' TL'
+                    );
+
+                    $('#topticket').html(
+                        Number(t.kapida_ticket).toLocaleString('tr-TR', { minimumFractionDigits: 2 }) + ' TL'
+                    );
+
+                    $('#toponline').html(
+                        Number(t.online).toLocaleString('tr-TR', { minimumFractionDigits: 2 }) + ' TL'
+                    );
+
+                    $('#topciro').html(
+                        Number(t.topciro).toLocaleString('tr-TR', { minimumFractionDigits: 2 }) + ' TL'
+                    );
 
                     Swal.fire({
                         icon: 'success',
-                        title: 'Filtreleme Başarılı',
-                        text: 'Rapor başarıyla yüklendi.',
-                        timer: 2000,
+                        title: 'Rapor Hazır',
+                        text: 'Filtreleme başarıyla tamamlandı',
+                        timer: 1500,
                         showConfirmButton: false
                     });
                 },
-                error: function() {
+                error: function () {
                     Swal.fire({
                         icon: 'error',
                         title: 'Hata!',
