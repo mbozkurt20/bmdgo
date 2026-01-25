@@ -76,19 +76,7 @@ class OrderController extends Controller
             return Json::error($validator->errors());
         }
 
-        $order->update([
-            'courier_id' => -1,
-            'assigned_at' => null,
-            'status' => OrderStatus::PREPARED,
-        ]);
-
-        $orderIds = Order::query()
-            ->where('status',OrderStatus::HANDOVER)
-            ->where('courier_id',$courier->id)
-            ->pluck('id')
-            ->toArray();
-
-       $fi = CourierOrder::query()->whereIn('order_id', $orderIds)
+       $fi = CourierOrder::query()->whereIn('order_id', $order->id)
            ->where('courier_id',$courier->id)
            ->whereNull('status')
            ->whereNull('reason')
@@ -97,6 +85,12 @@ class OrderController extends Controller
         $fi->update([
            'reason' => $request->reason,
            'status' => $request->status,
+        ]);
+
+        $order->update([
+            'courier_id' => -1,
+            'assigned_at' => null,
+            'status' => OrderStatus::PREPARED,
         ]);
 
         $courier->status = CourierStatus::passive;
