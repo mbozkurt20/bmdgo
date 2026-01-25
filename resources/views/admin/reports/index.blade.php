@@ -220,41 +220,44 @@
                     $('#report').html("");
                     if(response.data.length === 0) {
                         $('#no-data').show();
-                        resetTotals(); // Toplamları sıfırlayan bir fonksiyon
                     } else {
                         $('#no-data').hide();
-
-                        // Tabloyu doldur
                         response.data.forEach((element) => {
                             $('#report').append(
                                 `<tr>
-                    <td>${element.platform}</td>
-                    <td>${element.tracking_id}</td>
-                    <td>${element.courier}</td>
-                    <td>${element.full_name}</td>
-                    <td>${element.phone}</td>
-                    <td>${element.payment}</td>
-                    <td>${element.amount} TL</td>
-                    <td>${element.time}</td>
-                    <td>${element.distance ?? "0"} mt</td>
-                </tr>`
+                                    <td class="text-black font-weight-bold">${element.platform}</td>
+                                    <td class="text-black font-weight-bold">${element.tracking_id}</td>
+                                    <td class="text-black font-weight-bold">${element.courier}</td>
+                                    <td class="text-black font-weight-bold">${element.full_name}</td>
+                                    <td class="text-black font-weight-bold">${element.phone}</td>
+                                    <td class="text-black font-weight-bold">${element.payment}</td>
+                                    <td class="text-black font-weight-bold">${element.amount}</td>
+                                    <td class="text-black font-weight-bold">${element.time}</td>
+                                    <td class="text-black font-weight-bold">${element.distance ?? "Belirtilmemiş"} mt</td>
+                                </tr>`
                             );
+
+                            $('#topnakit').html(element.kapida_nakit);
+                            $('#topkkarti').html(element.kapida_k_karti);
+                            $('#topticket').html(element.kapida_ticket);
+                            $('#toponline').html(element.online);
+                            $('#topsiparis').html(element.topsiparis);
                         });
 
-                        // Toplamları PHP'den gelen hazır 'totals' objesinden al (Hata payı sıfır)
-                        $('#topnakit').html(parseFloat(response.totals.kapida_nakit).toFixed(2));
-                        $('#topkkarti').html(parseFloat(response.totals.kapida_k_karti).toFixed(2));
-                        $('#topticket').html(parseFloat(response.totals.kapida_ticket).toFixed(2));
-                        $('#toponline').html(parseFloat(response.totals.online).toFixed(2));
-                        $('#topsiparis').html(response.totals.topsiparis);
-
-                        // Genel Ciro
-                        var topciro = response.totals.kapida_nakit +
-                            response.totals.kapida_k_karti +
-                            response.totals.kapida_ticket +
-                            response.totals.online;
+                        var topciro = parseFloat($('#topnakit').html() || 0) +
+                            parseFloat($('#topkkarti').html() || 0) +
+                            parseFloat($('#topticket').html() || 0) +
+                            parseFloat($('#toponline').html() || 0);
                         $('#topciro').html(topciro.toFixed(2));
                     }
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Filtreleme Başarılı',
+                        text: 'Rapor başarıyla yüklendi.',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
                 },
                 error: function() {
                     Swal.fire({
