@@ -380,51 +380,54 @@
         });
     }
 
-    function Courier(e, order) {
+    function Courier(e, orderId) {
         let courierId = e.target.value;
         const selectEl = e.target;
 
-        // Spinner + bekleniyor yazısı oluştur
+        if (courierId === "0") return; // Seçim yapılmadıysa işlem yapma
+
         let loadingSpan = document.createElement('span');
         loadingSpan.className = 'ms-2 d-flex align-items-center';
         loadingSpan.innerHTML = `
         <div class="spinner-border spinner-border-sm me-1 mt-2" role="status"></div>
         <small class="mt-2">Kurye Atanıyor...</small>
     `;
-
-        // Select elementinin hemen yanına ekle
         selectEl.parentNode.appendChild(loadingSpan);
 
-        // AJAX isteği
         $.ajax({
             type: 'GET',
-            url: '/{{$key}}/orders/sendCourier/' + order + '/' + courierId,
+            url: '/{{$key}}/orders/sendCourier/' + orderId + '/' + courierId,
             success: function (data) {
-                // Spinner + yazıyı kaldır
                 loadingSpan.remove();
 
                 if (data == "OK") {
-                    $('#Courier' + order).modal('hide'); // modalı gizle
+                    // Modalı güvenli bir şekilde kapat
+                    const modalElement = document.getElementById('Courier' + orderId);
+                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    }
+
+                    // EKRANIN GRİ KALMASINI ENGELLEYEN KRİTİK KODLAR:
+                    $('.modal-backdrop').remove(); // Kalan gri fonu kaldır
+                    $('body').removeClass('modal-open').css('overflow', ''); // Body kilidini aç
+
                     Swal.fire({
                         title: 'Kurye Başarıyla Atandı',
                         icon: 'success',
-                        confirmButtonText: 'Tamam',
-                        background: '#fff',
-                        customClass: {
-                            popup: 'swal-radius',
-                            confirmButton: 'swal-btn'
-                        }
+                        timer: 1500,
+                        showConfirmButton: false
                     });
 
-
-                    fetchOrders();
-                } else if (data == "ERR") {
-                    Swal.fire('Kurye Atama Başarısız');
+                    fetchOrders(); // Tabloyu tazele
+                } else {
+                    Swal.fire('Hata', 'Kurye Atama Başarısız', 'error');
                 }
             },
             error: function () {
-                loadingSpan.remove(); // hata durumunda da kaldır
-                Swal.fire('İşlem sırasında bir hata oluştu!');
+                loadingSpan.remove();
+                Swal.fire('Hata', 'İşlem sırasında bir hata oluştu!', 'error');
             }
         });
     }
