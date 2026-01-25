@@ -82,9 +82,13 @@ class OrderController extends Controller
             'status' => OrderStatus::PREPARED,
         ]);
 
-       $fi = CourierOrder::query()->whereHas('order',function ($q){
-           $q->where('status',OrderStatus::HANDOVER);
-       })->where('order_id',$order->id)
+        $orderIds = Order::query()
+            ->where('status',OrderStatus::HANDOVER)
+            ->where('courier_id',$courier->id)
+            ->pluck('id')
+            ->toArray();
+
+       $fi = CourierOrder::query()->whereIn('order_id', $orderIds)
            ->where('courier_id',$courier->id)
            ->whereNull('status')
            ->whereNull('reason')
