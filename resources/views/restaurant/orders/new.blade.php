@@ -777,7 +777,7 @@
                                             </div>
 
                                             <div class="d-flex align-items-center mb-2">
-                                                <span class="me-2 text-black">Sok.</span>
+                                                <span class="me-2 text-black">Sok/Cadde</span>
                                                 <input type="text" name="sokak_cadde" class="flex-grow-1 border-0 border-bottom bg-transparent" placeholder="Örn: 5021" required>
                                             </div>
 

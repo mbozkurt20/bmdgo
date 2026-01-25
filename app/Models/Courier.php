@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
@@ -12,11 +11,6 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 class Courier extends Authenticatable implements JWTSubject
 {
     use HasFactory,SoftDeletes;
-
-    protected static function booted()
-    {
-        static::addGlobalScope(new ActiveScope);
-    }
 
     protected $fillable = [
         'admin_id',

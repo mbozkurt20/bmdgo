@@ -99,7 +99,7 @@
                                         </div>
 
                                         <div class="d-flex align-items-center mb-3">
-                                            <span class="me-3 fw-bold" style="color:#259a38; font-size:1rem;">Sok.</span>
+                                            <span class="me-3 fw-bold" style="color:#259a38; font-size:1rem;">Sok/Cadde</span>
                                             <input type="text" class="flex-grow-1 border-0 border-bottom bg-transparent"
                                                    name="sokak_cadde" placeholder="Sokak / Cadde" required>
                                         </div>

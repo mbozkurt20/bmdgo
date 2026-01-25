@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/courier/login', [\App\Http\Controllers\Api\v2\Courier\Auth\LoginController::class, 'login']); // Giriş için API Route
 Route::post('/courier/register', [\App\Http\Controllers\Api\v2\Courier\Auth\LoginController::class, 'register']); // Giriş için API Route
-Route::get('/courier/get-domain/{code}', [\App\Http\Controllers\Api\v2\Courier\Auth\LoginController::class, 'domain']); // Giriş için API Route
 
 // Auth middleware ile korunan route'lar
 Route::middleware('jwt.courier')->group(function () {
