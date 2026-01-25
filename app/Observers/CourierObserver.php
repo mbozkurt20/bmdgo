@@ -30,11 +30,10 @@ class CourierObserver
     {
         Log::info('courier geldi');
         // 🔒 Sadece status değiştiyse devam et
-       /*
         if (!$courier->wasChanged('status')) {
             return;
         }
-*/
+
         $newStatus = $courier->status;
         $orderId = null;
 

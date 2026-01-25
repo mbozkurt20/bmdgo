@@ -41,6 +41,7 @@ class AssignPendingOrders implements ShouldQueue
                 ->where('admin_id', $order->restaurant->admin_id)   // round robin için
                 ->first();
 
+            Log::info('Otamatik Kurye Atama Job Çalıştı '.$courier->id.' -'.$order->name);
             Log::info('Kurye', (array)json_encode($courier));
             if ($courier) {
                 // Siparişi kuryeye ata
