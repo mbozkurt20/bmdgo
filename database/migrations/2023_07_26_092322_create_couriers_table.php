@@ -23,6 +23,7 @@ class CreateCouriersTable extends Migration
             $table->string('price_type')->default('package');
             $table->decimal('price', 8, 2)->nullable();
             $table->decimal('fixed_price', 8, 2)->nullable();
+            $table->decimal('km_distance_later', 8, 2)->nullable(); // bu km sonrası hesaplanır kazançtan bu km kadar eksik hesaplanır
             $table->decimal('km_price', 8, 2)->nullable();
             $table->string('latitude',)->nullable();
             $table->string('longitude',)->nullable();

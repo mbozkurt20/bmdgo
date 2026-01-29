@@ -46,7 +46,7 @@ class CourierObserver
         if ($lastMovement) {
             $lastMovement->ended_at = now();
             $lastMovement->duration_seconds = $lastMovement->started_at->diffInSeconds(now());
-            $lastMovement->save();
+            $lastMovement->update();
         }
 
         // 🆕 Yeni hareketi oluştur (order_id varsa eklenir)

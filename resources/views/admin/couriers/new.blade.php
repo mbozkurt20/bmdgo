@@ -49,7 +49,7 @@
                                 <div class="row">
                                     <div class="col-lg-4 mb-3">
                                         <label for="form-text" class="form-label fs-14 text-dark">Kurye Adı</label>
-                                        <input required type="text" class="form-control" name="name" id="form-text"
+                                        <input value=" {{old('name')}}" required type="text" class="form-control" name="name" id="form-text"
                                                placeholder="Kurye Adı">
                                     </div>
 
@@ -73,11 +73,15 @@
 
                                     <div id="fixed-fields" class="col-lg-4 mb-3">
                                         <label class="form-label fs-14 text-dark">Sabit Ücret</label>
-                                        <input required type="text" class="form-control" name="fixed_price" placeholder="25.000">
+                                        <input  value=" {{old('fixed_price')}}" required type="text" class="form-control" name="fixed_price" placeholder="25.000">
                                     </div>
                                     <div id="fixed-fields2" class="col-lg-4 mb-3">
                                         <label class="form-label fs-14 text-dark">Km Ücreti (1 km göre giriniz)</label>
-                                        <input required type="text" class="form-control" name="km_price" placeholder="4,00">
+                                        <input value=" {{old('km_price')}}" required type="text" class="form-control" name="km_price" placeholder="4,00">
+                                    </div>
+                                    <div id="fixed-fields3" class="col-lg-4 mb-3">
+                                        <label class="form-label fs-14 text-dark">Km sonrası hesapla</label>
+                                        <input  value=" {{old('km_distance_later')}}" required type="number" class="form-control" name="km_distance_later" placeholder="2">
                                     </div>
 
                                     <div id="package-fields" class="col-lg-4 mb-3">
@@ -92,12 +96,12 @@
 
                                     <div class="col-md-6 mb-3">
                                         <label class="text-dark" for="latitude">Enlem (Latitude)</label>
-                                        <input required type="text" name="latitude" id="lat" class="form-control">
+                                        <input value="{{old('latitude')}}" required type="text" name="latitude" id="lat" class="form-control">
                                     </div>
 
                                     <div class="col-md-6 mb-3">
                                         <label class="text-dark" for="longitude">Boylam (Longitude)</label>
-                                        <input required type="text" name="longitude" id="lng" class="form-control">
+                                        <input value="{{old('longitude')}}" required type="text" name="longitude" id="lng" class="form-control">
                                     </div>
                                 </div>
 
@@ -116,10 +120,12 @@
             const packageFields = document.getElementById('package-fields');
             const fixedFields = document.getElementById('fixed-fields');
             const fixedFields2 = document.getElementById('fixed-fields2');
+            const fixedFields3 = document.getElementById('fixed-fields3');
 
             const packageInput = packageFields.querySelector('input');
             const fixedInput1 = fixedFields.querySelector('input');
             const fixedInput2 = fixedFields2.querySelector('input');
+            const fixedInput3 = fixedFields3.querySelector('input');
 
             function toggleFields() {
                 const selectedType = priceTypeSelect.value;
@@ -130,15 +136,18 @@
                     // Gizle
                     fixedFields.style.display = 'none';
                     fixedFields2.style.display = 'none';
+                    fixedFields3.style.display = 'none';
 
                     // Required ayarları
                     packageInput.required = true;
                     fixedInput1.required = false;
                     fixedInput2.required = false;
+                    fixedInput3.required = false;
                 } else {
                     // Göster
                     fixedFields.style.display = 'block';
                     fixedFields2.style.display = 'block';
+                    fixedFields3.style.display = 'block';
                     // Gizle
                     packageFields.style.display = 'none';
 
@@ -146,6 +155,7 @@
                     packageInput.required = false;
                     fixedInput1.required = true;
                     fixedInput2.required = true;
+                    fixedInput3.required = true;
                 }
             }
 

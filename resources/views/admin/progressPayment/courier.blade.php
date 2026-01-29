@@ -143,6 +143,18 @@
                                             <h4 class="text-white mb-0" id="fixed-amount">0₺</h4>
                                         </div>
                                     </div>
+                                    <div id="km_price" style="display: none" class=" col-md-6 mb-3">
+                                        <div class="p-3 border rounded bg-ok">
+                                            <h6 class="mb-1 text-white">Km Başı Ücret</h6>
+                                            <h4 class="text-white mb-0" id="fixed-amount">0₺</h4>
+                                        </div>
+                                    </div>
+                                    <div id="km_distance_later" style="display: none" class=" col-md-6 mb-3">
+                                        <div class="p-3 border rounded bg-ok">
+                                            <h6 class="mb-1 text-white">Km sonrası hesaplam 4</h6>
+                                            <h4 class="text-white mb-0" id="fixed-amount">0₺</h4>
+                                        </div>
+                                    </div>
 
                                     <div class="col-md-6 mb-3">
                                         <div class="p-3 border rounded bg-ok">

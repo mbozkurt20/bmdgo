@@ -2,15 +2,14 @@
 
 namespace App\Models;
 
-use App\Scopes\ActiveScope;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class Courier extends Authenticatable implements JWTSubject
 {
-    use HasFactory,SoftDeletes;
+    use SoftDeletes;
 
     protected $fillable = [
         'admin_id',
@@ -23,8 +22,9 @@ class Courier extends Authenticatable implements JWTSubject
         'latitude',
         'longitude',
         'price_type',
-        'price', //paket başı
+        'price',
         'km_price',
+        'km_distance_later',
         'fixed_price',
         'code',
         'birthday',

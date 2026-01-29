@@ -76,6 +76,10 @@
                                         <label class="form-label fs-14 text-dark">Km Ücreti (1 km göre giriniz)</label>
                                         <input value="{{$courier->km_price}}" required type="text" class="form-control" name="km_price" placeholder="4,00">
                                     </div>
+                                    <div id="fixed-fields3" class="col-lg-4 mb-3">
+                                        <label class="form-label fs-14 text-dark">Km sonrası hesapla</label>
+                                        <input  value="{{$courier->km_distance_later}}" required type="number" class="form-control" name="km_distance_later" placeholder="2">
+                                    </div>
 
                                     <div id="package-fields" class="col-lg-4 mb-3">
                                         <label class="form-label fs-14 text-dark">Paket Baş. Ücreti </label>
@@ -163,10 +167,12 @@
             const packageFields = document.getElementById('package-fields');
             const fixedFields = document.getElementById('fixed-fields');
             const fixedFields2 = document.getElementById('fixed-fields2');
+            const fixedFields3 = document.getElementById('fixed-fields2');
 
             const packageInput = packageFields.querySelector('input');
             const fixedInput1 = fixedFields.querySelector('input');
             const fixedInput2 = fixedFields2.querySelector('input');
+            const fixedInput3 = fixedFields3.querySelector('input');
 
             function toggleFields() {
                 const selectedType = priceTypeSelect.value;
@@ -177,15 +183,18 @@
                     // Gizle
                     fixedFields.style.display = 'none';
                     fixedFields2.style.display = 'none';
+                    fixedFields3.style.display = 'none';
 
                     // Required ayarları
                     packageInput.required = true;
                     fixedInput1.required = false;
                     fixedInput2.required = false;
+                    fixedInput3.required = false;
                 } else {
                     // Göster
                     fixedFields.style.display = 'block';
                     fixedFields2.style.display = 'block';
+                    fixedFields3.style.display = 'block';
                     // Gizle
                     packageFields.style.display = 'none';
 
@@ -193,6 +202,7 @@
                     packageInput.required = false;
                     fixedInput1.required = true;
                     fixedInput2.required = true;
+                    fixedInput3.required = true;
                 }
             }
 

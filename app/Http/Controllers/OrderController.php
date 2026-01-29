@@ -64,7 +64,7 @@ class OrderController extends Controller
         $order->courier_id = $courier->id;
         $order->assigned_at = Carbon::now();
         $order->status = OrderStatus::ASSIGNED;
-        $order->save();
+        $order->update();
 
         // 2 dakika sonra kuryenin siparişi alıp almadığını kontrol et
         CheckCourierTimeoutJob::dispatch($order->id)
@@ -72,7 +72,7 @@ class OrderController extends Controller
 
         // Kuryeyi servide de yap ve son atama zamanını güncelle
         $courier->last_assigned_at = now();
-        $courier->save();
+        $courier->update();
 
         $orderCourier = CourierOrder::where('courier_id',$courier->id)->where('order_id', $order->id)->first();
 

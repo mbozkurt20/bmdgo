@@ -76,6 +76,7 @@ class CourierController extends Controller
             'price_type' => $request->input('price_type'),
             'price' => $request->input('price'),
             'km_price' => $request->input('km_price'),
+            'km_distance_later' => $request->input('km_distance_later'),
             'fixed_price' => $request->input('fixed_price'),
             'status' => CourierStatus::active,
             'latitude' => $request->input('latitude'),
@@ -111,6 +112,10 @@ class CourierController extends Controller
             return redirect()->back()->with('message', 'Tüm alanları doldurunuz.');
         }
 
+        if (Courier::where('id','!=',$request->input('id'))->where('phone',$request->input('phone'))->exists()) {
+            return redirect()->back()->with('test', 'Bu numaraya ait kurye bulunmaktadır !!');
+        }
+
         if (!empty($request->input('password'))) {
             Courier::whereId($request->get('id'))->update([
                 'password' => $request->input('password')
@@ -127,6 +132,7 @@ class CourierController extends Controller
             'price_type' => $request->input('price_type'),
             'price' => $request->input('price'),
             'km_price' => $request->input('km_price'),
+            'km_distance_later' => $request->input('km_distance_later'),
             'fixed_price' => $request->input('fixed_price'),
             'status' => $request->input('status'),
             'password' => Hash::make($request->input('password')),

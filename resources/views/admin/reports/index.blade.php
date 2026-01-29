@@ -153,6 +153,15 @@
                         </tbody>
                     </table>
                 </div>
+
+                <!--div class="row mt-3 g-3">
+                    <div class="col-md-2 summary-box">Sipariş Sayısı: <span id="topsiparis">0</span></div>
+                    <div class="col-md-2 summary-box">Top. Nakit: <span id="topnakit">0</span></div>
+                    <div class="col-md-2 summary-box">Top. Kredi Kartı: <span id="topkkarti">0</span></div>
+                    <div class="col-md-2 summary-box">Top. Ticket: <span id="topticket">0</span></div>
+                    <div class="col-md-2 summary-box">Top. Online: <span id="toponline">0</span></div>
+                    <div class="col-md-2 summary-box">Top. Ciro: <span id="topciro">0</span></div>
+                </div-->
             </div>
         </div>
     </div>
