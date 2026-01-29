@@ -35,7 +35,6 @@ class ReportController extends Controller
         $getData = [];
         $topsiparis = 0;
 
-// Sorguyu dinamik olarak oluştur
         $query = Order::query();
 
         if ($courierId > 0) {
@@ -58,7 +57,7 @@ class ReportController extends Controller
         foreach ($orders as $order) {
             // Kurye bilgisi
             $courierOrder = CourierOrder::where('order_id', $order->id)->first();
-            $courierName = $courierOrder ? (Courier::find($courierOrder->courier_id)->name ?? 'Bilinmiyor') : 'Bilinmiyor';
+            $courierName = $courierOrder ? (Courier::find($courierOrder->courier_id)->name ?? 'Yönetici Kuryesi') : 'Yönetici Kuryesi';
 
             // Ödeme toplamlarını güncelle
             switch ($order->payment_method) {
@@ -109,6 +108,5 @@ class ReportController extends Controller
                 'topciro'        => $online + $kapida_nakit + $kapida_ticket + $kapida_k_karti,
             ]
         ]);
-
     }
 }

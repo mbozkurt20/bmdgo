@@ -78,6 +78,11 @@
                                         <input type="text" class="form-control" name="tax_number"
                                                placeholder="Vergi Numarası">
                                     </div>
+                                    <div class="mb-3 col-md-6">
+                                        <label class="form-label">Paket Fiyatı</label>
+                                        <input type="text" class="form-control" name="package_price"
+                                               placeholder="Paket Fiyatı">
+                                    </div>
                                     <div class="mb-3 col-md-12">
                                         <label class="form-label">Adres <small class="text-danger">*</small></label>
                                         <textarea required rows="8" cols="8" class="form-control"  name="address"  placeholder="İşyeri Adresi"></textarea>

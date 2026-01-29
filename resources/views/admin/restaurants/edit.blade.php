@@ -84,6 +84,12 @@
                                     </div>
 
                                     <div class="mb-3 col-md-6">
+                                        <label class="form-label">Paket Fiyatı</label>
+                                        <input type="text" class="form-control" name="package_price"
+                                               value="{{ $restaurant->package_price }}" placeholder="Paket Fiyatı">
+                                    </div>
+
+                                    <div class="mb-3 col-md-6">
                                         <label class="form-label">Status</label>
                                         <select class="form-control" name="status">
                                             <option value="active"

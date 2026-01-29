@@ -131,7 +131,7 @@
         <!-- Rapor tablosu -->
         <div class="card card-custom">
             <div class="card-body" id="reportList">
-                <div class="table-responsive">
+                <div class="table-responsive table-secondary">
                     <table class="table table-striped">
                         <thead class="table-bordered">
                         <tr>
@@ -201,11 +201,13 @@
             let start      = $('#start_date').val();
             let end        = $('#end_date').val();
 
-            if (courier == 0 || restaurant == 0) {
+            console.log({courier:courier})
+            console.log({restaurant:restaurant})
+            if (courier == '0' && restaurant == '0') {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Eksik Seçim!',
-                    text: 'Lütfen hem kurye hem de restoran seçiniz.',
+                    text: 'Lütfen kurye veya restaurant seçiniz.',
                     confirmButtonColor: '#ec691e'
                 });
                 return;

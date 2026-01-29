@@ -57,6 +57,7 @@ class RestaurantsController extends Controller
         $create->password = Hash::make($request->password);
         $create->tax_name = $request->tax_name;
         $create->tax_number = $request->tax_number;
+        $create->package_price = $request->package_price;
         $create->address = $request->address;
         $create->latitude = $request->latitude;
         $create->longitude = $request->longitude;
@@ -87,6 +88,7 @@ class RestaurantsController extends Controller
         $create->tax_number = $request->tax_number;
         $create->address = $request->address;
         $create->status = $request->status;
+        $create->package_price = $request->package_price;
         $create->latitude = $request->latitude;
         $create->longitude = $request->longitude;
         $create->update();

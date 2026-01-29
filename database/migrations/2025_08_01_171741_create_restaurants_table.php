@@ -27,7 +27,7 @@ class CreateRestaurantsTable extends Migration
             $table->tinyText('address')->nullable();
             $table->string('tax_name')->nullable();
             $table->string('tax_number')->nullable();
-            $table->float('package_price')->nullable();
+            $table->string('package_price');
             $table->json('getir')->nullable();
             $table->json('yemeksepeti')->nullable();
             $table->json('trendyol')->nullable();
