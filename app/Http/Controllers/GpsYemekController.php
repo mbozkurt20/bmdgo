@@ -109,7 +109,7 @@ class GpsYemekController extends Controller
             }
         }
 
-        return true;
+        return response()->json(['status' => "OK"], 200);
     }
 
     private function orders($restaurant)
