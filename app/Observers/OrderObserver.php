@@ -100,16 +100,14 @@ $avgDurations = OrderStatusLog::select('restaurant_id', 'status', DB::raw('AVG(d
         $restaurant = Restaurant::find($order->restaurant_id);
 
         //sipariş kuryeye verildiyse
-        if ($order->status == OrderStatus::PREPARED) {
+        if ($order->status == OrderStatus::HANDOVER) {
             if ($order->restaurant->admin->is_sms){
                 SendSms::send($order->phone, 'Sayın ' . $order->full_name . ', ' . $order->tracking_id . ' numaralı siparişiniz yola çıkmıştır.', $restaurant->admin_id);
             }
+        }
 
-            if (Admin::where('id', $restaurant->admin_id)->first()->auto_orders) {
-                if ($order) {
-                    dispatch(new AssignPendingOrders());
-                }
-            }
+        if ($order && Admin::where('id', $restaurant->admin_id)->first()->auto_orders && $order->status == OrderStatus::PENDING_ASSIGNED) {
+            dispatch(new AssignPendingOrders());
         }
 
         if ($order->status == OrderStatus::DELIVERED) {

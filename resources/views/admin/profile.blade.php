@@ -12,6 +12,7 @@
         }
         #map-search {
             margin-top: 10px;
+            margin-left: 10px;
             width: 500px;
             height: 40px;
             border-radius: 8px;

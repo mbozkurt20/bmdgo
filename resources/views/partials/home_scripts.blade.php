@@ -1,12 +1,5 @@
 <script>
-    const statusMap = {
-        'PENDING': 'pending',
-        'PREPARED': 'prepared',
-        'ASSIGNED': 'assigned',
-        'HANDOVER': 'handover',
-        'DELIVERED': 'delivered',
-        'UNSUPPLIED': 'unsupplied'
-    };
+    const statusMap = {!! json_encode(\App\Helpers\OrderStatus::statuses()) !!};
 
     document.addEventListener('DOMContentLoaded', () => {
         fetchOrders();
@@ -566,10 +559,14 @@
 
         // Durum seçenekleri
         const statusOptions = `
-        <option value="PENDING" ${status == 'PENDING' ? 'selected' : ''}>BEKLİYOR</option>
-        <option value="PREPARED" ${status == 'PREPARED' ? 'selected' : ''}>HAZIRLANIYOR</option>
-        <option value="DELIVERED" ${status == 'DELIVERED' ? 'selected' : ''}>TESLİM EDİLDİ</option>
-        <option value="UNSUPPLIED" ${status == 'UNSUPPLIED' ? 'selected' : ''}>İPTAL EDİLDİ</option>
+      <option value="PENDING" ${status == 'PENDING' ? 'selected' : ''}>BEKLEMEDE</option>
+<option value="PREPARING" ${status == 'PREPARING' ? 'selected' : ''}>HAZIRLANIYOR</option>
+<option value="PREPARED" ${status == 'PREPARED' ? 'selected' : ''}>HAZIRLANDI</option>
+<option value="PENDING_ASSIGNED" ${status == 'PENDING_ASSIGNED' ? 'selected' : ''}>KURYE ATAMA BEKLİYOR</option>
+<option value="ASSIGNED" ${status == 'ASSIGNED' ? 'selected' : ''}>KURYE ATANDI</option>
+<option value="HANDOVER" ${status == 'HANDOVER' ? 'selected' : ''}>KURYEYE TESLİM EDİLDİ / YOLDA</option>
+<option value="DELIVERED" ${status == 'DELIVERED' ? 'selected' : ''}>TESLİM EDİLDİ</option>
+<option value="UNSUPPLIED" ${status == 'UNSUPPLIED' ? 'selected' : ''}>İPTAL EDİLDİ / TEDARİK YOK</option>
     `;
 
         return `

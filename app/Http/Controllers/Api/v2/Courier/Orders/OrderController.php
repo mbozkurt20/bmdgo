@@ -9,10 +9,9 @@ use App\Helpers\NotificationHelper;
 use App\Helpers\OrdersHelper;
 use App\Helpers\OrderStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\GpsYemekController;
 use App\Http\Resources\OrderResource;
-use App\Models\Courier;
 use App\Models\CourierOrder;
-use App\Models\Notification;
 use App\Models\Order;
 use App\Models\ProgressPaymentRecord;
 use Carbon\Carbon;
@@ -33,7 +32,6 @@ class OrderController extends Controller
 
         return Json::success('Siparişler', OrderResource::collection($orders));
     }
-
     public function oldOrders(Request $request)
     {
         $startDate = $request->query('startDate')
@@ -90,7 +88,7 @@ class OrderController extends Controller
         $order->update([
             'courier_id' => -1,
             'assigned_at' => null,
-            'status' => OrderStatus::PREPARED,
+            'status' => OrderStatus::PENDING_ASSIGNED,
         ]);
 
         $courier->status = CourierStatus::passive;
@@ -112,10 +110,22 @@ class OrderController extends Controller
             return Json::error('Size atanmamış bir siparişi güncelleyemezsiniz', 401);
         }
 
+        //kurye teslim aldı
+        if ($request->input('order_status_id') == 3) {
+            if ($courier->status == CourierStatus::service){
+                return Json::error('Teslim Edilmeyen Sipariş Bulunuyor');
+            }
+
+            $courier->status = CourierStatus::service;
+            $courier->update();
+
+            $order->courier_id = $courier->id;
+            $order->status = OrderStatus::HANDOVER;
+            $order->update();
+        }
+
         //teslim edidi
         if ($request->input('order_status_id') == 1) {
-            $status = OrderStatus::DELIVERED;
-
             if (OrdersHelper::getOrderSystem(3)) {
                 NotificationHelper::add([
                     'title' => 'Paket Teslim Edildi',
@@ -125,7 +135,15 @@ class OrderController extends Controller
             }
 
             $order = Order::where('id', $orderId)->first();
-            $order->update(["status" => $status]);
+            $order->update(["status" => OrderStatus::DELIVERED]);
+
+            if ($order->platform === 'gpsyemek') {
+                $updateReq = new Request([
+                    'action' => OrderStatus::ASSIGNED,
+                    'tracking_id' => $order->tracking_id,
+                ]);
+                app(GpsYemekController::class)->updateOrder($updateReq);
+            }
 
             $courier->status = CourierStatus::active;
             $courier->update();
@@ -138,7 +156,7 @@ class OrderController extends Controller
 
            $order->courier_id = -1;
            $order->assigned_at = null;
-           $order->status = OrderStatus::PREPARED;
+           $order->status = OrderStatus::PENDING_ASSIGNED;
            $order->update();
 
            $courierOrder = CourierOrder::where('order_id',$order->id)->where('courier_id',$courier->id)->first();
@@ -155,19 +173,6 @@ class OrderController extends Controller
             }
         }
 
-        //kurye teslim aldı
-        if ($request->input('order_status_id') == 3) {
-            if ($courier->status == CourierStatus::service){
-                return Json::error('Teslim Edilmeyen Sipariş Bulunuyor');
-            }
-
-            $courier->status = CourierStatus::service;
-            $courier->update();
-
-            $order->courier_id = $courier->id;
-            $order->status = OrderStatus::HANDOVER;
-            $order->update();
-        }
 
 
         return Json::success('Sipariş Durumu Güncellendi', new OrderResource($order));
@@ -243,7 +248,6 @@ class OrderController extends Controller
         if ($order->courier_id != $courier->id) {
             return Json::error('Size atanmamış bir siparişi güncelleyemezsiniz', 401);
         }
-
 
         if (Order::where('verify_code', $code)->where('id', $order->id)->exists()) {
             $order->status = OrderStatus::DELIVERED;

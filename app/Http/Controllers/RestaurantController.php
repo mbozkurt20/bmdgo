@@ -37,24 +37,23 @@ class RestaurantController extends Controller
     public function ajax(Request $request)
     {
         $tumu = Order::whereDate('created_at', Carbon::today())
-          ->where('restaurant_id',Auth::guard('restaurant')->id())
-            ->orderBy('created_at', 'asc')->with(['restaurant','courier','logs'])->get();
+            ->where('restaurant_id', Auth::guard('restaurant')->id())
+            ->with(['restaurant', 'courier', 'logs'])
+            ->orderBy('created_at', 'asc')
+            ->get();
 
-        // Siparişleri duruma göre ayır
-        $pending = $tumu->where('status', OrderStatus::PENDING);
-        $prepared = $tumu->where('status',  OrderStatus::PREPARED);
-        $assigned = $tumu->where('status',  OrderStatus::ASSIGNED);
-        $handover = $tumu->where('status',  OrderStatus::HANDOVER);
-        $delivered = $tumu->where('status',  OrderStatus::DELIVERED);
-        $unsupplied = $tumu->where('status',  OrderStatus::UNSUPPLIED);
+        // Tüm siparişleri statülerine göre tek seferde grupla (Performans için kritik)
+        $grouped = $tumu->groupBy('status');
 
         return response()->json([
-            'pending' => $pending->values()->all(),
-            'prepared' => $prepared->values()->all(),
-            'assigned' => $assigned->values()->all(),
-            'handover' => $handover->values()->all(),
-            'delivered' => $delivered->values()->all(),
-            'unsupplied' => $unsupplied->values()->all(),
+            'pending'          => $grouped->get(OrderStatus::PENDING, collect())->values(),
+            'preparing'        => $grouped->get(OrderStatus::PREPARING, collect())->values(),
+            'prepared'         => $grouped->get(OrderStatus::PREPARED, collect())->values(),
+            'pending_assigned' => $grouped->get(OrderStatus::PENDING_ASSIGNED, collect())->values(),
+            'assigned'         => $grouped->get(OrderStatus::ASSIGNED, collect())->values(),
+            'handover'         => $grouped->get(OrderStatus::HANDOVER, collect())->values(),
+            'delivered'        => $grouped->get(OrderStatus::DELIVERED, collect())->values(),
+            'unsupplied'       => $grouped->get(OrderStatus::UNSUPPLIED, collect())->values(),
         ]);
     }
 

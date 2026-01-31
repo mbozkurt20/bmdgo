@@ -25,7 +25,6 @@ class CourierController extends Controller
     public function index()
     {
         $couriers = Courier::where('status', 'active')->where('restaurant_id', Auth::user()->id)->get();
-
         return view('restaurant.couriers.index', compact('couriers'));
     }
 

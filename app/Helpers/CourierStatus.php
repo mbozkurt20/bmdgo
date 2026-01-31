@@ -9,6 +9,7 @@ class CourierStatus
     public const passive = 'passive'; // siparişe kapalı
     public const break = 'break'; //molada
     public const service = 'service'; //servista
+    public const handover = 'handover'; //servista
 
     public static function all(): array
     {
@@ -17,6 +18,7 @@ class CourierStatus
             self::passive,
             self::break,
             self::service,
+            self::handover,
         ];
     }
 

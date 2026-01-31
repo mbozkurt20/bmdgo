@@ -718,9 +718,9 @@
 
                     <!-- Modal Footer -->
                     <div class="modal-footer d-flex justify-content-between">
-                        <button type="button" class="special-ok-button" data-toggle="modal" data-target="#yeniMusteri">
+                        <a href="/restaurant/customers/new" class="special-ok-button" >
                             <i class="fas fa-plus"></i> Müşteri Ekle
-                        </button>
+                        </a>
                         <button type="button" class="special-button" data-dismiss="modal">Tamam</button>
                     </div>
                 </div>

@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'restaurant'], function () {
     Route::group(['middleware' => ['guest.restaurant']], function () {
-        Route::view('register', 'restaurant.register')->name('restaurant.register');
         Route::view('login', 'restaurant.login')->name('restaurant.login');
         Route::view('payment', 'restaurant.payment')->name('restaurant.payment');
         Route::post('login', [App\Http\Controllers\RestaurantController::class, 'login'])->name('restaurant.auth');
@@ -30,6 +29,7 @@ Route::group(['prefix' => 'restaurant'], function () {
 
         Route::get('/reports/orders', [App\Http\Controllers\ReportController::class, 'orders'])->name('restaurant.reports.orders');
         Route::get('/reports/couriers', [App\Http\Controllers\ReportController::class, 'couriers'])->name('restaurant.reports.couriers');
+        Route::get('/couriers', [App\Http\Controllers\CourierController::class, 'index'])->name('restaurant.couriers.index');
 
         /* Products */
         Route::get('/products', [App\Http\Controllers\ProductController::class, 'index'])->name('restaurant.products');
@@ -95,10 +95,6 @@ Route::group(['prefix' => 'restaurant'], function () {
         Route::get('/orders/sendCourier/{orderID}/{courierID}', [App\Http\Controllers\OrderController::class, 'sendCourier'])->name('restaurant.orders.sendCourier');
         Route::get('/orders/addPOS/{id}', [App\Http\Controllers\OrderController::class, 'addPOS'])->name('restaurant.addPOS');
         Route::get('/get-pos-items', [App\Http\Controllers\OrderController::class, 'getPosItems']);
-
-        Route::get('/restaurant/orders/cartItems', function () {
-            return view('restaurant.orders._cart-items');
-        });
 
         Route::get('/orders/updatePlusPOS/{id}', [App\Http\Controllers\OrderController::class, 'updatePlusPOS'])->name('restaurant.updatePlusPOS');
         Route::get('/orders/updateMinusPOS/{id}/{qty}', [App\Http\Controllers\OrderController::class, 'updateMinusPOS'])->name('restaurant.updateMinusPOS');

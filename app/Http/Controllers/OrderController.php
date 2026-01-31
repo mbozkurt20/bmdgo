@@ -84,12 +84,13 @@ class OrderController extends Controller
         // Gelen veri zaten KM ise /1000 yapma, Metre ise yap.
         // haversineDistance genelde Metre döner:
         $distanceInKm = $distance / 1000;
+        $restaurantDistance = Restaurant::find($order->restaurant_id)->distance_limit_km;
 
         // 20 km den fazla olamaz
-        if ($distanceInKm > 20) {
+        if ($distanceInKm > $restaurantDistance) {
             return response()->json([
                 'success' => false,
-                'message' => "Mesafe çok uzak (" . round($distanceInKm, 2) . " km). 50 km'den uzak yerlere atama yapılamaz."
+                'message' => "Mesafe çok uzak (" . round($distanceInKm, 2) . " km). {$restaurantDistance} km'den uzak yerlere atama yapılamaz."
             ], 400);
         }
 
@@ -121,7 +122,7 @@ class OrderController extends Controller
         // Platform güncellemesi
         if ($order->platform === 'gpsyemek') {
             $updateReq = new Request([
-                'action' => OrderStatus::ASSIGNED,
+                'action' => OrderStatus::DELIVERED,
                 'tracking_id' => $order->tracking_id,
             ]);
             app(GpsYemekController::class)->updateOrder($updateReq);

@@ -4,92 +4,51 @@ namespace App\Observers;
 
 use App\Models\Courier;
 use App\Models\CourierStatusMovement;
-use App\Models\Order;
 use Illuminate\Support\Facades\Log;
 
 class CourierObserver
 {
-    /**
-     * Handle the Courier "created" event.
-     *
-     * @param  \App\Models\Courier  $courier
-     * @return void
-     */
-    public function created(Courier $courier)
-    {
-
-    }
-
-    /**
-     * Handle the Courier "updated" event.
-     *
-     * @param  \App\Models\Courier  $courier
-     * @return void
-     */
     public function updated(Courier $courier)
     {
-        Log::info('courier geldi');
-        // 🔒 Sadece status değiştiyse devam et
+        // 1. Sadece status kolonunda bir değişiklik olduysa işlem yap
         if (!$courier->wasChanged('status')) {
             return;
         }
 
+        $oldStatus = $courier->getOriginal('status');
         $newStatus = $courier->status;
-        $orderId = null;
 
-        // 🔚 Önceki açık hareket varsa, kapat
-        $lastMovement = CourierStatusMovement::where('courier_id', $courier->id)
-            ->whereNull('ended_at')
-            ->latest('started_at')
-            ->first();
+        Log::info("Kurye #{$courier->id} statüsü değişti: {$oldStatus} -> {$newStatus}");
 
-        if ($lastMovement) {
-            $lastMovement->ended_at = now();
-            $lastMovement->duration_seconds = $lastMovement->started_at->diffInSeconds(now());
-            $lastMovement->update();
+        try {
+            // 2. Önceki açık hareketi kapat (Eski statü ne kadar sürdü?)
+            $lastMovement = CourierStatusMovement::where('courier_id', $courier->id)
+                ->whereNull('ended_at')
+                ->latest('started_at')
+                ->first();
+
+            if ($lastMovement) {
+                $now = now();
+                $lastMovement->update([
+                    'ended_at' => $now,
+                    // Carbon cast yapıldığından emin olun (Model içinde protected $casts)
+                    'duration_seconds' => $lastMovement->started_at->diffInSeconds($now)
+                ]);
+            }
+
+            // 3. Yeni statü için kayıt başlat
+            // Eğer kuryeye son atanan siparişi bağlamak istersen:
+            // $orderId = $courier->orders()->latest()->first()?->id;
+
+            CourierStatusMovement::create([
+                'courier_id' => $courier->id,
+                'status'     => $newStatus,
+                'order_id'   => null, // Burası ihtiyaca göre doldurulabilir
+                'started_at' => now(),
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error("Kurye Hareket Kaydı Hatası: " . $e->getMessage());
         }
-
-        // 🆕 Yeni hareketi oluştur (order_id varsa eklenir)
-        CourierStatusMovement::create([
-            'courier_id' => $courier->id,
-            'status' => $newStatus,
-            'order_id' => $orderId,
-            'started_at' => now(),
-            'ended_at' => null,
-            'duration_seconds' => null,
-        ]);
-    }
-
-    /**
-     * Handle the Courier "deleted" event.
-     *
-     * @param  \App\Models\Courier  $courier
-     * @return void
-     */
-    public function deleted(Courier $courier)
-    {
-        //
-    }
-
-    /**
-     * Handle the Courier "restored" event.
-     *
-     * @param  \App\Models\Courier  $courier
-     * @return void
-     */
-    public function restored(Courier $courier)
-    {
-        //
-    }
-
-    /**
-     * Handle the Courier "force deleted" event.
-     *
-     * @param  \App\Models\Courier  $courier
-     * @return void
-     */
-    public function forceDeleted(Courier $courier)
-    {
-        //
     }
 }

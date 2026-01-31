@@ -3,6 +3,21 @@
     <script src="https://maps.googleapis.com/maps/api/js?key={{env('GOOGLE_MAPS_API_KEY')}}&libraries=places"></script>
 
     <style>
+        .custom-range-slider {
+            height: 1.5rem;
+            padding: 0;
+            background: transparent;
+        }
+        .form-range::-webkit-slider-runnable-track {
+            background-color: #dee2e6;
+            border-radius: 1rem;
+            height: 0.5rem;
+        }
+        .form-range::-webkit-slider-thumb {
+            background-color: #259a38; /* Senin yeşil rengin */
+            margin-top: -0.25rem;
+        }
+
         #userMap {
             border: #259a38 solid 2px;
             height: 500px;
@@ -98,16 +113,48 @@
                                         <input type="password" name="password" class="form-control border border-light">
                                     </div>
 
-                                    <div class="col-md-6 mb-3">
+                                    <div class="col-md-4 mb-3">
                                         <label class="text-dark fw-bold" for="latitude">Enlem (Latitude)</label>
                                         <input required type="text" name="latitude" id="latitude"
                                                value="{{ old('latitude', auth()->user()->latitude) }}" class="form-control  border border-light" >
                                     </div>
 
-                                    <div class="col-md-6 mb-3">
+                                    <div class="col-md-4 mb-3">
                                         <label class="text-dark fw-bold" for="longitude">Boylam (Longitude)</label>
                                         <input required type="text" name="longitude" id="longitude"
                                                value="{{ old('longitude', auth()->user()->longitude) }}" class="form-control border border-light" >
+                                    </div>
+
+                                    <div class="row py-3">
+                                        <div class="col-md-6 mb-4">
+                                            <label class="text-dark fw-bold d-flex justify-content-between" for="distance_limit_km">
+                                                <span><i class="fa fa-map-marked-alt text-primary me-2"></i>Maksimum Sipariş Mesafesi</span>
+                                                <span id="dist_val" class="badge bg-primary rounded-pill">0 km</span>
+                                            </label>
+                                            <input required type="range" name="distance_limit_km" id="distance_limit_km"
+                                                   min="1" max="100" step="1"
+                                                   value="{{ old('distance_limit_km', auth()->user()->distance_limit_km ?? 20) }}"
+                                                   class="form-range custom-range-slider">
+                                            <div class="small text-muted mt-1">
+                                                <i class="fa fa-info-circle me-1"></i>
+                                                Restoranınızın hizmet vereceği **maksimum yarıçapı** belirler. Bu mesafeden uzak müşteriler sipariş veremez ve kurye ataması yapılmaz.
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 mb-4">
+                                            <label class="text-dark fw-bold d-flex justify-content-between" for="max_package_limit">
+                                                <span><i class="fa fa-box-open text-warning me-2"></i>Maksimum Kurye Paket Ataması</span>
+                                                <span id="pkg_val" class="badge bg-warning text-dark rounded-pill">0 Paket</span>
+                                            </label>
+                                            <input required type="range" name="max_package_limit" id="max_package_limit"
+                                                   min="1" max="10" step="1"
+                                                   value="{{ old('max_package_limit', auth()->user()->max_package_limit ?? 4) }}"
+                                                   class="form-range custom-range-slider">
+                                            <div class="small text-muted mt-1">
+                                                <i class="fa fa-info-circle me-1"></i>
+                                                Bir kurye henüz **"Yola Çıkmadı"** durumundayken, üzerine atanabilecek **en fazla** sipariş sayısıdır. Bu sınıra ulaşıldığında kurye otomatik olarak yola çıkarılır.
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <div class="col-12 mt-3">
@@ -121,6 +168,21 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function updateRangeValues() {
+            $('#dist_val').text($('#distance_limit_km').val() + ' km');
+            $('#pkg_val').text($('#max_package_limit').val() + ' Paket');
+        }
+
+        $(document).on('input', '#distance_limit_km, #max_package_limit', function() {
+            updateRangeValues();
+        });
+
+        $(document).ready(function() {
+            updateRangeValues();
+        });
+    </script>
 
     <script>
         let map, marker, autocomplete;
