@@ -30,81 +30,86 @@ class GpsYemekController extends Controller
 
     public function updateOrder(Request $request)
     {
-        $orderCode = $request->input('tracking_id');
         $status = $request->input('action');
+        if ($status == OrderStatus::PREPARED || $status == OrderStatus::UNSUPPLIED || $status == OrderStatus::DELIVERED || $status == OrderStatus::ASSIGNED) {
+            $orderCode = $request->input('tracking_id');
 
-        $order = Order::where('tracking_id', $orderCode)->first();
 
-        $api_token = $order->restaurant->gpsyemek_api_key;
+            $order = Order::where('tracking_id', $orderCode)->first();
 
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $api_token
-        ])->post('https://gpsyemek.com/api/v1/webhook/orders', [
-            'event' => 'order_updated',
-            'order_code' => $orderCode,
-            'status' => $status,
-            'token' => $api_token,
-        ]);
+            $api_token = $order->restaurant->gpsyemek_api_key;
 
-        $response = json_decode($response->body());
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $api_token
+            ])->post('https://gpsyemek.com/api/v1/webhook/orders', [
+                'event' => 'order_updated',
+                'order_code' => $orderCode,
+                'status' => $status,
+                'token' => $api_token,
+            ]);
 
-        if ($response->success) {
-            // API'ye gönderilecek veriyi belirle
-            switch ($status) {
-                case 'DELIVERED':
-                    // Sipariş teslim edildiğinde kuryenin durumu güncelleniyor
-                    $courierOrder = CourierOrder::where('order_id', $order->id)->first();
-                    if ($courierOrder) {
-                        $courier = Courier::find($courierOrder->courier_id);
-                        if ($courier) {
-                            // Kuryenin durumunu güncelle
-                            $courier->status = CourierStatus::active;;
-                            $courier->update();
-                            Log::info('Kurye durumu güncellendi', ['courier_id' => $courier->id]);
-                        }
-                    }
-                    break;
-                case 'UNSUPPLIED':
-                    // Sipariş iptal edildiyse kuryenin durumu güncelleniyor
-                    $courierOrder = CourierOrder::where('order_id', $order->id)->first();
-                    if ($courierOrder) {
-                        $courier = Courier::find($courierOrder->courier_id);
-                        if ($courier) {
-                            // Kuryenin durumunu güncelle
-                            $courier->status = CourierStatus::active;;
-                            $courier->save();
+            $response = json_decode($response->body());
 
-                            $order->courier_id = -1;
-                            $order->assigned_at = null;
-                            $order->status = OrderStatus::PREPARED;
-                            $order->update();
-
-                            Log::info('Kurye durumu güncellendi', ['courier_id' => $courier->id]);
-
-                            if (OrdersHelper::getOrderSystem(3)) {
-                                NotificationHelper::add([
-                                    'title' => 'Kurye Paketi Reddetti',
-                                    'description' => $order->tracking_id . ' takip numaralı paket ' . $courier->name . '  kurye tarafından teslim edildi.',
-                                    'url' => route('admin.balance')
-                                ]);
+            if ($response->success) {
+                // API'ye gönderilecek veriyi belirle
+                switch ($status) {
+                    case 'DELIVERED':
+                        // Sipariş teslim edildiğinde kuryenin durumu güncelleniyor
+                        $courierOrder = CourierOrder::where('order_id', $order->id)->first();
+                        if ($courierOrder) {
+                            $courier = Courier::find($courierOrder->courier_id);
+                            if ($courier) {
+                                // Kuryenin durumunu güncelle
+                                $courier->status = CourierStatus::active;;
+                                $courier->update();
+                                Log::info('Kurye durumu güncellendi', ['courier_id' => $courier->id]);
                             }
                         }
-                    }
-                    break;
-            }
+                        break;
+                    case 'UNSUPPLIED':
+                        // Sipariş iptal edildiyse kuryenin durumu güncelleniyor
+                        $courierOrder = CourierOrder::where('order_id', $order->id)->first();
+                        if ($courierOrder) {
+                            $courier = Courier::find($courierOrder->courier_id);
+                            if ($courier) {
+                                // Kuryenin durumunu güncelle
+                                $courier->status = CourierStatus::active;;
+                                $courier->save();
 
-            $order->status = $status;
-            $success = $order->update();
+                                $order->courier_id = -1;
+                                $order->assigned_at = null;
+                                $order->status = OrderStatus::PREPARED;
+                                $order->update();
 
-            if ($success) {
-                return response()->json(['status' => "OK"], 200);
+                                Log::info('Kurye durumu güncellendi', ['courier_id' => $courier->id]);
+
+                                if (OrdersHelper::getOrderSystem(3)) {
+                                    NotificationHelper::add([
+                                        'title' => 'Kurye Paketi Reddetti',
+                                        'description' => $order->tracking_id . ' takip numaralı paket ' . $courier->name . '  kurye tarafından teslim edildi.',
+                                        'url' => route('admin.balance')
+                                    ]);
+                                }
+                            }
+                        }
+                        break;
+                }
+
+                $order->status = $status;
+                $success = $order->update();
+
+                if ($success) {
+                    return response()->json(['status' => "OK"], 200);
+                } else {
+                    Log::error('Sipariş durumu güncellenemedi', ['order_id' => $order->id]);
+                    return response()->json(['status' => "ERR"], 400);
+                }
             } else {
-                Log::error('Sipariş durumu güncellenemedi', ['order_id' => $order->id]);
-                return response()->json(['status' => "ERR"], 400);
+                return response()->json(['status' => ""], 200);
             }
-        }else {
-            return response()->json(['status' => ""], 200);
         }
+
+        return true;
     }
 
     private function orders($restaurant)
@@ -132,7 +137,7 @@ class GpsYemekController extends Controller
             }
 
             $address = json_decode($row['address']);
-            $create  = Customer::where('email',$row['customer']['email'])->first();
+            $create = Customer::where('email', $row['customer']['email'])->first();
             if (!$create) {
                 $create = new Customer();
                 $create->restaurant_id = $restaurant->id; // Assuming the authenticated user is the restaurant
@@ -167,7 +172,7 @@ class GpsYemekController extends Controller
                     'price' => $item['item_total'],              // toplam fiyat
                     'unitSellingPrice' => $item['unit_price'],   // birim fiyat
                     'discountedPrice' => $item['discounted_price'],   // birim fiyat
-                    'quantity' => (string) $item['quantity'],    // string isteniyorsa
+                    'quantity' => (string)$item['quantity'],    // string isteniyorsa
                     'name' => $item['menu_item']['name'],        // ürün adı
                     'image' => $item['menu_item']['image'],        // ürün adı
                     'restaurant_id' => $item['restaurant_id'],        // ürün adı
@@ -181,7 +186,7 @@ class GpsYemekController extends Controller
                 'courier_id' => -1,
                 'status' => OrderStatus::PENDING,
                 'tracking_id' => $row['order_code'],
-                'full_name' => $row['customer']['first_name'] . " " .$row['customer']['last_name'],
+                'full_name' => $row['customer']['first_name'] . " " . $row['customer']['last_name'],
                 'phone' => $row['customer']['first_name'] . '/' . substr($row['order_code'], -11, 11),
                 'payment_method' => $row['payment_method_name'],
                 'items' => json_encode($items),
@@ -191,7 +196,7 @@ class GpsYemekController extends Controller
                 'sub_amount' => $row['sub_total'],
                 'discount' => 0,
                 'amount' => $row['total'],
-                'notes' => $row['customerNote']??null,
+                'notes' => $row['customerNote'] ?? null,
                 'platform_date' => date('d-m-Y, H:i', strtotime($row['created_at'])),
 
                 'distance' => OrdersHelper::haversineDistance(
