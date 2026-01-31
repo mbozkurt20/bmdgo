@@ -397,37 +397,44 @@
         $.ajax({
             type: 'GET',
             url: '/{{$key}}/orders/sendCourier/' + orderId + '/' + courierId,
+            dataType: 'json', // JSON beklediğimizi belirttik
             success: function (data) {
                 loadingSpan.remove();
 
-                if (data == "OK") {
-                    // Modalı güvenli bir şekilde kapat
+                if (data.success) {
+                    // Modalı güvenli kapat
                     const modalElement = document.getElementById('Courier' + orderId);
                     const modalInstance = bootstrap.Modal.getInstance(modalElement);
-
                     if (modalInstance) {
                         modalInstance.hide();
                     }
 
-                    // EKRANIN GRİ KALMASINI ENGELLEYEN KRİTİK KODLAR:
-                    $('.modal-backdrop').remove(); // Kalan gri fonu kaldır
-                    $('body').removeClass('modal-open').css('overflow', ''); // Body kilidini aç
+                    // Ekran kararmasını önle
+                    $('.modal-backdrop').remove();
+                    $('body').removeClass('modal-open').css('overflow', '');
 
                     Swal.fire({
-                        title: 'Kurye Başarıyla Atandı',
+                        title: data.message,
                         icon: 'success',
-                        timer: 1500,
+                        timer: 2000,
                         showConfirmButton: false
                     });
 
                     fetchOrders(); // Tabloyu tazele
                 } else {
-                    Swal.fire('Hata', 'Kurye Atama Başarısız', 'error');
+                    Swal.fire('Uyarı', data.message || 'Kurye Atama Başarısız', 'error');
                 }
             },
-            error: function () {
+            error: function (xhr) {
                 loadingSpan.remove();
-                Swal.fire('Hata', 'İşlem sırasında bir hata oluştu!', 'error');
+                let errorMsg = 'İşlem sırasında bir hata oluştu!';
+
+                // Backend'den gelen 400 vb. hataların mesajını oku
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMsg = xhr.responseJSON.message;
+                }
+
+                Swal.fire('Üzgünüz :(', errorMsg, 'error');
             }
         });
     }

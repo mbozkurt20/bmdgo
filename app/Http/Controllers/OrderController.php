@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\CourierStatus;
 use App\Helpers\GeoLocation;
+use App\Helpers\MapHelper;
 use App\Helpers\NotificationHelper;
 use App\Helpers\OrdersHelper;
 use App\Helpers\OrderStatus;
@@ -61,56 +62,75 @@ class OrderController extends Controller
         $order = Order::find($orderId);
         $courier = Courier::find($courierId);
 
+        if (!$order || !$courier) {
+            return response()->json(['success' => false, 'message' => 'Sipariş veya Kurye bulunamadı.'], 404);
+        }
+
+        $customer = Customer::find($order->customer_id);
+
+        // Mesafe hesaplama
+        $distance = MapHelper::getGoogleDistance(
+            $courier->latitude, $courier->longitude,
+            $customer->latitude, $customer->longitude
+        );
+
+        if ($distance === null) {
+            $distance = OrdersHelper::haversineDistance(
+                $courier->latitude, $courier->longitude,
+                $customer->latitude, $customer->longitude
+            );
+        }
+
+        // Gelen veri zaten KM ise /1000 yapma, Metre ise yap.
+        // haversineDistance genelde Metre döner:
+        $distanceInKm = $distance / 1000;
+
+        // 20 km den fazla olamaz
+        if ($distanceInKm > 20) {
+            return response()->json([
+                'success' => false,
+                'message' => "Mesafe çok uzak (" . round($distanceInKm, 2) . " km). 50 km'den uzak yerlere atama yapılamaz."
+            ], 400);
+        }
+
+        // İşlemleri gerçekleştir
         $order->courier_id = $courier->id;
-        $order->assigned_at = Carbon::now();
+        $order->assigned_at = now();
         $order->status = OrderStatus::ASSIGNED;
         $order->update();
 
-        // 2 dakika sonra kuryenin siparişi alıp almadığını kontrol et
-        CheckCourierTimeoutJob::dispatch($order->id)
-            ->delay(now()->addMinutes(2));
+        // Job ve diğer işlemler
+        CheckCourierTimeoutJob::dispatch($order->id)->delay(now()->addMinutes(2));
 
-        // Kuryeyi servide de yap ve son atama zamanını güncelle
         $courier->last_assigned_at = now();
         $courier->update();
 
-        $orderCourier = CourierOrder::where('courier_id',$courier->id)->where('order_id', $order->id)->first();
-
-        if (!$orderCourier) {
-            // Yeni siparişi kuryeye atama
-            $newOrderCourier = new CourierOrder();
-            $newOrderCourier->courier_id = $courier->id;
-            $newOrderCourier->order_id = $order->id;
-            $newOrderCourier->save();
-        }
+        $orderCourier = CourierOrder::firstOrCreate([
+            'courier_id' => $courier->id,
+            'order_id' => $order->id
+        ]);
 
         $restaurant = Restaurant::find($order->restaurant_id);
 
-        //mobil bildiri
+        // Bildirimler
         if ($courier->fcm_token){
             $ser = new PushNotificationService();
-            $ser->sendNotification($courier->fcm_token,$restaurant->restaurant_name.' Restorandan Yeni Sipariş Atandı','Sipariş Takip Kodu:'. $order->tracking_id);
+            $ser->sendNotification($courier->fcm_token, $restaurant->restaurant_name.' Restorandan Yeni Sipariş Atandı', 'Sipariş Takip Kodu:'. $order->tracking_id);
         }
 
-        if (OrdersHelper::getOrderSystem(3)){
-            NotificationHelper::add([
-                'title' => 'Paket Kuryeye Atandı',
-                'description' => $order->tracking_id. ' takip numaralı paket '.$courier->name. ' isimli kuryeye atandı.',
-                'url' => route('admin.balance')
-            ]);
-        }
-
-        //kurye atanınca platform order status update et
+        // Platform güncellemesi
         if ($order->platform === 'gpsyemek') {
-            $request = new Request([
+            $updateReq = new Request([
                 'action' => OrderStatus::ASSIGNED,
                 'tracking_id' => $order->tracking_id,
             ]);
-
-            app(GpsYemekController::class)->updateOrder($request);
+            app(GpsYemekController::class)->updateOrder($updateReq);
         }
 
-        echo 'OK';
+        return response()->json([
+            'success' => true,
+            'message' => 'Kurye başarıyla atandı.'
+        ]);
     }
 
     public function new()
@@ -317,23 +337,16 @@ class OrderController extends Controller
         try {
             DB::beginTransaction();
 
-            $city = City::find(Admin::find(auth()->user()->admin_id)->city_id);
+            $restaurant = Restaurant::find($request->restaurant_id);
+            $restaurantId = $restaurant->id;
+            $city = City::find(Admin::find($restaurant->admin_id)->city_id);
 
-            $address = $request->mahalle . ' mah., ' .
-                $request->sokak_cadde . ', '.
-                District::find($request->ilce)->name . '/' . $city->name . ', Türkiye';
 
-            $location = GeoLocation::getLatLong($address);
-
-            if (isset($location['error'])) {
-                return response()->json(['message' => 'Lütfen Adres Bilginizi Detaylı ve Anlaşılır Yazınız.'], 400);
-            }
-
-            $customer = Customer::where('phone', $request->phone)->where('restaurant_id', \auth()->id())->first();
+            $customer = Customer::where('phone', $request->phone)->where('restaurant_id',$restaurantId)->first();
 
             if (!$customer) {
                 $customer = new Customer();
-                $customer->restaurant_id = Auth::user()->id;
+                $customer->restaurant_id = $restaurantId;
                 $customer->name = $request->input('full_name');
                 $customer->phone = $request->input('phone');
                 $customer->mobile = $request->input('mobile');
@@ -342,20 +355,17 @@ class OrderController extends Controller
             }
 
             $address = CustomerAddress::where('customer_id', $customer->id)
-                ->where('restaurant_id', Auth::guard('restaurant')->id())
-                ->where('daire_no', $request->daire_no)
+                ->where('restaurant_id', $restaurantId)
                 ->where('mahalle', $request->mahalle)
                 ->where('sokak_cadde', $request->sokak_cadde)
                 ->where('kat', $request->kat)
                 ->where('daire_no', $request->daire_no)
-                ->where('latitude', $location['lat'])
-                ->where('longitude', $location['lon'])
                 ->first();
 
             if (!$address) {
                 $address = new CustomerAddress();
                 $address->customer_id = $customer->id;
-                $address->restaurant_id = Auth::guard('restaurant')->id();
+                $address->restaurant_id = $restaurantId;
                 $address->name = 'Hızlı Sipariş';
                 $address->sokak_cadde = $request->sokak_cadde;
                 $address->bina_no = $request->bina_no;
@@ -363,14 +373,29 @@ class OrderController extends Controller
                 $address->city_id = $city->id;
                 $address->district_id = $request->ilce;
                 $address->adres_tarifi = $request->adress_tarifi;
-                $address->latitude = $location['lat'];
-                $address->longitude = $location['lon'];
+                $address->latitude = $request->latitude;
+                $address->longitude =$request->longitude;
                 $address->daire_no = $request->daire_no;
                 $address->mahalle = $request->mahalle;
                 $address->save();
             }
 
-            $restaurant = Restaurant::find($request->restaurant_id);
+            $distance = MapHelper::getGoogleDistance(
+                $restaurant->latitude,
+                $restaurant->longitude,
+                $address->latitude,
+                $address->longitude
+            );
+
+            if ($distance === null) {
+                $distance = OrdersHelper::haversineDistance(
+                    $restaurant->latitude,
+                    $restaurant->longitude,
+                    $address->latitude,
+                    $address->longitude
+                );
+            }
+
             $order = \App\Models\Order::create([
                 'platform' => 'telefonsiparis',
                 'courier_id' => $request->courier_id ?? -1,
@@ -379,19 +404,14 @@ class OrderController extends Controller
                 'tracking_id' => "POS-" . rand(9, 99999),
                 'full_name' => $request->full_name,
                 'phone' => $request->phone,
-                'address' =>  $address->mahalle . " Mah. " . $address->sokak_cadde . " Cad/Sk. Apt." . $address->bina_no . ". Kat:" . $address->kat . ". Daire No:" . $address->daire_no,
+                'address' =>  $request->adress_tarifi,
                 'payment_method' => $request->payment_method,
                 'sub_amount' => $request->amount,
                 'discount' => 0.00,
                 'amount' => $request->amount,
                 'status' => OrderStatus::PENDING,
                 'items' => json_encode([]),
-                'distance' => OrdersHelper::haversineDistance(
-                    $restaurant->latitude,
-                    $restaurant->longitude,
-                    $address->latitude,
-                    $address->longitude
-                )
+                'distance' => $distance
             ]);
 
             if (!$order) {

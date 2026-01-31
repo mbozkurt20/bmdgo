@@ -42,14 +42,19 @@ class GeoLocation
             return null;
         }
 
+        $params = [
+            'address' => $query,
+            'key'     => $apiKey,
+            'language' => 'tr',
+            'region'   => 'tr',
+        ];
+        $components = ['country:TR'];
+        if (!empty($details['city'])) $components[] = 'administrative_area:' . $details['city'];
+        if (!empty($details['district'])) $components[] = 'locality:' . $details['district'];
+        $params['components'] = implode('|', $components);
+
         try {
-            $response = Http::timeout(5)->get('https://maps.googleapis.com/maps/api/geocode/json', [
-                'address'  => $query,
-                'key'      => $apiKey,
-                'language' => 'tr',
-                'region'   => 'tr',
-                'components' => 'country:TR'
-            ]);
+            $response = Http::timeout(5)->get('https://maps.googleapis.com/maps/api/geocode/json', $params);
 
             if ($response->successful()) {
                 $data = $response->json();

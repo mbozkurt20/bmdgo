@@ -22,6 +22,7 @@ Route::group(['prefix' => 'restaurant'], function () {
 
         Route::post('/quick-order', [App\Http\Controllers\OrderController::class, 'storeQuick'])->name('quick.order.store');
 
+        Route::get('/customers/get-by-phone/{phone}', [App\Http\Controllers\RestaurantController::class, 'getByPhone']);
         Route::get('/', [App\Http\Controllers\RestaurantController::class, 'home'])->name('restaurant.index');
         Route::post('logout', [App\Http\Controllers\RestaurantController::class, 'logout'])->name('restaurant.logout');
         Route::get('/filter-by-date', [App\Http\Controllers\RestaurantController::class, 'filterByDate'])->name('restaurant.filterByDate');

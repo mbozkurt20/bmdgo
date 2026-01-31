@@ -143,6 +143,10 @@ class MyController extends Controller
             $auth->password = Hash::make($request->password);
         }
 
+        if (Restaurant::where('phone',$request->phone)->where('id','!=',$auth->id)->exists()){
+            return redirect()->back()->with('test', 'Bu telefon numarası zaten kullanılıyor!!');
+        }
+
         $auth->latitude = $request->input('latitude');
         $auth->longitude = $request->input('longitude');
         $auth->name = $request->input('name');

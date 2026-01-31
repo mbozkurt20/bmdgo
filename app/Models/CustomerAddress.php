@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CustomerAddress extends Model
 {
-    use HasFactory,SoftDeletes;
+    use SoftDeletes;
 
     protected $fillable = [
         'restaurant_id',

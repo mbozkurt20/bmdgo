@@ -3,11 +3,12 @@
 namespace App\Helpers;
 class OrderStatus
 {
-    public const PENDING = 'PENDING'; //bekliyor
+    public const PENDING = 'PENDING'; //BEKLEİYOR
     public const CONFIRMED = 'CONFIRMED'; //ONAYLANDI
-    public const PREPARED = 'PREPARED'; //hazırlandı
-    public const ASSIGNED = 'ASSIGNED';  //kuryeye atandı
-    public const PICKUP = 'PICKUP';  //YOLDA OLANLAR
+    public const PREPARING = 'PREPARING'; //HAZIRLANIYOR
+    public const PREPARED = 'PREPARED'; //HAZIRLANDI
+    public const ASSIGNED = 'ASSIGNED';  // KURYEE ATANDI
+    public const PICKUP = 'PICKUP';  // YOLA ÇIKTI
     public const HANDOVER = 'HANDOVER';  //kuryeye verildi
     public const DELIVERED = 'DELIVERED'; // teslim edildi
     public const UNSUPPLIED = 'UNSUPPLIED'; //reddedildi

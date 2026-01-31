@@ -279,6 +279,28 @@ class RestaurantController extends Controller
         ];
     }
 
+    public function getByPhone($phone)
+    {
+        // Müşteriyi ve adreslerini bul
+        $customer = \App\Models\Customer::where('phone', 'LIKE', "%$phone%")
+            ->with('addresses') // Adresler tablosuyla ilişki varsa
+            ->first();
+dd($customer);
+
+        if ($customer) {
+            return response()->json([
+                'success' => true,
+                'customer' => [
+                    'id' => $customer->id,
+                    'name' => $customer->full_name,
+                ],
+                'addresses' => $customer->addresses // Müşterinin tüm kayıtlı adresleri
+            ]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Müşteri bulunamadı']);
+    }
+
     public function filterByDate(Request $request)
     {
         $startTime = Carbon::parse($request->start_date)->startOfDay();
