@@ -31,11 +31,10 @@ class GpsYemekController extends Controller
     public function updateOrder(Request $request)
     {
         $status = $request->input('action');
+        $orderCode = $request->input('tracking_id');
+        $order = Order::where('tracking_id', $orderCode)->first();
+
         if ($status == OrderStatus::PREPARED || $status == OrderStatus::UNSUPPLIED || $status == OrderStatus::DELIVERED || $status == OrderStatus::ASSIGNED) {
-            $orderCode = $request->input('tracking_id');
-
-            $order = Order::where('tracking_id', $orderCode)->first();
-
             $api_token = $order->restaurant->gpsyemek_api_key;
 
             $response = Http::withHeaders([
@@ -93,14 +92,29 @@ class GpsYemekController extends Controller
                         }
                         break;
                 }
+
+                $order->status = $status;
+                $success = $order->update();
+
+                if ($success) {
+                    return response()->json(['status' => "OK"], 200);
+                } else {
+                    Log::error('Sipariş durumu güncellenemedi', ['order_id' => $order->id]);
+                    return response()->json(['status' => "ERR"], 400);
+                }
             } else {
                 return response()->json(['status' => ""], 200);
             }
+        }else {
+            $order->status = $status;
+            $success = $order->update();
+            if ($success) {
+                return response()->json(['status' => "OK"], 200);
+            } else {
+                Log::error('Sipariş durumu güncellenemedi', ['order_id' => $order->id]);
+                return response()->json(['status' => "ERR"], 400);
+            }
         }
-
-        $order->status = $status;
-        $success = $order->update();
-        return response()->json(['status' => "OK"], 200);
     }
 
     private function orders($restaurant)
