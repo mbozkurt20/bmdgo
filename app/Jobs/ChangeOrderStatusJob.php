@@ -15,6 +15,8 @@ class ChangeOrderStatusJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public $orderId;
+
     /**
      * Create a new job instance.
      *
