@@ -117,7 +117,7 @@ class OrderController extends Controller
             }
 
             $order->courier_id = $courier->id;
-            $order->status = OrderStatus::ACCEPT_ASSIGNED;
+            $order->status = OrderStatus::ASSIGNED;
             $order->update();
         }
 

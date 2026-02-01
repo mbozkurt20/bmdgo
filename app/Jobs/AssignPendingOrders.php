@@ -8,7 +8,6 @@ use App\Helpers\NotificationHelper;
 use App\Helpers\OrdersHelper;
 use App\Helpers\OrderStatus;
 use App\Models\CourierOrder;
-use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Courier;
 use App\Models\Restaurant;
@@ -32,7 +31,7 @@ class AssignPendingOrders implements ShouldQueue
         Log::info('--- OTOMATİK KURYE ATAMA DÖNGÜSÜ BAŞLADI ---');
 
         $orders = Order::where('courier_id', -1)
-            ->where('status', OrderStatus::Pre)
+            ->where('status', OrderStatus::PREPARED)
             ->orderBy('created_at', 'asc')
             ->whereDate('created_at', now()->toDateString())
             ->get();
