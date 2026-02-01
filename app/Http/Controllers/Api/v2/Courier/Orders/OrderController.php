@@ -246,8 +246,9 @@ class OrderController extends Controller
     {
         $courier = auth('courier')->user();
 
-        $startDate = Carbon::createFromFormat('Y-m-d', $request->startDate)->startOfDay();
-        $endDate = Carbon::createFromFormat('Y-m-d', $request->endDate)->endOfDay();
+        $startDate = Carbon::parse($request->startDate)->startOfDay();
+        $endDate   = Carbon::parse($request->endDate)->endOfDay();
+
 
         $orderCount = Order::where('courier_id', $courier->id)
             ->where('status',OrderStatus::DELIVERED)
