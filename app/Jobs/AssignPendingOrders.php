@@ -12,6 +12,7 @@ use App\Models\Order;
 use App\Models\Courier;
 use App\Models\Restaurant;
 use App\Services\PushNotificationService;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -33,7 +34,7 @@ class AssignPendingOrders implements ShouldQueue
         $orders = Order::where('courier_id', -1)
             ->where('status', OrderStatus::PREPARED)
             ->orderBy('created_at', 'asc')
-            ->whereDate('created_at', now()->toDateString())
+            ->whereDate('created_at', Carbon::today())
             ->get();
 
         if ($orders->isEmpty()) {
@@ -75,7 +76,6 @@ class AssignPendingOrders implements ShouldQueue
             try {
                 $order->courier_id = $courier->id;
                 $order->assigned_at = now();
-                $order->status = OrderStatus::ASSIGNED;
                 $order->update();
 
                 $courier->last_assigned_at = now();
@@ -85,14 +85,13 @@ class AssignPendingOrders implements ShouldQueue
 
                 // --- 4 PAKET KONTROLÜ VE YOLA ÇIKTI (HANDOVER) MANTIĞI ---
                 $activePackagesCount = Order::where('courier_id', $courier->id)
-                    ->whereIn('status', [OrderStatus::ASSIGNED])
                     ->count();
 
                 if ($activePackagesCount >= $maxPackageLimit) {
                     // Kuryenin üzerindeki tüm ASSIGNED paketleri HANDOVER (Yola Çıktı) yap
                     Order::query()->where('courier_id', $courier->id)
-                        ->where('status', OrderStatus::ASSIGNED)
-                        ->update(['status' => OrderStatus::HANDOVER]);
+                        ->where('status', OrderStatus::PREPARED)
+                        ->update(['status' => OrderStatus::ASSIGNED]);
 
                     // Kuryeyi meşgul yap ki yeni paket gelmesin
                     $courier->status = CourierStatus::service;
