@@ -112,11 +112,9 @@ class OrderController extends Controller
 
         //kurye teslim aldı
         if ($request->input('order_status_id') == 4) {
-            /*
-        if ($courier->status == CourierStatus::service){
-            return Json::error('Teslim Edilmeyen Sipariş Bulunuyor');
-        }
-*/
+            if (Order::where('courier_id', $courier->id)->whereIn('status', [OrderStatus::HANDOVER])->exists() ){
+                return Json::error('Teslim Edilmeyen Sipariş Bulunuyor');
+            }
 
             $order->courier_id = $courier->id;
             $order->status = OrderStatus::ASSIGNED;
@@ -125,11 +123,10 @@ class OrderController extends Controller
 
         //kurye YOLA ÇIKTI
         if ($request->input('order_status_id') == 3) {
-            /*
-            if ($courier->status == CourierStatus::service){
+            if (Order::where('courier_id', $courier->id)->whereIn('status', [OrderStatus::HANDOVER])->exists() ){
                 return Json::error('Teslim Edilmeyen Sipariş Bulunuyor');
             }
-*/
+
             $courier->status = CourierStatus::service;
             $courier->update();
 
