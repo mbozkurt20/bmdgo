@@ -32,7 +32,7 @@ class AssignPendingOrders implements ShouldQueue
         Log::info('--- OTOMATİK KURYE ATAMA DÖNGÜSÜ BAŞLADI ---');
 
         $orders = Order::where('courier_id', -1)
-            ->where('status', OrderStatus::PENDING_ASSIGNED)
+            ->where('status', OrderStatus::PREPARED)
             ->orderBy('created_at', 'asc')
             ->get();
 

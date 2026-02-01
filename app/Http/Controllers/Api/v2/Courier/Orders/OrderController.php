@@ -111,6 +111,17 @@ class OrderController extends Controller
         }
 
         //kurye teslim aldı
+        if ($request->input('order_status_id') == 4) {
+            if ($courier->status == CourierStatus::service){
+                return Json::error('Teslim Edilmeyen Sipariş Bulunuyor');
+            }
+
+            $order->courier_id = $courier->id;
+            $order->status = OrderStatus::ACCEPT_ASSIGNED;
+            $order->update();
+        }
+
+        //kurye YOLA ÇIKTI
         if ($request->input('order_status_id') == 3) {
             if ($courier->status == CourierStatus::service){
                 return Json::error('Teslim Edilmeyen Sipariş Bulunuyor');
@@ -230,7 +241,6 @@ class OrderController extends Controller
             ]
         ]);
     }
-
 
     public function report(REquest $request)
     {

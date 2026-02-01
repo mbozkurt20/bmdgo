@@ -8,6 +8,7 @@ class OrderStatus
     public const PREPARED = 'PREPARED'; //HAZIRLANDI
     public const PENDING_ASSIGNED = 'PENDING_ASSIGNED';  // KURYEE ATAMA AŞAMASINDA
     public const ASSIGNED = 'ASSIGNED';  // KURYEE ATANDI
+    public const ACCEPT_ASSIGNED = 'ACCEPT_ASSIGNED';  // KURYEE TESLİM ALDI
 
     public const HANDOVER = 'HANDOVER';  // YOLA ÇIKTI
     public const DELIVERED = 'DELIVERED'; // teslim edildi
@@ -21,6 +22,7 @@ class OrderStatus
             self::PREPARED,
             self::PENDING_ASSIGNED,
             self::ASSIGNED,
+            self::ACCEPT_ASSIGNED,
             self::HANDOVER,
             self::DELIVERED,
             self::UNSUPPLIED,
@@ -40,6 +42,7 @@ class OrderStatus
             'PREPARED' => 'prepared',
             'PENDING_ASSIGNED' => 'pending_assigned',
             'ASSIGNED' => 'assigned',
+            'ACCEPT_ASSIGNED' => 'accept_assigned',
             'HANDOVER' => 'handover',
             'DELIVERED' => 'delivered',
             'UNSUPPLIED' => 'unsupplied'
