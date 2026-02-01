@@ -106,7 +106,7 @@ $avgDurations = OrderStatusLog::select('restaurant_id', 'status', DB::raw('AVG(d
             }
         }
 
-        if ($order && Admin::where('id', $restaurant->admin_id)->first()->auto_orders && $order->status == OrderStatus::PENDING_ASSIGNED) {
+        if ($order && Admin::where('id', $restaurant->admin_id)->first()->auto_orders && $order->status == OrderStatus::PREPARED) {
             dispatch(new AssignPendingOrders());
         }
 

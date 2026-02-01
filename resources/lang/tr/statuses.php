@@ -2,9 +2,7 @@
 
 return [
     'pending'          => 'Beklemede',
-    'preparing'        => 'Hazırlanıyor',
-    'prepared'         => 'Hazırlandı',
-    'pending_assigned' => 'Kurye Atama Bekliyor',
+    'prepared'         => 'Hazırlanıyor',
     'assigned'         => 'Kuryeye Atananlar',
     'handover'         => 'Yola Çıktı',
     'delivered'        => 'Teslim Edildi',

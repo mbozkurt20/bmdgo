@@ -603,9 +603,7 @@
         // Durum seçenekleri
         const statusOptions = `
       <option value="PENDING" ${status == 'PENDING' ? 'selected' : ''}>BEKLEMEDE</option>
-<option value="PREPARING" ${status == 'PREPARING' ? 'selected' : ''}>HAZIRLANIYOR</option>
-<option value="PREPARED" ${status == 'PREPARED' ? 'selected' : ''}>HAZIRLANDI</option>
-<option value="PENDING_ASSIGNED" ${status == 'PENDING_ASSIGNED' ? 'selected' : ''}>KURYE ATAMA BEKLİYOR</option>
+<option value="PREPARED" ${status == 'PREPARED' ? 'selected' : ''}>HAZIRLANIYOR</option>
 <option value="ASSIGNED" ${status == 'ASSIGNED' ? 'selected' : ''}>KURYE ATANDI</option>
 <option value="HANDOVER" ${status == 'HANDOVER' ? 'selected' : ''}>KURYEYE TESLİM EDİLDİ / YOLDA</option>
 <option value="DELIVERED" ${status == 'DELIVERED' ? 'selected' : ''}>TESLİM EDİLDİ</option>

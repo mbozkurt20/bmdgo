@@ -88,7 +88,7 @@ class OrderController extends Controller
         $order->update([
             'courier_id' => -1,
             'assigned_at' => null,
-            'status' => OrderStatus::PENDING_ASSIGNED,
+            'status' => OrderStatus::PREPARED,
         ]);
 
         $courier->status = CourierStatus::passive;
