@@ -320,7 +320,6 @@ class CourierController extends Controller
 
         $order->courier_id = $courier->id;
         $order->assigned_at = Carbon::now();
-        $order->status = OrderStatus::ASSIGNED;
         $order->save();
 
         CheckCourierTimeoutJob::dispatch($order->id)

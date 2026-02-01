@@ -97,7 +97,6 @@ class OrderController extends Controller
         // İşlemleri gerçekleştir
         $order->courier_id = $courier->id;
         $order->assigned_at = now();
-        $order->status = OrderStatus::ASSIGNED;
         $order->update();
 
         // Job ve diğer işlemler
