@@ -106,8 +106,8 @@ class ProgressPaymentController extends Controller
     public function courierFilter(Request $request){
         $courier = Courier::find($request->courier);
 
-        $startDate = Carbon::createFromFormat('Y-m-d', $request->startDate)->startOfDay();
-        $endDate = Carbon::createFromFormat('Y-m-d', $request->endDate)->endOfDay();
+        $startDate = Carbon::createFromFormat('Y-m-d', $request->start)->startOfDay();
+        $endDate = Carbon::createFromFormat('Y-m-d', $request->end)->endOfDay();
 
         $orderCount = Order::where('courier_id', $courier->id)
             ->where('status',OrderStatus::DELIVERED)
