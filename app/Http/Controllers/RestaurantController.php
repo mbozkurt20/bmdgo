@@ -140,26 +140,7 @@ class RestaurantController extends Controller
         )));
     }
 
-    private function getPreparedSpeed($userId, $startDate, $endDate)
-    {
-        return DB::table('order_status_logs as p')
-            ->join('order_status_logs as pr', function($join) {
-                $join->on('p.order_id', '=', 'pr.order_id')
-                    ->where('pr.status', 'PREPARED');
-            })
-            ->join('orders as o', 'o.id', '=', 'p.order_id')
-            ->select(
-                DB::raw('DATE(p.changed_at) as date'),
-                DB::raw('ROUND(AVG(TIMESTAMPDIFF(MINUTE, p.changed_at, pr.changed_at)), 2) as avg_minutes'),
-                DB::raw('COUNT(*) as order_count')
-            )
-            ->where('p.status', 'PENDING')
-            ->where('o.restaurant_id', $userId)
-            ->whereBetween('p.changed_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
-            ->groupBy('date')
-            ->orderBy('date')
-            ->get();
-    }
+
 
     private function getCommonData($startDate, $endDate)
     {
@@ -198,6 +179,27 @@ class RestaurantController extends Controller
         ];
     }
 
+    private function getPreparedSpeed($userId, $startDate, $endDate)
+    {
+        return DB::table('order_status_logs as p')
+            ->join('order_status_logs as pr', function($join) {
+                $join->on('p.order_id', '=', 'pr.order_id')
+                    ->where('pr.status', OrderStatus::PREPARED);
+            })
+            ->join('orders as o', 'o.id', '=', 'p.order_id')
+            ->select(
+                DB::raw('DATE(p.changed_at) as date'),
+                DB::raw('ROUND(AVG(TIMESTAMPDIFF(MINUTE, p.changed_at, pr.changed_at)), 2) as avg_minutes'),
+                DB::raw('COUNT(*) as order_count')
+            )
+            ->where('p.status',  OrderStatus::PREPARED)
+            ->where('o.restaurant_id', $userId)
+            ->whereBetween('p.changed_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+    }
+
     /**
      * ASSIGNED to HANDOVER hızını hesapla
      */
@@ -206,7 +208,7 @@ class RestaurantController extends Controller
         return DB::table('order_status_logs as a')
             ->join('order_status_logs as h', function($join) {
                 $join->on('a.order_id', '=', 'h.order_id')
-                    ->where('h.status', 'HANDOVER');
+                    ->where('h.status', OrderStatus::HANDOVER);
             })
             ->join('orders as o', 'o.id', '=', 'a.order_id')
             ->select(
@@ -214,7 +216,7 @@ class RestaurantController extends Controller
                 DB::raw('ROUND(AVG(TIMESTAMPDIFF(MINUTE, a.changed_at, h.changed_at)), 2) as avg_minutes'),
                 DB::raw('COUNT(*) as order_count')
             )
-            ->where('a.status', 'ASSIGNED')
+            ->where('a.status', OrderStatus::ASSIGNED)
             ->where('o.restaurant_id', $userId)
             ->whereBetween('a.changed_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
             ->groupBy('date')
@@ -230,7 +232,7 @@ class RestaurantController extends Controller
         return DB::table('order_status_logs as h')
             ->join('order_status_logs as d', function($join) {
                 $join->on('h.order_id', '=', 'd.order_id')
-                    ->where('d.status', 'DELIVERED');
+                    ->where('d.status', OrderStatus::DELIVERED);
             })
             ->join('orders as o', 'o.id', '=', 'h.order_id')
             ->select(
@@ -238,7 +240,7 @@ class RestaurantController extends Controller
                 DB::raw('ROUND(AVG(TIMESTAMPDIFF(MINUTE, h.changed_at, d.changed_at)), 2) as avg_minutes'),
                 DB::raw('COUNT(*) as order_count')
             )
-            ->where('h.status', 'HANDOVER')
+            ->where('h.status', OrderStatus::HANDOVER)
             ->where('o.restaurant_id', $userId)
             ->whereBetween('h.changed_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
             ->groupBy('date')

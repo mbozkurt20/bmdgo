@@ -10,7 +10,8 @@
             url: '/{{$key}}/orders/ajax',
             method: 'GET', // veya 'POST' gerekiyorsa
             success: function (data) {
-                console.log({gird: data})
+                Object.keys(statusMap).forEach(status => updateTableForStatus(status));
+
                 if (data) {
                     Object.keys(data).forEach(statusKey => {
                         data[statusKey].forEach(order => {
@@ -73,38 +74,54 @@
         var platform = $('#platform_' + id).val();
         var selectEl = e.target;
 
-        // Spinner + bekleniyor yazısı
+        // Spinner ekle
         let loadingSpan = document.createElement('span');
         loadingSpan.className = 'ms-2 d-flex align-items-center';
         loadingSpan.innerHTML = `
         <div class="spinner-border spinner-border-sm me-1" role="status"></div>
-        <small>Bekleniyor...</small>
-    `;
-
-        // Select elementinin yanına ekle
+        <small>Bekleniyor...</small>`;
         selectEl.parentNode.appendChild(loadingSpan);
 
-        // İptal işlemi
         if (action === 'UNSUPPLIED') {
-            $('#cancelModal').modal('show');
+            // O siparişe özel modalı aç
+            var myModal = new bootstrap.Modal(document.getElementById('cancelModal' + id));
+            myModal.show();
 
-            $('#confirmCancel').off('click').on('click', function () {
-                var cancelReason = $('#cancelReason' + id).val();
+            // Spinner'ı modal açıldığı için temizle (işlem modal içinde devam edecek)
+            loadingSpan.remove();
 
-                if (cancelReason.trim() === '') {
-                    Swal.fire('Lütfen iptal nedenini belirtin.');
-                    loadingSpan.remove(); // iptal durumunda spinner kaldır
-                    return;
-                }
-                // Güncelle
-                sendOrderStatusUpdate(action, tracking_id, platform, cancelReason, id)
-                    .finally(() => loadingSpan.remove());
-            });
+            // Select box'ı eski haline getirmek isteyebilirsiniz (isteğe bağlı)
         } else {
-            // Diğer durumlar
+            // Diğer durumlar için doğrudan güncelle
             sendOrderStatusUpdate(action, tracking_id, platform, null, id)
                 .finally(() => loadingSpan.remove());
         }
+    }
+    function cancelOrder(id) {
+        var tracking_id = $('#tracking_' + id).val();
+        var platform = $('#platform_' + id).val();
+        var cancelReason = $('#cancelReason' + id).val();
+        var action = 'UNSUPPLIED';
+
+        if (!cancelReason || cancelReason.trim() === '') {
+            Swal.fire('Lütfen iptal nedenini belirtin.');
+            return;
+        }
+
+        // Butonu pasif yapalım ki mükerrer tıklanmasın
+        const btn = event.target;
+        btn.disabled = true;
+
+        sendOrderStatusUpdate(action, tracking_id, platform, cancelReason, id)
+            .then(() => {
+                // Modalı kapat
+                const modalEl = document.getElementById('cancelModal' + id);
+                const modalInstance = bootstrap.Modal.getInstance(modalEl);
+                if (modalInstance) modalInstance.hide();
+            })
+            .finally(() => {
+                btn.disabled = false;
+            });
     }
 
     async function sendOrderStatusUpdate(action, tracking_id, platform, message, orderId) {
@@ -154,22 +171,27 @@
         const existingRow = $('#' + rowId);
 
         if (existingRow.length) {
-            // Aynı satır zaten var
-            const parentTableId = existingRow.closest("table").attr("id");
-            if (parentTableId !== tabId) {
-                // Eski tablodan kaldır ve yeni tab’a ekle
+            const parentTable = existingRow.closest("table");
+            const oldTabId = parentTable.attr("id");
+
+            if (oldTabId !== tabId) {
+                // Eski tablodan kaldır
                 existingRow.remove();
+                // Yeni tab’a ekle
                 $('#' + tabId).find('tbody').append(newRowHtml);
+
+                // ÖNEMLİ: Eski tablonun durumunu kontrol et (Boşaldı mı?)
+                // statusMap içinden tabId'ye göre status'ü geri bulup gönderiyoruz
+                const oldStatus = Object.keys(statusMap).find(key => statusMap[key] === oldTabId);
+                updateTableForStatus(oldStatus);
             } else {
-                // Aynı tabloda ise güncelle
                 existingRow.replaceWith(newRowHtml);
             }
         } else {
-            // Satır yoksa ekle
             $('#' + tabId).find('tbody').append(newRowHtml);
         }
 
-        // Tab boşsa mesaj göster
+        // Mevcut tablonun durumunu kontrol et (Veri eklendiği için uyarıyı silecek)
         updateTableForStatus(order.status);
 
         if (order.status === 'HANDOVER') {
@@ -305,9 +327,29 @@
     }
 
     function updateTableForStatus(status) {
-        const tableBody = document.querySelector(`#${statusMap[status]} tbody`);
-        if (!tableBody || tableBody.children.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="10" class="text-center">Sipariş bulunmuyor</td></tr>`;
+        const tabId = statusMap[status];
+        if (!tabId) return;
+
+        const tableBody = document.querySelector(`#${tabId} tbody`);
+        if (tableBody) {
+            // Eğer tabloda hiç <tr> yoksa veya sadece bizim "Sipariş bulunmuyor" yazımız varsa
+            const rows = tableBody.querySelectorAll('tr:not(.no-order-row)');
+
+            if (rows.length === 0) {
+                tableBody.innerHTML = `
+                <tr class="no-order-row">
+                    <td colspan="12" class="text-center py-4">
+                        <div class="d-flex flex-column align-items-center">
+                            <i class="fas fa-box-open mb-2 text-muted" style="font-size: 2rem;"></i>
+                            <span class="fw-bold text-muted">Bu kategoride henüz sipariş bulunmuyor.</span>
+                        </div>
+                    </td>
+                </tr>`;
+            } else {
+                // Eğer sipariş geldiyse uyarı satırını kaldır
+                const noOrderRow = tableBody.querySelector('.no-order-row');
+                if (noOrderRow) noOrderRow.remove();
+            }
         }
     }
 
@@ -481,6 +523,7 @@
             hour: '2-digit',
             minute: '2-digit',
         }) : '';
+
         const courierName = order.courier ? order.courier.name : 'Kurye Bulunmuyor';
         const status = order.status; // varsayılan
         const distanceStr = order.distance ? formatDistance(order.distance) : '';
@@ -616,7 +659,7 @@
     <td>
         <input type="hidden" id="tracking_${order.id}" value="${trackingId}">
         <input type="hidden" id="platform_${order.id}" value="${platform}">
-        <select class="inline-order-select form-control" onchange="StatusOrderChange(event, ${order.id})" ${status == 'DELIVERED' ? 'disabled' : ''}>
+        <select class="inline-order-select form-control" onchange="StatusOrderChange(event, ${order.id})" ${status == 'DELIVERED' ||  status == 'UNSUPPLIED' ? 'disabled' : ''}>
             ${statusOptions}
         </select>
         <!-- İptal modal -->

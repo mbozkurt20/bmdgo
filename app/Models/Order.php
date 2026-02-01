@@ -50,4 +50,17 @@ class Order extends Model
     {
         return $this->hasMany(OrderStatusLog::class, 'order_id', 'id');
     }
+
+    public static function paymentMethods()
+    {
+        return [
+            'nakit'         => 'Kapıda Nakit ile Ödeme',
+            'kredi_karti'   => 'Kapıda Kredi Kartı ile Ödeme',
+            'ticket'        => 'Kapıda Ticket ile Ödeme',
+            'sodexo'        => 'Kapıda Sodexo ile Ödeme',
+            'multinet'      => 'Kapıda Multinet ile Ödeme',
+            'pluxee'        => 'Kapıda Pluxee ile Ödeme',
+            'online'        => 'Online Kredi/Banka Kartı'
+        ];
+    }
 }

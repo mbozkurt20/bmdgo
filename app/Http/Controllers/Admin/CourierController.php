@@ -29,6 +29,7 @@ class CourierController extends Controller
     {
         $this->middleware('auth');
     }
+
     public function index()
     {
         $couriers = Courier::where('restaurant_id', 0)
@@ -37,35 +38,39 @@ class CourierController extends Controller
 
         return view('admin.couriers.index', compact('couriers'));
     }
+
     public function getCourier()
     {
         $couriers = Courier::where('restaurant_id', 0)
             ->where('admin_id', Auth::guard('admin')->id())
-            ->whereIn('status', [CourierStatus::active,CourierStatus::service])
+            ->whereIn('status', [CourierStatus::active, CourierStatus::service])
             ->get();
 
         return response()->json($couriers);
     }
+
     public function new()
     {
         return view('admin.couriers.new');
     }
+
     public function edit($id)
     {
         $courier = Courier::find($id);
         return view('admin.couriers.edit', compact('courier'));
     }
+
     public function create(Request $request)
     {
         $testMode = env('TEST_MODE');
 
         if ($testMode) {
             if (Courier::count() > env('TEST_MODE_LIMIT')) {
-                return redirect()->back()->with('test', 'Test Modu: Üzgünüz, En Fazla '.env('TEST_MODE_LIMIT').' Kayıt Ekleyebilirsiniz');
+                return redirect()->back()->with('test', 'Test Modu: Üzgünüz, En Fazla ' . env('TEST_MODE_LIMIT') . ' Kayıt Ekleyebilirsiniz');
             }
         }
 
-        if (Courier::where('phone',$request->input('phone'))->exists()) {
+        if (Courier::where('phone', $request->input('phone'))->exists()) {
             return redirect()->back()->with('test', 'Bu numaraya ait kurye bulunmaktadır !!');
         }
 
@@ -112,7 +117,7 @@ class CourierController extends Controller
             return redirect()->back()->with('message', 'Tüm alanları doldurunuz.');
         }
 
-        if (Courier::where('id','!=',$request->input('id'))->where('phone',$request->input('phone'))->exists()) {
+        if (Courier::where('id', '!=', $request->input('id'))->where('phone', $request->input('phone'))->exists()) {
             return redirect()->back()->with('test', 'Bu numaraya ait kurye bulunmaktadır !!');
         }
 
@@ -138,14 +143,14 @@ class CourierController extends Controller
             'password' => Hash::make($request->input('password')),
         ]);
 
-        $courierss = Courier::where('status',1)
+        $courierss = Courier::where('status', 1)
             ->where('status', CourierStatus::active)
             ->get();
 
 
-        $admin = Admin::where('id', auth()->id())->select(['latitude','longitude'])->first();
+        $admin = Admin::where('id', auth()->id())->select(['latitude', 'longitude'])->first();
 
-        $courierss = $courierss->map(function($courier) use ($admin) {
+        $courierss = $courierss->map(function ($courier) use ($admin) {
             $distanceKm = $this->haversineDistance(
                 $admin->latitude,
                 $admin->longitude,
@@ -162,7 +167,7 @@ class CourierController extends Controller
             return $courier;
         });
 
-        Pusher::trigger('courier-channel', 'courier-'.$admin->id, $courierss);
+        Pusher::trigger('courier-channel', 'courier-' . $admin->id, $courierss);
 
         return redirect()->back()->with('message', 'Kurye güncelleme işlemi başarıyla gerçekleşti.');
     }
@@ -184,10 +189,10 @@ class CourierController extends Controller
 
         // Tarih aralığı alıyoruz (varsayılan: bugün)
         $startDate = $request->input('start_date', Carbon::today()->toDateString());
-        $endDate   = $request->input('end_date', Carbon::today()->toDateString());
+        $endDate = $request->input('end_date', Carbon::today()->toDateString());
 
         $startDateObj = Carbon::parse($startDate)->startOfDay();
-        $endDateObj   = Carbon::parse($endDate)->endOfDay();
+        $endDateObj = Carbon::parse($endDate)->endOfDay();
 
         // Kurye'nin eşleşmiş siparişleri
         $courierOrderIds = CourierOrder::where('courier_id', $courier->id)
@@ -204,37 +209,40 @@ class CourierController extends Controller
         $deliveredOrders = $orders->where('status', OrderStatus::DELIVERED);
 
         // Ödeme yöntemine göre filtreleme
-        $cashOrders   = $deliveredOrders->where('payment_method', 'Kapıda Nakit ile Ödeme');
-        $cardOrders   = $deliveredOrders->where('payment_method', 'Kapıda Kredi Kartı ile Ödeme');
-        $ticketOrders = $deliveredOrders->where('payment_method', 'Kapıda Ticket ile Ödeme');
+        $cashOrders = $deliveredOrders->whereIn('payment_method', ['Kapıda Nakit İle Ödeme', 'Nakit']);
+        $cardOrders = $deliveredOrders->whereIn('payment_method', ['Kapıda Kredi Kartı ile Ödeme', 'Kredi Kartı', 'Online Ödeme']);
+        $ticketOrders = $deliveredOrders->whereIn('payment_method', ['Kapıda Ticket ile Ödeme','Ticket','Ticket Online']);
+        $ticketOrders = $deliveredOrders->whereIn('payment_method', ['Kapıda Sodexo ile Ödeme','Sodexo','Sodexo Online']);
+        $ticketOrders = $deliveredOrders->whereIn('payment_method', ['Kapıda Multinet ile Ödeme','Multinet','Multinet Online']);
+        $ticketOrders = $deliveredOrders->whereIn('payment_method', ['Kapıda Pluxee ile Ödeme','Pluxee','Pluxee Online']);
 
         // Kazanç hesaplama
         if ($courier->price_type == 'package') {
             // Paket başı ücretlendirme
-            $totalCash       = $cashOrders->count() * $courier->price;
+            $totalCash = $cashOrders->count() * $courier->price;
             $totalCreditCard = $cardOrders->count() * $courier->price;
-            $totalTicket     = $ticketOrders->count() * $courier->price;
+            $totalTicket = $ticketOrders->count() * $courier->price;
         } else {
             // Km başı ücretlendirme
             $kmPrice = $courier->km_price;
 
-            $totalCash       = $cashOrders->sum(fn($o) => $o->distance * $kmPrice);
+            $totalCash = $cashOrders->sum(fn($o) => $o->distance * $kmPrice);
             $totalCreditCard = $cardOrders->sum(fn($o) => $o->distance * $kmPrice);
-            $totalTicket     = $ticketOrders->sum(fn($o) => $o->distance * $kmPrice);
+            $totalTicket = $ticketOrders->sum(fn($o) => $o->distance * $kmPrice);
         }
 
         $summary = [
-            'order_count'    => $deliveredOrders->count(),
-            'cash_orders'    => $cashOrders->count(),
-            'card_orders'    => $cardOrders->count(),
-            'ticket_orders'  => $ticketOrders->count(),
+            'order_count' => $deliveredOrders->count(),
+            'cash_orders' => $cashOrders->count(),
+            'card_orders' => $cardOrders->count(),
+            'ticket_orders' => $ticketOrders->count(),
         ];
 
         $totals = [
-            'cash'        => $totalCash,
+            'cash' => $totalCash,
             'credit_card' => $totalCreditCard,
-            'ticket'      => $totalTicket,
-            'overall'     => $totalCash + $totalCreditCard + $totalTicket,
+            'ticket' => $totalTicket,
+            'overall' => $totalCash + $totalCreditCard + $totalTicket,
         ];
 
         return view('admin.couriers.report', compact(
@@ -269,14 +277,14 @@ class CourierController extends Controller
                 ->count()
         ];
 
-        $couriers = Courier::whereIn('status', [CourierStatus::active,CourierStatus::service])
+        $couriers = Courier::whereIn('status', [CourierStatus::active, CourierStatus::service])
             ->where('restaurant_id', 0)
             ->where('admin_id', auth()->id())
             ->get();
 
-        $admin = Admin::where('id', \auth()->id())->select(['latitude','longitude'])->first();
-        $courierss = $couriers->map(function($courier) use ($admin) {
-            $distanceKm =  OrdersHelper::haversineDistance(
+        $admin = Admin::where('id', \auth()->id())->select(['latitude', 'longitude'])->first();
+        $courierss = $couriers->map(function ($courier) use ($admin) {
+            $distanceKm = OrdersHelper::haversineDistance(
                 $admin->latitude,
                 $admin->longitude,
                 $courier->latitude,
@@ -292,7 +300,7 @@ class CourierController extends Controller
             return $courier;
         });
 
-        return view('admin.couriers.new-maps',compact('courierss','data'));
+        return view('admin.couriers.new-maps', compact('courierss', 'data'));
     }
 
     public function auto_order($id)
@@ -322,7 +330,7 @@ class CourierController extends Controller
         $courier->last_assigned_at = now();
         $courier->save();
 
-        $orderCourier = CourierOrder::where('courier_id',$courier->id)->where('order_id', $order->id)->first();
+        $orderCourier = CourierOrder::where('courier_id', $courier->id)->where('order_id', $order->id)->first();
 
         if (!$orderCourier) {
             // Yeni siparişi kuryeye atama
@@ -335,15 +343,15 @@ class CourierController extends Controller
         $restaurant = Restaurant::find($order->restaurant_id);
 
         //mobil bildiri
-        if ($courier->fcm_token){
+        if ($courier->fcm_token) {
             $ser = new PushNotificationService();
-            $ser->sendNotification($courier->fcm_token,$restaurant->restaurant_name.' Restorandan Yeni Sipariş Atandı','Sipariş Takip Kodu:'. $order->tracking_id);
+            $ser->sendNotification($courier->fcm_token, $restaurant->restaurant_name . ' Restorandan Yeni Sipariş Atandı', 'Sipariş Takip Kodu:' . $order->tracking_id);
         }
 
-        if (OrdersHelper::getOrderSystem(3)){
+        if (OrdersHelper::getOrderSystem(3)) {
             NotificationHelper::add([
                 'title' => 'Paket Kuryeye Atandı',
-                'description' => $order->tracking_id. ' takip numaralı paket '.$courier->name. ' isimli kuryeye atandı.',
+                'description' => $order->tracking_id . ' takip numaralı paket ' . $courier->name . ' isimli kuryeye atandı.',
                 'url' => route('admin.balance')
             ]);
         }
@@ -358,12 +366,12 @@ class CourierController extends Controller
         $date = Carbon::parse($request->input('date', now()));
 
         // Tarih aralığına göre filtre
-        $startDate = match($period) {
+        $startDate = match ($period) {
             'weekly' => $date->copy()->startOfWeek(),
             'monthly' => $date->copy()->startOfMonth(),
             default => $date->copy()->startOfDay(),
         };
-        $endDate = match($period) {
+        $endDate = match ($period) {
             'weekly' => $date->copy()->endOfWeek(),
             'monthly' => $date->copy()->endOfMonth(),
             default => $date->copy()->endOfDay(),

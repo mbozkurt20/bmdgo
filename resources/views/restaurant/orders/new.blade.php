@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="author" content="{{env('APP_NAME')}}">
     <title>Sipariş Ekranı - {{env('APP_NAME')}}</title>
+
     <!-- Toastr CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
@@ -137,6 +138,20 @@
     </style>
 
     <style>
+        /* Varsayılan buton stilleri */
+        .paymentRol {
+            background: #183785; /* Genel koyu mavi */
+            color: white;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        /* Tıklandığında aktif olacak sınıf */
+        .paymentRol.active {
+            background: #ec691e !important; /* Turuncu vurgu */
+            transform: scale(1.05); /* Hafif büyüme efekti */
+        }
+
         #map {
             border: #259a38 solid 2px;
             height: 300px; /* ya da istediğin başka bir yükseklik */
@@ -374,6 +389,42 @@
 
 
     </style>
+
+    <style>
+        <style>
+        .header-main {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 15px 0;
+        }
+        .logo-text {
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            text-transform: uppercase;
+        }
+        .special-ok-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 8px 16px;
+            border-radius: 8px;
+            color: white !important;
+            text-decoration: none !important;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .special-ok-button:hover {
+            background: white;
+            color: #259a38 !important;
+        }
+        .customer-box {
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+            padding: 10px 15px;
+            border-left: 4px solid #fff;
+        }
+    </style>
+    </style>
 </head>
 <body>
 
@@ -392,31 +443,37 @@
         <section class="header-main" style="background:#259a38">
             <div class="container-fluid">
                 <div class="row align-items-center">
-                    <!-- Ortalanmış başlık -->
-                    <div class="col-md-4 col-sm-12 text-center">
-                        <h2 class="logo-text text-white m-0">Sipariş Ekranı</h2>
-                        <small class="text-white">{{ Auth::user()->restaurant_name }}</small>
-                    </div>
 
-                    <!-- Butonlar sağa hizalı -->
-                    <div class="col-md-5 col-sm-12 text-right mt-2">
-                        <a class="special-ok-button" href="{{ url('/restaurant') }}">
-                            <i class="fas fa-home"></i> Anasayfa
-                        </a>
-                        <span class="px-1"></span>
-
-
-                        <a class="special-ok-button text-white" data-toggle="modal" data-target="#musteriAta">
-                            <i class="fas fa-user-plus"></i> Müşteri Seçiniz
-                        </a>
-                    </div>
-
-                    <!-- Müşteri bilgisi sağa hizalı -->
-                    <div class="col-md-3 col-sm-12 text-right">
-                        <div class="brand-wrap customer text-white">
-                            <div style="padding: 10px">Seçili Müşteri Bulunmuyor...</div>
+                    <div class="col-md-4 col-12 mb-3 mb-md-0">
+                        <div class="d-flex align-items-center">
+                            <div class="text-left">
+                                <h2 class="logo-text text-white m-0" style="font-size: 1.5rem;">Sipariş Ekranı</h2>
+                                <small class="text-white-50"><i class="fas fa-utensils"></i> {{ Auth::user()->restaurant_name }}</small>
+                            </div>
                         </div>
                     </div>
+
+                    <div class="col-md-5 col-12 mb-3 mb-md-0 text-md-center">
+                        <div class="btn-group-wrap">
+                            <a class="special-ok-button" href="{{ url('/restaurant') }}">
+                                <i class="fas fa-home"></i> <span>Anasayfa</span>
+                            </a>
+                            <span class="mx-1"></span>
+                            <a class="special-ok-button" data-toggle="modal" data-target="#musteriAta" style="cursor: pointer;">
+                                <i class="fas fa-user-plus"></i> <span>Müşteri Seçiniz</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 col-12">
+                        <div class="customer-box text-white">
+                            <small class="d-block text-white-50" style="font-size: 0.7rem; text-transform: uppercase;">Aktif Müşteri</small>
+                            <div class="brand-wrap customer fw-bold">
+                                <i class="fas fa-user-circle"></i> Seçili Müşteri Bulunmuyor
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </section>
@@ -610,35 +667,42 @@
 
                                         </div>
                                         <div class="row" style="margin:0px;">
-                                            <div class="col-md-4" style="padding: 10px 0px">
-                                                <div class="paymentRol nakit"
-                                                     onclick="PaymentMethodSave('Kapıda Nakit ile Ödeme')"
-                                                     style="font-size: 14px;">
-                                                    <i class="fas fa-lira-sign"></i><br>
-                                                    Nakit
+                                            <div class="col-md-4 p-2">
+                                                <div class="paymentRol" onclick="PaymentMethodSave('Kapıda Nakit ile Ödeme', this)">
+                                                    <i class="fas fa-lira-sign"></i><br> Nakit
                                                 </div>
                                             </div>
-                                            <div class="col-md-4" style="padding: 10px 0px">
-                                                <div class="paymentRol kkarti"
-                                                     onclick="PaymentMethodSave('Kapıda Ticket ile Ödeme')"
-                                                     style="font-size: 14px;">
-                                                    <i class="fas fa-credit-card"></i><br>
-                                                    Ticket
+                                            <div class="col-md-4 p-2">
+                                                <div class="paymentRol" onclick="PaymentMethodSave('Kapıda Ticket ile Ödeme', this)">
+                                                    <i class="fas fa-credit-card"></i><br> Ticket
                                                 </div>
                                             </div>
-                                            <div class="col-md-4" style="padding: 10px 0px">
-                                                <div class="paymentRol kkkarti"
-                                                     onclick="PaymentMethodSave('Kapıda Kredi Kartı ile Ödeme')"
-                                                     style="font-size: 14px;">
-                                                    <i class="fas fa-credit-card"></i><br>
-                                                    Kredi Kartı
+                                            <div class="col-md-4 p-2">
+                                                <div class="paymentRol" onclick="PaymentMethodSave('Kapıda Sodexo ile Ödeme', this)">
+                                                    <i class="fas fa-credit-card"></i><br> Sodexo
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 p-2">
+                                                <div class="paymentRol" onclick="PaymentMethodSave('Kapıda Pluxee ile Ödeme', this)">
+                                                    <i class="fas fa-credit-card"></i><br> Pluxee
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 p-2">
+                                                <div class="paymentRol" onclick="PaymentMethodSave('Kapıda Multinet ile Ödeme', this)">
+                                                    <i class="fas fa-credit-card"></i><br> Multinet
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 p-2">
+                                                <div class="paymentRol" onclick="PaymentMethodSave('Kapıda Kredi Kartı ile Ödeme', this)">
+                                                    <i class="fas fa-credit-card"></i><br> Kredi Kartı
                                                 </div>
                                             </div>
 
-                                            <div class="col-md-12" style="padding: 10px 0px">
-                                                <div style="justify-content: center;cursor: pointer" class="mx-auto text-white kayit" onclick="CreateOrder()">
-                                                    <i class="fas fa-check"></i>
-                                                    Sipariş Ekle
+                                            <div class="col-md-12 p-2">
+                                                <div class="mx-auto text-white kayit d-flex justify-content-center align-items-center"
+                                                     style="cursor: pointer; background:#28a745; padding:15px; border-radius:5px;"
+                                                     onclick="CreateOrder()">
+                                                    <i class="fas fa-check me-2"></i> Sipariş Ekle
                                                 </div>
                                             </div>
                                         </div>
@@ -1052,33 +1116,20 @@
         });
     }
 
-    function PaymentMethodSave(e) {
-        $('#payment_control').val(e);
+    function PaymentMethodSave(methodName, element) {
+        // 1. Gizli inputu güncelle
+        $('#payment_control').val(methodName);
 
-        if (e === "Kapıda Nakit ile Ödeme") {
-            let src = '{{url('pos/audio/beep.mp3')}}';
-            let audio = new Audio(src);
-            audio.play();
-            $('.nakit').css('background', '#ec691e');
-            $('.kkarti').css('background', '#0077b8');
-            $('.kkkarti').css('background', '#183785');
-        }
-        if (e === "Kapıda Ticket ile Ödeme") {
-            let src = '{{url('pos/audio/beep.mp3')}}';
-            let audio = new Audio(src);
-            audio.play();
-            $('.nakit').css('background', '#1f49d3');
-            $('.kkarti').css('background', '#ec691e');
-            $('.kkkarti').css('background', '#183785');
-        }
-        if (e === "Kapıda Kredi Kartı ile Ödeme") {
-            let src = '{{url('pos/audio/beep.mp3')}}';
-            let audio = new Audio(src);
-            audio.play();
-            $('.nakit').css('background', '#1f49d3');
-            $('.kkarti').css('background', '#0077b8');
-            $('.kkkarti').css('background', '#ec691e');
-        }
+        // 2. Ses çalma işlemini yap
+        const audio = new Audio('{{url("pos/audio/beep.mp3")}}');
+        audio.play();
+
+        // 3. Aktiflik durumunu yönet
+        // Önce tüm butonlardan 'active' sınıfını çıkar
+        $('.paymentRol').removeClass('active');
+
+        // Sadece tıklanan butona 'active' sınıfını ekle
+        $(element).addClass('active');
     }
 
     function CourierSet(e) {
