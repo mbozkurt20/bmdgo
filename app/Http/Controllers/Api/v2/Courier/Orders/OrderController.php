@@ -173,8 +173,6 @@ class OrderController extends Controller
             }
         }
 
-
-
         return Json::success('Sipariş Durumu Güncellendi', new OrderResource($order));
     }
 
@@ -210,16 +208,16 @@ class OrderController extends Controller
 
         $totalOrders = $orders->count();
         $totalAmount = $orders->sum('amount');
-        $totalCash = $orders->where('payment_method', 'Kapıda Nakit ile Ödeme')->sum('amount');
-        $totalCreditCard = $orders->where('payment_method', 'Kapıda Kredi Kartı ile Ödeme')->sum('amount');
-        $totalTicket = $orders->where('payment_method', 'Kapıda Ticket ile Ödeme')->sum('amount');
+        $totalCash = $orders->whereIn('payment_method', ['Kapıda Nakit İle Ödeme', 'Nakit'])->sum('amount');
+        $totalCreditCard = $orders->whereIn('payment_method', ['Kapıda Kredi Kartı ile Ödeme', 'Kredi Kartı', 'Online Ödeme'])->sum('amount');
+        $totalTicket = $orders->whereIn('payment_method', ['Kapıda Ticket ile Ödeme','Kapıda Sodexo ile Ödeme','Sodexo','Sodexo Online','Kapıda Multinet ile Ödeme','Multinet','Multinet Online','Kapıda Pluxee ile Ödeme','Pluxee','Pluxee Online'])->sum('amount');
 
         // Geri dönen veri
         return Json::success('Kurye Raporları', [
             'name' => $courier->name,
             'text' =>
                 $courier->price_type == 'fixed'
-                    ? 'Sabit kazancınız: '.$courier->fixed_price.'₺. Aşağıda km (1 km '. $courier->km_price .'₺) bazlı kazançlarınız listelenmiştir.'
+                    ? 'Sabit kazancınız: '.$courier->fixed_price.'₺. Aşağıda km (1 km '. $courier->km_price .'₺) bazlı kazançlarınız listelenmiştir. Km ücretiniz '. $courier->km_distance_later .' km sonrasından hesaplanılır.'
                     : 'Paket ('.$courier->price.'₺) kazançlarınıza ait veriler aşağıda listelenmiştir.',
             'order_count' => $orderCount,
             'total_progress_payment' => number_format($totalProgressPayment, 2) . ' TL',
