@@ -3,14 +3,18 @@
 namespace App\Helpers;
 class OrderStatus
 {
-    public const PENDING = 'PENDING'; //BEKLEİYOR
-    public const PREPARING = 'PREPARING'; //HAZIRLANIYOR
+    /*
+     * Sipariş Durumları
+     *
+     */
+    public const PENDING = 'PENDING'; //BEKLİYOR 5 SN SONRA HAZIRLANIYOR
+    //public const PREPARING = 'PREPARING'; //HAZIRLANIYOR 3 dk sonra
     public const PREPARED = 'PREPARED'; //HAZIRLANDI
-    public const PENDING_ASSIGNED = 'PENDING_ASSIGNED';  // KURYEE ATAMA AŞAMASINDA
-    public const ASSIGNED = 'ASSIGNED';  // KURYEE ATANDI
-    public const ACCEPT_ASSIGNED = 'ACCEPT_ASSIGNED';  // KURYEE TESLİM ALDI
+    //public const PENDING_ASSIGNED = 'PENDING_ASSIGNED';  // KURYE ATAMA AŞAMASINDA
+    public const ASSIGNED = 'ASSIGNED';  // kAbUL EDİLDİ
+    //public const ACCEPT_ASSIGNED = 'ACCEPT_ASSIGNED';  // KURYE TESLİM ALDI
 
-    public const HANDOVER = 'HANDOVER';  // YOLA ÇIKTI
+    public const HANDOVER = 'HANDOVER';  // teslim al
     public const DELIVERED = 'DELIVERED'; // teslim edildi
     public const UNSUPPLIED = 'UNSUPPLIED'; //reddedildi
 
@@ -18,11 +22,8 @@ class OrderStatus
     {
         return [
             self::PENDING,
-            self::PREPARING,
             self::PREPARED,
-            self::PENDING_ASSIGNED,
             self::ASSIGNED,
-            self::ACCEPT_ASSIGNED,
             self::HANDOVER,
             self::DELIVERED,
             self::UNSUPPLIED,
@@ -38,9 +39,7 @@ class OrderStatus
     {
         return [
             'PENDING' => 'pending',
-            'PREPARING' => 'preparing',
             'PREPARED' => 'prepared',
-            'PENDING_ASSIGNED' => 'pending_assigned',
             'ASSIGNED' => 'assigned',
             'ACCEPT_ASSIGNED' => 'accept_assigned',
             'HANDOVER' => 'handover',

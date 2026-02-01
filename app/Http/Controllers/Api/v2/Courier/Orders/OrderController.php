@@ -27,7 +27,7 @@ class OrderController extends Controller
         $orders = Order::where('courier_id', $courier->id)
             ->whereDate('created_at', Carbon::today())
             ->orderBy('created_at', 'asc')
-            ->whereIn('status', [OrderStatus::ASSIGNED, OrderStatus::HANDOVER])
+            ->whereIn('status', [OrderStatus::PREPARED])
             ->get();
 
         return Json::success('Siparişler', OrderResource::collection($orders));
@@ -167,7 +167,7 @@ class OrderController extends Controller
 
            $order->courier_id = -1;
            $order->assigned_at = null;
-           $order->status = OrderStatus::PENDING_ASSIGNED;
+           $order->status = OrderStatus::PREPARED;
            $order->update();
 
            $courierOrder = CourierOrder::where('order_id',$order->id)->where('courier_id',$courier->id)->first();
@@ -249,22 +249,10 @@ class OrderController extends Controller
         $startDate = Carbon::parse($request->startDate)->startOfDay();
         $endDate   = Carbon::parse($request->endDate)->endOfDay();
 
-
         $orderCount = Order::where('courier_id', $courier->id)
             ->where('status',OrderStatus::DELIVERED)
             ->whereBetween('created_at', [$startDate, $endDate])
             ->count();
-
-        $paidAmount = ProgressPaymentRecord::where('payable_type', 'courier')
-            ->where('payable_id', $courier->id)
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->sum('amount');
-
-        $records = ProgressPaymentRecord::where('payable_type', 'courier')
-            ->where('payable_id', $courier->id)
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->orderBy('payment_date', 'desc')
-            ->get();
 
         $courierOrderIds = CourierOrder::where('courier_id', $courier->id)
             ->whereBetween('created_at', [$startDate, $endDate])
@@ -296,12 +284,8 @@ class OrderController extends Controller
         }
 
         return response()->json([
-            'paidAmount' => number_format($paidAmount, 2, '.', ''), // 2 basamak
-            'courier' => $courier,
             'order_count' => $orderCount,
-            'fixed_amount' => $fixedTotal ?? 0,
             'total_progress_payment' =>  number_format($total,2,'.',''),
-            'records' => $records,
         ]);
     }
 
