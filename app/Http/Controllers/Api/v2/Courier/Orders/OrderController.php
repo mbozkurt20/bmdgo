@@ -232,6 +232,68 @@ class OrderController extends Controller
     }
 
 
+    public function report(REquest $request)
+    {
+        $courier = auth('courier')->user();
+
+        $startDate = Carbon::createFromFormat('Y-m-d', $request->start)->startOfDay();
+        $endDate = Carbon::createFromFormat('Y-m-d', $request->end)->endOfDay();
+
+        $orderCount = Order::where('courier_id', $courier->id)
+            ->where('status',OrderStatus::DELIVERED)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->count();
+
+        $paidAmount = ProgressPaymentRecord::where('payable_type', 'courier')
+            ->where('payable_id', $courier->id)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->sum('amount');
+
+        $records = ProgressPaymentRecord::where('payable_type', 'courier')
+            ->where('payable_id', $courier->id)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->orderBy('payment_date', 'desc')
+            ->get();
+
+        $courierOrderIds = CourierOrder::where('courier_id', $courier->id)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->pluck('order_id');
+
+        // Sipariş listesi (admin ekranında tablo için)
+        $orders = Order::whereIn('id', $courierOrderIds)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $deliveredOrders = $orders->where('status', OrderStatus::DELIVERED);
+
+        $total = 0;
+
+        if ($courier->price_type == 'package') {
+            $total+= $deliveredOrders->count() * $courier->price;
+        } else {
+            $kmPrice = (float) $courier->km_price;
+
+            $distanceTotal = $deliveredOrders->sum(
+                fn($o) => ($o->distance / 1000) * $kmPrice
+            );
+
+            $fixedTotal = (float) $courier->fixed_price * $orderCount;
+
+            $total += $distanceTotal;
+            $total += $fixedTotal;
+        }
+
+        return response()->json([
+            'paidAmount' => number_format($paidAmount, 2, '.', ''), // 2 basamak
+            'courier' => $courier,
+            'order_count' => $orderCount,
+            'fixed_amount' => $fixedTotal ?? 0,
+            'total_progress_payment' =>  number_format($total,2,'.',''),
+            'records' => $records,
+        ]);
+    }
+
     public function verifyOrderCode(Request $request, $orderId): JsonResponse
     {
         $courier = auth('courier')->user();
