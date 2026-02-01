@@ -120,12 +120,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="modal-footer">
-                                                <button class="btn btn-primary" onclick="printDiv({{ $order->id }})">
-                                                    <i class="fa fa-print"></i> Yazdır
-                                                </button>
-                                                <button class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
-                                            </div>
+
                                         </div>
                                     </div>
                                 </div>
@@ -171,21 +166,41 @@
 
         function printDiv(id) {
             const content = document.getElementById('Printed' + id).innerHTML;
-            const printWindow = window.open('', '', 'width=900,height=700');
+            const printWindow = window.open('', '_blank', 'width=1000,height=800');
+
             printWindow.document.write(`
-                <html>
-                <head>
-                    <title>Yazdır</title>
-                    <link rel="stylesheet" href="{{ asset('theme/css/style.css') }}">
-                    <!-- Gerekirse diğer CSS dosyalarını ekleyin -->
-                </head>
-                <body>${content}</body>
-                </html>
-            `);
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Yazdır - Sipariş No: ${id}</title>
+            <link rel="stylesheet" href="{{ asset('theme/css/style.css') }}">
+            <style>
+                /* Yazdırma anına özel ekstra düzenlemeler */
+                body { background-color: white !important; padding: 20px; font-family: sans-serif; }
+                .no-print { display: none !important; }
+                @media print {
+                    @page { margin: 0; }
+                    body { margin: 1.6cm; }
+                }
+            </style>
+        </head>
+        <body>
+            ${content}
+            <script>
+                // Tüm kaynakların (CSS, resimler) yüklenmesini bekle
+                window.onload = function() {
+                    window.focus();
+                    setTimeout(() => {
+                        window.print();
+                        window.close();
+                    }, 500); // Tarayıcı renderı için kısa bir bekleme
+                };
+            <\/script>
+        </body>
+        </html>
+    `);
+
             printWindow.document.close();
-            printWindow.focus();
-            printWindow.print();
-            printWindow.close();
         }
     </script>
 @endsection
