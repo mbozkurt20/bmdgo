@@ -105,7 +105,7 @@ class OrderController extends Controller
         $courier->last_assigned_at = now();
         $courier->update();
 
-        $orderCourier = CourierOrder::firstOrCreate([
+        CourierOrder::firstOrCreate([
             'courier_id' => $courier->id,
             'order_id' => $order->id
         ]);
@@ -118,18 +118,9 @@ class OrderController extends Controller
             $ser->sendNotification($courier->fcm_token, $restaurant->restaurant_name.' Restorandan Yeni Sipariş Atandı', 'Sipariş Takip Kodu:'. $order->tracking_id);
         }
 
-        // Platform güncellemesi
-        if ($order->platform === 'gpsyemek') {
-            $updateReq = new Request([
-                'action' => OrderStatus::DELIVERED,
-                'tracking_id' => $order->tracking_id,
-            ]);
-            app(GpsYemekController::class)->updateOrder($updateReq);
-        }
-
         return response()->json([
             'success' => true,
-            'message' => 'Kurye başarıyla atandı.'
+            'message' => 'Kurye Başarıyla Atandı.'
         ]);
     }
 

@@ -34,7 +34,7 @@ class GpsYemekController extends Controller
         $orderCode = $request->input('tracking_id');
         $order = Order::where('tracking_id', $orderCode)->first();
 
-        if ($status == OrderStatus::PREPARED || $status == OrderStatus::UNSUPPLIED || $status == OrderStatus::DELIVERED || $status == OrderStatus::ASSIGNED) {
+        if ($status == OrderStatus::PREPARED || $status == OrderStatus::UNSUPPLIED || $status == OrderStatus::DELIVERED || $status == OrderStatus::HANDOVER) {
             $api_token = $order->restaurant->gpsyemek_api_key;
 
             $response = Http::withHeaders([

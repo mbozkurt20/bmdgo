@@ -7,6 +7,7 @@ use App\Helpers\OrdersHelper;
 use App\Helpers\OrderStatus;
 use App\Helpers\SendSms;
 use App\Jobs\AssignPendingOrders;
+use App\Jobs\ChangeOrderStatusJob;
 use App\Models\Admin;
 use App\Models\Courier;
 use App\Models\Order;
@@ -28,6 +29,10 @@ class OrderObserver
     {
         $order->verify_code = OrdersHelper::generateVerifyCode();
         $order->saveQuietly();
+
+        // 5 saniye sonra durumu PENDING'den PREPARED'a değiştir
+        ChangeOrderStatusJob::dispatch($order->id)
+            ->delay(now()->addSeconds(5));
 
 // Restoranı bul
         $restaurant = Restaurant::find($order->restaurant_id);

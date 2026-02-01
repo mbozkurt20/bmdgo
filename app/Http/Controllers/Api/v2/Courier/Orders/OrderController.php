@@ -112,9 +112,11 @@ class OrderController extends Controller
 
         //kurye teslim aldı
         if ($request->input('order_status_id') == 4) {
-            if ($courier->status == CourierStatus::service){
-                return Json::error('Teslim Edilmeyen Sipariş Bulunuyor');
-            }
+            /*
+        if ($courier->status == CourierStatus::service){
+            return Json::error('Teslim Edilmeyen Sipariş Bulunuyor');
+        }
+*/
 
             $order->courier_id = $courier->id;
             $order->status = OrderStatus::ASSIGNED;
@@ -123,16 +125,26 @@ class OrderController extends Controller
 
         //kurye YOLA ÇIKTI
         if ($request->input('order_status_id') == 3) {
+            /*
             if ($courier->status == CourierStatus::service){
                 return Json::error('Teslim Edilmeyen Sipariş Bulunuyor');
             }
-
+*/
             $courier->status = CourierStatus::service;
             $courier->update();
 
             $order->courier_id = $courier->id;
             $order->status = OrderStatus::HANDOVER;
             $order->update();
+
+            // Platform güncellemesi
+            if ($order->platform === 'gpsyemek') {
+                $updateReq = new Request([
+                    'action' => OrderStatus::HANDOVER,
+                    'tracking_id' => $order->tracking_id,
+                ]);
+                app(GpsYemekController::class)->updateOrder($updateReq);
+            }
         }
 
         //teslim edidi

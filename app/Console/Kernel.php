@@ -46,6 +46,10 @@ class Kernel extends ConsoleKernel
             $tyc = app(JobController::class);
             $tyc->index();
         })->everyMinute();
+
+        $schedule->command('orders:check-status')
+            ->everyMinute()
+            ->withoutOverlapping();
     }
 
     /**
