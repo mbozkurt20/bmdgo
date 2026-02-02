@@ -46,7 +46,7 @@ class RestaurantController extends Controller
         $grouped = $tumu->groupBy('status');
 
         return response()->json([
-            'pending'          => $grouped->get(OrderStatus::PENDING, collect())->values(),
+            'pending'          => $grouped->where('courier_id','!=', -1)->get(OrderStatus::PENDING, collect())->values(),
             'prepared'         => $grouped->where('courier_id','!=', -1)->get(OrderStatus::PREPARED, collect())->values(),
             'assigned'         => $grouped->get(OrderStatus::ASSIGNED, collect())->values(),
             'handover'         => $grouped->get(OrderStatus::HANDOVER, collect())->values(),
