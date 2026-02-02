@@ -164,7 +164,15 @@
     }
 
     async function refreshOrderTable(order) {
-        const tabId = statusMap[order.status];
+        // ÖNEMLİ: Mantıksal Tab Belirleme
+        let targetStatusKey = order.status;
+
+        // Eğer statü PREPARED ama kurye atanmışsa, onu ASSIGNED sekmesine zorla
+        if (order.status === 'PREPARED' && order.courier_id && order.courier_id != -1) {
+            targetStatusKey = 'ASSIGNED';
+        }
+
+        const tabId = statusMap[targetStatusKey]; // Hedef tablo ID'si
         const rowId = 'data_' + order.id;
 
         const newRowHtml = await generateOrderRowHtml(order);
@@ -172,27 +180,29 @@
 
         if (existingRow.length) {
             const parentTable = existingRow.closest("table");
-            const oldTabId = parentTable.attr("id");
+            const currentTabId = parentTable.attr("id"); // Mevcut olduğu tablo ID'si
 
-            if (oldTabId !== tabId) {
-                // Eski tablodan kaldır
+            // Eğer olması gereken yer ile olduğu yer farklıysa taşı
+            if (currentTabId !== tabId) {
                 existingRow.remove();
-                // Yeni tab’a ekle
-                $('#' + tabId).find('tbody').append(newRowHtml);
-
-                // ÖNEMLİ: Eski tablonun durumunu kontrol et (Boşaldı mı?)
-                // statusMap içinden tabId'ye göre status'ü geri bulup gönderiyoruz
-                const oldStatus = Object.keys(statusMap).find(key => statusMap[key] === oldTabId);
-                updateTableForStatus(oldStatus);
+                $('#order-tbody-' + tabId).append(newRowHtml); // Tbody ID'nize göre güncelleyin
             } else {
                 existingRow.replaceWith(newRowHtml);
             }
         } else {
-            $('#' + tabId).find('tbody').append(newRowHtml);
+            // İlk kez ekleniyorsa
+            const targetBody = $('#order-tbody-' + tabId);
+            if(targetBody.length) {
+                targetBody.append(newRowHtml);
+            } else {
+                // Eğer tbody ID formatınız farklıysa (tabId doğrudan id ise):
+                $(`#${tabId}`).find('tbody').append(newRowHtml);
+            }
         }
 
-        // Mevcut tablonun durumunu kontrol et (Veri eklendiği için uyarıyı silecek)
+        // Tablo boş/dolu uyarısını güncelle
         updateTableForStatus(order.status);
+        if (targetStatusKey === 'ASSIGNED') updateTableForStatus('ASSIGNED');
 
         if (order.status === 'HANDOVER') {
             await updateCourierOptions(order.id);
@@ -578,6 +588,8 @@
 
         // Kurye bölümü
         let courierSection = '';
+        let courierStatusBadge = ''; // Yeni durum rozeti
+
         if (status === 'UNSUPPLIED' || status === 'DELIVERED' || status === 'HANDOVER') {
             courierSection = `
         <a style="cursor:pointer;color: #ec691e">
@@ -585,27 +597,36 @@
         </a>`;
         } else {
             if (order.courier && order.courier.id) {
+                // Eğer kurye atanmışsa statüsüne bakalım
+                if (status === 'ASSIGNED') {
+                    // Statü ASSIGNED ise dükkandan teslim alınmış demektir
+                    courierStatusBadge = '<br><span class="badge bg-success" style="font-size: 10px;"><i class="fas fa-check-double"></i> Kurye Teslim Aldı</span>';
+                } else if (status === 'PREPARED') {
+                    // Statü hala PREPARED ama kuryesi varsa (Bizim assigned sekmesine zorladığımız durum)
+                    courierStatusBadge = '<br><span class="badge bg-primary text-white" style="font-size: 10px;"><i class="fas fa-clock"></i> Teslimat Bekliyor</span>';
+                }
+
                 courierSection = `
-            <div style="display:flex; align-items:center;">
-                <a data-bs-toggle="modal" data-bs-target="#Courier${order.id}" style="cursor:pointer;color: #ec691e">
-                   <i class="fas fa-truck mr-1"></i> ${order.courier.name.substr(0, 10)}
-                </a>
-            </div>`;
+    <div style="display:flex; flex-direction:column; align-items:start;">
+        <a data-bs-toggle="modal" data-bs-target="#Courier${order.id}" style="cursor:pointer;color: #ec691e; font-weight:bold;">
+           <i class="fas fa-truck mr-1"></i> ${order.courier.name.substr(0, 15)}
+        </a>
+        ${courierStatusBadge}
+    </div>`;
             } else {
+                // Kurye yoksa eski "Kurye Ata" butonu
                 courierSection = `
-            <a style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#Courier${order.id}" class="sharp text-secondary size-3 px-3 fw-bold">
-                <i class="fas fa-truck mr-1"></i> <small>Kurye Ata</small>
-            </a>`;
+    <a style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#Courier${order.id}" class="sharp text-secondary size-3 px-3 fw-bold">
+        <i class="fas fa-truck mr-1"></i> <small>Kurye Ata</small>
+    </a>`;
             }
         }
-
-
         // Durum seçenekleri
         const statusOptions = `
       <option value="PENDING" ${status == 'PENDING' ? 'selected' : ''}>BEKLEMEDE</option>
 <option value="PREPARED" ${status == 'PREPARED' ? 'selected' : ''}>HAZIRLANIYOR</option>
-<option value="ASSIGNED" ${status == 'ASSIGNED' ? 'selected' : ''}>KURYE ATANDI</option>
-<option value="HANDOVER" ${status == 'HANDOVER' ? 'selected' : ''}>KURYEYE TESLİM EDİLDİ / YOLDA</option>
+<option disabled value="ASSIGNED" ${status == 'ASSIGNED' ? 'selected' : ''}>KURYE ATANDI</option>
+<option disabled value="HANDOVER" ${status == 'HANDOVER' ? 'selected' : ''}>KURYEYE TESLİM EDİLDİ / YOLDA</option>
 <option value="DELIVERED" ${status == 'DELIVERED' ? 'selected' : ''}>TESLİM EDİLDİ</option>
 <option value="UNSUPPLIED" ${status == 'UNSUPPLIED' ? 'selected' : ''}>İPTAL EDİLDİ / TEDARİK YOK</option>
     `;
@@ -633,6 +654,7 @@
                             <div class="mb-1 col-md-12">
                                 <select class="single-select-placeholder js-states form-control" onchange="Courier(event, ${order.id})">
                                     <option value="0">Kurye Seçiniz</option>
+                                    <option value="-1">Kurye Boşa Çıkar</option>
                                     ${couriers.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
                                 </select>
                             </div>

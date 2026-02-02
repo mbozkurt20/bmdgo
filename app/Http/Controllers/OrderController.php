@@ -60,68 +60,83 @@ class OrderController extends Controller
     public function sendCourier(Request $request, $orderId, $courierId)
     {
         $order = Order::find($orderId);
-        $courier = Courier::find($courierId);
 
-        if (!$order || !$courier) {
-            return response()->json(['success' => false, 'message' => 'Sipariş veya Kurye bulunamadı.'], 404);
-        }
+        if ($courierId == -1){
+            $order->update([
+                'courier_id' => null,
+                'assigned_at' => null
+            ]);
 
-        $customer = Customer::find($order->customer_id);
+            CourierOrder::where('order_id', $order->id)->delete();
 
-        // Mesafe hesaplama
-        $distance = MapHelper::getGoogleDistance(
-            $courier->latitude, $courier->longitude,
-            $customer->latitude, $customer->longitude
-        );
+            return response()->json([
+                'success' => true,
+                'message' => 'Siparişin kuryesi başarıyla kaldırıldı.'
+            ]);
+        }else {
+            $courier = Courier::find($courierId);
 
-        if ($distance === null) {
-            $distance = OrdersHelper::haversineDistance(
+            if (!$order || !$courier) {
+                return response()->json(['success' => false, 'message' => 'Sipariş veya Kurye bulunamadı.'], 404);
+            }
+
+            $customer = Customer::find($order->customer_id);
+
+            // Mesafe hesaplama
+            $distance = MapHelper::getGoogleDistance(
                 $courier->latitude, $courier->longitude,
                 $customer->latitude, $customer->longitude
             );
-        }
 
-        // Gelen veri zaten KM ise /1000 yapma, Metre ise yap.
-        // haversineDistance genelde Metre döner:
-        $distanceInKm = $distance / 1000;
-        $restaurantDistance = Restaurant::find($order->restaurant_id)->distance_limit_km;
+            if ($distance === null) {
+                $distance = OrdersHelper::haversineDistance(
+                    $courier->latitude, $courier->longitude,
+                    $customer->latitude, $customer->longitude
+                );
+            }
 
-        // 20 km den fazla olamaz
-        if ($distanceInKm > $restaurantDistance) {
+            // Gelen veri zaten KM ise /1000 yapma, Metre ise yap.
+            // haversineDistance genelde Metre döner:
+            $distanceInKm = $distance / 1000;
+            $restaurantDistance = Restaurant::find($order->restaurant_id)->distance_limit_km;
+
+            // 20 km den fazla olamaz
+            if ($distanceInKm > $restaurantDistance) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Mesafe çok uzak (" . round($distanceInKm, 2) . " km). {$restaurantDistance} km'den uzak yerlere atama yapılamaz."
+                ], 400);
+            }
+
+            // İşlemleri gerçekleştir
+            $order->courier_id = $courier->id;
+            $order->assigned_at = now();
+            $order->update();
+
+            // Job ve diğer işlemler
+            CheckCourierTimeoutJob::dispatch($order->id)->delay(now()->addMinutes(2));
+
+            $courier->last_assigned_at = now();
+            $courier->update();
+
+            CourierOrder::firstOrCreate([
+                'courier_id' => $courier->id,
+                'order_id' => $order->id
+            ]);
+
+            $restaurant = Restaurant::find($order->restaurant_id);
+
+            // Bildirimler
+            if ($courier->fcm_token){
+                $ser = new PushNotificationService();
+                $ser->sendNotification($courier->fcm_token, $restaurant->restaurant_name.' Restorandan Yeni Sipariş Atandı', 'Sipariş Takip Kodu:'. $order->tracking_id);
+            }
+
             return response()->json([
-                'success' => false,
-                'message' => "Mesafe çok uzak (" . round($distanceInKm, 2) . " km). {$restaurantDistance} km'den uzak yerlere atama yapılamaz."
-            ], 400);
+                'success' => true,
+                'message' => 'Kurye Başarıyla Atandı.'
+            ]);
         }
-
-        // İşlemleri gerçekleştir
-        $order->courier_id = $courier->id;
-        $order->assigned_at = now();
-        $order->update();
-
-        // Job ve diğer işlemler
-        CheckCourierTimeoutJob::dispatch($order->id)->delay(now()->addMinutes(2));
-
-        $courier->last_assigned_at = now();
-        $courier->update();
-
-        CourierOrder::firstOrCreate([
-            'courier_id' => $courier->id,
-            'order_id' => $order->id
-        ]);
-
-        $restaurant = Restaurant::find($order->restaurant_id);
-
-        // Bildirimler
-        if ($courier->fcm_token){
-            $ser = new PushNotificationService();
-            $ser->sendNotification($courier->fcm_token, $restaurant->restaurant_name.' Restorandan Yeni Sipariş Atandı', 'Sipariş Takip Kodu:'. $order->tracking_id);
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Kurye Başarıyla Atandı.'
-        ]);
     }
 
     public function new()

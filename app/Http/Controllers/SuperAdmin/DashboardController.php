@@ -93,7 +93,7 @@ class DashboardController extends Controller
 
         return response()->json([
             'pending'          => $grouped->get(OrderStatus::PENDING, collect())->values(),
-            'prepared'         => $grouped->get(OrderStatus::PREPARED, collect())->values(),
+            'prepared'         => $grouped->where('courier_id','!=', -1)->get(OrderStatus::PREPARED, collect())->values(),
             'assigned'         => $grouped->get(OrderStatus::ASSIGNED, collect())->values(),
             'handover'         => $grouped->get(OrderStatus::HANDOVER, collect())->values(),
             'delivered'        => $grouped->get(OrderStatus::DELIVERED, collect())->values(),
