@@ -19,7 +19,7 @@ use Pusher\Pusher;
 */
 
 Route::get('/pSwAIk2Jo6edRFcHME/gpskurye', [\App\Http\Controllers\GpsYemekController::class,'index'])->name('restaurant.couriers.index');
-Route::get('/pSwAIk2Jo6edRFcHME/jobs', [\App\Http\Controllers\JobController::class,'index']);
+//Route::get('/pSwAIk2Jo6edRFcHME/jobs', [\App\Http\Controllers\JobController::class,'index']);
 
 Route::get('/partner', [App\Http\Controllers\HomeController::class, 'dealer'])->name('dealer');
 Route::post('/new-partner', [App\Http\Controllers\HomeController::class, 'createDealerRequest'])->name('createDealerRequest');
