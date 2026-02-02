@@ -652,11 +652,17 @@
                     <div class="modal-body" style="padding: 1rem;">
                         <div class="row">
                             <div class="mb-1 col-md-12">
-                                <select class="single-select-placeholder js-states form-control" onchange="Courier(event, ${order.id})">
-                                    <option value="0">Kurye Seçiniz</option>
-                                    <option value="-1">Kurye Boşa Çıkar</option>
-                                    ${couriers.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
-                                </select>
+                              <select class="single-select-placeholder js-states form-control" onchange="Courier(event, ${order.id})">
+    <option value="0">Kurye Seçiniz</option>
+
+    ${/* Eğer kurye atanmışsa (-1, 0 veya null değilse) Boşa Çıkar seçeneğini göster */
+            (order.courier_id && order.courier_id != -1 && order.courier_id != 0)
+                ? '<option value="-1" class="text-danger fw-bold">Kurye Boşa Çıkar</option>'
+                : ''
+        }
+
+    ${couriers.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
+</select>
                             </div>
                         </div>
                     </div>
