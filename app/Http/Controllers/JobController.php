@@ -16,9 +16,6 @@ class JobController extends Controller
 
     function schedule()
     {
-        if (request('key') !== config('app.schedule_key')) {
-            abort(403);
-        }
         Artisan::call('schedule:run --stop-when-empty');
     }
 }
