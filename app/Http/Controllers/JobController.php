@@ -13,9 +13,4 @@ class JobController extends Controller
         }
         Artisan::call('queue:work --stop-when-empty');
     }
-
-    function schedule()
-    {
-        Artisan::call('schedule:run');
-    }
 }
