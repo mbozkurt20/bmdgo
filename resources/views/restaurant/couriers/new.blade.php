@@ -1,0 +1,195 @@
+@extends('restaurant.layouts.app')
+@section('content')
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map {
+            border: #259a38 solid 2px;
+            height: 500px; /* ya da istediğin başka bir yükseklik */
+            width: 100%;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+    </style>
+
+    <div class="container-fluid">
+        <div class="mb-sm-4 d-flex flex-wrap align-items-center text-head">
+            <h2 class="mb-3 me-auto">Yeni Kurye Ekle</h2>
+            <div>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/restaurant/couriers">Kuryeler</a></li>
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Yeni</a></li>
+                </ol>
+            </div>
+        </div>
+
+        @if(session()->has('message'))
+            <div class="custom-alert success">
+                <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+                <span class="alert-message">{{ session()->get('message') }}</span>
+            </div>
+        @endif
+
+        @if(session()->has('test') )
+            <div class="custom-alert error">
+                <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+                <span class="alert-message">{{ session()->get('test') }}</span>
+            </div>
+        @endif
+
+        <div class="row">
+            <div class="col-xl-8 col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">Yeni Kurye Formu</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="basic-form">
+                            <form method="post" action="{{route('restaurant.couriers.create')}}">
+                                @csrf
+                                <div class="row">
+                                    <div class="col-lg-4 mb-3">
+                                        <label for="form-text" class="form-label fs-14 text-dark">Kurye Adı</label>
+                                        <input required type="text" class="form-control" name="name" id="form-text"
+                                               placeholder="Kurye Adı">
+                                    </div>
+
+                                    <div class="col-lg-4 mb-3">
+                                        <label for="form-password" class="form-label fs-14 text-dark">Şifresi</label>
+                                        <input required type="text" class="form-control" name="password" id="form-text"
+                                               placeholder="Şifre belirleyin">
+                                    </div>
+
+                                    <div class="col-lg-4 mb-3">
+                                        <label for="form-password" class="form-label fs-14 text-dark">Telefonu</label>
+                                        <input required type="text" class="form-control" name="phone" id="form-text"
+                                               placeholder="0532 532 0000">
+                                    </div>
+                                    <div class="col-lg-4 mb-3">
+                                        <label for="price-type" class="form-label fs-14 text-dark">Ödeme Türü </label>
+                                        <select class="form-control" name="price_type" id="price-type">
+                                            <option value="package">Paket Başı</option>
+                                            <option value="fixed">Sabit + Km Ücreti</option>
+                                        </select>
+                                    </div>
+
+                                    <div id="fixed-fields" class="col-lg-4 mb-3">
+                                        <label class="form-label fs-14 text-dark">Sabit Ücret</label>
+                                        <input required type="text" class="form-control" name="fixed_price" placeholder="25.000">
+                                    </div>
+                                    <div id="fixed-fields2" class="col-lg-4 mb-3">
+                                        <label class="form-label fs-14 text-dark">Km Ücreti (1 km göre giriniz)</label>
+                                        <input required type="text" class="form-control" name="km_price" placeholder="4,00">
+                                    </div>
+
+                                    <div id="package-fields" class="col-lg-4 mb-3">
+                                        <label class="form-label fs-14 text-dark">Paket Baş. Ücreti </label>
+                                        <input required type="text" class="form-control" name="price" placeholder="10,00">
+                                    </div>
+
+                                    <div class="mt-5 mb-3">
+                                        <p class="text-danger fw-bold">Lütfen haritadan konum işaratlemesi yapınız.</p>
+                                        <div id="map"></div>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label class="text-dark" for="latitude">Enlem (Latitude)</label>
+                                        <input required type="text" name="latitude" id="lat" class="form-control">
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label class="text-dark" for="longitude">Boylam (Longitude)</label>
+                                        <input required type="text" name="longitude" id="lng" class="form-control">
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="special-button float-end">Kaydet</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const priceTypeSelect = document.getElementById('price-type');
+            const packageFields = document.getElementById('package-fields');
+            const fixedFields = document.getElementById('fixed-fields');
+            const fixedFields2 = document.getElementById('fixed-fields2');
+
+            const packageInput = packageFields.querySelector('input');
+            const fixedInput1 = fixedFields.querySelector('input');
+            const fixedInput2 = fixedFields2.querySelector('input');
+
+            function toggleFields() {
+                const selectedType = priceTypeSelect.value;
+
+                if (selectedType === 'package') {
+                    // Göster
+                    packageFields.style.display = 'block';
+                    // Gizle
+                    fixedFields.style.display = 'none';
+                    fixedFields2.style.display = 'none';
+
+                    // Required ayarları
+                    packageInput.required = true;
+                    fixedInput1.required = false;
+                    fixedInput2.required = false;
+                } else {
+                    // Göster
+                    fixedFields.style.display = 'block';
+                    fixedFields2.style.display = 'block';
+                    // Gizle
+                    packageFields.style.display = 'none';
+
+                    // Required ayarları
+                    packageInput.required = false;
+                    fixedInput1.required = true;
+                    fixedInput2.required = true;
+                }
+            }
+
+            // Seçim değiştiğinde çalıştır
+            priceTypeSelect.addEventListener('change', toggleFields);
+
+            // Sayfa ilk yüklendiğinde çalıştır
+            toggleFields();
+        });
+    </script>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        var existingLat = {{ auth()->user()->latitude ?? '37.15026069044849' }};
+        var existingLng = {{ auth()->user()->longitude ?? '38.77905463205474' }};
+        var map;
+
+        if (existingLat && existingLng) {
+            map = L.map('map').setView([existingLat, existingLng], 13);
+            marker = L.marker([existingLat, existingLng]).addTo(map);
+        } else {
+            map = L.map('map').setView([39.9208, 32.8541], 6); // Türkiye geneli
+        }
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        map.on('click', function(e) {
+            var lat = e.latlng.lat;
+            var lng = e.latlng.lng;
+
+            if (marker) {
+                map.removeLayer(marker);
+            }
+
+            marker = L.marker([lat, lng]).addTo(map);
+
+            document.getElementById('lat').value = lat;
+            document.getElementById('lng').value = lng;
+        });
+
+    </script>
+@endsection
+
+

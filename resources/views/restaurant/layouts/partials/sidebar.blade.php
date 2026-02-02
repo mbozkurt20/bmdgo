@@ -1,0 +1,98 @@
+<div class="deznav" style="background:  #259a38">
+    <div class="deznav-scroll">
+        <ul class="metismenu" id="menu">
+            <li><a class="ai-icon text-white" href="{{ url('/restaurant') }}" aria-expanded="false">
+                    <i class="flaticon-381-news text-white"></i>
+                    <span class="nav-text text-white">Anasayfa</span>
+                </a>
+            </li>
+
+            <li><a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
+                    <i class="flaticon-381-user-9 text-white"></i>
+                    <span class="nav-text text-white">Müşteriler</span>
+                </a>
+                <ul aria-expanded="false">
+                    <li><a class="text-white" href="{{ route('restaurant.customers') }}">Müşteriler</a></li>
+                </ul>
+            </li>
+
+            <li>
+                <a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
+                    <i class="flaticon-381-tab text-white"></i>
+                    <span class="nav-text text-white">Ürünler</span>
+                </a>
+                <ul aria-expanded="false">
+                    <li><a class="text-white" href="{{ route('restaurant.categories') }}">Kategoriler</a></li>
+                    <li><a class="text-white" href="{{ route('restaurant.products') }}">Ürünler</a></li>
+                </ul>
+            </li>
+
+
+            {{-- Siparisler --}}
+            <li><a class="has-arrow" href="javascript:void(0)" aria-expanded="false">
+                    <i class="fa-solid fa-utensils text-white"></i>
+                    <span class="nav-text text-white">Siparişler</span>
+                </a>
+                <ul aria-expanded="false">
+                    <li><a class="text-white" href="{{ route('restaurant.deliveredOrders') }}">Teslim Edilen Siparişler</a></li>
+                    <li><a class="text-white" href="{{ route('restaurant.deletedOrders') }}">İptal Edilen Siparişler</a></li>
+                </ul>
+            </li>
+
+            <li><a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
+                    <i class="flaticon-041-graph text-white"></i>
+                    <span class="nav-text text-white">Raporlar</span>
+                </a>
+                <ul aria-expanded="false">
+                    <li><a class="text-white" href="{{ route('restaurant.reports.orders') }}">Sipariş Raporları</a></li>
+                    <li><a class="text-white" href="{{ route('restaurant.reports.couriers') }}">Kurye Raporları</a></li>
+                </ul>
+            </li>
+
+            <li><a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
+                    <i class="flaticon-069-plus text-white"></i>
+                    <span class="nav-text text-white">Kuponlar</span>
+                </a>
+                <ul aria-expanded="false">
+                    <li><a class="text-white" href="{{ route('restaurant.coupons') }}">Kuponlar</a></li>
+                    <li><a class="text-white" href="{{ route('restaurant.coupons.new') }}">Kupon Tanımla</a></li>
+                </ul>
+            </li>
+
+            <li><a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
+                    <i class="flaticon-381-settings-5 text-white"></i>
+                    <span class="nav-text text-white">Entegrasyonlar</span>
+                </a>
+                <ul aria-expanded="false">
+                    <li><a class="text-white" href="{{ route('restaurant.entegrations') }}">Platformlar</a></li>
+                    <li><a class="text-white" href="{{ route('restaurant.prints') }}">Yazıcılar</a></li>
+                </ul>
+            </li>
+
+            <li><a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
+                    <i class="flaticon-042-menu text-white"></i>
+                    <span class="nav-text text-white">Menüler</span>
+                </a>
+                <ul aria-expanded="false">
+                    <li><a  class="text-white" href="{{ route('restaurant.menus') }}">Menüler</a></li>
+                    <li><a target="_blank" class="text-white" href="{{ route('restaurant.menu',auth()->id()) }}">Aktif Menü</a></li>
+                </ul>
+            </li>
+
+            <li><a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
+                    <i class="flaticon-381-settings-5 text-white"></i>
+                    <span class="nav-text text-white">Ayarlar</span>
+                </a>
+                <ul aria-expanded="false">
+                    <li><a  class="text-white" href="https://download.anydesk.com/AnyDesk.exe">Teknik Destek</a></li>
+                </ul>
+            </li>
+            <li><a class="ai-icon text-white" href="{{ url('/restaurant/apps') }}" aria-expanded="false">
+                    <i class="flaticon-381-news text-white"></i>
+                    <span class="nav-text text-white">Uygulamalar</span>
+                </a>
+            </li>
+
+        </ul>
+    </div>
+</div>

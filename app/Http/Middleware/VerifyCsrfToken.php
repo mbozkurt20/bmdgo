@@ -1,0 +1,24 @@
+<?php
+
+namespace App\Http\Middleware;
+
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken as Middleware;
+
+class VerifyCsrfToken extends Middleware
+{
+    /**
+     * The URIs that should be excluded from CSRF verification.
+     *
+     * @var array
+     */
+    protected $except = [
+        '/payment/callback',
+        '/payment/success',
+        '/payment/fail',
+        '/entegra/add-order',
+        '/entegra/cancel-order',
+        '/paytr/callback',
+        '/paytr/success',
+        '/paytr/fail',
+    ];
+}

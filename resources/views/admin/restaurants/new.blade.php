@@ -1,0 +1,239 @@
+@extends('admin.layouts.app')
+@section('content')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+    <style>
+        #map {
+            border: #259a38 solid 2px;
+            height: 500px;
+            width: 100%;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        .map-search-container {
+            margin-bottom: 15px;
+        }
+    </style>
+
+    <div class="container-fluid">
+        <div class="mb-sm-4 d-flex flex-wrap align-items-center text-head">
+            <h2 class="mb-3 me-auto">Restaurantlar</h2>
+            <div>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/admin/restaurants">Restaurantlar</a></li>
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Yeni</a></li>
+                </ol>
+            </div>
+        </div>
+
+        @if(session()->has('message'))
+            <div class="custom-alert success">
+                <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+                <span class="alert-message">{{ session()->get('message') }}</span>
+            </div>
+        @endif
+
+        @if(session()->has('test') )
+            <div class="custom-alert error">
+                <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+                <span class="alert-message">{{ session()->get('test') }}</span>
+            </div>
+        @endif
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">Yeni İşyeri Formu</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="basic-form">
+                            <form method="post" action="{{route('admin.restaurants.create')}}">
+                                @csrf
+                                <div class="row">
+                                    <div class="mb-3 col-md-6">
+                                        <label class="form-label">İşyeri Adı <small class="text-danger">*</small></label>
+                                        <input required type="text" class="form-control" name="restaurant_name" placeholder="İşyeri Adı">
+                                    </div>
+                                    <div class="mb-3 col-md-6">
+                                        <label class="form-label">Yetkili Adı <small class="text-danger">*</small></label>
+                                        <input required type="text" class="form-control" name="name" placeholder="Yetkili Adı">
+                                    </div>
+                                    <div class="mb-3 col-md-6">
+                                        <label class="form-label">E-posta Adresi <small class="text-danger">*</small></label>
+                                        <input required type="email" class="form-control" name="email" placeholder="E-posta Adresi">
+                                    </div>
+                                    <div class="mb-3 col-md-6">
+                                        <label class="form-label">Telefon <small class="text-danger">*</small></label>
+                                        @include('components.phone',['key' => 'phone', 'required' => true, 'value' => null])
+                                    </div>
+                                    <div class="mb-3 col-md-6">
+                                        <label class="form-label">Şifre <small class="text-danger">*</small></label>
+                                        <input required type="password" class="form-control" name="password" placeholder="Şifre">
+                                    </div>
+                                    <div class="mb-3 col-md-6">
+                                        <label class="form-label">Vergi Dairesi</label>
+                                        <input type="text" class="form-control" name="tax_name" placeholder="Vergi Dairesi">
+                                    </div>
+                                    <div class="mb-3 col-md-6">
+                                        <label class="form-label">Vergi Numarası</label>
+                                        <input type="text" class="form-control" name="tax_number" placeholder="Vergi Numarası">
+                                    </div>
+                                    <div class="mb-3 col-md-6">
+                                        <label class="form-label">Paket Fiyatı</label>
+                                        <input type="text" class="form-control" name="package_price" placeholder="Paket Fiyatı">
+                                    </div>
+
+                                    @php
+                                        $admin = \App\Models\Admin::find(auth()->id());
+                                        $city = \App\Models\City::find($admin->city_id);
+                                    @endphp
+
+                                    <div class="mb-3 col-md-4 d-none">
+                                        <select class="form-control" id="city-select">
+                                            <option value="{{$city->id}}" data-lat="{{$city->lat}}" data-lng="{{$city->lng}}" selected>{{$city->name}}</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="mt-4 mb-3 col-md-12">
+                                        <label class="form-label fw-bold text-primary">Haritada Konum Ara / İşaretle</label>
+                                        <div class="map-search-container">
+                                            <input id="pac-input" class="form-control mb-2" type="text" placeholder="Adres, mahalle veya mekan arayın...">
+                                        </div>
+                                        <div id="map"></div>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label class="text-dark">Enlem (Latitude)</label>
+                                        <input required type="text" name="latitude" id="lat" class="form-control" readonly>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label class="text-dark">Boylam (Longitude)</label>
+                                        <input required type="text" name="longitude" id="lng" class="form-control" readonly>
+                                    </div>
+
+                                    <div class="mb-3 col-md-12">
+                                        <label class="form-label text-black">Tam Adres (Haritadan otomatik gelir, düzenleyebilirsiniz)</label>
+                                        <textarea id="address_field" rows="4" name="address" class="form-control" required placeholder="Açık adres giriniz..."></textarea>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="special-button btn btn-success float-end">Kaydet</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{env('GOOGLE_MAPS_API_KEY')}}&libraries=places&callback=initMap" async defer></script>
+
+    <script>
+        let map, marker, autocomplete, geocoder;
+
+        function initMap() {
+            geocoder = new google.maps.Geocoder();
+
+            const cityOption = document.querySelector('#city-select option');
+            const initialPos = {
+                lat: parseFloat(cityOption.dataset.lat) || 39.9208,
+                lng: parseFloat(cityOption.dataset.lng) || 32.8541
+            };
+
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: initialPos,
+                zoom: 13,
+                mapTypeControl: true
+            });
+
+            marker = new google.maps.Marker({
+                position: initialPos,
+                map: map,
+                draggable: true
+            });
+
+            updateInputs(initialPos.lat, initialPos.lng);
+
+            // Arama Kutusu Ayarı
+            const input = document.getElementById("pac-input");
+
+            // Enter tuşuyla formun submit olmasını engelle
+            input.addEventListener("keydown", function(e) {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                }
+            });
+
+            autocomplete = new google.maps.places.Autocomplete(input);
+            autocomplete.bindTo("bounds", map);
+
+            autocomplete.addListener("place_changed", () => {
+                const place = autocomplete.getPlace();
+                if (!place.geometry) return;
+
+                if (place.geometry.viewport) {
+                    map.fitBounds(place.geometry.viewport);
+                } else {
+                    map.setCenter(place.geometry.location);
+                    map.setZoom(17);
+                }
+
+                marker.setPosition(place.geometry.location);
+                updateInputs(place.geometry.location.lat(), place.geometry.location.lng());
+
+                if (place.formatted_address) {
+                    document.getElementById("address_field").value = place.formatted_address;
+                }
+            });
+
+            // Harita Tıklama
+            map.addListener("click", (e) => {
+                marker.setPosition(e.latLng);
+                updateInputs(e.latLng.lat(), e.latLng.lng());
+                geocodeAddress(e.latLng);
+            });
+
+            // Marker Sürükleme
+            marker.addListener("dragend", () => {
+                const pos = marker.getPosition();
+                updateInputs(pos.lat(), pos.lng());
+                geocodeAddress(pos);
+            });
+        }
+
+        function updateInputs(lat, lng) {
+            document.getElementById("lat").value = lat;
+            document.getElementById("lng").value = lng;
+        }
+
+        function geocodeAddress(latLng) {
+            geocoder.geocode({ location: latLng }, (results, status) => {
+                if (status === "OK" && results[0]) {
+                    document.getElementById("address_field").value = results[0].formatted_address;
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            $('.select2').select2();
+
+            var cityId = $('#city-select').val();
+            if (cityId) {
+                $.ajax({
+                    url: '/admin/get-districts/' + cityId,
+                    type: 'GET',
+                    success: function (data) {
+                        $('#district-select').empty().append('<option value="">İlçe Seç</option>');
+                        $.each(data, function (key, value) {
+                            $('#district-select').append('<option value="' + value.id + '">' + value.name + '</option>');
+                        });
+                    }
+                });
+            }
+        });
+    </script>
+@endsection
