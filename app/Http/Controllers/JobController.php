@@ -16,6 +16,6 @@ class JobController extends Controller
 
     function schedule()
     {
-        Artisan::call('schedule:run --stop-when-empty');
+        Artisan::call('schedule:run');
     }
 }
