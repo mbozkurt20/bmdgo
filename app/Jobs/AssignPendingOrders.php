@@ -104,8 +104,8 @@ class AssignPendingOrders implements ShouldQueue
                 CheckCourierTimeoutJob::dispatch($order->id)->delay(now()->addMinutes(2));
 
                 if ($courier->fcm_token) {
-                    $ser = new PushNotificationService();
-                    $ser->sendNotification($courier->fcm_token, $restaurant->restaurant_name . ' - Yeni Sipariş', 'Takip: ' . $order->tracking_id);
+                    $notificationService = new PushNotificationService();
+                    $notificationService->sendNotification($courier->fcm_token, $restaurant->restaurant_name . ' - Yeni Sipariş', 'Takip: ' . $order->tracking_id);
                 }
 
                 Log::info("BAŞARILI: Sipariş #{$order->id}, Kurye #{$courier->id} kişisine atandı.");
