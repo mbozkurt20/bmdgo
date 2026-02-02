@@ -45,9 +45,9 @@ class MenuController extends Controller
     }
 
 
-    public function show()
+    public function show($restaurantId)
     {
-        $restaurant = Auth::guard('restaurant')->user();
+        $restaurant = Restaurant::find($restaurantId);
 
         $data = [
             'name' => $restaurant->name,

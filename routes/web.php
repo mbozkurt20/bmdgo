@@ -17,6 +17,7 @@ use Pusher\Pusher;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::get('/restaurant/{restaurantId}/menu', [App\Http\Controllers\MenuController::class, 'show'])->name('restaurant.menu');
 
 Route::get('/pSwAIk2Jo6edRFcHME/gpskurye', [\App\Http\Controllers\GpsYemekController::class,'index'])->name('restaurant.couriers.index');
 //Route::get('/pSwAIk2Jo6edRFcHME/jobs', [\App\Http\Controllers\JobController::class,'index']);
@@ -30,6 +31,7 @@ include __DIR__ . '/app/superAdminRoutes.php';
 include __DIR__ . '/app/adminRoutes.php';
 include __DIR__ . '/app/restaurantRoutes.php';
 include __DIR__ . '/app/partnerRoutes.php';
+
 
 Route::post('/entegra/add-order', [App\Http\Controllers\Api\OrderController::class, 'addOrder']);
 Route::post('/entegra/cancel-order', [App\Http\Controllers\Api\OrderController::class, 'cancelOrder']);

@@ -106,7 +106,7 @@ Route::group(['prefix' => 'restaurant'], function () {
         Route::get('/deliveredOrders', [App\Http\Controllers\SiparislerController::class, 'deliveredOrders'])->name('restaurant.deliveredOrders');
 
         Route::get('/menus', [App\Http\Controllers\MenuController::class, 'index'])->name('restaurant.menus');
-        Route::get('/menu', [App\Http\Controllers\MenuController::class, 'show'])->name('restaurant.menu');
+        Route::get('/{restaurantId}/menu', [App\Http\Controllers\MenuController::class, 'show'])->name('restaurant.menu');
         Route::post('/menus/select', [App\Http\Controllers\MenuController::class, 'store'])->name('restaurant.menu.template.select');
 
         /* Menus */

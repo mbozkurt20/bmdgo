@@ -75,7 +75,7 @@
                 </a>
                 <ul aria-expanded="false">
                     <li><a  class="text-white" href="{{ route('restaurant.menus') }}">Menüler</a></li>
-                    <li><a target="_blank" class="text-white" href="{{ route('restaurant.menu') }}">Aktif Menü</a></li>
+                    <li><a target="_blank" class="text-white" href="{{ route('restaurant.menu',auth()->id()) }}">Aktif Menü</a></li>
                 </ul>
             </li>
 
