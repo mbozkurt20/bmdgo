@@ -65,7 +65,6 @@ class LoginController extends Controller
             'latitude' => 'required',
             'longitude' => 'required',
             'birthday' => 'required',
-            'price_type' => 'required',
             'fcm_token' => 'nullable',
         ]);
 
