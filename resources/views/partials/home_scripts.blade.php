@@ -600,7 +600,7 @@
                 // Eğer kurye atanmışsa statüsüne bakalım
                 if (status === 'ASSIGNED') {
                     // Statü ASSIGNED ise dükkandan teslim alınmış demektir
-                    courierStatusBadge = '<br><span class="badge bg-success" style="font-size: 10px;"><i class="fas fa-check-double"></i> Kurye Atamayı Onayladı</span>';
+                    courierStatusBadge = '<br><span class="badge bg-success" style="font-size: 10px;"><i class="fas fa-check-double"></i>  Paket Kabul Edildi</span>';
                 } else if (status === 'PREPARED') {
                     // Statü hala PREPARED ama kuryesi varsa (Bizim assigned sekmesine zorladığımız durum)
                     courierStatusBadge = '<br><span class="badge bg-primary text-white" style="font-size: 10px;"><i class="fas fa-clock"></i> Teslimat Bekliyor</span>';
