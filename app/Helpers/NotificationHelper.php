@@ -9,7 +9,7 @@ class NotificationHelper
 {
     static function add($data)
     {
-        $data['admin_id'] = Auth::id();
+        $data['admin_id'] = $data['admin_id'] ?? Auth::id();
         \App\Models\Notification::create($data);
 
         $options = array (
@@ -25,6 +25,6 @@ class NotificationHelper
         );
 
 
-        $pusher->trigger('notifications-'.Auth::user()->id, 'new-notify-'.Auth::user()->id, $data);
+        $pusher->trigger('notifications-'.$data['admin_id'] ?? Auth::user()->id, 'new-notify-'.$data['admin_id'] ?? Auth::user()->id, $data);
     }
 }

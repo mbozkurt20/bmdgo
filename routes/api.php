@@ -25,12 +25,6 @@ Route::get('/getPlatformGetirYemek', [App\Http\Controllers\GetirYemekController:
 Route::get('/getPlatformTrendyolYemek', [App\Http\Controllers\TrendyolYemekController::class, 'index']);
 Route::get('/getPlatformAdisyo', [App\Http\Controllers\AdisyoController::class, 'index']);
 
-Route::post('/getPlatformGetirYemek/create', [App\Http\Controllers\GetirYemekController::class, 'createExe']);
-
-
-Route::get('/getCourierOrder', [App\Http\Controllers\ApiController::class, 'getCourierOrder']);
-
-
 //Kurye App
 /*
 Route::post('/verify/order-code', [App\Http\Controllers\ApiController::class, 'verifyOrderCode']);
@@ -51,10 +45,6 @@ include __DIR__."/api/courier/v2.php";
 //Caller App
 Route::post('/caller/login', [App\Http\Controllers\CallerController::class, 'login']);
 Route::get('/caller/phoneNumber/{userId}/{phone}', [App\Http\Controllers\CallerController::class, 'getphoneNumber']);
-
-
-
-
 
 
 

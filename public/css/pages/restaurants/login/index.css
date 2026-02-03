@@ -1,5 +1,5 @@
 body {
-    background-image: url('/theme/images/bg.jpeg');
+    background-image: url('/theme/motor.jpg');
     background-repeat: no-repeat;
     background-size: cover;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -54,14 +54,14 @@ body {
     padding: 12px;
     font-size: 16px;
     border-radius: 8px;
-    background-color: #e7004d;
+    background-color: #ec691e;
     border: none;
     color: #fff;
     font-weight: 500;
 }
 
 .btn-login:hover {
-    background-color: #e11b5d;
+    background-color: #ec691e;
     color: white;
 }
 
@@ -99,7 +99,7 @@ body {
 }
 
 .type-btn {
-    background-color: #0d2646;
+    background-color: #259a38;
     color: white;
     border: 2px solid transparent;
     padding: 10px 20px;
@@ -109,9 +109,9 @@ body {
     font-size: 16px;
 }
 .type-btn.active {
-    background-color: #f12c6d;
-    border-color: #e11b5d;
+    background-color: #ec691e;
+    border-color: #ec691e;
 }
 .type-btn:hover {
-    background-color: #e11b5d;
+    background-color: #ec691e;
 }

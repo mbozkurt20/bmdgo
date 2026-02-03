@@ -3,13 +3,13 @@
 
     <div class="row ">
         <div class="col-md-6">
-            <div class="card card-body" style="background: #0d2646">
+            <div class="card card-body" style="background: #259a38">
                 <h5 class="text-white fw-bold"> Müsait: {{$data['active']}} Kurye</h5>
             </div>
 
         </div>
         <div class="col-md-6">
-            <div class="card card-body " style="background: #e7004d">
+            <div class="card card-body " style="background: #ec691e">
                 <h5 class="text-white fw-bold"> Molada: {{$data['break']}} Kurye</h5>
             </div>
 
@@ -21,7 +21,7 @@
 
         </div>
         <div class="col-md-6">
-            <div class="card card-body" style="background: #e7004d">
+            <div class="card card-body" style="background: #ec691e">
                 <h5 class="text-white fw-bold"> Kapalı: {{$data['passive']}} Kurye</h5>
             </div>
         </div>

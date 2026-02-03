@@ -2805,7 +2805,7 @@ textarea.form-control-lg {
   border-color: #f72b50; }
   .btn-outline-danger:hover {
     color: #000;
-    background-color: #e7004d;
+    background-color: #ec691e;
     border-color: #f72b50; }
   .btn-check:focus + .btn-outline-danger, .btn-outline-danger:focus {
     box-shadow: 0 0 0 0.25rem rgba(247, 43, 80, 0.5); }
@@ -9285,7 +9285,7 @@ label {
     margin-bottom: 1.5rem !important; } }
 /* Editable */
 :root {
-    --accent: #e7004d;
+    --accent: #ec691e;
 }
 
 /* Preloader ekran kaplama */
@@ -9933,7 +9933,7 @@ svg.pulse-svg {
       z-index: -1;
       margin: -0.1875rem;
       border-radius: inherit;
-      background: linear-gradient(to right, #e7004d, rgb(231, 0, 77)); }
+      background: linear-gradient(to right, #ec691e, rgb(231, 0, 77)); }
   .navbar-expand .header-profile:after {
     content: "";
     height: 3.5rem;
@@ -12831,7 +12831,7 @@ Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Comp
       transition: all 0.5s; }
   [data-sidebar-style="full"][data-layout="vertical"] .deznav .metismenu > li.mm-active > a i, [data-sidebar-style="full"][data-layout="vertical"] .deznav .metismenu > li:hover > a i {
     font-weight: 300;
-    background: #e7004d;
+    background: #ec691e;
     color: #fff;
     box-shadow: 0 0.5625rem 0.5625rem var(--rgba-primary-3);
     margin-right: 10px; }
@@ -12885,7 +12885,7 @@ Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Comp
   [data-sidebar-style="full"][data-layout="vertical"] .menu-toggle .deznav .metismenu li {
     position: relative; }
     [data-sidebar-style="full"][data-layout="vertical"] .menu-toggle .deznav .metismenu li a {
-      background: #e7004d;
+      background: #ec691e;
       margin: 0.125rem 0; }
       [data-sidebar-style="full"][data-layout="vertical"] .menu-toggle .deznav .metismenu li a svg {
         max-width: 1.5rem;
@@ -20854,7 +20854,7 @@ Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Comp
     background: #fff; }
 
 .form-check-input:checked {
-  background-color: #e7004d;
+  background-color: #ec691e;
   border-color: var(--primary); }
 .form-check-input:focus {
   border-color: var(--primary);
@@ -21080,7 +21080,7 @@ Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Comp
   border-radius: 0; }
 
 .select2-container--default .select2-results__option--highlighted[aria-selected] {
-  background-color: #e7004d
+  background-color: #ec691e
 }
 
 .select2-container--default.select2-container--focus .select2-selection--multiple {
@@ -25759,7 +25759,7 @@ table.dataTable tfoot th {
         line-height: 3.125rem; } }
     .dataTables_wrapper .dataTables_paginate span .paginate_button.current, .dataTables_wrapper .dataTables_paginate span .paginate_button:hover {
       color: #fff !important;
-      background: #0d2646 }
+      background: #259a38 }
       .dataTables_wrapper .dataTables_paginate span .paginate_button.current:hover, .dataTables_wrapper .dataTables_paginate span .paginate_button:hover:hover {
         color: #fff !important;
         background: var(--primary) !important; }
@@ -25767,7 +25767,7 @@ table.dataTable tfoot th {
 .dataTables_wrapper input[type="search"], .dataTables_wrapper input[type="text"], .dataTables_wrapper select {
   border: 0.0625rem solid #e2e2e2;
   padding: .3rem 0.5rem;
-  color: #0d2646;
+  color: #259a38;
     background: white;
   border-radius: 0.3125rem; }
   [data-theme-version="dark"] .dataTables_wrapper input[type="search"], [data-theme-version="dark"] .dataTables_wrapper input[type="text"], [data-theme-version="dark"] .dataTables_wrapper select {
@@ -26843,7 +26843,7 @@ svg.vert-move {
     font-size: 1rem; }
   .customer-search .input-group-text i {
     font-size: 1.5rem;
-    color: #e7004d
+    color: #ec691e
   }
   @media only screen and (max-width: 1400px) {
     .customer-search .input-group-text i {

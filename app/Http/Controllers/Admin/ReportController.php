@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Courier;
 use App\Models\Restaurant;
@@ -29,15 +30,19 @@ class ReportController extends Controller
     {
         $courierId = $request->courier ?? 0;
         $restaurantId = $request->restaurant ?? 0;
-        $startDate = $request->start . " 00:00:00";
-        $endDate = $request->end . " 23:59:59";
+        $startDate = Carbon::parse($request->start)->startOfDay();
+        $endDate = Carbon::parse($request->end)->endOfDay();
 
-        $getData = [];
-        $online = $kapida_nakit = $kapida_ticket = $kapida_k_karti = 0;
-        $topsiparis = 0;
+        if ($request->input('status') === 'cancelled') {
+            $query = Order::query()->where('status', OrderStatus::UNSUPPLIED);
+        }
+        if ($request->input('status') === 'all') {
+            $query = Order::query()->where('status', OrderStatus::DELIVERED);
+        }
+        if ($request->input('status') === 'delivered') {
+            $query = Order::query();
+        }
 
-// Sorguyu dinamik olarak oluştur
-        $query = Order::query();
 
         if ($courierId > 0) {
             $orderIds = CourierOrder::where('courier_id', $courierId)->pluck('order_id');
@@ -48,32 +53,45 @@ class ReportController extends Controller
             $query->where('restaurant_id', $restaurantId);
         }
 
-        $query->whereBetween('created_at', [$startDate, $endDate]);
+        $orders = $query->whereBetween('created_at', [$startDate, $endDate])->get();
 
-        $orders = $query->get();
+        // Ödeme haritası ve sayaçlar
+        $methodMap = [
+            "Online Kredi/Banka Kartı" => "online",
+            "Kapıda Nakit ile Ödeme" => "nakit",
+            "Kapıda Kredi Kartı ile Ödeme" => "kkarti",
+            "Kapıda Ticket ile Ödeme" => "ticket",
+            "Kapıda Sodexo ile Ödeme" => "sodexo",
+            "Kapıda Multinet ile Ödeme" => "multinet",
+            "Kapıda Pluxee ile Ödeme" => "pluxee"
+        ];
+
+        $totals = [
+            'topsiparis' => 0,
+            'online' => 0, 'nakit' => 0, 'kkarti' => 0,
+            'ticket' => 0, 'sodexo' => 0, 'multinet' => 0, 'pluxee' => 0,
+            'topciro' => 0
+        ];
+
+        $getData = [];
 
         foreach ($orders as $order) {
-            // Kurye bilgisi
+            // Kurye ismi bulma
             $courierOrder = CourierOrder::where('order_id', $order->id)->first();
-            $courierName = $courierOrder ? (Courier::find($courierOrder->courier_id)->name ?? 'Bilinmiyor') : 'Bilinmiyor';
-
-            // Ödeme toplamlarını güncelle
-            switch ($order->payment_method) {
-                case "Online Kredi/Banka Kartı":
-                    $online += $order->amount;
-                    break;
-                case "Kapıda Nakit ile Ödeme":
-                    $kapida_nakit += $order->amount;
-                    break;
-                case "Kapıda Ticket ile Ödeme":
-                    $kapida_ticket += $order->amount;
-                    break;
-                case "Kapıda Kredi Kartı ile Ödeme":
-                    $kapida_k_karti += $order->amount;
-                    break;
+            $courierName = 'Yönetici Kuryesi';
+            if($courierOrder) {
+                $c = Courier::find($courierOrder->courier_id);
+                $courierName = $c ? $c->name : 'Yönetici Kuryesi';
             }
 
-            $topsiparis++;
+            // Ödeme toplamını ilgili kategoriye ekle
+            $methodKey = $methodMap[$order->payment_method] ?? null;
+            if ($methodKey) {
+                $totals[$methodKey] += $order->amount;
+            }
+
+            $totals['topciro'] += $order->amount;
+            $totals['topsiparis']++;
 
             $getData[] = [
                 "platform" => $order->platform,
@@ -82,28 +100,15 @@ class ReportController extends Controller
                 "full_name" => $order->full_name,
                 "phone" => $order->phone,
                 "payment" => $order->payment_method,
-                "amount" => number_format($order->amount, 2) . " TL",
-                "topsiparis" => $topsiparis,
-                "online" => number_format($online, 2) . " TL",
-                "kapida_nakit" => number_format($kapida_nakit, 2) . " TL",
-                "kapida_ticket" => number_format($kapida_ticket, 2) . " TL",
-                "kapida_k_karti" => number_format($kapida_k_karti, 2) . " TL",
+                "amount" => number_format($order->amount, 2, ',', '.') . " TL",
                 "time" => Carbon::parse($order->created_at)->translatedFormat('d-m-Y H:i'),
-                "distance" => number_format($order->distance, 3),
-                "message" => $order->message ?? null,
-                "message2" => $order->message2 ?? null,
+                "distance" => $order->distance ? number_format($order->distance, 0, ',', '.') : '0',
             ];
         }
 
         return response()->json([
             'data' => $getData,
-            'totals' => [
-                'online' => number_format($online, 2),
-                'kapida_nakit' => number_format($kapida_nakit, 2),
-                'kapida_ticket' => number_format($kapida_ticket, 2),
-                'kapida_k_karti' => number_format($kapida_k_karti, 2),
-                'topsiparis' => $topsiparis
-            ]
+            'totals' => $totals
         ]);
     }
 }

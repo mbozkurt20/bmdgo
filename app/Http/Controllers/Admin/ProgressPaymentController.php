@@ -135,33 +135,29 @@ class ProgressPaymentController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Teslim edilen siparişler
-        $deliveredOrders = $orders->where('status', OrderStatus::DELIVERED);
-
-        // Ödeme yöntemine göre filtreleme
-        $cashOrders   = $deliveredOrders->where('payment_method', 'Kapıda Nakit ile Ödeme');
-        $cardOrders   = $deliveredOrders->where('payment_method', 'Kapıda Kredi Kartı ile Ödeme');
-        $ticketOrders = $deliveredOrders->where('payment_method', 'Kapıda Ticket ile Ödeme');
+        // Tabloda göstermek için kayıtları HTML'e çevireceğiz
+        $recordsHtml = view('admin.progressPayment._courier_records', compact('records'))->render();
 
         $totalProgressPayment = floatval($courier->price) * $orderCount;
 
-        // Tabloda göstermek için kayıtları HTML'e çevireceğiz
-        $recordsHtml = view('admin.progressPayment._courier_records', compact('records'))->render();
+        // Teslim edilen siparişler
+        $deliveredOrders = $orders->where('status', OrderStatus::DELIVERED);
 
         $total = 0;
 
         if ($courier->price_type == 'package') {
-            // Paket başı ücretlendirme
-            $total+= $cashOrders->count() * $courier->price;
-            $total+= $cardOrders->count() * $courier->price;
-            $total+= $ticketOrders->count() * $courier->price;
+            $total+= $deliveredOrders->count() * $courier->price;
         } else {
-            // Km başı ücretlendirme
-            $kmPrice = $courier->km_price;
+            $kmPrice = (float) $courier->km_price;
 
-            $total+= $cashOrders->sum(fn($o) => $o->distance * $kmPrice);
-            $total+= $cardOrders->sum(fn($o) => $o->distance * $kmPrice);
-            $total+= $ticketOrders->sum(fn($o) => $o->distance * $kmPrice);
+            $distanceTotal = $deliveredOrders->sum(
+                fn($o) => ($o->distance / 1000) * $kmPrice
+            );
+
+            $fixedTotal = (float) $courier->fixed_price * $orderCount;
+
+            $total += $distanceTotal;
+            $total += $fixedTotal;
         }
 
 
@@ -169,8 +165,8 @@ class ProgressPaymentController extends Controller
             'paidAmount' => number_format($paidAmount, 2, '.', ''), // 2 basamak
             'courier' => $courier,
             'order_count' => $orderCount,
-            'fixed_amount' => $courier->fixed_price,
-            'total_progress_payment' => $total,
+            'fixed_amount' => $fixedTotal ?? 0,
+            'total_progress_payment' =>  number_format($total,2,'.',''),
             'records_html' => $recordsHtml,
         ]);
     }

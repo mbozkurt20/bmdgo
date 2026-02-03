@@ -7,6 +7,7 @@ use App\Helpers\OrdersHelper;
 use App\Helpers\OrderStatus;
 use App\Helpers\SendSms;
 use App\Jobs\AssignPendingOrders;
+use App\Jobs\ChangeOrderStatusJob;
 use App\Models\Admin;
 use App\Models\Courier;
 use App\Models\Order;
@@ -21,13 +22,17 @@ class OrderObserver
 {
     public function creating(Order $order)
     {
-        OrdersHelper::updateTopup(null, $order->restaurant_id);
+        OrdersHelper::updateTopup($order->restaurant->admin->id, $order->restaurant_id);
     }
 
     public function created(Order $order)
     {
         $order->verify_code = OrdersHelper::generateVerifyCode();
         $order->saveQuietly();
+
+        // 5 saniye sonra durumu PENDING'den PREPARED'a değiştir
+        ChangeOrderStatusJob::dispatch($order->id)
+            ->delay(now()->addSeconds(5));
 
 // Restoranı bul
         $restaurant = Restaurant::find($order->restaurant_id);
@@ -45,7 +50,9 @@ class OrderObserver
         $or = new OrderStatusService();
         $or->changeStatus($order, $newStatus);
 
-        SendSms::send($order->phone, $message, $restaurant->admin_id);
+        if ($order->restaurant->admin->is_sms) {
+            SendSms::send($order->phone, $message, $restaurant->admin_id);
+        }
 
         if (Auth::guard('restaurant')->check()) {
             $printers = Printer::where('payable_type', 'restaurant')->where('payable_id', $restaurant->id)->pluck('name')->toArray();
@@ -67,6 +74,8 @@ class OrderObserver
 
     public function updated(Order $order)
     {
+        $order = Order::find($order->id);
+
         /*
          * Şu anki status’u öğrenmek:
          * $currentStatus = OrderStatusLog::where('order_id', $orderId)
@@ -97,21 +106,25 @@ $avgDurations = OrderStatusLog::select('restaurant_id', 'status', DB::raw('AVG(d
 
         //sipariş kuryeye verildiyse
         if ($order->status == OrderStatus::HANDOVER) {
-            SendSms::send($order->phone, 'Sayın ' . $order->full_name . ', ' . $order->tracking_id . ' numaralı siparişiniz yola çıkmıştır.', $restaurant->admin_id);
-
-            if (Admin::where('id', $restaurant->admin_id)->first()->auto_orders) {
-                if ($order) {
-                    dispatch(new AssignPendingOrders());
-                }
+            if ($order->restaurant->admin->is_sms){
+                SendSms::send($order->phone, 'Sayın ' . $order->full_name . ', ' . $order->tracking_id . ' numaralı siparişiniz yola çıkmıştır.', $restaurant->admin_id);
             }
         }
 
-        if ($order->status == OrderStatus::DELIVERED) {
-            SendSms::send($order->phone, 'Sayın ' . $order->full_name . ', ' . $order->tracking_id . ' numaralı siparişiniz teslim edilmiştir. \n \n Bizi tercih ettiğiniz için teşekkür ederiz.', $restaurant->admin_id);
+        if ($order && Admin::where('id', $restaurant->admin_id)->first()->auto_orders && $order->status == OrderStatus::PREPARED) {
+            dispatch(new AssignPendingOrders());
+        }
 
-            $courier = Courier::find($order->courier_id);
-            $courier->status = CourierStatus::active;
-            $courier->update();
+        if ($order->status == OrderStatus::DELIVERED) {
+            if ($order->restaurant->admin->is_sms){
+                SendSms::send($order->phone, 'Sayın ' . $order->full_name . ', ' . $order->tracking_id . ' numaralı siparişiniz teslim edilmiştir. \n \n Bizi tercih ettiğiniz için teşekkür ederiz.', $restaurant->admin_id);
+            }
+
+            if ($order->courier_id != -1){
+                $courier = Courier::find($order->courier_id);
+                $courier->status = CourierStatus::active;
+                $courier->update();
+            }
         }
 
         $pusher = new Pusher(
@@ -127,7 +140,6 @@ $avgDurations = OrderStatusLog::select('restaurant_id', 'status', DB::raw('AVG(d
 
         $pusher->trigger("admin-{$restaurant->admin_id}", "update-order", ['order' => $order]);
         $pusher->trigger("restaurant-{$restaurant->id}", "update-order", ['order' => $order]);
-
     }
 
     /**

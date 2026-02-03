@@ -25,7 +25,7 @@
         }
 
         .bg-ok {
-            background: #e7004d;
+            background: #ec691e;
         }
     </style>
 
@@ -82,8 +82,17 @@
                                     </div>
 
                                     <div class="mb-4 text-dark">
-                                        <label>Ödeme Tutarı Seçiniz</label>
-                                        <input class="form-control" type="number" placeholder="0.00" name="amount" required>
+                                        <label>Ödeme Tutarı</label>
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            placeholder="0,00"
+                                            name="amount_display"
+                                            oninput="formatMoney(this)"
+                                            inputmode="decimal"
+                                            autocomplete="off"
+                                        >
+                                        <input type="hidden" name="amount">
                                     </div>
 
 
@@ -300,8 +309,8 @@
                 text: "Bu işlemi geri alamazsınız!",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#0d2646',
-                cancelButtonColor: '#e7004d',
+                confirmButtonColor: '#259a38',
+                cancelButtonColor: '#ec691e',
                 cancelButtonText: 'Hayır',
                 confirmButtonText: 'Evet, Silmek istiyorum!'
             }).then((result) => {
@@ -325,4 +334,33 @@
             });
         }
     </script>
+
+    <script>
+        function formatMoney(el) {
+            let value = el.value;
+
+            // Sadece rakam ve virgül
+            value = value.replace(/[^0-9,]/g, '');
+
+            // Virgülden fazlasını sil
+            if (value.indexOf(',') !== -1) {
+                const parts = value.split(',');
+                value = parts[0] + ',' + parts[1].slice(0, 2);
+            }
+
+            // Binlik ayırıcı ekle
+            let parts = value.split(',');
+            parts[0] = parts[0]
+                .replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+            el.value = parts.join(',');
+
+            // Backend için: 12.244,55 → 12244.55
+            const hidden = document.querySelector('input[name="amount"]');
+            hidden.value = el.value
+                .replace(/\./g, '')
+                .replace(',', '.');
+        }
+    </script>
+
 @endsection

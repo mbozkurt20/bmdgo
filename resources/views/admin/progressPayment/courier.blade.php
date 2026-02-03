@@ -25,7 +25,7 @@
         }
 
         .bg-ok {
-            background: #e7004d;
+            background: #ec691e;
         }
     </style>
 
@@ -82,10 +82,18 @@
                                     </div>
 
                                     <div class="mb-4 text-dark">
-                                        <label>Ödeme Tutarı Seçiniz</label>
-                                        <input class="form-control" type="number" placeholder="0.00" name="amount" required>
+                                        <label>Ödeme Tutarı</label>
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            placeholder="0,00"
+                                            name="amount_display"
+                                            oninput="formatMoney(this)"
+                                            inputmode="decimal"
+                                            autocomplete="off"
+                                        >
+                                        <input type="hidden" name="amount">
                                     </div>
-
 
                                     <div class="mb-4 text-dark">
                                         <label>Eklemek İstediğiniz Detay (opsiyonel)</label>
@@ -132,6 +140,18 @@
                                     <div id="fixed_price" style="display: none" class=" col-md-6 mb-3">
                                         <div class="p-3 border rounded bg-ok">
                                             <h6 class="mb-1 text-white">Sabit Ücret</h6>
+                                            <h4 class="text-white mb-0" id="fixed-amount">0₺</h4>
+                                        </div>
+                                    </div>
+                                    <div id="km_price" style="display: none" class=" col-md-6 mb-3">
+                                        <div class="p-3 border rounded bg-ok">
+                                            <h6 class="mb-1 text-white">Km Başı Ücret</h6>
+                                            <h4 class="text-white mb-0" id="fixed-amount">0₺</h4>
+                                        </div>
+                                    </div>
+                                    <div id="km_distance_later" style="display: none" class=" col-md-6 mb-3">
+                                        <div class="p-3 border rounded bg-ok">
+                                            <h6 class="mb-1 text-white">Km sonrası hesaplam 4</h6>
                                             <h4 class="text-white mb-0" id="fixed-amount">0₺</h4>
                                         </div>
                                     </div>
@@ -314,8 +334,8 @@
                 text: "Bu işlemi geri alamazsınız!",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#0d2646',
-                cancelButtonColor: '#e7004d',
+                confirmButtonColor: '#259a38',
+                cancelButtonColor: '#ec691e',
                 cancelButtonText: 'Hayır',
                 confirmButtonText: 'Evet, Silmek istiyorum!'
             }).then((result) => {
@@ -339,4 +359,33 @@
             });
         }
     </script>
+
+    <script>
+        function formatMoney(el) {
+            let value = el.value;
+
+            // Sadece rakam ve virgül
+            value = value.replace(/[^0-9,]/g, '');
+
+            // Virgülden fazlasını sil
+            if (value.indexOf(',') !== -1) {
+                const parts = value.split(',');
+                value = parts[0] + ',' + parts[1].slice(0, 2);
+            }
+
+            // Binlik ayırıcı ekle
+            let parts = value.split(',');
+            parts[0] = parts[0]
+                .replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+            el.value = parts.join(',');
+
+            // Backend için: 12.244,55 → 12244.55
+            const hidden = document.querySelector('input[name="amount"]');
+            hidden.value = el.value
+                .replace(/\./g, '')
+                .replace(',', '.');
+        }
+    </script>
+
 @endsection

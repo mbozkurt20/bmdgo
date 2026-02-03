@@ -43,6 +43,14 @@ class RestaurantsController extends Controller
             }
         }
 
+        if (Restaurant::where('email',$request->email)->exists()) {
+            return redirect()->back()->with('test', 'Bu email adresine ait bir restaurant zaten mevcut!!');
+        }
+
+        if (Restaurant::where('phone',$request->phone)->exists()) {
+            return redirect()->back()->with('test', 'Bu telefon numarasına ait bir restaurant zaten mevcut!!');
+        }
+
         if (Restaurant::where('restaurant_name',$request->restaurant_name)->exists()) {
             return redirect()->back()->with('test', 'Bu isimde bir restaurant zaten mevcut!!');
         }
@@ -57,8 +65,6 @@ class RestaurantsController extends Controller
         $create->password = Hash::make($request->password);
         $create->tax_name = $request->tax_name;
         $create->tax_number = $request->tax_number;
-        $create->entegra_id = $request->entegra_id;
-        $create->entegra_token = $request->entegra_token;
         $create->package_price = $request->package_price;
         $create->address = $request->address;
         $create->latitude = $request->latitude;
@@ -70,33 +76,35 @@ class RestaurantsController extends Controller
 
     public function update(Request $request)
     {
-        $data = $request->validate([
-            'name' => 'required',
-            'restaurant_name' => 'required',
-            'email' => 'required',
-            'phone' => 'required'
-        ]);
-
         $create = Restaurant::find($request->id);
 
-        $create->restaurant_name = $data['restaurant_name'];
-        $create->name = $data['name'];
-        $create->email = $data['email'];
-        $create->phone = $data['phone'];
-        if (isset($data->password)) {
-            $create->password = Hash::make($data['password']);
+        if (Restaurant::where('email',$request->email)->where('id','!=',$create->id)->exists()) {
+            return redirect()->back()->with('test', 'Bu email adresine ait bir restaurant zaten mevcut!!');
+        }
+
+        if (Restaurant::where('phone',$request->phone)->where('id','!=',$create->id)->exists()) {
+            return redirect()->back()->with('test', 'Bu telefon numarasına ait bir restaurant zaten mevcut!!');
+        }
+
+        if (Restaurant::where('restaurant_name',$request->restaurant_name)->where('id','!=',$create->id)->exists()) {
+            return redirect()->back()->with('test', 'Bu isimde bir restaurant zaten mevcut!!');
+        }
+
+        $create->restaurant_name = $request->restaurant_name;
+        $create->name = $request->name;
+        $create->email = $request->email;
+        $create->phone = $request->phone;
+        if ($request->password) {
+            $create->password = Hash::make($request->password);
         }
         $create->tax_name = $request->tax_name;
         $create->tax_number = $request->tax_number;
         $create->address = $request->address;
-        $create->entegra_id = $request->entegra_id;
-        $create->entegra_token = $request->entegra_token;
-        $create->package_price = $request->package_price;
         $create->status = $request->status;
+        $create->package_price = $request->package_price;
         $create->latitude = $request->latitude;
         $create->longitude = $request->longitude;
-
-        $create->save();
+        $create->update();
 
         return redirect()->back()->with('message', 'İşyeri bilgileri güncellendi.');
     }

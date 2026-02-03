@@ -1,12 +1,5 @@
 <script>
-    const statusMap = {
-        'PENDING': 'pending',
-        'PREPARED': 'prepared',
-        'ASSIGNED': 'assigned',
-        'HANDOVER': 'handover',
-        'DELIVERED': 'delivered',
-        'UNSUPPLIED': 'unsupplied'
-    };
+    const statusMap = {!! json_encode(\App\Helpers\OrderStatus::statuses()) !!};
 
     document.addEventListener('DOMContentLoaded', () => {
         fetchOrders();
@@ -17,7 +10,8 @@
             url: '/{{$key}}/orders/ajax',
             method: 'GET', // veya 'POST' gerekiyorsa
             success: function (data) {
-                console.log({gird: data})
+                Object.keys(statusMap).forEach(status => updateTableForStatus(status));
+
                 if (data) {
                     Object.keys(data).forEach(statusKey => {
                         data[statusKey].forEach(order => {
@@ -80,38 +74,54 @@
         var platform = $('#platform_' + id).val();
         var selectEl = e.target;
 
-        // Spinner + bekleniyor yazısı
+        // Spinner ekle
         let loadingSpan = document.createElement('span');
         loadingSpan.className = 'ms-2 d-flex align-items-center';
         loadingSpan.innerHTML = `
         <div class="spinner-border spinner-border-sm me-1" role="status"></div>
-        <small>Bekleniyor...</small>
-    `;
-
-        // Select elementinin yanına ekle
+        <small>Bekleniyor...</small>`;
         selectEl.parentNode.appendChild(loadingSpan);
 
-        // İptal işlemi
         if (action === 'UNSUPPLIED') {
-            $('#cancelModal').modal('show');
+            // O siparişe özel modalı aç
+            var myModal = new bootstrap.Modal(document.getElementById('cancelModal' + id));
+            myModal.show();
 
-            $('#confirmCancel').off('click').on('click', function () {
-                var cancelReason = $('#cancelReason' + id).val();
+            // Spinner'ı modal açıldığı için temizle (işlem modal içinde devam edecek)
+            loadingSpan.remove();
 
-                if (cancelReason.trim() === '') {
-                    Swal.fire('Lütfen iptal nedenini belirtin.');
-                    loadingSpan.remove(); // iptal durumunda spinner kaldır
-                    return;
-                }
-                // Güncelle
-                sendOrderStatusUpdate(action, tracking_id, platform, cancelReason, id)
-                    .finally(() => loadingSpan.remove());
-            });
+            // Select box'ı eski haline getirmek isteyebilirsiniz (isteğe bağlı)
         } else {
-            // Diğer durumlar
+            // Diğer durumlar için doğrudan güncelle
             sendOrderStatusUpdate(action, tracking_id, platform, null, id)
                 .finally(() => loadingSpan.remove());
         }
+    }
+    function cancelOrder(id) {
+        var tracking_id = $('#tracking_' + id).val();
+        var platform = $('#platform_' + id).val();
+        var cancelReason = $('#cancelReason' + id).val();
+        var action = 'UNSUPPLIED';
+
+        if (!cancelReason || cancelReason.trim() === '') {
+            Swal.fire('Lütfen iptal nedenini belirtin.');
+            return;
+        }
+
+        // Butonu pasif yapalım ki mükerrer tıklanmasın
+        const btn = event.target;
+        btn.disabled = true;
+
+        sendOrderStatusUpdate(action, tracking_id, platform, cancelReason, id)
+            .then(() => {
+                // Modalı kapat
+                const modalEl = document.getElementById('cancelModal' + id);
+                const modalInstance = bootstrap.Modal.getInstance(modalEl);
+                if (modalInstance) modalInstance.hide();
+            })
+            .finally(() => {
+                btn.disabled = false;
+            });
     }
 
     async function sendOrderStatusUpdate(action, tracking_id, platform, message, orderId) {
@@ -125,6 +135,7 @@
             requestData.message = message;
         }
 
+        console.log({platform:platform})
         $.ajax({
             type: 'POST',
             url: '/{{$key}}/' + platform + '/updateOrderStatus',
@@ -134,8 +145,8 @@
                     title: 'Sipariş durumu başarıyla değiştirildi.',
                     icon: 'success',
                     confirmButtonText: 'Tamam',
-                    confirmButtonColor: '#0d2646',
-                    cancelButtonColor: '#e7004d',
+                    confirmButtonColor: '#259a38',
+                    cancelButtonColor: '#ec691e',
                 })
                 $('#cancelModal').modal('hide');
 
@@ -153,30 +164,45 @@
     }
 
     async function refreshOrderTable(order) {
-        const tabId = statusMap[order.status];
+        // ÖNEMLİ: Mantıksal Tab Belirleme
+        let targetStatusKey = order.status;
+
+        // Eğer statü PREPARED ama kurye atanmışsa, onu ASSIGNED sekmesine zorla
+        if (order.status === 'PREPARED' && order.courier_id && order.courier_id != -1) {
+            targetStatusKey = 'ASSIGNED';
+        }
+
+        const tabId = statusMap[targetStatusKey]; // Hedef tablo ID'si
         const rowId = 'data_' + order.id;
 
         const newRowHtml = await generateOrderRowHtml(order);
         const existingRow = $('#' + rowId);
 
         if (existingRow.length) {
-            // Aynı satır zaten var
-            const parentTableId = existingRow.closest("table").attr("id");
-            if (parentTableId !== tabId) {
-                // Eski tablodan kaldır ve yeni tab’a ekle
+            const parentTable = existingRow.closest("table");
+            const currentTabId = parentTable.attr("id"); // Mevcut olduğu tablo ID'si
+
+            // Eğer olması gereken yer ile olduğu yer farklıysa taşı
+            if (currentTabId !== tabId) {
                 existingRow.remove();
-                $('#' + tabId).find('tbody').append(newRowHtml);
+                $('#order-tbody-' + tabId).append(newRowHtml); // Tbody ID'nize göre güncelleyin
             } else {
-                // Aynı tabloda ise güncelle
                 existingRow.replaceWith(newRowHtml);
             }
         } else {
-            // Satır yoksa ekle
-            $('#' + tabId).find('tbody').append(newRowHtml);
+            // İlk kez ekleniyorsa
+            const targetBody = $('#order-tbody-' + tabId);
+            if(targetBody.length) {
+                targetBody.append(newRowHtml);
+            } else {
+                // Eğer tbody ID formatınız farklıysa (tabId doğrudan id ise):
+                $(`#${tabId}`).find('tbody').append(newRowHtml);
+            }
         }
 
-        // Tab boşsa mesaj göster
+        // Tablo boş/dolu uyarısını güncelle
         updateTableForStatus(order.status);
+        if (targetStatusKey === 'ASSIGNED') updateTableForStatus('ASSIGNED');
 
         if (order.status === 'HANDOVER') {
             await updateCourierOptions(order.id);
@@ -311,9 +337,29 @@
     }
 
     function updateTableForStatus(status) {
-        const tableBody = document.querySelector(`#${statusMap[status]} tbody`);
-        if (!tableBody || tableBody.children.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="10" class="text-center">Sipariş bulunmuyor</td></tr>`;
+        const tabId = statusMap[status];
+        if (!tabId) return;
+
+        const tableBody = document.querySelector(`#${tabId} tbody`);
+        if (tableBody) {
+            // Eğer tabloda hiç <tr> yoksa veya sadece bizim "Sipariş bulunmuyor" yazımız varsa
+            const rows = tableBody.querySelectorAll('tr:not(.no-order-row)');
+
+            if (rows.length === 0) {
+                tableBody.innerHTML = `
+                <tr class="no-order-row">
+                    <td colspan="12" class="text-center py-4">
+                        <div class="d-flex flex-column align-items-center">
+                            <i class="fas fa-box-open mb-2 text-muted" style="font-size: 2rem;"></i>
+                            <span class="fw-bold text-muted">Bu kategoride henüz sipariş bulunmuyor.</span>
+                        </div>
+                    </td>
+                </tr>`;
+            } else {
+                // Eğer sipariş geldiyse uyarı satırını kaldır
+                const noOrderRow = tableBody.querySelector('.no-order-row');
+                if (noOrderRow) noOrderRow.remove();
+            }
         }
     }
 
@@ -379,41 +425,61 @@
         });
     }
 
-    function Courier(e, order) {
+    function Courier(e, orderId) {
         let courierId = e.target.value;
         const selectEl = e.target;
 
-        // Spinner + bekleniyor yazısı oluştur
+        if (courierId === "0") return; // Seçim yapılmadıysa işlem yapma
+
         let loadingSpan = document.createElement('span');
         loadingSpan.className = 'ms-2 d-flex align-items-center';
         loadingSpan.innerHTML = `
         <div class="spinner-border spinner-border-sm me-1 mt-2" role="status"></div>
         <small class="mt-2">Kurye Atanıyor...</small>
     `;
-
-        // Select elementinin hemen yanına ekle
         selectEl.parentNode.appendChild(loadingSpan);
 
-        // AJAX isteği
         $.ajax({
             type: 'GET',
-            url: '/{{$key}}/orders/sendCourier/' + order + '/' + courierId,
+            url: '/{{$key}}/orders/sendCourier/' + orderId + '/' + courierId,
+            dataType: 'json', // JSON beklediğimizi belirttik
             success: function (data) {
-                // Spinner + yazıyı kaldır
                 loadingSpan.remove();
 
-                if (data == "OK") {
-                    $('#Courier' + order).modal('hide'); // modalı gizle
-                    Swal.fire('Kurye Başarıyla Atandı');
+                if (data.success) {
+                    // Modalı güvenli kapat
+                    const modalElement = document.getElementById('Courier' + orderId);
+                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    }
 
-                    fetchOrders();
-                } else if (data == "ERR") {
-                    Swal.fire('Kurye Atama Başarısız');
+                    // Ekran kararmasını önle
+                    $('.modal-backdrop').remove();
+                    $('body').removeClass('modal-open').css('overflow', '');
+
+                    Swal.fire({
+                        title: data.message,
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+
+                    fetchOrders(); // Tabloyu tazele
+                } else {
+                    Swal.fire('Uyarı', data.message || 'Kurye Atama Başarısız', 'error');
                 }
             },
-            error: function () {
-                loadingSpan.remove(); // hata durumunda da kaldır
-                Swal.fire('İşlem sırasında bir hata oluştu!');
+            error: function (xhr) {
+                loadingSpan.remove();
+                let errorMsg = 'İşlem sırasında bir hata oluştu!';
+
+                // Backend'den gelen 400 vb. hataların mesajını oku
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMsg = xhr.responseJSON.message;
+                }
+
+                Swal.fire('Üzgünüz :(', errorMsg, 'error');
             }
         });
     }
@@ -466,8 +532,8 @@
             year: 'numeric',
             hour: '2-digit',
             minute: '2-digit',
-            second: '2-digit'
         }) : '';
+
         const courierName = order.courier ? order.courier.name : 'Kurye Bulunmuyor';
         const status = order.status; // varsayılan
         const distanceStr = order.distance ? formatDistance(order.distance) : '';
@@ -522,34 +588,47 @@
 
         // Kurye bölümü
         let courierSection = '';
+        let courierStatusBadge = ''; // Yeni durum rozeti
+
         if (status === 'UNSUPPLIED' || status === 'DELIVERED' || status === 'HANDOVER') {
             courierSection = `
-        <a style="cursor:pointer;color: #e7004d">
+        <a style="cursor:pointer;color: #ec691e">
             <i class="fas fa-truck mr-1"></i> ${order.courier ? order.courier.name.substr(0, 10) : 'Kurye Yok'}
         </a>`;
         } else {
             if (order.courier && order.courier.id) {
+                // Eğer kurye atanmışsa statüsüne bakalım
+                if (status === 'ASSIGNED') {
+                    // Statü ASSIGNED ise dükkandan teslim alınmış demektir
+                    courierStatusBadge = '<br><span class="badge bg-success" style="font-size: 10px;"><i class="fas fa-check-double"></i>  Paket Kabul Edildi</span>';
+                } else if (status === 'PREPARED') {
+                    // Statü hala PREPARED ama kuryesi varsa (Bizim assigned sekmesine zorladığımız durum)
+                    courierStatusBadge = '<br><span class="badge bg-primary text-white" style="font-size: 10px;"><i class="fas fa-clock"></i> Teslimat Bekliyor</span>';
+                }
+
                 courierSection = `
-            <div style="display:flex; align-items:center;">
-                <a data-bs-toggle="modal" data-bs-target="#Courier${order.id}" style="cursor:pointer;color: #e7004d">
-                   <i class="fas fa-truck mr-1"></i> ${order.courier.name.substr(0, 10)}
-                </a>
-            </div>`;
+    <div style="display:flex; flex-direction:column; align-items:start;">
+        <a data-bs-toggle="modal" data-bs-target="#Courier${order.id}" style="cursor:pointer;color: #ec691e; font-weight:bold;">
+           <i class="fas fa-truck mr-1"></i> ${order.courier.name.substr(0, 15)}
+        </a>
+        ${courierStatusBadge}
+    </div>`;
             } else {
+                // Kurye yoksa eski "Kurye Ata" butonu
                 courierSection = `
-            <a style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#Courier${order.id}" class="sharp text-secondary size-3 px-3 fw-bold">
-                <i class="fas fa-truck mr-1"></i> <small>Kurye Ata</small>
-            </a>`;
+    <a style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#Courier${order.id}" class="sharp text-secondary size-3 px-3 fw-bold">
+        <i class="fas fa-truck mr-1"></i> <small>Kurye Ata</small>
+    </a>`;
             }
         }
-
-
         // Durum seçenekleri
         const statusOptions = `
-        <option value="PENDING" ${status == 'PENDING' ? 'selected' : ''}>BEKLİYOR</option>
-        <option value="PREPARED" ${status == 'PREPARED' ? 'selected' : ''}>HAZIRLANIYOR</option>
-        <option value="DELIVERED" ${status == 'DELIVERED' ? 'selected' : ''}>TESLİM EDİLDİ</option>
-        <option value="UNSUPPLIED" ${status == 'UNSUPPLIED' ? 'selected' : ''}>İPTAL EDİLDİ</option>
+      <option value="PENDING" ${status == 'PENDING' ? 'selected' : ''}>BEKLEMEDE</option>
+<option value="PREPARED" ${status == 'PREPARED' ? 'selected' : ''}>HAZIRLANIYOR</option>
+<option disabled value="ASSIGNED" ${status == 'ASSIGNED' ? 'selected' : ''}>KURYE ATANDI</option>
+<option disabled value="HANDOVER" ${status == 'HANDOVER' ? 'selected' : ''}>KURYEYE TESLİM EDİLDİ / YOLDA</option>
+<option value="DELIVERED" ${status == 'DELIVERED' ? 'selected' : ''}>TESLİM EDİLDİ</option>
+<option value="UNSUPPLIED" ${status == 'UNSUPPLIED' ? 'selected' : ''}>İPTAL EDİLDİ / TEDARİK YOK</option>
     `;
 
         return `
@@ -558,7 +637,7 @@
         <input type="hidden" value="${trackingId}" id="tracking_${order.id}">
     </td>
     <td>${trackingId}</td>
-    <td>${createdAt}</td>
+    <td>${order.platform_date ?? createdAt}</td>
     <td style="width:200px;overflow: hidden;">${fullName}</td>
     <td>
         ${courierSection}
@@ -573,10 +652,17 @@
                     <div class="modal-body" style="padding: 1rem;">
                         <div class="row">
                             <div class="mb-1 col-md-12">
-                                <select class="single-select-placeholder js-states form-control" onchange="Courier(event, ${order.id})">
-                                    <option value="0">Kurye Seçiniz</option>
-                                    ${couriers.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
-                                </select>
+                              <select class="single-select-placeholder js-states form-control" onchange="Courier(event, ${order.id})">
+    <option value="0">Kurye Seçiniz</option>
+
+    ${/* Eğer kurye atanmışsa (-1, 0 veya null değilse) Boşa Çıkar seçeneğini göster */
+            (order.courier_id && order.courier_id != -1 && order.courier_id != 0)
+                ? '<option value="-1" class="text-danger fw-bold">Kurye Boşa Çıkar</option>'
+                : ''
+        }
+
+    ${couriers.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
+</select>
                             </div>
                         </div>
                     </div>
@@ -599,7 +685,7 @@
     <td>
         <input type="hidden" id="tracking_${order.id}" value="${trackingId}">
         <input type="hidden" id="platform_${order.id}" value="${platform}">
-        <select class="inline-order-select form-control" onchange="StatusOrderChange(event, ${order.id})" ${status == 'DELIVERED' ? 'disabled' : ''}>
+        <select class="inline-order-select form-control" onchange="StatusOrderChange(event, ${order.id})" ${status == 'DELIVERED' ||  status == 'UNSUPPLIED' ? 'disabled' : ''}>
             ${statusOptions}
         </select>
         <!-- İptal modal -->

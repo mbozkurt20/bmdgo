@@ -31,6 +31,9 @@ class Order extends Model
         'message',
         'discount',
         'distance',
+        'platform_date',
+        'created_at',
+        'assigned_at',
     ];
 
     public function restaurant(): BelongsTo
@@ -46,5 +49,18 @@ class Order extends Model
     public function logs()
     {
         return $this->hasMany(OrderStatusLog::class, 'order_id', 'id');
+    }
+
+    public static function paymentMethods()
+    {
+        return [
+            'nakit'         => 'Kapıda Nakit ile Ödeme',
+            'kredi_karti'   => 'Kapıda Kredi Kartı ile Ödeme',
+            'ticket'        => 'Kapıda Ticket ile Ödeme',
+            'sodexo'        => 'Kapıda Sodexo ile Ödeme',
+            'multinet'      => 'Kapıda Multinet ile Ödeme',
+            'pluxee'        => 'Kapıda Pluxee ile Ödeme',
+            'online'        => 'Online Kredi/Banka Kartı'
+        ];
     }
 }

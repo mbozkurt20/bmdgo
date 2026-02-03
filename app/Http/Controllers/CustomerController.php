@@ -2,17 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\GeoLocation;
 use App\Models\Admin;
-use App\Models\City;
-use App\Models\Courier;
 use App\Models\Customer;
 use App\Models\CustomerAddress;
 use App\Models\District;
-use App\Models\Expenses;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
 {
@@ -29,14 +24,15 @@ class CustomerController extends Controller
 
     public function new()
     {
-        $cities = DB::table('cities')->get();
-        return view('restaurant.customers.new', compact('cities'));
+        $admin = Admin::where('id', auth()->user()->admin_id)->first();
+        $location = json_encode( ['lat' => floatval($admin->latitude), 'lng' => floatval($admin->longitude)]);
+        return view('restaurant.customers.new', compact('location'));
     }
 
     public function getCustomers()
     {
         try {
-            $customers = \App\Models\Customer::where('restaurant_id', auth()->id())->get();
+            $customers = \App\Models\Customer::where('status','active')->where('restaurant_id', auth()->id())->get();
 
             return response()->json([
                 'success' => true,
@@ -53,7 +49,8 @@ class CustomerController extends Controller
     public function edit($id)
     {
         $customer = Customer::find($id);
-        return view('restaurant.customers.edit', compact('customer'));
+        $districts = \App\Models\District::where('city_id',auth()->user()->admin->city_id)->get();
+        return view('restaurant.customers.edit', compact('customer','districts'));
     }
 
     public function create(Request $request)
@@ -66,6 +63,10 @@ class CustomerController extends Controller
             }
         }
 
+        if (Customer::where('phone',$request->phone)->where('restaurant_id', Auth::user()->id)->exists()) {
+            return redirect()->back()->with('test', 'Bu telefon numarasına ait bir müşteri zaten mevcut!!');
+        }
+
         // Save customer information
         $create = new Customer();
         $create->restaurant_id = Auth::user()->id; // Assuming the authenticated user is the restaurant
@@ -75,54 +76,28 @@ class CustomerController extends Controller
         $create->email = $request->input('email')??null;
         $create->save();
 
-        $city =  City::find(Admin::find(auth()->user()->admin_id)->city_id);
+        $admin = Admin::find(auth()->user()->admin_id);
+        $cityId = $admin->city_id;
 
         // Check if address data is present
         if ($request->address) {
-            $errors = [];
             foreach ($request->address as $adres) {
-
-                $addres = $adres['mahalle'] . ' mah. ' .
-                    $adres['sokak_cadde'] . ' sokak. Bina No:' .
-                    $adres['kat'] . ' Kat:' .
-                    $adres['daire_no'] . ' Daire No:' .
-                    $adres['bina_no'] . ' Bina no' .
-                    District::find($adres['ilce'])->name . '/' .$city->name. ' Türkiye';
-
-                $location = GeoLocation::getLatLong($addres);
-
-
-                if (!isset($location['error'])) {
-                    // Save each address for the customer
-                    $address = new CustomerAddress();
-                    $address->customer_id = $create->id;
-                    $address->restaurant_id = Auth::user()->id;
-                    $address->name = $adres['name'];
-                    $address->sokak_cadde = $adres['sokak_cadde'];
-                    $address->bina_no = $adres['bina_no'];
-                    $address->city_id = $city->id;
-                    $address->district_id = $adres['ilce'];
-                    $address->kat = $adres['kat'];
-                    $address->latitude = $location['lat'];
-                    $address->longitude = $location['lon'];
-                    $address->daire_no = $adres['daire_no'];
-                    $address->mahalle = $adres['mahalle'];
-                    $address->adres_tarifi = $adres['adres_tarifi'] ?? '';
-                    $address->save();
-                } else {
-                    // Eğer konum bulunamadıysa hata kaydet
-                    $errors[] = [
-                        'input' => $location['input'],
-                        'message' => $location['error']
-                    ];
-                }
-            }
-
-            if (!empty($errors)) {
-                // Hata varsa kullanıcıyı editlemeye yönlendir
-                return redirect()->route('restaurant.customers.edit', $create->id)
-                    ->with('test', 'Bazı adreslerin konumu bulunamadı.')
-                    ->with('errors', $errors);
+                // Save each address for the customer
+                $address = new CustomerAddress();
+                $address->customer_id = $create->id;
+                $address->restaurant_id = Auth::user()->id;
+                $address->name = $adres['name'];
+                $address->sokak_cadde = $adres['sokak_cadde'];
+                $address->bina_no = $adres['bina_no'];
+                $address->city_id = $cityId;
+                $address->district_id = District::where('name', $adres['ilce'])->first()->id ?? null;
+                $address->kat = $adres['kat'];
+                $address->latitude = $adres['latitude'];
+                $address->longitude =  $adres['longitude'];
+                $address->daire_no = $adres['daire_no'];
+                $address->mahalle = $adres['mahalle'];
+                $address->adres_tarifi = $adres['adres_tarifi'] ?? '';
+                $address->save();
             }
         }
 
@@ -135,8 +110,7 @@ class CustomerController extends Controller
         $customer->name = $request->name;
         $customer->phone = $request->phone;
         $customer->mobile = $request->mobile;
-        $customer->save();
-        $city =  City::find(Admin::find(auth()->user()->admin_id)->city_id);
+        $customer->update();
 
         if ($request->address) {
             // Mevcut adresleri çek
@@ -150,19 +124,6 @@ class CustomerController extends Controller
             CustomerAddress::whereIn('id', $toDelete)->delete();
 
             foreach ($request->address as $adres) {
-                $addres = $adres['mahalle'] . ' mah. ' .
-                    $adres['sokak_cadde'] . ' sokak. Bina No:' .
-                    $adres['kat'] . ' Kat:' .
-                    $adres['daire_no'] . ' Daire No:' .
-                    $adres['bina_no'] . ' Bina no ' .
-                    District::find($adres['ilce'])->name . '/' .$city->name. ' Türkiye';
-
-                $location = GeoLocation::getLatLong($addres);
-
-                if (isset($location['error'])) {
-                    return response()->json(['message' => 'Konumu doğru girip tekrar deneyiniz.']);
-                }
-
                 if (isset($adres['id']) && $findAddress = CustomerAddress::find($adres['id'])) {
                     // Güncelle
                     $findAddress->update([
@@ -171,16 +132,18 @@ class CustomerController extends Controller
                         'bina_no' => $adres['bina_no'],
                         'kat' => $adres['kat'],
                         'daire_no' => $adres['daire_no'],
+                        'district_id' => $adres['district_id'] ?? null,
                         'mahalle' => $adres['mahalle'],
                         'adres_tarifi' => $adres['adres_tarifi'],
-                        'latitude' => $location['lat'],
-                        'longitude' => $location['lon'],
+                        'latitude' => $adres['latitude'],
+                        'longitude' => $adres['longitude'],
                     ]);
                 } else {
                     // Yeni ekle
                     CustomerAddress::create([
                         'restaurant_id' => Auth::user()->id,
                         'customer_id' => $customer->id,
+                        'district_id' => $adres['district_id'] ?? null,
                         'name' => $adres['name'],
                         'sokak_cadde' => $adres['sokak_cadde'],
                         'bina_no' => $adres['bina_no'],
@@ -188,13 +151,12 @@ class CustomerController extends Controller
                         'daire_no' => $adres['daire_no'],
                         'mahalle' => $adres['mahalle'],
                         'adres_tarifi' => $adres['adres_tarifi'],
-                        'latitude' => $location['lat'],
-                        'longitude' => $location['lon'],
+                        'latitude' => $adres['latitude'],
+                        'longitude' => $adres['longitude'],
                     ]);
                 }
             }
         }
-
 
         return redirect()->back()->with('message', 'Müşteri ve Adresleri Başarıyla Güncellendi.');
     }

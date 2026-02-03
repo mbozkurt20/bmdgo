@@ -1,20 +1,4 @@
-<div class="nav-header" style="background:  #0d2646">
-    <a href="{{ url('/restaurant') }}" class="brand-logo">
-        <div class="logo-abbr" style="width: 56px; height:56px">
-            <img alt="" src="" style="height: 40px">
-        </div>
-        <div class="brand-title">
-            <img src="{{config('site.logo')}}" style="height: 100px" alt="">
-        </div>
-    </a>
-    <div class="nav-control">
-        <div class="hamburger">
-            <span class="line"></span><span class="line"></span><span class="line"></span>
-        </div>
-    </div>
-</div>
-
-<div class="deznav" style="background:  #0d2646">
+<div class="deznav" style="background:  #259a38">
     <div class="deznav-scroll">
         <ul class="metismenu" id="menu">
             <li><a class="ai-icon text-white" href="{{ url('/restaurant') }}" aria-expanded="false">
@@ -91,7 +75,7 @@
                 </a>
                 <ul aria-expanded="false">
                     <li><a  class="text-white" href="{{ route('restaurant.menus') }}">Menüler</a></li>
-                    <li><a target="_blank" class="text-white" href="{{ route('restaurant.menu') }}">Aktif Menü</a></li>
+                    <li><a target="_blank" class="text-white" href="{{ route('restaurant.menu',auth()->id()) }}">Aktif Menü</a></li>
                 </ul>
             </li>
 

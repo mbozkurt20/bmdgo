@@ -15,5 +15,10 @@ class VerifyCsrfToken extends Middleware
         '/payment/callback',
         '/payment/success',
         '/payment/fail',
+        '/entegra/add-order',
+        '/entegra/cancel-order',
+        '/paytr/callback',
+        '/paytr/success',
+        '/paytr/fail',
     ];
 }

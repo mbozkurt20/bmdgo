@@ -20,7 +20,7 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'phone' => 'required|numeric',
+            'phone' => 'required|string',
             'fcm_token' => 'nullable',
             'password' => 'required|string|min:6',
         ]);
@@ -30,7 +30,7 @@ class LoginController extends Controller
         }
 
         // Courier kullanıcıyı bul
-        $courier = Courier::where('phone', $request->phone)->first();
+        $courier = Courier::query()->where('phone', $request->phone)->first();
 
         if (isset($courier->is_active) && !$courier->is_active) {
             if ($token = JWTAuth::getToken()) {
@@ -65,7 +65,6 @@ class LoginController extends Controller
             'latitude' => 'required',
             'longitude' => 'required',
             'birthday' => 'required',
-            'price_type' => 'required',
             'fcm_token' => 'nullable',
         ]);
 
@@ -107,8 +106,8 @@ class LoginController extends Controller
             'km_price' => $request->input('km_price'),
             'fcm_token' => $request->input('fcm_token'),
             'code' => $this->generateCode(),
-            'status' => CourierStatus::passive,
-            'is_active' => false
+            'status' => CourierStatus::active,
+            'is_active' => true
         ]);
 
         return Json::success('Kaydınız Başarıyla Alınmıştır', $courier);

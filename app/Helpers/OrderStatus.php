@@ -3,12 +3,10 @@
 namespace App\Helpers;
 class OrderStatus
 {
-    public const PENDING = 'PENDING'; //bekliyor
-    public const CONFIRMED = 'CONFIRMED'; //ONAYLANDI
-    public const PREPARED = 'PREPARED'; //hazırlandı
-    public const ASSIGNED = 'ASSIGNED';  //kuryeye atandı
-    public const PICKUP = 'PICKUP';  //YOLDA OLANLAR
-    public const HANDOVER = 'HANDOVER';  //kuryeye verildi
+    public const PENDING = 'PENDING'; //BEKLİYOR 5 SN SONRA HAZIRLANIYOR
+    public const PREPARED = 'PREPARED'; //HAZIRLANDI
+    public const ASSIGNED = 'ASSIGNED';  // kAbUL EDİLDİ
+    public const HANDOVER = 'HANDOVER';  // teslim al
     public const DELIVERED = 'DELIVERED'; // teslim edildi
     public const UNSUPPLIED = 'UNSUPPLIED'; //reddedildi
 
@@ -17,9 +15,7 @@ class OrderStatus
         return [
             self::PENDING,
             self::PREPARED,
-            self::CONFIRMED,
             self::ASSIGNED,
-            self::PICKUP,
             self::HANDOVER,
             self::DELIVERED,
             self::UNSUPPLIED,
@@ -29,5 +25,17 @@ class OrderStatus
     public static function isValid(string $value): bool
     {
         return in_array($value, self::all(), true);
+    }
+
+    public static function statuses()
+    {
+        return [
+            'PENDING' => 'pending',
+            'PREPARED' => 'prepared',
+            'ASSIGNED' => 'assigned',
+            'HANDOVER' => 'handover',
+            'DELIVERED' => 'delivered',
+            'UNSUPPLIED' => 'unsupplied'
+        ];
     }
 }

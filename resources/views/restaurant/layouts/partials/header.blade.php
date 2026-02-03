@@ -1,8 +1,24 @@
+<div class="nav-header" style="background:  #efd5ab">
+    <a href="{{ url('/restaurant') }}" class="brand-logo">
+        <div class="logo-abbr" style="width: 56px; height:56px">
+            <img alt="" src="" style="height: 50px">
+        </div>
+        <div class="brand-title">
+            <img src="{{config('site.logo')}}" style="height: 50px" alt="">
+        </div>
+    </a>
+    <div class="nav-control">
+        <div class="hamburger">
+            <span class="line"></span><span class="line"></span><span class="line"></span>
+        </div>
+    </div>
+</div>
+
 <div class="header">
     @if(env('TEST_MODE') === true)
-        <div class="row relative" style="background-color: #f3eded; color: #e7004d;">
+        <div class="row relative" style="background-color: #f3eded; color: #ec691e;">
             <div class="text-lg absolute text-center fw-bold py-2" >
-                <strong>BmdGo</strong> Test Modu Hesabı Kullanmaktasınız !!
+                <strong>{{env('APP_NAME')}}</strong> Test Modu Hesabı Kullanmaktasınız !!
             </div>
         </div>
     @endif

@@ -73,20 +73,16 @@ class AdminController extends Controller
             })->orderBy('created_at', 'asc')->with(['restaurant','courier'])->get();
 
         // Siparişleri duruma göre ayır
-        $pending = $tumu->where('status', OrderStatus::PENDING);
-        $prepared = $tumu->where('status',  OrderStatus::PREPARED);
-        $assigned = $tumu->where('status',  OrderStatus::ASSIGNED);
-        $handover = $tumu->where('status',  OrderStatus::HANDOVER);
-        $delivered = $tumu->where('status',  OrderStatus::DELIVERED);
-        $unsupplied = $tumu->where('status',  OrderStatus::UNSUPPLIED);
+        // Tüm siparişleri statülerine göre tek seferde grupla (Performans için kritik)
+        $grouped = $tumu->groupBy('status');
 
         return response()->json([
-            'pending' => $pending->values()->all(),
-            'prepared' => $prepared->values()->all(),
-            'assigned' => $assigned->values()->all(),
-            'handover' => $handover->values()->all(),
-            'delivered' => $delivered->values()->all(),
-            'unsupplied' => $unsupplied->values()->all(),
+            'pending'          => $grouped->get(OrderStatus::PENDING, collect())->values(),
+            'prepared'         => $grouped->where('courier_id','!=', -1)->get(OrderStatus::PREPARED, collect())->values(),
+            'assigned'         => $grouped->get(OrderStatus::ASSIGNED, collect())->values(),
+            'handover'         => $grouped->get(OrderStatus::HANDOVER, collect())->values(),
+            'delivered'        => $grouped->get(OrderStatus::DELIVERED, collect())->values(),
+            'unsupplied'       => $grouped->get(OrderStatus::UNSUPPLIED, collect())->values(),
         ]);
     }
     public function topupTalep(REquest $request){

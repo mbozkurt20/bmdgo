@@ -25,7 +25,6 @@ class CourierController extends Controller
     public function index()
     {
         $couriers = Courier::where('status', 'active')->where('restaurant_id', Auth::user()->id)->get();
-
         return view('restaurant.couriers.index', compact('couriers'));
     }
 
@@ -102,6 +101,7 @@ class CourierController extends Controller
             'latitude' => $request->input('latitude'),
             'longitude' => $request->input('longitude'),
             'code' => $this->generateCode(),
+            'is_active' => 1,
             'admin_id' => Auth::guard('admin')->user()->id,
         ]);
 

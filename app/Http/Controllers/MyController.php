@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\EntegraHelper;
 use App\Models\Admin;
 use App\Models\Restaurant;
-use App\Models\RestaurantSystemFeature;
-use App\Models\SystemFeature;
 use App\Services\VatanSmsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Artisan;
 
 class MyController extends Controller
 {
@@ -22,24 +22,66 @@ class MyController extends Controller
     public function entegrastion_update(Request $request)
     {
         $restaurant = Restaurant::find(Auth::user()->id);
-        $restaurant->gpsyemek_api_key = $request->gpsyemek_api_key;
-        $restaurant->yemeksepeti_email = $request->yemeksepeti_email;
-        $restaurant->yemeksepeti_password = $request->yemeksepeti_password;
-        $restaurant->getir_restaurant_id = $request->getir_restaurant_id;
-        $restaurant->getir_app_secret_key = $request->getir_app_secret_key;
-        $restaurant->getir_restaurant_secret_key = $request->getir_restaurant_secret_key;
-        $restaurant->trendyol_satici_id = $request->trendyol_satici_id;
-        $restaurant->trendyol_sube_id = $request->trendyol_sube_id;
-        $restaurant->trendyol_api_key = $request->trendyol_api_key;
-        $restaurant->trendyol_secret_key = $request->trendyol_secret_key;
-        $restaurant->adisyo_api_key = $request->adisyo_api_key;
-        $restaurant->adisyo_secret_key = $request->adisyo_secret_key;
-        $restaurant->adisyo_consumer_adi = $request->adisyo_consumer_adi;
-        $restaurant->save();
+        $platform = $request->input('platform');
 
-        return redirect()->back()->with('message', 'Entegrasyon Güncellenmesi Tamamlandı.');
+        $data = $request->input('data');
+
+        if ($platform == 'gpsyemek') {
+            $restaurant->gpsyemek_api_key = $data['api_key'];
+            $restaurant->update();
+            return redirect()->back()->with('message', 'Entegrasyon Güncellenmesi Tamamlandı.');
+        } else {
+            $restaurant->$platform = json_encode($data);
+        }
+
+        if (!$restaurant->entegra_restaurant_id){
+            $businessRes = EntegraHelper::newBusiness([
+                'name' => $restaurant->name,
+                'email' => $restaurant->email,
+                'password' => $restaurant->name.'.'.$restaurant->code
+            ]);
+
+            if ($businessRes['success']){
+                $restaurantRes = EntegraHelper::newRestaurant([
+                    'name' => $restaurant->name,
+                    'businessId' => $businessRes->data->id,
+                    'website' => 'https://app.gpskurye.com',
+                    'website_restaurant_id' => $restaurant->id,
+                ]);
+
+                $restaurant->entegra_restaurant_id = $restaurantRes->data->restaurant_id;
+                $restaurant->save();
+            }
+        }
+
+        $providerRes = EntegraHelper::patchProvider($restaurant,$platform);
+
+        if ($providerRes['success']){
+            $restaurant->update();
+            return redirect()->back()->with('message', 'Entegrasyon Güncellenmesi Tamamlandı.');
+        }
+
+        return redirect()->back()->with('message', 'Üzgünüz, bir hata meydana geldi, lütfen tekrar deneyiniz.');
     }
 
+    public function paymentEntegrations()
+    {
+        return view('superadmin.payment');
+    }
+
+    public function paymentUpdateEntegrations(REquest $request)
+    {
+        $this->setEnv([
+            'PAYTR_MERCHANT_ID'   => $request->merchant_id,
+            'PAYTR_MERCHANT_KEY'  => $request->merchant_key,
+            'PAYTR_MERCHANT_SALT' => $request->merchant_salt,
+            'PAYTR_SANDBOX'       => $request->sandbox ? 'true' : 'false',
+        ]);
+
+        Artisan::call('config:clear');
+
+        return redirect()->back()->with(['message' => 'Bilgiler Güncellendi']);
+    }
     public function smsEntegrations()
     {
         $admin = Admin::find(Auth::user()->id);
@@ -101,12 +143,38 @@ class MyController extends Controller
             $auth->password = Hash::make($request->password);
         }
 
+        if (Restaurant::where('phone',$request->phone)->where('id','!=',$auth->id)->exists()){
+            return redirect()->back()->with('test', 'Bu telefon numarası zaten kullanılıyor!!');
+        }
+
         $auth->latitude = $request->input('latitude');
         $auth->longitude = $request->input('longitude');
         $auth->name = $request->input('name');
         $auth->phone = $request->input('phone');
-        $auth->save();
+        $auth->distance_limit_km = $request->input('distance_limit_km');
+        $auth->update();
 
         return redirect()->back()->with('message', 'Bilgileriniz Güncellenmiştir.');
+    }
+
+    private function setEnv(array $values)
+    {
+        $envPath = base_path('.env');
+
+        $env = file_get_contents($envPath);
+
+        foreach ($values as $key => $value) {
+            if (preg_match("/^{$key}=.*/m", $env)) {
+                $env = preg_replace(
+                    "/^{$key}=.*/m",
+                    "{$key}=\"{$value}\"",
+                    $env
+                );
+            } else {
+                $env .= "\n{$key}=\"{$value}\"";
+            }
+        }
+
+        file_put_contents($envPath, $env);
     }
 }

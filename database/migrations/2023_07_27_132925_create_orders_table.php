@@ -32,9 +32,11 @@ class CreateOrdersTable extends Migration
             $table->json('items')->nullable();
             $table->json('promotions')->nullable();
             $table->json('coupon')->nullable();
+            $table->string('platform_date')->nullable();
             $table->string('message')->nullable(); //iptal mesajı
             $table->string('distance')->nullable();
             $table->string('status');
+            $table->string('assigned_at')->nullable();
             $table->timestamps();
         });
     }

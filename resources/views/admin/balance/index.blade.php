@@ -25,57 +25,61 @@
                             durumdan {{env('APP_NAME')}} olarak sorumluluk almadığımızı belirtmek isteriz.</strong>
                     </p>
 
-                    <p class="text-success">
-                        <strong> Satın Alım:: </strong> Paketlerimizi <a class="text-primary"
-                                                                         style="text-decoration: underline"
-                                                                         href="https://bmdgo.com/fiyat/">BmdGo </a>
+                   {{--  <p class="text-success">
+                        <strong> Satın Alım:: </strong> Paketlerimizi
+                        <a class="text-primary" style="text-decoration: underline"
+                           href="https://gpskurye.com/fiyat/">{{env('APP_NAME')}} </a>
                         adresimizden inceleyebilirsiniz.
-                    </p>
+                    </p> --}}
                 </div>
 
+                <!-- tami için route('admin.payment.tami.form') GET yap paytr için POST route('payment.paytr.form')  -->
+              @if(auth()->check() && !auth()->user()->phone)
+                    <p class="py-2 font-weight-bold">Bakiye yüklemek için lütfen telefon numaranızı doğrulayınız.</p>
+                    <a class="btn btn-spotify w-25" href="/admin/profile">Profilime Git</a>
+                @else
+                    <div class="border border-dark p-3 rounded-2" style="max-width: 25%">
+                        <form method="POST" action="{{ route('admin.payment.paytr.form') }}">
+                            @csrf
 
-                <div class="border border-dark p-3 rounded-2" style="max-width: 25%">
-                    <form method="GET" action="{{ route('payment.form') }}">
-                        @csrf
+                            <!-- Kullanıcıya tanımlı kontör fiyatı -->
+                            <input type="hidden" id="top_up_price" value="{{ auth()->user()->top_up_price }}">
 
-                        <!-- Kullanıcıya tanımlı kontör fiyatı -->
-                        <input type="hidden" id="top_up_price" value="{{ auth()->user()->top_up_price }}">
-
-                        <div class="mb-3">
-                            <label class="fw-bold text-black">Kontör Fiyatı</label>
-                            <div class="form-control bg-secondary text-white fw-bold">
-                                1 Kontör = <span class="text-white fw-bold">{{ auth()->user()->top_up_price }} ₺</span>
+                            <div class="mb-3">
+                                <label class="fw-bold text-black">Kontör Fiyatı</label>
+                                <div class="form-control bg-secondary text-white fw-bold">
+                                    1 Kontör = <span class="text-white fw-bold">{{ auth()->user()->top_up_price }} ₺</span>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="mb-3">
-                            <label class="fw-bold text-black">Kontör Adet</label>
-                            <input required class="form-control" type="number" min="1" placeholder="Adet giriniz"
-                                   id="top_up" name="top_up">
-                        </div>
+                            <div class="mb-3">
+                                <label class="fw-bold text-black">Kontör Adet</label>
+                                <input required class="form-control" type="number" min="1" placeholder="Adet giriniz"
+                                       id="top_up" name="top_up">
+                            </div>
 
-                        <!-- Anlık hesaplanan tutar -->
-                        <div class="alert alert-info" id="hesaplamaBox" style="display: none;">
-                            <span class="fw-bold">Ödemeniz Gereken Tutar:</span>
-                            <span id="toplamTutar" class="text-success"></span> ₺
-                        </div>
+                            <!-- Anlık hesaplanan tutar -->
+                            <div class="alert alert-info" id="hesaplamaBox" style="display: none;">
+                                <span class="fw-bold">Ödemeniz Gereken Tutar:</span>
+                                <span id="toplamTutar" class="text-success"></span> ₺
+                            </div>
 
-                        <!-- Butonlar -->
-                        <div class="d-flex gap-2">
-                            <button class="special-button" style="display: none" type="button" id="hesaplaBtn">Hesapla
-                            </button>
-                            <button class="special-button" type="submit">Ödeme Yap</button>
-                        </div>
-                    </form>
-                </div>
-
+                            <!-- Butonlar -->
+                            <div class="d-flex gap-2">
+                                <button class="special-button" style="display: none" type="button" id="hesaplaBtn">Hesapla
+                                </button>
+                                <button class="special-button" type="submit">Ödeme Yap</button>
+                            </div>
+                        </form>
+                    </div>
+                @endif
                 <div class="card mt-4">
                     <div class="card-header">
                         <h4 class="mb-0">Kontör Hareketleri</h4>
                     </div>
                     <div class="card-body table-responsive">
                         <table class="table table-bordered table-striped align-middle">
-                            <thead style="background-color: #0d2646; color: #fff;">
+                            <thead style="background-color: #259a38; color: #fff;">
                             <tr>
                                 <th>#</th>
                                 <th>İşlem Sahibi</th>
@@ -101,21 +105,21 @@
 
                                     <td>
                                         @if($movement->is_approved)
-                                            <span class="badge" style="background-color:#0d2646;">Onaylı</span>
+                                            <span class="badge" style="background-color:#259a38;">Onaylı</span>
                                         @else
                                             <span class="badge bg-warning text-dark">Bekliyor</span>
                                         @endif
                                     </td>
                                     <td>
                                         @if($movement->is_paid)
-                                            <span class="badge" style="background-color:#0d2646;">Ödendi</span>
+                                            <span class="badge" style="background-color:#259a38;">Ödendi</span>
                                         @else
                                             <span class="badge bg-danger">Ödenmedi</span>
                                         @endif
                                     </td>
                                     <td>
                                         @if($movement->payment_details)
-                                            <button class="btn btn-sm" style="background-color:#0d2646; color:#fff;"
+                                            <button class="btn btn-sm" style="background-color:#259a38; color:#fff;"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#paymentDetailsModal{{ $movement->id }}">
                                                 Görüntüle
@@ -127,7 +131,7 @@
                                                 <div class="modal-dialog modal-lg modal-dialog-centered">
                                                     <div class="modal-content">
                                                         <div class="modal-header"
-                                                             style="background-color:#0d2646; color:#fff;">
+                                                             style="background-color:#259a38; color:#fff;">
                                                             <h5 class="modal-title text-white">Ödeme Detayları</h5>
                                                             <button type="button" class="btn-close"
                                                                     data-bs-dismiss="modal" aria-label="Kapat"></button>
@@ -142,25 +146,25 @@
                                                                     @foreach($details as $key => $value)
                                                                         @if($key=='card')
                                                                             <li class="list-group-item d-flex justify-content-between"
-                                                                                style="border-left:5px solid #0d2646;">
+                                                                                style="border-left:5px solid #259a38;">
                                                                                 <strong>Kart Tipi</strong>
                                                                                 <span>{{ $value['cardType'] }}</span>
                                                                             </li>
 
                                                                             <li class="list-group-item d-flex justify-content-between"
-                                                                                style="border-left:5px solid #0d2646;">
+                                                                                style="border-left:5px solid #259a38;">
                                                                                 <strong>BIN Number</strong>
                                                                                 <span>{{ $value['binNumber'] }}</span>
                                                                             </li>
 
                                                                             <li class="list-group-item d-flex justify-content-between"
-                                                                                style="border-left:5px solid #0d2646;">
+                                                                                style="border-left:5px solid #259a38;">
                                                                                 <strong>Banka</strong>
                                                                                 <span>{{ $value['cardBrand'] }}</span>
                                                                             </li>
 
                                                                             <li class="list-group-item d-flex justify-content-between"
-                                                                                style="border-left:5px solid #0d2646;">
+                                                                                style="border-left:5px solid #259a38;">
                                                                                 <strong>Kart Organizasyonu</strong>
                                                                                 <span>{{ $value['cardOrganization'] }}</span>
                                                                             </li>
@@ -169,7 +173,7 @@
                                                                             @switch($key)
                                                                                 @case('is3D')
                                                                                     <li class="list-group-item d-flex justify-content-between"
-                                                                                        style="border-left:5px solid #0d2646;">
+                                                                                        style="border-left:5px solid #259a38;">
                                                                                         <strong>3D Ödeme</strong>
                                                                                         <span>{{ $value ? 'Evet' : 'Hayır' }}</span>
                                                                                     </li>
@@ -177,21 +181,21 @@
 
                                                                                 @case('currency')
                                                                                     <li class="list-group-item d-flex justify-content-between"
-                                                                                        style="border-left:5px solid #0d2646;">
+                                                                                        style="border-left:5px solid #259a38;">
                                                                                         <strong>Birim</strong>
                                                                                         <span>{{ $value }}</span>
                                                                                     </li>
                                                                                     @break
                                                                                 @case('currency')
                                                                                     <li class="list-group-item d-flex justify-content-between"
-                                                                                        style="border-left:5px solid #0d2646;">
+                                                                                        style="border-left:5px solid #259a38;">
                                                                                         <strong>Birim</strong>
                                                                                         <span>{{ $value }}</span>
                                                                                     </li>
                                                                                     @break
                                                                                 @case('amount')
                                                                                     <li class="list-group-item d-flex justify-content-between"
-                                                                                        style="border-left:5px solid #0d2646;">
+                                                                                        style="border-left:5px solid #259a38;">
                                                                                         <strong>Toplam Tutar</strong>
                                                                                         <span>{{ $value }}₺</span>
                                                                                     </li>

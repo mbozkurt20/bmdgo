@@ -2,80 +2,112 @@
 namespace App\Http\Controllers\Api;
 
 use App\Helpers\OrdersHelper;
+use App\Helpers\OrderStatus;
 use App\Http\Controllers\Controller;
+use App\Models\Customer;
+use App\Models\CustomerAddress;
 use App\Models\Restaurant;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use App\Jobs\AssignOrderToCourier;
 
 class OrderController extends Controller
 {
-    public function addOnlineOrder(Request $request){
-        $order = $request->input('order');
+    public function addOrder(Request $request)
+    {
+        Log::info('Gelen Data', (array)json_encode($request->all()));
 
-        Log::info("response: ". json_encode($order));
+        $orderData = $request->json()->all();
 
-        $restaurant = Restaurant::where('entegra_id', $order['restaurant_id'])->first();
-        $address = json_decode($order['client']['delivery_address']);
-        $address = $address->address;
-        $paymentMethod = $this->getPaymentMethod($order['provider']['slug'], $order['payment_method']);
-        if ($restaurant){
-            $items = [];
-            if(isset($order['items'])){
-                foreach ($order['items'] as $product) {
-                    $addItem = [];
-                    $addItem['price'] = $product['price'];
-                    $addItem['quantity'] = $product['quantity'];
-                    $addItem['unitSellingPrice'] = $product['total_price_with_option'];
-                    $addItem['name'] = $product['name'];
-                    $items[] = $addItem;
-                }
+        $address = $orderData['client']['deliveryAddress'];
+        $restaurant = Restaurant::where('entegra_restaurant_id',$orderData['restaurantId'])->first();
+
+        $create  = Customer::where('email',$orderData['client']['id'])->first();
+        if (!$create) {
+            $create = new Customer();
+            $create->restaurant_id = $restaurant->id; // Assuming the authenticated user is the restaurant
+            $create->name =  $orderData['client']['name'];
+            $create->phone = $orderData['client']['clientPhoneNumber'];
+            $create->mobile = $orderData['client']['contactPhoneNumber'];
+            $create->email = $orderData['client']['id'] ?? null;
+            $create->save();
+
+            if ($create) {
+                $addr = new CustomerAddress();
+                $addr->customer_id = $create->id;
+                $addr->restaurant_id = $restaurant->id;
+                $addr->name = $orderData['client']['name'];
+                $addr->sokak_cadde =  $orderData['client']['deliveryAddress']['street'] ?? " ";
+                $addr->bina_no = $orderData['client']['deliveryAddress']['aptNo'] ?? " ";
+                $addr->city_id = ' ';
+                $addr->kat = $orderData['client']['deliveryAddress']['floor'];;
+                $addr->latitude = $orderData['client']['location']['lat'];
+                $addr->longitude =$orderData['client']['location']['lon'];
+                $addr->daire_no = $orderData['client']['deliveryAddress']['doorNo'];
+                $addr->mahalle = ' ';
+                $addr->adres_tarifi = $orderData['client']['deliveryAddress']['address'] ?? '';
+                $addr->save();
             }
+        }
 
-            $orderData = [
-                'platform'       => $this->enrichmentPlatform($order['provider']['slug']),
-                'courier_id'     => 0,
-                'status'         => 'PENDING',
-                'restaurant_id'  => $restaurant->id,
-                'tracking_id'    => $order['pid'],
-                'full_name'      => $order['client']['name'],
-                'phone'          =>  $order['client']['client_phone_number'],
-                'amount'         => $order['total_discounted_price'],
-                'payment_method' => $paymentMethod,
-                'items'          => json_encode($items),
-                'address'        => $address,
-                'notes'          => $order['client_note']
+        $items = [];
+
+        foreach ($orderData['products'] as $item) {
+            $items[] = [
+                'price' => $item['totalPrice'],              // toplam fiyat
+                'unitSellingPrice' => $item['price'],   // birim fiyat
+                'totalOptionPrice' => $item['totalOptionPrice'],   // birim fiyat
+                'totalPriceWithOption' => $item['totalPriceWithOption'],   // birim fiyat
+                'quantity' => (string) $item['count'],    // string isteniyorsa
+                'name' => $item['name']['tr'],        // ürün adı
+                'image' => " ",        // ürün adı
             ];
-            $createOrder = Order::create($orderData);
-            if ($createOrder){
-                AssignOrderToCourier::dispatch($createOrder);
-
-                //sipariş eklenince ses bildirimi gerçekleştirir.
-                OrdersHelper::createOrderNotification($createOrder);
-
-                return response()->json(['message' => 'Sipariş oluşturuldu'], 200);
-            }
         }
 
-        return response()->json(['message' => 'Sipariş oluşturulamadı!'], 422);
-    }
-    public function enrichmentPlatform($slug){
-        $platforms = ["ys" => "yemeksepeti ", "ty" => "trendyol"];
-        return isset($platforms[$slug]) ?  $platforms[$slug] : $slug;
-    }
-    public function  getPaymentMethod($slug, $id){
-        $paymentMethods=["ys"=>[["id"=>"1","name"=>"Kapıda Nakit ile Ödeme"],["id"=>"2","name"=>"Kapıda Ticket ile Ödeme"],["id"=>"3","name"=>"Kapıda Ticket ile Ödeme"],["id"=>"4","name"=>"Online Kredi/Banka Kartı"],["id"=>"5","name"=>"Kapıda Ticket ile Ödeme"],["id"=>"6","name"=>"Kapıda Kredi Kartı ile Ödeme"],["id"=>"10","name"=>"Kapıda Ticket ile Ödeme"],["id"=>"11","name"=>"Kapıda Ticket ile Ödeme"],["id"=>"15","name"=>"Kapıda Ticket ile Ödeme"],["id"=>"18","name"=>"Kapıda Ticket ile Ödeme"],["id"=>"23","name"=>"Online Kredi/Banka Kartı"],["id"=>"24","name"=>"Kapıda Ticket ile Ödeme"],["id"=>"25","name"=>"Kapıda Ticket ile Ödeme"],["id"=>"26","name"=>"Kapıda Ticket ile Ödeme"],["id"=>"27","name"=>"Kapıda Ticket ile Ödeme"],["id"=>"28","name"=>"Kapıda Ticket ile Ödeme"],["id"=>"29","name"=>"Online Kredi/Banka Kartı"]],"ty"=>[["id"=>"1","name"=>"Online Kredi/Banka Kartı"],["id"=>"2","name"=>"Online Kredi/Banka Kartı"],["id"=>"3","name"=>"Online Kredi/Banka Kartı"],["id"=>"4","name"=>"Online Kredi/Banka Kartı"]],"getir"=>[["id"=>"1","name"=>"Online Kredi/Banka Kartı"],["id"=>"2","name"=>"Kapıda Ticket ile Ödeme"],["id"=>"3","name"=>"Kapıda Kredi Kartı ile Ödeme"],["id"=>"4","name"=>"Kapıda Nakit ile Ödeme"],["id"=>"5","name"=>"Kapıda Ticket ile Ödeme"],["id"=>"6","name"=>"Kapıda Ticket ile Ödeme"],["id"=>"7","name"=>"Kapıda Ticket ile Ödeme"],["id"=>"8","name"=>"Kapıda Ticket ile Ödeme"],["id"=>"9","name"=>"Kapıda Ticket ile Ödeme"],["id"=>"10","name"=>"Kapıda Ticket ile Ödeme"],["id"=>"11","name"=>"Kapıda Ticket ile Ödeme"],["id"=>"12","name"=>"Kapıda Ticket ile Ödeme"],["id"=>"15","name"=>"Kapıda Ticket ile Ödeme"],["id"=>"16","name"=>"Online Kredi/Banka Kartı"],["id"=>"17","name"=>"Kapıda Ticket ile Ödeme"],["id"=>"18","name"=>"Kapıda Ticket ile Ödeme"],["id"=>"19","name"=>"Kapıda Ticket ile Ödeme"],["id"=>"21","name"=>"Kapıda Ticket ile Ödeme"],["id"=>"22","name"=>"Online Kredi/Banka Kartı"],["id"=>"24","name"=>"Online Kredi/Banka Kartı"]],"migros"=>[["id"=>1,"name"=>"Kapıda Ticket ile Ödeme"],["id"=>2,"name"=>"Online Kredi/Banka Kartı"],["id"=>3,"name"=>"Online Kredi/Banka Kartı"],["id"=>4,"name"=>"Kapıda Ticket ile Ödeme"],["id"=>5,"name"=>"Kapıda Kredi Kartı ile Ödeme"],["id"=>6,"name"=>"Kapıda Nakit ile Ödeme"],["id"=>7,"name"=>"Kapıda Ticket ile Ödeme"],["id"=>8,"name"=>"Kapıda Ticket ile Ödeme"],["id"=>9,"name"=>"Kapıda Ticket ile Ödeme"],["id"=>10,"name"=>"Kapıda Ticket ile Ödeme"],["id"=>11,"name"=>"Kapıda Ticket ile Ödeme"],["id"=>12,"name"=>"Kapıda Ticket ile Ödeme"]]];
-        if ($paymentMethods[$slug]){
-            $column = array_column($paymentMethods[$slug], "id");
-            $index = array_search($id, $column);
+        $orderData = [
+            'platform' => $orderData['provider']['slug'],
+            'customer_id' => $create->id,
+            'restaurant_id' => $restaurant->id,
+            'courier_id' => -1,
+            'status' => OrderStatus::PENDING,
+            'tracking_id' => $orderData['shortCode'],
+            'full_name' => $orderData['client']['name'],
+            'phone' =>  $orderData['client']['contactPhoneNumber'],
+            'payment_method' => $orderData['paymentMethodText']['tr'],
+            'items' => json_encode($items),
+            'address' => $orderData['client']['deliveryAddress']['address'],
+            'promotions' => json_encode([]),
+            'coupon' => json_encode([]),
+            'sub_amount' => $orderData['totalPrice'],
+            'discount' => $orderData['totalDiscount'],
+            'amount' => $orderData['totalDiscountedPrice'],
+            'notes' => $orderData['clientNote']??null,
+            'platform_date' => date('d-m-Y, H:i', strtotime($orderData['created_at'])),
 
-            if ($index !== false) {
-                $result = $paymentMethods[$slug][$index]['name'];
-                return $result;
-            }
-        }
-        return 'bilinmiyor';
+            'distance' => OrdersHelper::haversineDistance(
+                $restaurant->latitude,
+                $restaurant->longitude,
+                $orderData['client']['location']['lat'],
+                $orderData['client']['location']['lon']
+            )
+        ];
+
+        $order = Order::create($orderData);
+
+        return response()->json(['success' => true, 'order' => $order]);
+    }
+
+    public function cancelOrder(Request $request)
+    {
+        $orderData = $request->json()->all();
+
+        $order = Order::where('tracking_id' , $orderData['shortCode'])->first();
+
+        $order->update([
+            'status' => OrderStatus::UNSUPPLIED
+        ]);
+
+        return response()->json(['success' => true, 'order' => $order]);
     }
 }

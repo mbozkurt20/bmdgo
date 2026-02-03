@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'restaurant'], function () {
     Route::group(['middleware' => ['guest.restaurant']], function () {
-        Route::view('register', 'restaurant.register')->name('restaurant.register');
         Route::view('login', 'restaurant.login')->name('restaurant.login');
         Route::view('payment', 'restaurant.payment')->name('restaurant.payment');
         Route::post('login', [App\Http\Controllers\RestaurantController::class, 'login'])->name('restaurant.auth');
@@ -22,6 +21,7 @@ Route::group(['prefix' => 'restaurant'], function () {
 
         Route::post('/quick-order', [App\Http\Controllers\OrderController::class, 'storeQuick'])->name('quick.order.store');
 
+        Route::get('/customers/get-by-phone/{phone}', [App\Http\Controllers\RestaurantController::class, 'getByPhone']);
         Route::get('/', [App\Http\Controllers\RestaurantController::class, 'home'])->name('restaurant.index');
         Route::post('logout', [App\Http\Controllers\RestaurantController::class, 'logout'])->name('restaurant.logout');
         Route::get('/filter-by-date', [App\Http\Controllers\RestaurantController::class, 'filterByDate'])->name('restaurant.filterByDate');
@@ -29,6 +29,7 @@ Route::group(['prefix' => 'restaurant'], function () {
 
         Route::get('/reports/orders', [App\Http\Controllers\ReportController::class, 'orders'])->name('restaurant.reports.orders');
         Route::get('/reports/couriers', [App\Http\Controllers\ReportController::class, 'couriers'])->name('restaurant.reports.couriers');
+        Route::get('/couriers', [App\Http\Controllers\CourierController::class, 'index'])->name('restaurant.couriers.index');
 
         /* Products */
         Route::get('/products', [App\Http\Controllers\ProductController::class, 'index'])->name('restaurant.products');
@@ -95,10 +96,6 @@ Route::group(['prefix' => 'restaurant'], function () {
         Route::get('/orders/addPOS/{id}', [App\Http\Controllers\OrderController::class, 'addPOS'])->name('restaurant.addPOS');
         Route::get('/get-pos-items', [App\Http\Controllers\OrderController::class, 'getPosItems']);
 
-        Route::get('/restaurant/orders/cartItems', function () {
-            return view('restaurant.orders._cart-items');
-        });
-
         Route::get('/orders/updatePlusPOS/{id}', [App\Http\Controllers\OrderController::class, 'updatePlusPOS'])->name('restaurant.updatePlusPOS');
         Route::get('/orders/updateMinusPOS/{id}/{qty}', [App\Http\Controllers\OrderController::class, 'updateMinusPOS'])->name('restaurant.updateMinusPOS');
         Route::get('/orders/customerpos/{id}', [App\Http\Controllers\OrderController::class, 'customerpos'])->name('restaurant.customerpos');
@@ -109,7 +106,7 @@ Route::group(['prefix' => 'restaurant'], function () {
         Route::get('/deliveredOrders', [App\Http\Controllers\SiparislerController::class, 'deliveredOrders'])->name('restaurant.deliveredOrders');
 
         Route::get('/menus', [App\Http\Controllers\MenuController::class, 'index'])->name('restaurant.menus');
-        Route::get('/menu', [App\Http\Controllers\MenuController::class, 'show'])->name('restaurant.menu');
+        Route::get('/{restaurantId}/menu', [App\Http\Controllers\MenuController::class, 'show'])->name('restaurant.menu');
         Route::post('/menus/select', [App\Http\Controllers\MenuController::class, 'store'])->name('restaurant.menu.template.select');
 
         /* Menus */
@@ -135,7 +132,7 @@ Route::group(['prefix' => 'restaurant'], function () {
         Route::post('/yemeksepeti/updateOrderStatus', [App\Http\Controllers\YemekSepetiController::class, 'updateOrder']);
         Route::post('/getir/updateOrderStatus', [App\Http\Controllers\GetirYemekController::class, 'updateOrder']);
         Route::post('/adisyo/updateOrderStatus', [App\Http\Controllers\AdisyoController::class, 'updateOrder']);
-
+        Route::post('/gpsyemek/updateOrderStatus', [App\Http\Controllers\GpsYemekController::class, 'updateOrder']);
 
         Route::get('/printed/{orderId}', [App\Http\Controllers\OrderController::class, 'printed']);
         //Get Adisyo Orders

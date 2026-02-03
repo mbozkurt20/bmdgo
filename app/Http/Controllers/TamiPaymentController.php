@@ -149,7 +149,7 @@ class TamiPaymentController extends Controller
                 'threeDSHtmlContent' => $data['threeDSHtmlContent'] ?? ''
             ]);
         }else {
-            return view('admin.payment.form')->with(['test' => 'Ödeme Sırasında Bir Sorun MEydana Geldi']);
+            return view('admin.payment.form')->with(['test' => 'Ödeme Sırasında Bir Sorun Meydana Geldi']);
         }
     }
 

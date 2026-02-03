@@ -27,8 +27,8 @@ class PushNotificationService
      *
      * @param  string  $token  FCM device token
      * @param  string  $title  Notification title
-     * @param  string  $body  Notification body
-     * @param  array  $data  Additional data to send
+     * @param  string  $body   Notification body
+     * @param  array   $data   Additional data to send
      *
      * @throws Exception
      */
@@ -39,55 +39,49 @@ class PushNotificationService
                 ->withNotification(
                     Notification::create($title, $body)
                 )
-                ->withData(array_merge([
-                    'title'   => $title,
-                    'message' => $body,
-                    'sound'   => 'notification_sound',
-                ], $data))
                 ->withAndroidConfig(AndroidConfig::fromArray([
-                    'priority' => 'high',
+                    'priority' => 'HIGH',
                     'notification' => [
-                        // Dosya adı: android/app/src/main/res/raw/notification_sound.wav
-                        // Android'de uzantı YAZILMAZ
-                        'sound' => 'notification_sound',
-                        // Android 8+ için: uygulamada bu channel'ı oluşturmalısın
-                        'channel_id' => 'custom_sound_channel',
+                        'sound' => 'alarm', // android/app/src/main/res/raw/alarm.mp3
+                        'channel_id' => 'high_importance_channel',
+                        'notification_priority' => 'PRIORITY_MAX',
+                        'default_sound' => false,
                     ],
                 ]))
-
-                // iOS (APNs)
                 ->withApnsConfig(ApnsConfig::fromArray([
                     'headers' => [
-                        // iOS 13+ için önerilen push-type
+                        'apns-priority' => '10',
                         'apns-push-type' => 'alert',
                     ],
                     'payload' => [
                         'aps' => [
-                            // Dosya adı: Xcode projesine ekli "notification_sound.caf" (veya .wav)
-                            'sound' => 'notification_sound.caf',
-                            'alert' => [
-                                'title' => $title,
-                                'body'  => $body,
-                            ],
+                            'sound' => 'alarm.mp3', // Xcode bundle içindeki alarm.mp3
+                            'mutable-content' => 1,
+                            'content-available' => 1,
                         ],
                     ],
                 ]));
 
+            // Eğer ek veri gönderilmek istenirse (genelde boş array gelir)
+            if (!empty($data)) {
+                $message = $message->withData($data);
+            }
+
             $this->client->send($message);
             return true;
 
-        } catch (MessagingException|FirebaseException $e) {
-            throw new \Exception('Failed to send push notification: '.$e->getMessage());
+        } catch (MessagingException | FirebaseException $e) {
+            throw new \Exception('Bildirim gönderme hatası: ' . $e->getMessage());
         }
     }
 
     /**
      * Send push notifications to multiple devices
      *
-     * @param  array  $tokens  Array of FCM device tokens
-     * @param  string  $title  Notification title
-     * @param  string  $body  Notification body
-     * @param  array  $data  Additional data to send
+     * @param  array   $tokens  Array of FCM device tokens
+     * @param  string  $title   Notification title
+     * @param  string  $body    Notification body
+     * @param  array   $data    Additional data to send
      * @return array Array of successful and failed tokens
      *
      * @throws Exception
@@ -99,11 +93,24 @@ class PushNotificationService
                 ->withNotification(
                     Notification::create($title, $body)
                 )
-                ->withData(array_merge([
-                    'title' => $title,
-                    'body' => $body,
-                ], $data))
-                ->withDefaultSounds();
+                ->withAndroidConfig(AndroidConfig::fromArray([
+                    'priority' => 'HIGH',
+                    'notification' => [
+                        'sound' => 'alarm',
+                        'channel_id' => 'high_importance_channel',
+                    ],
+                ]))
+                ->withApnsConfig(ApnsConfig::fromArray([
+                    'payload' => [
+                        'aps' => [
+                            'sound' => 'alarm.mp3',
+                        ],
+                    ],
+                ]));
+
+            if (!empty($data)) {
+                $message = $message->withData($data);
+            }
 
             $report = $this->client->sendMulticast($message, $tokens);
 
@@ -115,8 +122,8 @@ class PushNotificationService
                     'failed' => $this->getTokensFromReport($report, false),
                 ],
             ];
-        } catch (MessagingException|FirebaseException $e) {
-            throw new Exception('Failed to send bulk notifications: '.$e->getMessage());
+        } catch (MessagingException | FirebaseException $e) {
+            throw new Exception('Bulk bildirim hatası: ' . $e->getMessage());
         }
     }
 
@@ -125,8 +132,8 @@ class PushNotificationService
      *
      * @param  string  $topic  Topic name
      * @param  string  $title  Notification title
-     * @param  string  $body  Notification body
-     * @param  array  $data  Additional data to send
+     * @param  string  $body   Notification body
+     * @param  array   $data   Additional data to send
      *
      * @throws Exception
      */
@@ -138,71 +145,62 @@ class PushNotificationService
                 ->withNotification(
                     Notification::create($title, $body)
                 )
-                ->withData(array_merge([
-                    'title' => $title,
-                    'body' => $body,
-                ], $data))
-                ->withDefaultSounds();
+                ->withAndroidConfig(AndroidConfig::fromArray([
+                    'priority' => 'HIGH',
+                    'notification' => [
+                        'sound' => 'alarm',
+                        'channel_id' => 'high_importance_channel',
+                    ],
+                ]))
+                ->withApnsConfig(ApnsConfig::fromArray([
+                    'payload' => [
+                        'aps' => [
+                            'sound' => 'alarm.mp3',
+                        ],
+                    ],
+                ]));
+
+            if (!empty($data)) {
+                $message = $message->withData($data);
+            }
 
             $this->client->send($message);
 
             return true;
-        } catch (MessagingException|FirebaseException $e) {
-            throw new Exception('Failed to send topic notification: '.$e->getMessage());
+        } catch (MessagingException | FirebaseException $e) {
+            throw new Exception('Topic bildirim hatası: ' . $e->getMessage());
         }
     }
 
     /**
      * Subscribe tokens to a topic
-     *
-     * @param  array  $tokens  Array of FCM device tokens
-     * @param  string  $topic  Topic name
-     * @return array Array of successful and failed tokens
-     *
-     * @throws Exception
      */
     public function subscribeToTopic(array $tokens, string $topic): array
     {
         try {
             $result = $this->client->subscribeToTopic($topic, $tokens);
-
             return [
-                'success' => count($result['successCount']),
-                'failure' => count($result['failureCount']),
-                'tokens' => [
-                    'successful' => $result['successCount'],
-                    'failed' => $result['failureCount'],
-                ],
+                'success' => $result->successes()->count(),
+                'failure' => $result->failures()->count(),
             ];
-        } catch (MessagingException|FirebaseException $e) {
-            throw new Exception('Failed to subscribe to topic: '.$e->getMessage());
+        } catch (MessagingException | FirebaseException $e) {
+            throw new Exception('Topic abonelik hatası: ' . $e->getMessage());
         }
     }
 
     /**
      * Unsubscribe tokens from a topic
-     *
-     * @param  array  $tokens  Array of FCM device tokens
-     * @param  string  $topic  Topic name
-     * @return array Array of successful and failed tokens
-     *
-     * @throws Exception
      */
     public function unsubscribeFromTopic(array $tokens, string $topic): array
     {
         try {
             $result = $this->client->unsubscribeFromTopic($topic, $tokens);
-
             return [
-                'success' => count($result['successCount']),
-                'failure' => count($result['failureCount']),
-                'tokens' => [
-                    'successful' => $result['successCount'],
-                    'failed' => $result['failureCount'],
-                ],
+                'success' => $result->successes()->count(),
+                'failure' => $result->failures()->count(),
             ];
-        } catch (MessagingException|FirebaseException $e) {
-            throw new Exception('Failed to unsubscribe from topic: '.$e->getMessage());
+        } catch (MessagingException | FirebaseException $e) {
+            throw new Exception('Topic abonelik iptal hatası: ' . $e->getMessage());
         }
     }
 

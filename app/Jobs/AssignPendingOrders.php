@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Helpers\CourierStatus;
+use App\Helpers\MapHelper;
 use App\Helpers\NotificationHelper;
 use App\Helpers\OrdersHelper;
 use App\Helpers\OrderStatus;
@@ -11,6 +12,7 @@ use App\Models\Order;
 use App\Models\Courier;
 use App\Models\Restaurant;
 use App\Services\PushNotificationService;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -27,61 +29,92 @@ class AssignPendingOrders implements ShouldQueue
      */
     public function handle()
     {
-        // Atanmamış siparişleri sırayla al
+        Log::info('--- OTOMATİK KURYE ATAMA DÖNGÜSÜ BAŞLADI ---');
+
         $orders = Order::where('courier_id', -1)
             ->where('status', OrderStatus::PREPARED)
-            ->orderBy('created_at')
+            ->orderBy('created_at', 'asc')
+            ->whereDate('created_at', Carbon::today())
             ->get();
 
+        if ($orders->isEmpty()) {
+            Log::info('Otomatik Atama: Atanacak uygun sipariş bulunamadı.');
+            return;
+        }
+
         foreach ($orders as $order) {
+            $restaurant = Restaurant::find($order->restaurant_id);
+            $distLimit = $restaurant->distance_limit_km ?? 50; // Restoran sınırı yoksa default 50km
+            $maxPackageLimit = $restaurant->max_package_limit ?? 4; // Restoran sınırı yoksa default 50km
+
             // Müsait kurye bul
             $courier = Courier::where('status', CourierStatus::active)
+                ->where('admin_id', $order->restaurant->admin_id)
                 ->orderBy('last_assigned_at', 'asc')
-                ->where('admin_id', $order->restaurant->admin_id)   // round robin için
                 ->first();
 
-            if ($courier) {
-                // Siparişi kuryeye ata
+            if (!$courier) {
+                Log::warning("Sipariş #{$order->id} için MÜSAİT KURYE YOK.");
+                break;
+            }
+
+            // --- YARIÇAP KONTROLÜ (Kurye Restorana Ne Kadar Uzak?) ---
+            // Kurye restoranın hizmet alanı içinde mi?
+            $distanceToRest = MapHelper::getGoogleDistance(
+                $courier->latitude, $courier->longitude,
+                $restaurant->latitude, $restaurant->longitude
+            ) ?? OrdersHelper::haversineDistance($courier->latitude, $courier->longitude, $restaurant->latitude, $restaurant->longitude);
+
+            $distToRestKm = $distanceToRest / 1000;
+
+            if ($distToRestKm > $distLimit) {
+                Log::info("Kurye #{$courier->id} restoranın {$distLimit}km yarıçapı dışında ({$distToRestKm}km). Atama yapılmadı.");
+                continue;
+            }
+
+            // --- ATAMA İŞLEMİ ---
+            try {
                 $order->courier_id = $courier->id;
-                $order->status = OrderStatus::ASSIGNED;
+                $order->assigned_at = now();
                 $order->update();
 
-                // Kuryeyi busy yap ve son atama zamanını güncelle
                 $courier->last_assigned_at = now();
                 $courier->update();
 
-                $restaurant = Restaurant::find($order->restaurant_id);
+                CourierOrder::firstOrCreate(['courier_id' => $courier->id, 'order_id' => $order->id]);
 
-                //mobil bildiri
-                if ($courier->fcm_token){
-                    $ser = new PushNotificationService();
-                    $ser->sendNotification($courier->fcm_token,$restaurant->restaurant_name.' Restorandan Yeni Siparişiniz Var','Sipariş Takip Kodu:'. $order->tracking_id);
+                // --- 4 PAKET KONTROLÜ VE YOLA ÇIKTI (HANDOVER) MANTIĞI ---
+                $activePackagesCount = Order::where('courier_id', $courier->id)
+                    ->count();
+
+                if ($activePackagesCount >= $maxPackageLimit) {
+                    // Kuryenin üzerindeki tüm ASSIGNED paketleri HANDOVER (Yola Çıktı) yap
+                    Order::query()->where('courier_id', $courier->id)
+                        ->where('status', OrderStatus::PREPARED)
+                        ->update(['status' => OrderStatus::ASSIGNED]);
+
+                    // Kuryeyi meşgul yap ki yeni paket gelmesin
+                    $courier->status = CourierStatus::service;
+                    $courier->update();
+
+                    Log::info("Kurye #{$courier->id} için 4 paket doldu. Durum: HANDOVER ve BUSY yapıldı.");
                 }
 
-                $orderCourier = CourierOrder::where('courier_id',$courier->id)->where('order_id', $order->id)->first();
+                // Bildirim ve Job İşlemleri
+                CheckCourierTimeoutJob::dispatch($order->id)->delay(now()->addMinutes(2));
 
-                if (!$orderCourier) {
-                    // Yeni siparişi kuryeye atama
-                    $newOrderCourier = new CourierOrder();
-                    $newOrderCourier->courier_id = $courier->id;
-                    $newOrderCourier->order_id = $order->id;
-                    $newOrderCourier->save();
-
-                    Log::info("Kurye atandı ve durumu Serviste yapıldı. Sipariş ID: " . $order->id . " Kurye ID: " . $courier->id);
+                if ($courier->fcm_token) {
+                    $notificationService = new PushNotificationService();
+                    $notificationService->sendNotification($courier->fcm_token, $restaurant->restaurant_name . ' - Yeni Sipariş', 'Takip: ' . $order->tracking_id);
                 }
 
-                if (OrdersHelper::getOrderSystem(3)){
-                    NotificationHelper::add([
-                        'title' => 'Paket Kuryeye Atandı',
-                        'description' => $order->tracking_id. ' takip numaralı paket '.$courier->name. ' isimli kuryeye atandı.',
-                        'url' => route('admin.balance')
-                    ]);
-                }
+                Log::info("BAŞARILI: Sipariş #{$order->id}, Kurye #{$courier->id} kişisine atandı.");
 
-                Log::info("Sipariş #{$order->id} kurye #{$courier->id} ile eşlendi.");
-            } else {
-                Log::info("Sipariş #{$order->id} için müsait kurye yok.");
+            } catch (\Exception $e) {
+                Log::error("Atama Hatası: " . $e->getMessage());
             }
         }
+
+        Log::info('--- OTOMATİK KURYE ATAMA DÖNGÜSÜ TAMAMLANDI ---');
     }
 }

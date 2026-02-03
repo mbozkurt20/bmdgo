@@ -4,7 +4,7 @@ namespace App\Console;
 
 use App\Http\Controllers\GpsYemekController;
 use App\Http\Controllers\TrendyolYemekController;
-use App\Jobs\AssignPendingOrders;
+use App\Http\Controllers\JobController;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -30,7 +30,7 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')->hourly();
         // $schedule->command('adisyo:getOrders')->everyMinute();
 
-        $schedule->job(new AssignPendingOrders)->everyMinute();
+        //$schedule->job(new AssignPendingOrders)->everyMinute();
 
         $schedule->call(function () {
             $tyc = app(TrendyolYemekController::class);
@@ -41,6 +41,15 @@ class Kernel extends ConsoleKernel
             $tyc = app(GpsYemekController::class);
             $tyc->index();
         })->everyMinute();
+
+        $schedule->call(function () {
+            $tyc = app(JobController::class);
+            $tyc->index();
+        })->everyMinute();
+
+        $schedule->command('orders:check-status')
+            ->everyMinute()
+            ->withoutOverlapping();
     }
 
     /**

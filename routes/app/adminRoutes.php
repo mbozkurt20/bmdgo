@@ -13,7 +13,11 @@ Route::group(['prefix' => 'admin'], function () {
     Route::group(['middleware' => ['admin.auth']], function () {
         Route::get('/get-districts/{cityId}', [App\Http\Controllers\AdminController::class, 'getDistricts'])->name('admin.get_districts');
 
-        Route::get('/payment/form', [TamiPaymentController::class, 'showForm'])->name('payment.form');
+        //paytr
+        Route::post('/payment/paytr', [\App\Http\Controllers\PayTrPaymentController::class, 'payTrPayment'])->name('admin.payment.paytr.form');
+
+        //tami
+        Route::get('/payment/form', [TamiPaymentController::class, 'showForm'])->name('admin.payment.tami.form');
         Route::post('/payment/start', [TamiPaymentController::class, 'start'])->name('payment.start');
 
         Route::get('/printed/{orderId}', [App\Http\Controllers\OrderController::class, 'printed']);
@@ -53,6 +57,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('/yemeksepeti/updateOrderStatus', [App\Http\Controllers\OrderController::class, 'updateOrderStatus']);
         Route::post('/getir/updateOrderStatus', [App\Http\Controllers\OrderController::class, 'updateOrderStatus']);
         Route::post('/adisyo/updateOrderStatus', [App\Http\Controllers\AdisyoController::class, 'updateOrder']);
+        Route::post('/gpsyemek/updateOrderStatus', [App\Http\Controllers\GpsYemekController::class, 'updateOrder']);
+
         Route::post('/orders/message', [App\Http\Controllers\OrderController::class, 'message']);
 
         /* Restaurants */
