@@ -42,6 +42,11 @@
             </div>
         @endif
 
+        @if(session()->has('error'))
+            <div class="alert alert-success border-0 shadow-sm mb-4 d-flex align-items-center" style="background: #dcfce7; color: #166534; border-radius: 12px;">
+                <i class="fas fa-check-circle me-2"></i> {{ session()->get('error') }}
+            </div>
+        @endif
         <div class="row p-4 main-content-wrapper">
             @php
                 $platforms = [

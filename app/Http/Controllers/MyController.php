@@ -61,7 +61,7 @@ class MyController extends Controller
             return redirect()->back()->with('message', 'Entegrasyon Güncellenmesi Tamamlandı.');
         }
 
-        return redirect()->back()->with('message', 'Üzgünüz, bir hata meydana geldi, lütfen tekrar deneyiniz.');
+        return redirect()->back()->with('error', 'Üzgünüz, bir hata meydana geldi, lütfen tekrar deneyiniz.');
     }
 
     public function paymentEntegrations()
