@@ -41,7 +41,7 @@ class MyController extends Controller
                 'password' => $restaurant->name.'.'.$restaurant->code
             ]);
 
-            if ($businessRes['success']){
+            if ($businessRes->success){
                 $restaurantRes = EntegraHelper::newRestaurant([
                     'name' => $restaurant->name,
                     'businessId' => $businessRes->data->id,

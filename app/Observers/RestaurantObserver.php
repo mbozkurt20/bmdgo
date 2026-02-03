@@ -3,12 +3,14 @@
 namespace App\Observers;
 
 use App\Models\Restaurant;
+use Illuminate\Support\Str;
 
 class RestaurantObserver
 {
     public function creating(Restaurant $restaurant)
     {
         $restaurant->menu_template = 'first';
+        $restaurant->slug = Str::slug($restaurant->name);
     }
 
     /**

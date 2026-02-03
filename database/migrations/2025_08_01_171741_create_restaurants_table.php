@@ -19,6 +19,7 @@ class CreateRestaurantsTable extends Migration
             $table->string('restaurant_code');
             $table->string('restaurant_name');
             $table->string('name');
+            $table->string('slug')->unique();
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
             $table->string('latitude')->nullable();
