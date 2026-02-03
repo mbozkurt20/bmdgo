@@ -3,7 +3,7 @@
 <html lang="tr">
 
 @include('admin.layouts.partials.head')
-
+<!-- dd -->
 <body>
 <div id="preloader">
     <div class="gooey">
