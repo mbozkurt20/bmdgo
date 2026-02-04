@@ -559,7 +559,7 @@
             <img src="{{ asset('theme/images/gpsyemek.png') }}" style="height:20px;margin-right:4px;">
 
         </span>`;
-        } else if (platform.toLowerCase() === 'ty') {
+        } else if (platform.toLowerCase() === 'trendyol') {
             platformHtml = `
         <span class="d-inline-flex align-items-center border rounded-pill px-2 py-1 small">
             <img src="{{ asset('theme/images/trendyolyemek.png') }}" style="height:16px;margin-right:4px;">

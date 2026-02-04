@@ -65,8 +65,40 @@ class OrderController extends Controller
             ];
         }
 
+        switch ($orderData['paymentMethodText']['tr']) {
+            case 'PAY_WITH_CARD':
+                $payMethod = 'Online Kredi Kartı ile Ödeme';
+                break;
+            case 'CARD':
+                $payMethod = 'Kapıda Kredi Kartı ile Ödeme';
+                break;
+            case 'CASH':
+                $payMethod = 'Kapıda Nakit ile Ödeme';
+                break;
+            default:
+                $payMethod = $orderData['paymentMethodText']['tr'];
+        }
+
+        switch ($orderData['provider']['slug']) {
+            case 'ys':
+                $platform = 'yemeksepeti';
+                break;
+            case 'getir':
+                $platform = 'getir';
+                break;
+            case 'migros':
+                $platform = 'migros';
+                break;
+            case 'ty':
+                $platform = 'trendyol';
+                break;
+            default:
+                $platform = $orderData['provider']['slug'];
+                break;
+        }
+
         $orderData = [
-            'platform' => $orderData['provider']['slug'],
+            'platform' => $platform,
             'customer_id' => $create->id,
             'pid' => $orderData['pid'] ?? null,
             'status_request_count' => 0,
@@ -76,7 +108,7 @@ class OrderController extends Controller
             'tracking_id' => $orderData['shortCode'],
             'full_name' => $orderData['client']['name'],
             'phone' =>  $orderData['client']['contactPhoneNumber'],
-            'payment_method' => $orderData['paymentMethodText']['tr'],
+            'payment_method' =>$payMethod,
             'items' => json_encode($items),
             'address' => $orderData['client']['deliveryAddress']['address'],
             'promotions' => json_encode([]),
