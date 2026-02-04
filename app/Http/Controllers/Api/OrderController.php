@@ -70,7 +70,7 @@ class OrderController extends Controller
             'customer_id' => $create->id,
             'restaurant_id' => $restaurant->id,
             'courier_id' => -1,
-            'status' => OrderStatus::PENDING,
+            'status' => OrderStatus::PREPARED,
             'tracking_id' => $orderData['shortCode'],
             'full_name' => $orderData['client']['name'],
             'phone' =>  $orderData['client']['contactPhoneNumber'],

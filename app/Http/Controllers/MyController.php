@@ -18,7 +18,6 @@ class MyController extends Controller
         $restaurant = Restaurant::find(Auth::user()->id);
         return view('restaurant.entegrations.platforms', compact('restaurant'));
     }
-
     public function entegrastion_update(Request $request)
     {
         $restaurant = Restaurant::find(Auth::user()->id);

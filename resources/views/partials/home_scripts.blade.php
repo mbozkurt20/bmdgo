@@ -97,6 +97,7 @@
                 .finally(() => loadingSpan.remove());
         }
     }
+
     function cancelOrder(id) {
         var tracking_id = $('#tracking_' + id).val();
         var platform = $('#platform_' + id).val();
@@ -135,7 +136,7 @@
             requestData.message = message;
         }
 
-        console.log({platform:platform})
+        console.log({platform: platform})
         $.ajax({
             type: 'POST',
             url: '/{{$key}}/' + platform + '/updateOrderStatus',
@@ -192,7 +193,7 @@
         } else {
             // İlk kez ekleniyorsa
             const targetBody = $('#order-tbody-' + tabId);
-            if(targetBody.length) {
+            if (targetBody.length) {
                 targetBody.append(newRowHtml);
             } else {
                 // Eğer tbody ID formatınız farklıysa (tabId doğrudan id ise):
@@ -282,7 +283,7 @@
       </div>
       <div class="mb-2 col-md-12">
         <p class="">Müşteri Notu</p>
-        <p class="orderProde">${order.notes??'Bulunmuyor.'}</p>
+        <p class="orderProde">${order.notes ?? 'Bulunmuyor.'}</p>
       </div>
     `;
 
@@ -515,6 +516,34 @@
         }
     }
 
+
+    function nextOrderStatus(id, action) {
+        var tracking_id = $('#tracking_' + id).val();
+        var platform = $('#platform_' + id).val();
+
+        // Spinner
+        let btn = event.target;
+        btn.disabled = true;
+        let originalText = btn.innerHTML;
+        btn.innerHTML = `
+        <span class="spinner-border spinner-border-sm me-1"></span>
+        Bekleniyor...
+    `;
+
+        sendOrderStatusUpdate(action, tracking_id, platform, null, id)
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            });
+    }
+
+    function cancelOrderButton(id) {
+        var myModal = new bootstrap.Modal(
+            document.getElementById('cancelModal' + id)
+        );
+        myModal.show();
+    }
+
     async function generateOrderRowHtml(order) {
         const couriers = await fetchCouriers();
 
@@ -549,11 +578,10 @@
         } else if (platform.toLowerCase() === 'getir') {
             platformHtml = `
         <span class="d-inline-flex align-items-center border rounded-pill px-2 py-1 small">
-            <img src="{{ asset('theme/images/getiryemek.png') }}" style="height:14px;margin-right:4px;">
+            <img src="{{ asset('theme/images/gy.png') }}" style="height:14px;margin-right:4px;">
             ${restaurantName}
         </span>`;
-        }
-        else if (platform.toLowerCase() === 'gpsyemek') {
+        } else if (platform.toLowerCase() === 'gpsyemek') {
             platformHtml = `
         <span class="d-inline-flex align-items-center border rounded-pill px-2 py-1 small">
             <img src="{{ asset('theme/images/gpsyemek.png') }}" style="height:20px;margin-right:4px;">
@@ -622,14 +650,15 @@
             }
         }
         // Durum seçenekleri
-        const statusOptions = `
-      <option value="PENDING" ${status == 'PENDING' ? 'selected' : ''}>BEKLEMEDE</option>
-<option value="PREPARED" ${status == 'PREPARED' ? 'selected' : ''}>HAZIRLANIYOR</option>
-<option disabled value="ASSIGNED" ${status == 'ASSIGNED' ? 'selected' : ''}>KURYE ATANDI</option>
-<option disabled value="HANDOVER" ${status == 'HANDOVER' ? 'selected' : ''}>KURYEYE TESLİM EDİLDİ / YOLDA</option>
-<option value="DELIVERED" ${status == 'DELIVERED' ? 'selected' : ''}>TESLİM EDİLDİ</option>
-<option value="UNSUPPLIED" ${status == 'UNSUPPLIED' ? 'selected' : ''}>İPTAL EDİLDİ / TEDARİK YOK</option>
-    `;
+        const statusFlow = {
+            PENDING: {label: 'BEKLEMEDE', next: 'PREPARED', btn: 'Hazırlandı'},
+            PREPARED: {label: 'HAZIRLANIYOR', next: 'ASSIGNED', btn: 'Kurye Aldı'},
+            ASSIGNED: {label: 'KURYE ATANDI', next: 'HANDOVER', btn: 'Yola Çıktı'},
+            HANDOVER: {label: 'YOLDA', next: 'DELIVERED', btn: 'Teslim Edildi'},
+            DELIVERED: {label: 'TESLİM EDİLDİ', next: null},
+            UNSUPPLIED: {label: 'İPTAL EDİLDİ', next: null}
+        };
+
 
         return `
 <tr id="data_${order.id}">
@@ -683,11 +712,27 @@
         </strong>
     </td>
     <td>
-        <input type="hidden" id="tracking_${order.id}" value="${trackingId}">
-        <input type="hidden" id="platform_${order.id}" value="${platform}">
-        <select class="inline-order-select form-control" onchange="StatusOrderChange(event, ${order.id})" ${status == 'DELIVERED' ||  status == 'UNSUPPLIED' ? 'disabled' : ''}>
-            ${statusOptions}
-        </select>
+            <input type="hidden" id="tracking_${order.id}" value="${trackingId}">
+            <input type="hidden" id="platform_${order.id}" value="${platform}">
+
+            <!-- Status yazısı -->
+            <div class="fw-bold text-secondary mb-2">
+              ${statusFlow[status]?.label || status}
+           </div>
+             <!-- İlerleme -->
+            ${statusFlow[status]?.next ? `<buttonclass="btn btn-sm btn-primary mb-1"
+                onclick="nextOrderStatus(${order.id}, '${statusFlow[status].next}')">
+                ${statusFlow[status].btn}
+           </button>` : ''}
+
+            <!-- İptal (her zaman altta) -->
+            ${status !== 'DELIVERED' && status !== 'UNSUPPLIED'
+            ? `<button
+                class="btn btn-sm btn-danger d-block"
+                onclick="cancelOrderButton(${order.id})">
+                İptal Et
+           </button>` : ''}
+
         <!-- İptal modal -->
         <div class="modal fade" id="cancelModal${order.id}">
             <div class="modal-dialog">

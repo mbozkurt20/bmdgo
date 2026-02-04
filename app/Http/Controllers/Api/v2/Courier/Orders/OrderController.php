@@ -99,6 +99,7 @@ class OrderController extends Controller
 
     public function status(Request $request, $orderId)
     {
+        //gpsyemek PREPARED - HANDOVER - DELIVERED - REJECTED
         $courier = auth('courier')->user();
         $order = Order::find($orderId);
 
@@ -134,6 +135,10 @@ class OrderController extends Controller
                 ]);
                 app(GpsYemekController::class)->updateOrder($updateReq);
             }
+
+            if ($order->platform === 'getir' || $order->platform === 'yemeksepeti' || $order->platform === 'trendyol' || $order->platform === 'migros') {
+                app(EntegraController::class)->updateOrder($updateReq);
+            }
         }
 
         //teslim edidi
@@ -151,7 +156,7 @@ class OrderController extends Controller
 
             if ($order->platform === 'gpsyemek') {
                 $updateReq = new Request([
-                    'action' => OrderStatus::ASSIGNED,
+                    'action' => OrderStatus::DELIVERED,
                     'tracking_id' => $order->tracking_id,
                 ]);
                 app(GpsYemekController::class)->updateOrder($updateReq);

@@ -93,6 +93,8 @@
                                                 <input type="text" class="form-control form-control-sm" name="data[information][apiKey]" value="{{ $val->information->apiKey ?? '' }}" required>
                                             @endif
                                         @elseif($key == 'trendyol')
+                                            <label class="form-label">Api Key</label>
+                                            <input type="text" class="form-control form-control-sm mb-2" name="data[information][apiKey]" value="{{ $val->information->apiKey ?? '' }}" required>
                                             <label class="form-label">Supplier ID</label>
                                             <input type="text" class="form-control form-control-sm mb-2" name="data[information][supplierId]" value="{{ $val->information->supplierId ?? '' }}" required>
                                             <label class="form-label">API Secret Key</label>
