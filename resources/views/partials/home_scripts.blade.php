@@ -676,7 +676,7 @@
     <td class="text-ov">${total} ₺</td>
     <td class="text-ov">${discount} ₺</td>
     <td class="text-ov">${amount} ₺</td>
-    <td class="text-ov">${order.payment_method} ₺</td>
+    <td class="text-ov">${order.payment_method}</td>
     <td class="text-ov">
         <strong class="text-secondary fw-bold" id="distance${order.id}">
             ${distanceStr}
