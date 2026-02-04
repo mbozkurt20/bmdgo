@@ -9,6 +9,7 @@ use App\Helpers\NotificationHelper;
 use App\Helpers\OrdersHelper;
 use App\Helpers\OrderStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\EntegraController;
 use App\Http\Controllers\GpsYemekController;
 use App\Http\Resources\OrderResource;
 use App\Models\CourierOrder;

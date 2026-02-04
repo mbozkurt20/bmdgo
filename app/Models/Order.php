@@ -18,6 +18,8 @@ class Order extends Model
         'tracking_id',
         'full_name',
         'phone',
+        'pid',
+        'status_request_count',
         'payment_method',
         'items',
         'address',

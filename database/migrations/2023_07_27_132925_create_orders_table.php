@@ -22,6 +22,8 @@ class CreateOrdersTable extends Migration
             $table->string('tracking_id');
             $table->string('full_name');
             $table->string('phone');
+            $table->string('pid')->nullable(); // entegra order id
+            $table->tinyInteger('status_request_count')->default(0); // entegra durum güncelleme istek sayısı
             $table->text('address');
             $table->string('verify_code')->nullable();
             $table->tinyText('notes')->nullable();

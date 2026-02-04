@@ -68,6 +68,8 @@ class OrderController extends Controller
         $orderData = [
             'platform' => $orderData['provider']['slug'],
             'customer_id' => $create->id,
+            'pid' => $orderData['pid'] ?? null,
+            'status_request_count' => 0,
             'restaurant_id' => $restaurant->id,
             'courier_id' => -1,
             'status' => OrderStatus::PREPARED,
@@ -84,7 +86,6 @@ class OrderController extends Controller
             'amount' => $orderData['totalDiscountedPrice'],
             'notes' => $orderData['clientNote']??null,
             'platform_date' => date('d-m-Y, H:i', strtotime($orderData['created_at'])),
-
             'distance' => OrdersHelper::haversineDistance(
                 $restaurant->latitude,
                 $restaurant->longitude,

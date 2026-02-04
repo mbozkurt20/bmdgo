@@ -27,9 +27,7 @@ class EntegraController extends Controller
         $orderCode = $request->input('tracking_id');
         $order = Order::where('tracking_id', $orderCode)->first();
 
-        $api_token = $order->restaurant->gpsyemek_api_key;
-
-        $response = EntegraHelper::updateOrder($order->id);
+        $response = EntegraHelper::updateOrder($order->pid);
 
         if ($response->success) {
             // API'ye gönderilecek veriyi belirle
