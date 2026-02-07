@@ -30,12 +30,12 @@ class OrderStatus
     public static function statuses()
     {
         return [
-            'PENDING' => 'pending',
-            'PREPARED' => 'prepared',
-            'ASSIGNED' => 'assigned',
-            'HANDOVER' => 'handover',
-            'DELIVERED' => 'delivered',
-            'UNSUPPLIED' => 'unsupplied'
+            'PENDING' => 'PENDING',
+            'PREPARED' => 'PREPARED',
+            'ASSIGNED' => 'ASSIGNED',
+            'HANDOVER' => 'HANDOVER',
+            'DELIVERED' => 'DELIVERED',
+            'UNSUPPLIED' => 'UNSUPPLIED'
         ];
     }
 }

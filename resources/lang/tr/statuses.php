@@ -1,10 +1,10 @@
 <?php
 
 return [
-    'pending'          => 'Beklemede',
-    'prepared'         => 'Hazırlanıyor',
-    'assigned'         => 'Kuryeye Atananlar',
-    'handover'         => 'Yola Çıktı',
-    'delivered'        => 'Teslim Edildi',
-    'unsupplied'       => 'Tedarik Edilemedi / İptal',
+    'PENDING'          => 'Beklemede',
+    'PREPARED'         => 'Hazırlanıyor',
+    'ASSIGNED'         => 'Kuryeye Atananlar',
+    'HANDOVER'         => 'Yola Çıktı',
+    'DELIVERED'        => 'Teslim Edildi',
+    'UNSUPPLIED'       => 'Tedarik Edilemedi / İptal',
 ];
