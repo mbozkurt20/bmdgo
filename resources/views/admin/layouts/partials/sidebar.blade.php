@@ -50,7 +50,7 @@
                 </a>
                 <ul aria-expanded="false">
                     <li><a class="text-white" href="{{ route('admin.expenses.index') }}">Genel Giderler</a></li>
-                    <li><a class="text-white" href="{{ route('admin.progress_payment.restaurant') }}">Restaurant Hakedişler</a></li>
+                    <li><a class="text-white" href="{{ route('admin.progress_payment.restaurant') }}">Restaurant Paket Raporu</a></li>
                     <li><a class="text-white" href="{{ route('admin.progress_payment.courier') }}">Kurye Hakedişler</a></li>
                 </ul>
             </li>

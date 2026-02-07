@@ -152,6 +152,13 @@
 
                             <div class="col">
                                 <div class="stat-item">
+                                    <img src="{{ asset('theme/images/platforms/getir.png') }}" class="platform-icon" alt="Getir">
+                                    <span class="stat-value">{{ count($gpsyemek) }}</span>
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <div class="stat-item">
                                     <img src="{{ asset('theme/images/platforms/trendyol.png') }}" class="platform-icon" alt="Trendyol">
                                     <span class="stat-value">{{ count($trendyol) }}</span>
                                 </div>
