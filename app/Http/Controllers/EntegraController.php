@@ -146,6 +146,8 @@ class EntegraController extends Controller
                 }
                 break;
             case OrderStatus::PREPARED:
+                $res =  EntegraHelper::updateOrder($order->pid);
+                dd($res);
                 break;
             case OrderStatus::DELIVERED:
                 // Sipariş teslim edildiğinde kuryenin durumu güncelleniyor

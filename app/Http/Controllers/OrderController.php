@@ -61,6 +61,7 @@ class OrderController extends Controller
     {
         $order = Order::find($orderId);
 
+        //-1 kuryeyi siparişten çıkarır
         if ($courierId == -1) {
             $order->update([
                 'courier_id' => null,
@@ -74,6 +75,8 @@ class OrderController extends Controller
                 'message' => 'Siparişin kuryesi başarıyla kaldırıldı.'
             ]);
         } else {
+
+
             $courier = Courier::find($courierId);
 
             if (!$order || !$courier) {

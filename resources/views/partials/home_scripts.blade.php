@@ -5,7 +5,7 @@
         fetchOrders();
     });
 
-    function fetchOrders() {
+    function fetchOrders(status) {
         $.ajax({
             url: '/{{$key}}/orders/ajax',
             method: 'GET', // veya 'POST' gerekiyorsa
@@ -291,7 +291,7 @@
         }
 
         // Tablo boş/dolu uyarısını güncelle
-        updateTableForStatus(order.status);
+        Object.keys(statusMap).forEach(status => updateTableForStatus(status));
         if (targetStatusKey === 'ASSIGNED') updateTableForStatus('ASSIGNED');
 
         if (order.status === 'HANDOVER') {
@@ -466,35 +466,6 @@
             })
             .catch(err => console.error(err));
     }
-
-
-    {{--
-     const selectBox = document.getElementById("selectedCourier");
-    const optionsContainer = document.getElementById("courierOptions");
-    const options = document.querySelectorAll(".option");
-    const courierIdInput = document.getElementById("courierId");
-
-    selectBox.addEventListener("click", () => {
-        optionsContainer.style.display = optionsContainer.style.display === "block" ? "none" : "block";
-    });
-
-    options.forEach(option => {
-        option.addEventListener("click", (e) => {
-            const selectedText = option.innerText;
-            const selectedId = option.getAttribute("data-id");
-
-            selectBox.innerHTML = selectedText;
-            courierIdInput.value = selectedId;
-            optionsContainer.style.display = "none";
-        });
-    });
-
-    document.addEventListener("click", function (event) {
-        if (!selectBox.contains(event.target) && !optionsContainer.contains(event.target)) {
-            optionsContainer.style.display = "none";
-        }
-    });
-    --}}
 
     function deleteOrder(order) {
         let orderid = order;

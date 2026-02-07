@@ -4,12 +4,15 @@ namespace App\Helpers;
 
 class EntegraHelper {
 
+    // Değişken yerine sabit (const) kullanmak statik metodlar için en temiz yoldur.
+    private const BASE_URL = 'https://entegra.gpsyazilim.com/api/v1';
+
     public static function newBusiness($payload)
     {
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://integration.emisoft.com.tr/api/v1/business',
+            CURLOPT_URL => self::BASE_URL . '/business',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -24,7 +27,6 @@ class EntegraHelper {
         ));
 
         $response = curl_exec($curl);
-
         curl_close($curl);
 
         return json_decode($response);
@@ -35,7 +37,7 @@ class EntegraHelper {
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://integration.emisoft.com.tr/api/v1/restaurant',
+            CURLOPT_URL => self::BASE_URL . '/restaurant',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -50,7 +52,6 @@ class EntegraHelper {
         ));
 
         $response = curl_exec($curl);
-
         curl_close($curl);
 
         return json_decode($response);
@@ -70,10 +71,8 @@ class EntegraHelper {
         }
 
         $providerId = $providerMap[$platform];
-
         $fet = json_decode($restaurant->$platform);
 
-        // 🔥 JSON olarak düzgün payload
         $payload = [
             'status'        => (bool) ($fet->status ?? false),
             'otomatikOnay'  => (bool) ($fet->otomatikOnay ?? false),
@@ -87,10 +86,11 @@ class EntegraHelper {
         $curl = curl_init();
 
         curl_setopt_array($curl, [
-            CURLOPT_URL => "https://integration.emisoft.com.tr/api/v1/restaurant/{$restaurant->entegra_restaurant_id}/provider/{$providerId}",
+            // Statik erişim: self::BASE_URL
+            CURLOPT_URL => self::BASE_URL . "/restaurant/{$restaurant->entegra_restaurant_id}/provider/{$providerId}",
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_TIMEOUT => 30,
-            CURLOPT_CUSTOMREQUEST => 'POST', // ❗ PATCH ise PATCH
+            CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => json_encode($payload, JSON_UNESCAPED_UNICODE),
             CURLOPT_HTTPHEADER => [
                 'Content-Type: application/json',
@@ -113,7 +113,7 @@ class EntegraHelper {
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://integration.emisoft.com.tr/api/v1/order/{$orderId}/update-status",
+            CURLOPT_URL => self::BASE_URL . "/order/{$orderId}/update-status",
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -124,8 +124,8 @@ class EntegraHelper {
         ));
 
         $response = curl_exec($curl);
-
         curl_close($curl);
+
         return json_decode($response);
     }
 
@@ -133,7 +133,7 @@ class EntegraHelper {
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://integration.emisoft.com.tr/api/v1/order/{$orderId}/reject-statuses",
+            CURLOPT_URL => self::BASE_URL . "/order/{$orderId}/reject-statuses",
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -144,17 +144,16 @@ class EntegraHelper {
         ));
 
         $response = curl_exec($curl);
-
         curl_close($curl);
 
         return json_decode($response);
     }
 
-    public static function rejectOrder($orderId,$payload){
+    public static function rejectOrder($orderId, $payload){
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://integration.emisoft.com.tr/api/v1/order/{$orderId}/reject",
+            CURLOPT_URL => self::BASE_URL . "/order/{$orderId}/reject",
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -169,7 +168,6 @@ class EntegraHelper {
         ));
 
         $response = curl_exec($curl);
-
         curl_close($curl);
 
         return json_decode($response);
