@@ -14,6 +14,7 @@ use App\Observers\AdminSystemFeautureObserver;
 use App\Observers\CourierObserver;
 use App\Observers\OrderObserver;
 use App\Observers\RestaurantObserver;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -41,6 +42,10 @@ class AppServiceProvider extends ServiceProvider
         Order::observe(OrderObserver::class);
         Restaurant::observe(RestaurantObserver::class);
         AdminSystemFeature::observe(AdminSystemFeautureObserver::class);
+
+        Relation::morphMap([
+            'courier' => \App\Models\Courier::class,
+        ]);
 
         View::composer('*', function ($view) {
             if (Auth::guard('restaurant')->check()) {

@@ -72,94 +72,105 @@
             <div class="col-lg-6">
                 <div class="orders-section" style="margin-bottom: 10px">
                     <h4>Siparişler</h4>
-                    <div class="row g-3">
-                        <!-- All Orders Button -->
-                        <div class="col-md-6">
-                            <button
-                                class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100"
-                                style="background: #ec691e">
+                    <style>
+                        .minimal-row {
+                            background: #ffffff;
+                            padding: 20px;
+                            border-radius: 15px;
+                        }
 
-                                <span class="fw-bold">
-                                    <i class="fa-solid fa-box"
-                                       style="color: #fffdfd;font-size:18px;padding-right:10px"></i>
-                                    Tüm Siparişler</span>
-                                <span class="badge bg-white text-dark order-number">{{ count($tumu) }}</span>
-                            </button>
-                        </div>
+                        .stat-item {
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            justify-content: center;
+                            padding: 10px;
+                            transition: all 0.3s ease;
+                            border-right: 1px solid #f0f0f0; /* Ayırıcı ince çizgi */
+                        }
 
-                        <div class="col-md-6">
-                            <button
-                                class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100"
-                                style="background: #0d2646">
-                                <i class="fa-solid fa-phone" style="color: #fff;font-size:18px;padding-left:10px"></i>
-                                <span class="fw-bold">Telefonla Gelen Sipariş</span>
-                                <span class="badge bg-white text-dark order-number">{{ count($telefonsiparis) }}</span>
-                            </button>
-                        </div>
-                        <div class="col-md-6">
-                            <button
-                                class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100" style="background: #4927b3">
-                                <img src="{{ asset('theme/images/GetirYemek_Logo.png') }}"
-                                     style="background-repeat: no-repeat; background-position:center"
-                                     height="20px" alt="">
-                                <span class="badge bg-white text-dark order-number">{{ count($getiryemek) }}</span>
-                            </button>
-                        </div>
+                        .stat-item:last-child {
+                            border-right: none;
+                        }
 
-                        <div class="col-md-6">
-                            <button
-                                class="order-card btn-group-custom fw-bold order-btn d-flex justify-content-between align-items-center w-100"
-                                style="background: #d7cbcb">
-                                <img src="{{ asset('theme/images/gpsyemek.png') }}"
-                                     style="background-repeat: no-repeat; background-position:center"
-                                     height="35px" alt="">
-                                <span class="badge bg-white text-dark order-number">{{ count($gpsyemek) }}</span>
-                            </button>
-                        </div>
+                        .stat-value {
+                            font-size: 22px;
+                            font-weight: 800;
+                            color: #2d3436;
+                            margin-top: 8px;
+                        }
 
-                        <!-- Trendyol Orders -->
-                        <div class="col-md-6">
-                            <button
-                                class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100" style="background: orangered">
-                                <img src="{{ asset('theme/images/trendyolyemek.png') }}"
-                                     style="background-repeat: no-repeat; background-position:center"
-                                     height="20px" alt="">
-                                <span class="badge bg-white text-dark order-number">{{ count($trendyol) }}</span>
-                            </button>
-                        </div>
+                        .stat-label {
+                            font-size: 20px;
+                            text-transform: uppercase;
+                            letter-spacing: 1px;
+                            color: #a0aec0;
+                            font-weight: 700;
+                        }
 
-                        <!-- Yemeksepeti Orders -->
-                        <div class="col-md-6">
-                            <button
-                                class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100"
-                                style="background: #F90050">
-                                <img src="{{ asset('theme/images/Yemeksepeti_Logo.png') }}"
-                                     style="background-repeat: no-repeat; background-position:center"
-                                     height="25px" alt="">
-                                <span class="badge bg-white text-dark order-number">{{ count($yemeksepeti) }}</span>
-                            </button>
-                        </div>
-                        <!-- Migros Orders -->
-                        <div class="col-md-6">
-                            <button
-                                class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100"
-                                style="background: #363A86">
-                                <img src="{{ asset('theme/images/MigrosYemek_logo.png') }}"
-                                     style="background-repeat: no-repeat; background-position:center"
-                                     height="30px" alt="">
-                                <span class="badge bg-white text-dark order-number">{{ $migros }}</span>
-                            </button>
-                        </div>
-                        <!-- Phone Orders -->
+                        .platform-icon {
+                            height: 52px;
+                            width: auto;
+                            transition: all 0.3s ease;
+                        }
 
-                        <div class="col-md-6">
-                            <button
-                                class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100"
-                                style="background: #259a38">
-                                <i class="fa-solid fa-phone" style="color: #fff;font-size:18px;padding-left:10px"></i>
-                                <span class="fw-bold">Telefonla Gelen Sipariş</span>
-                                <span class="badge bg-white text-dark order-number">{{ count($telefonsiparis) }}</span>
-                            </button>
+                        .stat-item:hover .platform-icon {
+                            filter: grayscale(0%);
+                            opacity: 1;
+                            transform: scale(1.1);
+                        }
+
+                        /* Sipariş varsa sayıyı renklendir */
+                        .has-count {
+                            color: #ec691e !important;
+                        }
+                    </style>
+
+                    <div class="minimal-row shadow-sm border">
+                        <div class="row align-items: center;">
+
+                            <div class="col">
+                                <div class="stat-item">
+                                    <span class="stat-label">Toplam</span>
+                                    <span class="stat-value {{ count($tumu) > 0 ? 'has-count' : '' }}">{{ count($tumu) }}</span>
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <div class="stat-item">
+                                    <span class="stat-label"><i class="fa-solid fa-phone"></i></span>
+                                    <span class="stat-value">{{ count($telefonsiparis) }}</span>
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <div class="stat-item">
+                                    <img src="{{ asset('theme/images/platforms/getir.png') }}" class="platform-icon" alt="Getir">
+                                    <span class="stat-value">{{ count($getiryemek) }}</span>
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <div class="stat-item">
+                                    <img src="{{ asset('theme/images/platforms/trendyol.png') }}" class="platform-icon" alt="Trendyol">
+                                    <span class="stat-value">{{ count($trendyol) }}</span>
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <div class="stat-item">
+                                    <img src="{{ asset('theme/images/platforms/yemeksepeti.png') }}" class="platform-icon" alt="Yemeksepeti">
+                                    <span class="stat-value">{{ count($yemeksepeti) }}</span>
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <div class="stat-item">
+                                    <img src="{{ asset('theme/images/platforms/migros.png') }}" class="platform-icon" alt="Migros">
+                                    <span class="stat-value">{{ $migros }}</span>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>

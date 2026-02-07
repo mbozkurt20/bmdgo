@@ -15,10 +15,10 @@
 </div>
 
 <div class="header">
-    @if(env('TEST_MODE') === true)
+    @if(config('site.test_mode') === true)
         <div class="row relative" style="background-color: #f3eded; color: #ec691e;">
             <div class="text-lg absolute text-center fw-bold py-2" >
-                <strong>{{env('APP_NAME')}}</strong> Test Modu Hesabı Kullanmaktasınız !!
+                <strong>{{config('site.name')}}</strong> Test Modu Hesabı Kullanmaktasınız !!
             </div>
         </div>
     @endif
@@ -27,11 +27,7 @@
         <nav class="navbar navbar-expand">
             <div class="collapse navbar-collapse justify-content-between">
                 <div class="header-left">
-                    <!--a href="{{ route('getOrders') }}"
-                       style="font-family: 'Poppins', sans-serif;margin-left:15px;"
-                       class="btn btn-primary btn-rounded">
-                        {{ Auth::user()->restaurant_name }}
-                    </a-->
+
                 </div>
 
                 <ul class="navbar-nav header-right">

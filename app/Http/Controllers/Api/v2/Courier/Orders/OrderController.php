@@ -275,24 +275,40 @@ class OrderController extends Controller
 
         $total = 0;
 
+        $info = "";
+
         if ($courier->price_type == 'package') {
-            $total+= $deliveredOrders->count() * $courier->price;
+            $pricePerPackage = (float) $courier->price;
+            $total += $orderCount * $pricePerPackage;
+
+            // Paket başı ücret bilgilendirmesi
+            $info = "Paket başı sabit ücret sistemine göre; {$orderCount} adet teslimat için paket başı " .
+                number_format($pricePerPackage, 2) . " TL üzerinden hesaplama yapılmıştır.";
+
         } else {
             $kmPrice = (float) $courier->km_price;
+            $externalKm = (float) $courier->km_distance_later;
+            $fixedPrice = (float) $courier->fixed_price;
 
-            $distanceTotal = $deliveredOrders->sum(
-                fn($o) => ($o->distance / 1000) * $kmPrice
-            );
+            $distanceTotal = $deliveredOrders->sum(function($o) use ($kmPrice, $externalKm) {
+                $orderKm = (float) $o->distance;
+                $payableKm = max(0, $orderKm - $externalKm);
+                return $payableKm * $kmPrice;
+            });
 
-            $fixedTotal = (float) $courier->fixed_price * $orderCount;
+            $fixedTotal = $fixedPrice * $orderCount;
+            $total += ($distanceTotal + $fixedTotal);
 
-            $total += $distanceTotal;
-            $total += $fixedTotal;
+            // Mesafe + Sabit ücret bilgilendirmesi
+            $info = "Paket başı sabit " . number_format($fixedPrice, 2) . " TL'ye ek olarak; " .
+                "her siparişte ilk {$externalKm} km'den sonraki mesafe için km başına " .
+                number_format($kmPrice, 2) . " TL eklenerek hesaplama yapılmıştır.";
         }
 
         return response()->json([
             'order_count' => $orderCount,
-            'total_progress_payment' =>  number_format($total,2,'.',''),
+            'total_progress_payment' => number_format($total, 2, '.', ''),
+            'calculation_info' => $info // Bilgilendirme metni
         ]);
     }
 

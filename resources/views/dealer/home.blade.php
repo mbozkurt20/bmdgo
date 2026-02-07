@@ -99,7 +99,7 @@
                         <div class="col-md-6">
                             <button
                                 class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100" style="background: orangered">
-                                <img src="{{ asset('theme/images/trendyolyemek.png') }}"
+                                <img src="{{ asset('theme/images/platforms/trendyol.png) }}"
                                      style="background-repeat: no-repeat; background-position:center" width="71px"
                                      height="14px" alt="">
                                 <span class="badge bg-white text-dark order-number">{{ count($trendyol) }}</span>

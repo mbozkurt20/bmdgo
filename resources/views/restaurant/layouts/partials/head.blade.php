@@ -3,7 +3,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <!-- PAGE TITLE HERE -->
-    <title> {{env('APP_NAME')}} </title>
+    <title> {{config('site.name')}} </title>
     <!-- FAVICONS ICON -->
     <link rel="shortcut icon" type="image/png" href="{{config('site.logo')}}">
     <link rel="stylesheet" href="{{ asset('theme/css/chartist.min.css') }}">

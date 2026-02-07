@@ -67,7 +67,10 @@
                             </div>
 
                             <div class="repeater-heading d-flex justify-content-between align-items-center mb-4">
-                                <h5>Adres Bilgileri</h5>
+                                <div>
+                                    <h5>Adres Bilgileri</h5>
+                                    <p class="fw-bold">Konum Seç diyerek konum bilgileriniz giriniz</p>
+                                </div>
                                 <button type="button" class="btn btn-primary btn-sm" data-repeater-create>
                                     <i class="fa fa-plus me-1"></i> Yeni Adres Ekle
                                 </button>

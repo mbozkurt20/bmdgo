@@ -1,83 +1,15 @@
 @extends('admin.layouts.app')
 @section('content')
     <style>
-        body {
-            background-color: #f8f9fa;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .page-header {
-            background: #07004d;
-            color: white;
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 4px 20px rgba(7,0,77,0.2);
-        }
-
-        .page-header h2 {
-            font-weight: 700;
-            margin: 0;
-        }
-
-
-
-        .card-custom {
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
-            border: none;
-            margin-bottom: 24px;
-        }
-
-        .card-custom h5 {
-            font-weight: 600;
-            color: #07004d;
-        }
-
-        .btn-primary {
-            background-color: #ec691e;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-        }
-
-        .bg-primary2 {
-            background: #259a38;
-            color: white;
-        }
-        .btn-primary:hover {
-            background-color: #ca3768;
-        }
-
-        .table {
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .table thead {
-            background: #259a38;
-            color: white;
-        }
-
-        .table tfoot {
-            background: #f1f1f1;
-        }
-
-        .summary-box {
-            background: #ec691e;
-            color: white;
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-            font-weight: 600;
-            margin-top: 16px;
-        }
+        .card-custom { background: #fff; border-radius: 16px; box-shadow: 0 3px 12px rgba(0,0,0,0.05); border: none; margin-bottom: 24px; }
+        .bg-primary2 { background: #259a38; color: white; }
+        .summary-box { background: #ec691e; color: white; border-radius: 12px; padding: 20px; text-align: center; font-weight: 600; margin-top: 16px; box-shadow: 0 4px 15px rgba(236,105,30,0.3); }
+        .info-alert { background: #e3f2fd; color: #0d47a1; border: none; border-radius: 12px; padding: 15px; margin-bottom: 20px; font-size: 0.95rem; display: flex; align-items: center; }
+        .table thead { background: #f8f9fa; color: #333; }
+        .badge-payment { font-size: 0.85rem; padding: 5px 10px; border-radius: 8px; }
     </style>
 
     <div class="container-fluid">
-
-        <!-- Sayfa Başlık -->
         <div class="mb-sm-4 d-flex flex-wrap align-items-center text-head">
             <h2 class="mb-3 me-auto">Kurye Raporu</h2>
             <div>
@@ -88,130 +20,108 @@
             </div>
         </div>
 
-        <!-- Tarih Aralığı -->
         <form method="GET" class="card-custom p-4">
             <div class="row g-3 align-items-end">
-                <div class="col-md-3">
-                    <label class="form-label fw-bold">Başlangıç Tarihi</label>
-                    <input type="date" name="start_date" class="form-control"
-                           value="{{ request('start_date', \Carbon\Carbon::parse($startDate)->toDateString()) }}">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold text-dark">Başlangıç Tarihi</label>
+                    <input type="date" name="start_date" class="form-control" value="{{ $startDate }}">
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label fw-bold">Bitiş Tarihi</label>
-                    <input type="date" name="end_date" class="form-control"
-                           value="{{ request('end_date', \Carbon\Carbon::parse($endDate)->toDateString()) }}">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold text-dark">Bitiş Tarihi</label>
+                    <input type="date" name="end_date" class="form-control" value="{{ $endDate }}">
                 </div>
-                <div class="col-md-3">
-                    <button type="submit" class="btn btn-primary w-100">Filtrele</button>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary w-100 py-2"><i class="fa fa-filter me-2"></i>Raporu Güncelle</button>
                 </div>
             </div>
         </form>
 
-        <!-- Kurye Bilgileri -->
-        <div class="card-custom p-4 d-flex justify-content-between flex-wrap">
+        <div class="info-alert">
+            <i class="fa fa-info-circle fa-lg me-3"></i>
             <div>
-                <h5>{{$courier->name}}</h5>
-                <h6 >{{$courier->phone}}</h6>
+                <strong>Hesaplama Detayı:</strong> {{ $summary['info'] }}
             </div>
-            @if ($courier->price_type == 'fixed')
-                <div class="text-end">
-                    <h6 class="fw-bold">Sabit Ücret</h6>
-                    <span class="badge bg-primary2 fs-6">{{ $courier->fixed_price }} ₺</span>
-                </div>
-            @endif
         </div>
 
-        <!-- Sipariş Tablosu -->
-        <div class="card-custom p-0">
+        <div class="row mb-4 text-center">
+            <div class="col-md-3">
+                <div class="card-custom p-3 border-start border-4 border-success">
+                    <h6 class="text-muted mb-1">Toplam Sipariş</h6>
+                    <h4 class="mb-0">{{ $summary['order_count'] }} Adet</h4>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card-custom p-3 border-start border-4 border-info">
+                    <h6 class="text-muted mb-1">Nakit Sipariş</h6>
+                    <h4 class="mb-0">{{ $summary['cash_count'] }}</h4>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card-custom p-3 border-start border-4 border-primary">
+                    <h6 class="text-muted mb-1">Kredi Kartı</h6>
+                    <h4 class="mb-0">{{ $summary['card_count'] }}</h4>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card-custom p-3 border-start border-4 border-warning">
+                    <h6 class="text-muted mb-1">Yemek Kartı</h6>
+                    <h4 class="mb-0">{{ $summary['ticket_count'] }}</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-custom overflow-hidden">
             <div class="table-responsive">
-                <table class="table align-middle mb-0">
-                    <thead class="text-center">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
                     <tr>
-                        <th>#</th>
+                        <th class="ps-4">Sipariş No</th>
                         <th>Platform</th>
-                        <th>Sipariş No</th>
                         <th>Müşteri</th>
-                        <th>Telefon</th>
                         <th>Tutar</th>
-                        <th>Ödeme Yöntemi</th>
+                        <th>Ödeme</th>
+                        <th>Mesafe</th>
                         <th>Durum</th>
-                        <th>Tarih</th>
+                        <th class="pe-4">Tarih</th>
                     </tr>
                     </thead>
                     <tbody>
                     @forelse($orders as $order)
                         <tr>
-                            <td class="font-weight-bold">{{$loop->iteration}}</td>
-                            <td  class="font-weight-bold text-black">{{$order->platform}}</td>
-                            <td  class="font-weight-bold text-black">{{$order->tracking_id}}</td>
-                            <td  class="font-weight-bold text-black">{{$order->full_name}}</td>
-                            <td  class="font-weight-bold text-black">{{$order->phone}}</td>
-                            <td  class="font-weight-bold text-black"><strong>{{ $order->amount }} ₺</strong></td>
-                            <td  class="font-weight-bold text-black">
-                                @if($order->payment_method == "Kapıda Ticket ile Ödeme") Ticket
-                                @elseif($order->payment_method == "Kapıda Nakit ile Ödeme") Nakit
-                                @elseif($order->payment_method == "Kapıda Kredi Kartı ile Ödeme") Kredi Kartı
-                                @else {{$order->payment_method}}
+                            <td class="ps-4">#{{$order->tracking_id}}</td>
+                            <td><span class="badge bg-light text-dark border">{{$order->platform}}</span></td>
+                            <td>{{$order->full_name}}</td>
+                            <td class="fw-bold">{{ number_format($order->amount, 2) }} ₺</td>
+                            <td>
+                                @if(str_contains($order->payment_method, 'Nakit'))
+                                    <span class="badge bg-success-subtle text-success badge-payment">Nakit</span>
+                                @elseif(str_contains($order->payment_method, 'Kart') || str_contains($order->payment_method, 'Online'))
+                                    <span class="badge bg-primary-subtle text-primary badge-payment">Kredi Kartı</span>
+                                @else
+                                    <span class="badge bg-warning-subtle text-warning badge-payment">Yemek Kartı</span>
                                 @endif
                             </td>
-                            <td  class="font-weight-bold text-black">
-                                @switch($order->status)
-                                    @case('DELIVERED')
-                                        Teslim Edildi
-                                    @break
-                                    @case('HANDOVER')
-                                        Kuryede Yolda
-                                    @break
-                                    @case('UNSUPPLIED')
-                                    İptal Edildi
-                                    @break
-                                @endswitch
+                            <td>{{ number_format((float)$order->distance, 2) }} km</td>
+                            <td>
+                                @if($order->status == 'DELIVERED')
+                                    <span class="text-success fw-bold"><i class="fa fa-check-circle me-1"></i>Teslim Edildi</span>
+                                @else
+                                    <span class="text-muted">{{$order->status}}</span>
+                                @endif
                             </td>
-                            <td  class="font-weight-bold text-black">{{ $order->created_at->format('d.m.Y H:i') }}</td>
+                            <td class="pe-4 text-muted small">{{ $order->created_at->format('d.m.Y H:i') }}</td>
                         </tr>
                     @empty
-                        <tr>
-                            <td colspan="9" class="text-center text-muted py-4">
-                                Bu tarih aralığında sipariş bulunamadı.
-                            </td>
-                        </tr>
+                        <tr><td colspan="8" class="text-center py-5 text-muted">Kayıt bulunamadı.</td></tr>
                     @endforelse
                     </tbody>
-
-                    <tfoot>
-                    <tr class="fw-bold text-center bg-primary2">
-                        <td colspan="3">
-                            Toplam Sipariş: {{ $summary['order_count'] }}
-                        </td>
-                        <td colspan="2">
-                            Nakit ({{ $summary['cash_orders'] }}):
-                            {{ number_format($totals['cash'], 2) }} ₺
-                        </td>
-                        <td colspan="2">
-                            Kredi Kartı ({{ $summary['card_orders'] }}):
-                            {{ number_format($totals['credit_card'], 2) }} ₺
-                        </td>
-                        <td colspan="2">
-                            Ticket ({{ $summary['ticket_orders'] }}):
-                            {{ number_format($totals['ticket'], 2) }} ₺
-                        </td>
-                    </tr>
-                    </tfoot>
                 </table>
             </div>
         </div>
 
-        <!-- Genel Toplam -->
         <div class="summary-box">
-            Genel Toplam: {{ number_format($totals['overall'], 2) }} ₺
-            <br>
-            <small>
-                Hesaplama Tipi:
-                {{ $courier->price_type == 'package'
-                    ? 'Paket Başı'
-                    : 'Km Başı ('.$courier->km_price.' ₺/km)' }}
-            </small>
+            <h5 class="mb-1 text-white">Toplam Hakediş Kazancı</h5>
+            <h2 class="mb-0 text-white fw-bold">{{ number_format($totalEarnings, 2) }} ₺</h2>
         </div>
-
     </div>
 @endsection

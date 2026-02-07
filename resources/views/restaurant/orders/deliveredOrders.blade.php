@@ -66,7 +66,7 @@
                             <td>{{ $order->full_name }}</td>
                             <td>{{ $order->phone }}</td>
                             <td>
-                                {{ optional(\App\Models\Courier::find($order->courier_id))->name ?? env('APP_NAME') }}
+                                {{ optional(\App\Models\Courier::find($order->courier_id))->name ?? config('site.name') }}
                             </td>
                             <td>{{ number_format($order->amount, 2) }} TL</td>
                             <td>

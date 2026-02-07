@@ -6,13 +6,13 @@
     <meta name="author" content>
     <meta name="robots" content>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="{{env('APP_NAME')}} :  Süper Admin Ekranı">
-    <meta property="og:title" content="{{env('APP_NAME')}} :  Süper Admin Ekranı">
-    <meta property="og:description" content="{{env('APP_NAME')}} :  Süper Admin Ekranı">
+    <meta name="description" content="{{config('site.name')}} :  Süper Admin Ekranı">
+    <meta property="og:title" content="{{config('site.name')}} :  Süper Admin Ekranı">
+    <meta property="og:description" content="{{config('site.name')}} :  Süper Admin Ekranı">
     <meta property="og:image" content="images/social-image.png">
     <meta name="format-detection" content="telephone=no">
 
-    <title>Üst Yönetici - {{env('APP_NAME')}}</title>
+    <title>Üst Yönetici - {{config('site.name')}}</title>
 
     @vite('resources/js/app.js')
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />

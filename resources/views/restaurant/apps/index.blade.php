@@ -16,10 +16,10 @@
                 <div class="card text-center shadow-sm border-0">
 
                     <div class="card-body">
-                        <img src="/theme/images/print.jpg" class="img-fluid card-img-top p-4" alt="{{env('APP_NAME')}} Yazıcı">
-                        <h5 class="card-title">{{env('APP_NAME')}} Yazıcı</h5>
+                        <img src="/theme/images/print.jpg" class="img-fluid card-img-top p-4" alt="{{config('site.name')}} Yazıcı">
+                        <h5 class="card-title">{{config('site.name')}} Yazıcı</h5>
                         <p class="card-text">
-                            {{env('APP_NAME')}} yazıcınızı indirip kurun. Kurulum sırasında sizden <strong>Restaurant ID</strong> istenecektir.
+                            {{config('site.name')}} yazıcınızı indirip kurun. Kurulum sırasında sizden <strong>Restaurant ID</strong> istenecektir.
                             Lütfen aşağıdaki ID’yi giriniz:
                         </p>
                         <p class="bg-black text-white rounded-circle d-inline-block p-3 fw-bold" style="font-size: 2rem; min-width: 50px; text-align: center;">

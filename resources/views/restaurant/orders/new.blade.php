@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="author" content="{{env('APP_NAME')}}">
-    <title>Sipariş Ekranı - {{env('APP_NAME')}}</title>
+    <meta name="author" content="{{config('site.name')}}">
+    <title>Sipariş Ekranı - {{config('site.name')}}</title>
 
     <!-- Toastr CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
@@ -24,14 +24,17 @@
             color: #fff !important;
             font-weight: 600;
             border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
         }
+
         .toast-success .toast-title {
             font-size: 15px;
         }
+
         .toast-success .toast-message {
             font-size: 14px;
         }
+
         .coupon-list {
             display: flex;
             flex-wrap: wrap;
@@ -48,7 +51,7 @@
             box-sizing: border-box;
             background-color: #fce9ef;
             color: #ec691e;,
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        transition: background-color 0.3 s ease, color 0.3 s ease, border-color 0.3 s ease;
             user-select: none;
         }
 
@@ -391,16 +394,17 @@
     </style>
 
     <style>
-        <style>
         .header-main {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             padding: 15px 0;
         }
+
         .logo-text {
             font-weight: 800;
             letter-spacing: -0.5px;
             text-transform: uppercase;
         }
+
         .special-ok-button {
             background: rgba(255, 255, 255, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.4);
@@ -413,17 +417,18 @@
             align-items: center;
             gap: 8px;
         }
+
         .special-ok-button:hover {
             background: white;
             color: #259a38 !important;
         }
+
         .customer-box {
             background: rgba(0, 0, 0, 0.15);
             border-radius: 10px;
             padding: 10px 15px;
             border-left: 4px solid #fff;
         }
-    </style>
     </style>
 </head>
 <body>
@@ -448,7 +453,8 @@
                         <div class="d-flex align-items-center">
                             <div class="text-left">
                                 <h2 class="logo-text text-white m-0" style="font-size: 1.5rem;">Sipariş Ekranı</h2>
-                                <small class="text-white-50"><i class="fas fa-utensils"></i> {{ Auth::user()->restaurant_name }}</small>
+                                <small class="text-white-50"><i
+                                        class="fas fa-utensils"></i> {{ Auth::user()->restaurant_name }}</small>
                             </div>
                         </div>
                     </div>
@@ -459,7 +465,8 @@
                                 <i class="fas fa-home"></i> <span>Anasayfa</span>
                             </a>
                             <span class="mx-1"></span>
-                            <a class="special-ok-button" data-toggle="modal" data-target="#musteriAta" style="cursor: pointer;">
+                            <a class="special-ok-button" data-toggle="modal" data-target="#musteriAta"
+                               style="cursor: pointer;">
                                 <i class="fas fa-user-plus"></i> <span>Müşteri Seçiniz</span>
                             </a>
                         </div>
@@ -467,7 +474,8 @@
 
                     <div class="col-md-3 col-12">
                         <div class="customer-box text-white">
-                            <small class="d-block text-white-50" style="font-size: 0.7rem; text-transform: uppercase;">Aktif Müşteri</small>
+                            <small class="d-block text-white-50" style="font-size: 0.7rem; text-transform: uppercase;">Aktif
+                                Müşteri</small>
                             <div class="brand-wrap customer fw-bold">
                                 <i class="fas fa-user-circle"></i> Seçili Müşteri Bulunmuyor
                             </div>
@@ -558,19 +566,24 @@
 
                                         <!-- Kupon Seçimi Butonu -->
                                         @if(count($coupons))
-                                            <button type="button" class="px-2 special-ok-button-small text-white mt-2 float-end float-right" data-bs-toggle="modal" data-bs-target="#couponModal">
-                                               + Kuponlar
+                                            <button type="button"
+                                                    class="px-2 special-ok-button-small text-white mt-2 float-end float-right"
+                                                    data-bs-toggle="modal" data-bs-target="#couponModal">
+                                                + Kuponlar
                                             </button>
 
                                             <!-- Kupon Modal -->
-                                            <div class="modal fade" id="couponModal" tabindex="-1" aria-labelledby="couponModalLabel" aria-hidden="true">
+                                            <div class="modal fade" id="couponModal" tabindex="-1"
+                                                 aria-labelledby="couponModalLabel" aria-hidden="true">
                                                 <div class="modal-dialog modal-dialog-centered" role="document">
                                                     <div class="modal-content" style="border-radius: 10px;">
                                                         <div class="modal-header">
                                                             <h5 class="modal-title" id="couponModalLabel">Kuponlar</h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                                                            <button type="button" class="btn-close"
+                                                                    data-bs-dismiss="modal" aria-label="Kapat"></button>
                                                         </div>
-                                                        <div class="modal-body" style="max-height: 500px; overflow-y: auto;">
+                                                        <div class="modal-body"
+                                                             style="max-height: 500px; overflow-y: auto;">
                                                             <div class="coupon-list p-3">
                                                                 @foreach($coupons as $coupon)
                                                                     <div class="coupon-item"
@@ -580,7 +593,9 @@
                                                                          onclick="selectCoupon(this); $('#couponModal').modal('hide');"
                                                                          style="cursor: pointer; padding: 10px; border-bottom: 1px solid #eee;">
                                                                         <strong>{{ $coupon->name }}</strong><br>
-                                                                        Toplam Tutar: {{ number_format($coupon->total_seller_amount, 2, ',', '.') }} ₺
+                                                                        Toplam
+                                                                        Tutar: {{ number_format($coupon->total_seller_amount, 2, ',', '.') }}
+                                                                        ₺
                                                                     </div>
                                                                 @endforeach
                                                             </div>
@@ -589,7 +604,6 @@
                                                 </div>
                                             </div>
                                         @endif
-
                                     </div>
                                     <hr>
 
@@ -668,40 +682,47 @@
                                         </div>
                                         <div class="row" style="margin:0px;">
                                             <div class="col-md-4 p-2">
-                                                <div class="paymentRol" onclick="PaymentMethodSave('Kapıda Nakit ile Ödeme', this)">
+                                                <div class="paymentRol"
+                                                     onclick="PaymentMethodSave('Kapıda Nakit ile Ödeme', this)">
                                                     <i class="fas fa-lira-sign"></i><br> Nakit
                                                 </div>
                                             </div>
                                             <div class="col-md-4 p-2">
-                                                <div class="paymentRol" onclick="PaymentMethodSave('Kapıda Ticket ile Ödeme', this)">
+                                                <div class="paymentRol"
+                                                     onclick="PaymentMethodSave('Kapıda Ticket ile Ödeme', this)">
                                                     <i class="fas fa-credit-card"></i><br> Ticket
                                                 </div>
                                             </div>
                                             <div class="col-md-4 p-2">
-                                                <div class="paymentRol" onclick="PaymentMethodSave('Kapıda Sodexo ile Ödeme', this)">
+                                                <div class="paymentRol"
+                                                     onclick="PaymentMethodSave('Kapıda Sodexo ile Ödeme', this)">
                                                     <i class="fas fa-credit-card"></i><br> Sodexo
                                                 </div>
                                             </div>
                                             <div class="col-md-4 p-2">
-                                                <div class="paymentRol" onclick="PaymentMethodSave('Kapıda Pluxee ile Ödeme', this)">
+                                                <div class="paymentRol"
+                                                     onclick="PaymentMethodSave('Kapıda Pluxee ile Ödeme', this)">
                                                     <i class="fas fa-credit-card"></i><br> Pluxee
                                                 </div>
                                             </div>
                                             <div class="col-md-4 p-2">
-                                                <div class="paymentRol" onclick="PaymentMethodSave('Kapıda Multinet ile Ödeme', this)">
+                                                <div class="paymentRol"
+                                                     onclick="PaymentMethodSave('Kapıda Multinet ile Ödeme', this)">
                                                     <i class="fas fa-credit-card"></i><br> Multinet
                                                 </div>
                                             </div>
                                             <div class="col-md-4 p-2">
-                                                <div class="paymentRol" onclick="PaymentMethodSave('Kapıda Kredi Kartı ile Ödeme', this)">
+                                                <div class="paymentRol"
+                                                     onclick="PaymentMethodSave('Kapıda Kredi Kartı ile Ödeme', this)">
                                                     <i class="fas fa-credit-card"></i><br> Kredi Kartı
                                                 </div>
                                             </div>
 
                                             <div class="col-md-12 p-2">
-                                                <div class="mx-auto text-white kayit d-flex justify-content-center align-items-center"
-                                                     style="cursor: pointer; background:#28a745; padding:15px; border-radius:5px;"
-                                                     onclick="CreateOrder()">
+                                                <div
+                                                    class="mx-auto text-white kayit d-flex justify-content-center align-items-center"
+                                                    style="cursor: pointer; background:#28a745; padding:15px; border-radius:5px;"
+                                                    onclick="CreateOrder()">
                                                     <i class="fas fa-check me-2"></i> Sipariş Ekle
                                                 </div>
                                             </div>
@@ -730,7 +751,7 @@
                                 <select class="js-example-basic-single" onchange="CourierSet(event)"
                                         style="width: 100%;">
                                     <option value="0">Kurye Ata</option>
-                                    <option value="-1">{{env('APP_NAME')}} Kuryesi</option>
+                                    <option value="-1">{{config('site.name')}} Kuryesi</option>
                                     @foreach($courierses as $courier)
                                         <option value="{{$courier->id}}">{{$courier->name}}</option>
                                     @endforeach
@@ -782,7 +803,7 @@
 
                     <!-- Modal Footer -->
                     <div class="modal-footer d-flex justify-content-between">
-                        <a href="/restaurant/customers/new" class="special-ok-button" >
+                        <a href="/restaurant/customers/new" class="special-ok-button">
                             <i class="fas fa-plus"></i> Müşteri Ekle
                         </a>
                         <button type="button" class="special-button" data-dismiss="modal">Tamam</button>
@@ -837,32 +858,44 @@
 
                                             <div class="d-flex align-items-center mb-2">
                                                 <span class="me-2 text-black">Mah.</span>
-                                                <input type="text" name="mahalle" class="flex-grow-1 border-0 border-bottom bg-transparent" placeholder="Örn: Ankara" required>
+                                                <input type="text" name="mahalle"
+                                                       class="flex-grow-1 border-0 border-bottom bg-transparent"
+                                                       placeholder="Örn: Ankara" required>
                                             </div>
 
                                             <div class="d-flex align-items-center mb-2">
                                                 <span class="me-2 text-black">Sok/Cadde</span>
-                                                <input type="text" name="sokak_cadde" class="flex-grow-1 border-0 border-bottom bg-transparent" placeholder="Örn: 5021" required>
+                                                <input type="text" name="sokak_cadde"
+                                                       class="flex-grow-1 border-0 border-bottom bg-transparent"
+                                                       placeholder="Örn: 5021" required>
                                             </div>
 
                                             <div class="d-flex align-items-center mb-2">
                                                 <span class="me-2 text-black">Apt Adı.</span>
-                                                <input type="text" name="bina_no" class="flex-grow-1 border-0 border-bottom bg-transparent" placeholder="Örn: Deniz Apt." required>
+                                                <input type="text" name="bina_no"
+                                                       class="flex-grow-1 border-0 border-bottom bg-transparent"
+                                                       placeholder="Örn: Deniz Apt." required>
                                             </div>
 
                                             <div class="d-flex align-items-center mb-2">
                                                 <span class="me-2 text-black">Kat:</span>
-                                                <input type="text" name="kat" class="flex-grow-1 border-0 border-bottom bg-transparent" placeholder="Örn: 3" required>
+                                                <input type="text" name="kat"
+                                                       class="flex-grow-1 border-0 border-bottom bg-transparent"
+                                                       placeholder="Örn: 3" required>
                                             </div>
 
                                             <div class="d-flex align-items-center mb-2">
                                                 <span class="me-2 text-black">Daire:</span>
-                                                <input type="text" name="daire_no" class="flex-grow-1 border-0 border-bottom bg-transparent" placeholder="Örn: 5" required>
+                                                <input type="text" name="daire_no"
+                                                       class="flex-grow-1 border-0 border-bottom bg-transparent"
+                                                       placeholder="Örn: 5" required>
                                             </div>
 
                                             <div class="d-flex align-items-center mb-2">
                                                 <span class="me-2 text-black">Adres Tarifi (opsiyonel):</span>
-                                                <input type="text" name="adress_tarifi" class="flex-grow-1 border-0 border-bottom bg-transparent" placeholder="Örn: 5" required>
+                                                <input type="text" name="adress_tarifi"
+                                                       class="flex-grow-1 border-0 border-bottom bg-transparent"
+                                                       placeholder="Örn: 5" required>
                                             </div>
 
                                         </div>
@@ -939,7 +972,7 @@
 
     $('form[name="formPos"]').on('submit', function (e) {
         e.preventDefault(); // Sayfa yenilenmesin
-       CreateOrder(); // Siparişi oluştur
+        CreateOrder(); // Siparişi oluştur
     });
 
     $(document).ready(function () {
@@ -1154,62 +1187,21 @@
         });
     }
 
-    function CreateCustomer() {
-        const form = document.getElementById('customerForm');
-
-        // Form validation kontrolü
-        if (!form.checkValidity()) {
-            form.reportValidity(); // Eksik alanları gösterir
-            return; // AJAX çalışmaz
-        }
-
-
-        // AJAX işlemi
-        $.ajax({
-            type: 'POST',
-            url: '/restaurant/orders/customeradd' + '?_token=' + '{{ csrf_token() }}',
-            data: $('#customerForm').serialize(),
-            success: function (response) {
-                $('.customer').html(response.customer);
-                $('#customer_id').val(response.customerid);
-
-                if(response.message){
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Başarılı',
-                        text: response.message,
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
-                }
-
-                // Modal kapat ve formu sıfırla
-                $('#yeniMusteri').modal('hide');
-                form.reset();
-
-                $('#customerSelect').select2({
-                    dropdownParent: $('#musteriAta'),
-                    width: '100%',
-                    placeholder: 'Müşteri Seçiniz'
-                });
-
-                loadCustomers();
-            },
-            error: function (xhr, status, error) {
-                console.error(xhr.responseText);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Hata',
-                    text: 'Müşteri eklenirken bir hata oluştu!',
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-            }
-        });
-    }
-
     function CreateOrder() {
-        this.disabled = true;
+        // 1. Butonu seç ve devre dışı bırak, içeriği değiştir
+        const btn = $('.kayit');
+        const originalContent = btn.html(); // Eski içeriği sakla
+
+        btn.css('pointer-events', 'none'); // Tıklamayı engelle
+        btn.addClass('opacity-50'); // Görsel olarak pasif yap
+        btn.html('<i class="fas fa-spinner fa-spin me-2"></i> Sipariş Oluşturuluyor...');
+
+        // Fonksiyonun sonundaki AJAX ve validation kısımlarında butonu geri açmamız gerekecek
+        function resetBtn() {
+            btn.css('pointer-events', 'auto');
+            btn.removeClass('opacity-50');
+            btn.html(originalContent);
+        }
 
         var payment_control = $('#payment_control').val();
         var customer_id = $('#customer_id').val();
@@ -1218,195 +1210,72 @@
         var total = $('#totalPrice').val();
 
         let products = [];
-
         $('.item').each(function () {
             products.push({
                 product_id: $(this).find('input[name="product_id"]').val(),
                 quantity: $(this).find('input[name="quantity"]').val()
             })
-        })
+        });
 
-        console.log({payment_control: payment_control})
-        console.log({products: products})
-
-        if (payment_control !== 0) {
-            if (customer_id > 0) {
-                if (products.length > 0) {
-
-                    //İşlemleriburada yapacağız
-                    $.ajax({
-                        type: 'POST',
-                        url: '/restaurant/orders/addOrder' + '?_token=' + '{{ csrf_token() }}',
-                        data: {
-                            customer_id: customer_id,
-                            payment_method: payment_control,
-                            courier_id: courier_id,
-                            coupon_id: coupon_id,
-                            products: products,
-                            amount: total
-                        },
-                        success: function (response) {
-                            console.log({sgf: response})
-
-                            if (response.status === "BalanceError") {
-                                console.log('balance girdi')
-                                Swal.fire({
-                                    title: response.message,
-                                    text: 'Üzgünüz, Kontör Bakiyeniz Yetersiz Olduğundan Ürün Eklenemiyor !',
-                                    icon: 'warning',
-                                    confirmButtonText: 'Tamam',
-                                    background: '#ffffff', // senin rengin
-                                    color: '#fff',
-                                    iconColor: '#ec691e', // modern yeşil
-                                    confirmButtonColor: '#ec691e', // modern yeşil düğme
-                                    customClass: {
-                                        popup: 'rounded-xl shadow-2xl',
-                                        confirmButton: 'px-6 py-3 text-lg font-semibold',
-                                    },
-                                    showClass: {
-                                        popup: 'animate__animated animate__fadeInDown',
-                                    },
-                                    hideClass: {
-                                        popup: 'animate__animated animate__fadeOutUp',
-                                    }
-                                })
-                            }
-
-                            if (response.status === 'ERR') {
-                                Swal.fire({
-                                    title: response.message,
-                                    text: '',
-                                    icon: 'warning',
-                                    confirmButtonText: 'Tamam',
-                                    background: '#ffffff', // senin rengin
-                                    color: '#fff',
-                                    iconColor: '#ec691e', // modern yeşil
-                                    confirmButtonColor: '#ec691e', // modern yeşil düğme
-                                    customClass: {
-                                        popup: 'rounded-xl shadow-2xl',
-                                        confirmButton: 'px-6 py-3 text-lg font-semibold',
-                                    },
-                                    showClass: {
-                                        popup: 'animate__animated animate__fadeInDown',
-                                    },
-                                    hideClass: {
-                                        popup: 'animate__animated animate__fadeOutUp',
-                                    }
-                                })
-                            }
-
-                            if (response.status === "OK") {
-                                removePos(1)
-
-                                toastr.success("1 Yeni Sipariş Eklendi ", "Sipariş Başarıyla Eklendi", {
-                                    positionClass: "toast-top-right",
-                                    closeButton: true,
-                                    progressBar: true,
-                                    timeOut: 1500
-                                });
-                               /* $.ajax({
-                                    type: "POST",
-                                    url: `/restaurant/order/${order}/print`,
-                                    data: {
-                                        _token: '{{ csrf_token() }}',
-                                        html: response.printed
-                                    },
-                                    success: function(res) {
-                                        if(res.status === "OK") {
-                                            console.log("Adisyon yazıcıya gönderildi");
-                                        } else {
-                                            console.error(res.message);
-                                        }
-                                    }
-                                });
-*/
-
-                            }
-                        },
-                        error: function (response) {
-                            console.log({response: response})
-                        }
-                    });
-
-                } else {
-                    Swal.fire({
-                        title: 'Sepetinizde ürün Bulunmuyor!!',
-                        text: '',
-                        icon: 'warning',
-                        confirmButtonText: 'Tamam',
-                        background: '#ffffff', // senin rengin
-                        color: '#fff',
-                        iconColor: '#ec691e', // modern yeşil
-                        confirmButtonColor: '#ec691e', // modern yeşil düğme
-                        customClass: {
-                            popup: 'rounded-xl shadow-2xl',
-                            confirmButton: 'px-6 py-3 text-lg font-semibold',
-                        },
-                        showClass: {
-                            popup: 'animate__animated animate__fadeInDown',
-                        },
-                        hideClass: {
-                            popup: 'animate__animated animate__fadeOutUp',
-                        }
-                    })
-                }
-            } else {
-                Swal.fire({
-                    title: 'Lütfen Bir Müşteri Seçiniz',
-                    text: '',
-                    icon: 'warning',
-                    confirmButtonText: 'Tamam',
-                    background: '#ffffff', // senin rengin
-                    color: '#fff',
-                    iconColor: '#ec691e', // modern yeşil
-                    confirmButtonColor: '#ec691e', // modern yeşil düğme
-                    customClass: {
-                        popup: 'rounded-xl shadow-2xl',
-                        confirmButton: 'px-6 py-3 text-lg font-semibold',
-                    },
-                    showClass: {
-                        popup: 'animate__animated animate__fadeInDown',
-                    },
-                    hideClass: {
-                        popup: 'animate__animated animate__fadeOutUp',
-                    }
-                })
-                $('#musteriAta').modal('show');
-            }
-        } else {
-            Swal.fire({
-                title: 'Lütfen Bir Ödeme Methodu Seçiniz',
-                text: '',
-                icon: 'warning',
-                confirmButtonText: 'Tamam',
-                background: '#ffffff', // senin rengin
-                color: '#fff',
-                iconColor: '#ec691e', // modern yeşil
-                confirmButtonColor: '#ec691e', // modern yeşil düğme
-                customClass: {
-                    popup: 'rounded-xl shadow-2xl',
-                    confirmButton: 'px-6 py-3 text-lg font-semibold',
-                },
-                showClass: {
-                    popup: 'animate__animated animate__fadeInDown',
-                },
-                hideClass: {
-                    popup: 'animate__animated animate__fadeOutUp',
-                }
-            })
+        // Doğrulama Kontrolleri
+        if (payment_control == 0) {
+            Swal.fire({ title: 'Lütfen Bir Ödeme Methodu Seçiniz', icon: 'warning', confirmButtonText: 'Tamam' });
+            resetBtn();
+            return;
         }
+        if (!(customer_id > 0)) {
+            Swal.fire({ title: 'Lütfen Bir Müşteri Seçiniz', icon: 'warning', confirmButtonText: 'Tamam' });
+            $('#musteriAta').modal('show');
+            resetBtn();
+            return;
+        }
+        if (products.length === 0) {
+            Swal.fire({ title: 'Sepetinizde ürün Bulunmuyor!!', icon: 'warning', confirmButtonText: 'Tamam' });
+            resetBtn();
+            return;
+        }
+
+        // AJAX İşlemi
+        $.ajax({
+            type: 'POST',
+            url: '/restaurant/orders/addOrder' + '?_token=' + '{{ csrf_token() }}',
+            data: {
+                customer_id: customer_id,
+                payment_method: payment_control,
+                courier_id: courier_id,
+                coupon_id: coupon_id,
+                products: products,
+                amount: total
+            },
+            success: function (response) {
+                if (response.status === "OK") {
+                    removePos(1);
+                    toastr.success("Sipariş Başarıyla Eklendi");
+                    // Başarılı olduğunda buton genellikle sayfadan temizlenir veya resetlenir
+                    resetBtn();
+                } else {
+                    // Hata mesajları (BalanceError veya ERR)
+                    Swal.fire({ title: response.message, icon: 'warning' });
+                    resetBtn();
+                }
+            },
+            error: function (response) {
+                console.log({response: response});
+                resetBtn(); // Sunucu hatasında butonu geri aç
+            }
+        });
     }
 
     function loadCustomers() {
         $.ajax({
             type: 'GET',
             url: '/restaurant/get-customers', // Bu endpoint'i oluşturmanız gerekecek
-            success: function(data) {
-                console.log({data:data})
+            success: function (data) {
+                console.log({data: data})
                 $('#customerSelect').empty().append('<option value="0">🔍 Müşteri Seçiniz...</option>');
 
                 if (data.customers && data.customers.length > 0) {
-                    $.each(data.customers, function(index, customer) {
+                    $.each(data.customers, function (index, customer) {
                         $('#customerSelect').append(
                             $('<option>', {
                                 value: customer.id,
@@ -1431,7 +1300,7 @@
                     placeholder: 'Müşteri Seçiniz'
                 });
             },
-            error: function() {
+            error: function () {
                 console.log("Müşteri listesi yüklenirken hata oluştu.");
                 $('#customerSelect').empty().append('<option value="0">🔍 Müşteri Seçiniz...</option>');
 

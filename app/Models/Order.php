@@ -8,8 +8,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Order extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'platform',
         'restaurant_id',
@@ -19,7 +17,7 @@ class Order extends Model
         'full_name',
         'phone',
         'pid',
-        'status_request_count',
+        'entegra_status', // entegra için kaç istek atılmışı takip eder
         'payment_method',
         'items',
         'address',

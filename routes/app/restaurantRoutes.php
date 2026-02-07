@@ -10,8 +10,6 @@ Route::group(['prefix' => 'restaurant'], function () {
         Route::post('register', [App\Http\Controllers\RestaurantController::class, 'register'])->name('restaurant.create');
     });
 
-    Route::get('/order/{orderId}/print', [App\Http\Controllers\OrderController::class, 'print']);
-
     Route::group(['middleware' => ['restaurant.auth']], function () {
         Route::get('/printed/{orderId}', [App\Http\Controllers\OrderController::class, 'printed']);
         Route::get('/orders/ajax', [App\Http\Controllers\RestaurantController::class, 'ajax'])->name('restaurant.orders.ajax');
@@ -89,7 +87,6 @@ Route::group(['prefix' => 'restaurant'], function () {
         Route::post('/orders/message2', [App\Http\Controllers\OrderController::class, 'message2']);
         Route::get('/orders/new', [App\Http\Controllers\OrderController::class, 'new'])->name('restaurant.orders.new');
         Route::get('/orders/removePOS', [App\Http\Controllers\OrderController::class, 'removePOS'])->name('restaurant.removePOS');
-        Route::post('/updateCourierStatus', [App\Http\Controllers\OrderController::class, 'updateCourierStatus'])->name('updateCourierStatus');
 
         Route::get('/orders/{link}', [App\Http\Controllers\OrderController::class, 'index'])->name('restaurant.orders');
         Route::get('/orders/sendCourier/{orderID}/{courierID}', [App\Http\Controllers\OrderController::class, 'sendCourier'])->name('restaurant.orders.sendCourier');
@@ -99,7 +96,6 @@ Route::group(['prefix' => 'restaurant'], function () {
         Route::get('/orders/updatePlusPOS/{id}', [App\Http\Controllers\OrderController::class, 'updatePlusPOS'])->name('restaurant.updatePlusPOS');
         Route::get('/orders/updateMinusPOS/{id}/{qty}', [App\Http\Controllers\OrderController::class, 'updateMinusPOS'])->name('restaurant.updateMinusPOS');
         Route::get('/orders/customerpos/{id}', [App\Http\Controllers\OrderController::class, 'customerpos'])->name('restaurant.customerpos');
-        Route::post('/orders/customeradd', [App\Http\Controllers\OrderController::class, 'customeradd'])->name('restaurant.customers.customeradd');
         Route::post('/orders/addOrder', [App\Http\Controllers\OrderController::class, 'addOrder']);
 
         Route::get('/deletedOrders', [App\Http\Controllers\SiparislerController::class, 'deletedOrders'])->name('restaurant.deletedOrders');
@@ -111,9 +107,7 @@ Route::group(['prefix' => 'restaurant'], function () {
 
         /* Menus */
         Route::get('/menus', [App\Http\Controllers\MenuController::class, 'index'])->name('restaurant.menus');
-        Route::get('/menus/new', [App\Http\Controllers\MenuController::class, 'new'])->name('restaurant.menus.new');
         Route::get('/menus/edit/{id}', [App\Http\Controllers\MenuController::class, 'edit'])->name('restaurant.menus.edit');
-        Route::get('/menus/delete/{id}', [App\Http\Controllers\MenuController::class, 'delete'])->name('restaurant.menus.delete');
         Route::post('/menus/create', [App\Http\Controllers\MenuController::class, 'create'])->name('restaurant.menus.create');
         Route::post('/menus/update', [App\Http\Controllers\MenuController::class, 'update'])->name('restaurant.menus.update');
 
@@ -128,15 +122,12 @@ Route::group(['prefix' => 'restaurant'], function () {
         Route::get('/check-orders', [App\Http\Controllers\OrderController::class, 'checkOrders']);
 
         Route::post('/telefonsiparis/updateOrderStatus', [App\Http\Controllers\OrderController::class, 'updateOrderStatus']);
-        Route::post('/trendyol/updateOrderStatus', [App\Http\Controllers\TrendyolYemekController::class, 'updateOrderStatus']);
-        Route::post('/yemeksepeti/updateOrderStatus', [App\Http\Controllers\YemekSepetiController::class, 'updateOrder']);
-        Route::post('/getir/updateOrderStatus', [App\Http\Controllers\GetirYemekController::class, 'updateOrder']);
-        Route::post('/adisyo/updateOrderStatus', [App\Http\Controllers\AdisyoController::class, 'updateOrder']);
+        Route::post('/getir/updateOrderStatus', [App\Http\Controllers\EntegraController::class, 'updateOrderStatus']);
+        Route::post('/yemeksepeti/updateOrderStatus', [App\Http\Controllers\EntegraController::class, 'updateOrderStatus']);
+        Route::post('/migros/updateOrderStatus', [App\Http\Controllers\EntegraController::class, 'updateOrderStatus']);
+        Route::post('/trendyol/updateOrderStatus', [App\Http\Controllers\EntegraController::class, 'updateOrderStatus']);
         Route::post('/gpsyemek/updateOrderStatus', [App\Http\Controllers\GpsYemekController::class, 'updateOrder']);
 
         Route::get('/printed/{orderId}', [App\Http\Controllers\OrderController::class, 'printed']);
-        //Get Adisyo Orders
-        //Route::get('/getAdisyoOrders', [App\Http\Controllers\AdisyoController::class, 'GetOrders'])->name('getOrders');
-        Route::get('/getAdisyoOrders', [App\Http\Controllers\AdisyoController::class, 'index'])->name('getOrders');
     });
 });

@@ -18,7 +18,7 @@ class RestaurantFactory extends Factory
 
     public function definition()
     {
-      if (env('TEST_MODE')){
+      if (config('site.test_mode')){
           return [
               'admin_id' => 1,
               'restaurant_name' => 'Restaurant',

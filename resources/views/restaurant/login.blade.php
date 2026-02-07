@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{env('APP_NAME')}} - Restaurant Girişi</title>
+    <title>{{config('site.name')}} - Restaurant Girişi</title>
 
     <link rel="shortcut icon" type="image/png" href="{{config('site.logo')}}">
     <link href="{{asset('theme/login/css/bootstrap.min.css')}}" rel="stylesheet">
@@ -120,7 +120,7 @@
         restaurant: "{{ route('restaurant.auth') }}"
     };
 
-    const testMode = {{ env('TEST_MODE') ? 'true' : 'false' }};
+    const testMode = {{config('site.test_mode') ? 'true' : 'false' }};
 
     function setTestCredentials(type) {
         if (!testMode) return;

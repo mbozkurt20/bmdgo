@@ -61,7 +61,7 @@ class OrderController extends Controller
     {
         $order = Order::find($orderId);
 
-        if ($courierId == -1){
+        if ($courierId == -1) {
             $order->update([
                 'courier_id' => null,
                 'assigned_at' => null
@@ -73,7 +73,7 @@ class OrderController extends Controller
                 'success' => true,
                 'message' => 'Siparişin kuryesi başarıyla kaldırıldı.'
             ]);
-        }else {
+        } else {
             $courier = Courier::find($courierId);
 
             if (!$order || !$courier) {
@@ -128,9 +128,9 @@ class OrderController extends Controller
             $restaurant = Restaurant::find($order->restaurant_id);
 
             // Bildirimler
-            if ($courier->fcm_token){
+            if ($courier->fcm_token) {
                 $ser = new PushNotificationService();
-                $ser->sendNotification($courier->fcm_token, $restaurant->restaurant_name.' Restorandan Yeni Sipariş Atandı', 'Sipariş Takip Kodu:'. $order->tracking_id);
+                $ser->sendNotification($courier->fcm_token, $restaurant->restaurant_name . ' Restorandan Yeni Sipariş Atandı', 'Sipariş Takip Kodu:' . $order->tracking_id);
             }
 
             return response()->json([
@@ -348,8 +348,7 @@ class OrderController extends Controller
             $restaurantId = $restaurant->id;
             $city = City::find(Admin::find($restaurant->admin_id)->city_id);
 
-
-            $customer = Customer::where('phone', $request->phone)->where('restaurant_id',$restaurantId)->first();
+            $customer = Customer::where('phone', $request->phone)->where('restaurant_id', $restaurantId)->first();
 
             if (!$customer) {
                 $customer = new Customer();
@@ -381,7 +380,7 @@ class OrderController extends Controller
                 $address->district_id = $request->ilce;
                 $address->adres_tarifi = $request->adress_tarifi;
                 $address->latitude = $request->latitude;
-                $address->longitude =$request->longitude;
+                $address->longitude = $request->longitude;
                 $address->daire_no = $request->daire_no;
                 $address->mahalle = $request->mahalle;
                 $address->save();
@@ -411,7 +410,7 @@ class OrderController extends Controller
                 'tracking_id' => "POS-" . rand(9, 99999),
                 'full_name' => $request->full_name,
                 'phone' => $request->phone,
-                'address' =>  $request->adress_tarifi,
+                'address' => $request->adress_tarifi,
                 'payment_method' => $request->payment_method,
                 'sub_amount' => $request->amount,
                 'discount' => 0.00,
@@ -499,59 +498,6 @@ class OrderController extends Controller
         }
 
         return response()->json(['customer' => $customer]);
-    }
-
-    public function customeradd(Request $request)
-    {
-        $testMode = env('TEST_MODE');
-
-        if ($testMode) {
-            if (Customer::count() > env('TEST_MODE_LIMIT')) {
-                return redirect()->back()->with('test', 'Test Modu: Üzgünüz, En Fazla ' . env('TEST_MODE_LIMIT') . ' Kayıt Ekleyebilirsiniz');
-            }
-        }
-
-        $data = $request->all();
-
-        $city = City::find(Admin::find(auth()->user()->admin_id)->city_id);
-        $create = Customer::where('phone', $data['phone'])->where('restaurant_id', Auth::user()->id)->first();
-
-        if (!$create) {
-            $create = new Customer();
-            $create->restaurant_id = Auth::user()->id;
-            $create->name = $data['name'];
-            $create->phone = $data['phone'];
-            $create->mobile = $data['mobile'] ?? '';
-            $create->save();
-        }
-
-        $address = $request->mahalle . ' mah., ' .
-            $request->sokak_cadde . ', '.
-            District::find($request->ilce)->name . '/' . $city->name . ', Türkiye';
-
-        $location = GeoLocation::getLatLong($address);
-
-        if (isset($location['error'])) {
-            return response()->json(['message' => 'Konumu doğru girip tekrar deneyiniz.']);
-        }
-
-        $adreses = new CustomerAddress();
-        $adreses->restaurant_id = Auth::user()->id;
-        $adreses->customer_id = $create->id;
-        $adreses->name = $request->adres_name;
-        $adreses->sokak_cadde = $request->sokak_cadde;
-        $adreses->bina_no = $request->bina_no;
-        $adreses->kat = $request->kat;
-        $adreses->city_id = $city->id;
-        $adreses->district_id = $request->ilce;
-        $adreses->latitude = $location['lat'];
-        $adreses->longitude = $location['lon'];
-        $adreses->daire_no = $request->daire_no;
-        $adreses->mahalle = $request->mahalle;
-        $adreses->adres_tarifi = $request->adres_tarifi;
-        $adreses->save();
-
-        return response()->json(['customer' => $create, 'customerid' => $create->id, 'message' => 'Müşteri Başarıyla Eklendi']);
     }
 
     public function addOrder(Request $request)
@@ -667,28 +613,44 @@ class OrderController extends Controller
             return response()->json(['error' => 'Order not found'], 404);
         }
 
-        if ($action == OrderStatus::UNSUPPLIED) {
-            $courier = Order::where('tracking_id', $trackingId)->where('courier_id','!=',-1)->with('courier')->first();
-            if ($courier) {
-                $courier->status = CourierStatus::active;
-                $courier->update();
+        switch ($action) {
+            case OrderStatus::UNSUPPLIED:
+                $courier = Order::where('tracking_id', $trackingId)->where('courier_id', '!=', -1)->with('courier')->first();
+                if ($courier) {
+                    $courier->status = CourierStatus::active;
+                    $courier->update();
 
-                $order->courier_id = -1;
-                $order->update();
+                    $order->courier_id = -1;
+                    $order->update();
 
-                $courierOrder = CourierOrder::where('order_id',$order->id)->where('courier_id',$courier->id)->first();
+                    $courierOrder = CourierOrder::where('order_id', $order->id)->where('courier_id', $courier->id)->first();
+                    if ($courierOrder) {
+                        $courierOrder->delete();
+                    }
+
+                    if (OrdersHelper::getOrderSystem(3)) {
+                        NotificationHelper::add([
+                            'title' => 'Restaurant Paketi İptal Etti',
+                            'description' => $order->tracking_id . ' takip numaralı paket ' . $courier->name . '  Restaurant tarafından iptal edildi.',
+                            'url' => route('admin.balance')
+                        ]);
+                    }
+                }
+                break;
+
+            case OrderStatus::DELIVERED:
+                // Sipariş teslim edildiğinde kuryenin durumu güncelleniyor
+                $courierOrder = CourierOrder::where('order_id', $order->id)->first();
                 if ($courierOrder) {
-                    $courierOrder->delete();
+                    $courier = Courier::find($courierOrder->courier_id);
+                    if ($courier) {
+                        // Kuryenin durumunu güncelle
+                        $courier->status = CourierStatus::active;;
+                        $courier->update();
+                        Log::info('Kurye durumu güncellendi', ['courier_id' => $courier->id]);
+                    }
                 }
-
-                if (OrdersHelper::getOrderSystem(3)) {
-                    NotificationHelper::add([
-                        'title' => 'Restaurant Paketi İptal Etti',
-                        'description' => $order->tracking_id . ' takip numaralı paket ' . $courier->name . '  Restaurant tarafından iptal edildi.',
-                        'url' => route('admin.balance')
-                    ]);
-                }
-            }
+                break;
         }
 
         $order->status = $action;
@@ -709,7 +671,7 @@ class OrderController extends Controller
         $printers = Printer::where('payable_type', 'restaurant')->where('payable_id', $order->restaurant_id)->pluck('name')->toArray();
 
         if (count($printers) > 0) {
-            OrdersHelper::nowPrint($order->id,$printers);
+            OrdersHelper::nowPrint($order->id, $printers);
         }
     }
 

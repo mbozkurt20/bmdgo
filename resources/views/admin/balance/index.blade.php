@@ -22,13 +22,13 @@
 
                     <p class="text-danger">
                         <strong>Dikkat:: Kontör bakiyeniz yetersiz olması durumunda siparişleriniz eklenmeyecektir, bu
-                            durumdan {{env('APP_NAME')}} olarak sorumluluk almadığımızı belirtmek isteriz.</strong>
+                            durumdan {{config('site.name')}} olarak sorumluluk almadığımızı belirtmek isteriz.</strong>
                     </p>
 
                    {{--  <p class="text-success">
                         <strong> Satın Alım:: </strong> Paketlerimizi
                         <a class="text-primary" style="text-decoration: underline"
-                           href="https://gpskurye.com/fiyat/">{{env('APP_NAME')}} </a>
+                           href="https://gpskurye.com/fiyat/">{{config('site.name')}} </a>
                         adresimizden inceleyebilirsiniz.
                     </p> --}}
                 </div>

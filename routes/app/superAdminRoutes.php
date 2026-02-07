@@ -7,6 +7,9 @@ use App\Http\Controllers\SuperAdmin\Report\ReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'superadmin'], function () {
+    Route::get('/partner', [App\Http\Controllers\HomeController::class, 'dealer'])->name('dealer');
+    Route::post('/new-partner', [App\Http\Controllers\HomeController::class, 'createDealerRequest'])->name('createDealerRequest');
+
     Route::view('login', "superadmin.login")->name('superadmin.login');
     Route::post('login', [SuperAdmin::class, 'login'])->name('superadmin.auth');
     Route::post('logout', [SuperAdmin::class, 'logout'])->name('superadmin.logout');
@@ -36,13 +39,9 @@ Route::group(['prefix' => 'superadmin'], function () {
         });
 
         Route::post('/telefonsiparis/updateOrderStatus', [App\Http\Controllers\OrderController::class, 'updateOrderStatus']);
-        Route::get('/trendyol/get-orders', [App\Http\Controllers\TrendyolYemekController::class, 'index']);
-        Route::post('/trendyol/updateOrderStatus', [App\Http\Controllers\TrendyolYemekController::class, 'orderStatus']);
         Route::post('/yemeksepeti/updateOrderStatus', [App\Http\Controllers\OrderController::class, 'updateOrderStatus']);
         Route::post('/getir/updateOrderStatus', [App\Http\Controllers\OrderController::class, 'updateOrderStatus']);
-        Route::post('/adisyo/updateOrderStatus', [App\Http\Controllers\AdisyoController::class, 'updateOrder']);
         Route::post('/orders/message', [App\Http\Controllers\OrderController::class, 'message']);
-
 
         Route::prefix('admin')->group(function () {
             Route::get('/', [\App\Http\Controllers\SuperAdmin\AdminController::class, 'admin'])->name('superadmin.admin');

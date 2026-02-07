@@ -46,13 +46,16 @@
                             <td>
                                 @switch($order->platform)
                                     @case('yemeksepeti')
-                                        <img src="{{ asset('theme/images/yemeksepeti.png') }}" style="height: 18px;">
+                                        <img src="{{ asset('theme/images/platforms/yemeksepeti.png') }}" style="height: 18px;">
                                         @break
                                     @case('getir')
-                                        <img src="{{ asset('theme/images/getiryemek.png') }}" style="height: 18px;">
+                                        <img src="{{ asset('theme/images/platforms/getir.png') }}" style="height: 18px;">
+                                        @break
+                                    @case('migros')
+                                        <img src="{{ asset('theme/images/platforms/migros.png') }}" style="height: 18px;">
                                         @break
                                     @case('trendyol')
-                                        <img src="{{ asset('theme/images/trendyolyemek.png') }}" style="height: 18px;">
+                                        <img src="{{ asset('theme/images/platforms/trendyol.png') }}" style="height: 18px;">
                                         @break
                                     @case('adisyo')
                                         <img src="{{ asset('theme/images/adisyoFull.png') }}" style="height: 22px;">

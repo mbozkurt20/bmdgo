@@ -84,8 +84,12 @@
                         </select>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label class="form-label fw-bold">Tutar (₺)</label>
-                        <input type="number" step="0.01" name="amount" class="border-dark form-control rounded-pill shadow-sm fw-bold text-dark" placeholder="0.00" required>
+                        <x-money-input
+                            name="amount"
+                            label="Tutar (₺)"
+                            required="true"
+                            class="border-dark form-control rounded-pill shadow-sm fw-bold text-dark"
+                        />
                     </div>
                 </div>
             </div>

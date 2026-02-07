@@ -48,9 +48,7 @@
                                     <th style="color:#259a38;font-size: 14px;font-weight: bold">İndirim</th>
                                     <th style="color:#259a38;font-size: 14px;font-weight: bold">Tutar</th>
                                     <th style="color:#259a38;font-size: 14px;font-weight: bold">Ödeme Türü</th>
-                                    <th style="color:#259a38;width:8%;font-size: 14px;font-weight: bold">Paket
-                                        Mesafesi
-                                    </th>
+                                    <th style="color:#259a38;width:8%;font-size: 14px;font-weight: bold">Paket Mesafesi</th>
                                     <th style="color:#259a38;font-size: 14px;font-weight: bold">Durum</th>
                                     <th style="color:#259a38;font-size: 14px;font-weight: bold">İşlem</th>
                                 </tr>

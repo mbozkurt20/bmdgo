@@ -5,7 +5,7 @@ namespace App\Helpers;
 class MapHelper {
     public static function getGoogleDistance($lat1, $lng1, $lat2, $lng2)
     {
-        $apiKey = env('GOOGLE_MAPS_API_KEY');
+        $apiKey = config('site.google_map_api_key');
 
         // Google Distance Matrix API URL
         $url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins={$lat1},{$lng1}&destinations={$lat2},{$lng2}&mode=driving&key={$apiKey}";

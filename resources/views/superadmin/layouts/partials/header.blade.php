@@ -14,7 +14,7 @@
 <div class="header">
     <div class="row" style="background-color: #f3eded; color: #ec691e;">
         <div class="text-center fw-bold py-2">
-            <strong>{{env('APP_NAME')}}</strong> Üst Yönetici
+            <strong>{{config('site.name')}}</strong> Üst Yönetici
         </div>
     </div>
 

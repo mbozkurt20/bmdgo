@@ -38,11 +38,11 @@ class CategorieController extends Controller
 
     public function create(Request $request)
     {
-        $testMode = env('TEST_MODE');
+        $testMode =config('site.test_mode');
 
         if ($testMode) {
-            if (Categorie::count() > env('TEST_MODE_LIMIT')) {
-                return redirect()->back()->with('test', 'Test Modu: Üzgünüz, En Fazla '.env('TEST_MODE_LIMIT').' Kayıt Ekleyebilirsiniz');
+            if (Categorie::count() > config('site.test_mode_limit')) {
+                return redirect()->back()->with('test', 'Test Modu: Üzgünüz, En Fazla '.config('site.test_mode_limit').' Kayıt Ekleyebilirsiniz');
             }
         }
 

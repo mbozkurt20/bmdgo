@@ -8,17 +8,17 @@
         @elseif ($order->platform == 'getir' || $order->platform == 'Getir')
             <a class="btn btn-primary btn-rounded" style="padding: 5px;background: #6244be;border-color: #6244be; font-size:12px;">
                 {{ $order->restaurant->restaurant_name }} /
-                <img src="{{ asset('theme/images/getiryemek.png') }}" style="height: 15px">
+                <img src="{{ asset('theme/images/platforms/getir.png') }}" style="height: 15px">
             </a>
         @elseif ($order->platform == 'trendyol' || $order->platform == 'Trendyol')
             <a style="width:100%;font-weight: bold;padding:10px 15px;font-size:12px;" class="btn btn-primary btn-rounded">
                 {{ $order->restaurant->restaurant_name }} /
-                <img src="{{ asset('theme/images/trendyolyemek.png') }}" style="height: 10px">
+                <img src="{{ asset('theme/images/platforms/trendyol.png') }}" style="height: 10px">
             </a>
         @elseif ($order->platform == 'migros' || $order->platform == 'Migros')
             <a style="padding: 5px;background: #000080;border-color: #6244be; font-size: 14px" class="btn btn-primary btn-rounded">
                 {{ $order->restaurant->restaurant_name }} /
-                <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/aff9ed163620751.6556613f80c21.png" style="height: 25px;">
+                <img src="{{asset('theme/images/platforms/migros.png')}}" style="height: 25px;">
             </a>
         @elseif ($order->platform == 'adisyo' || $order->platform == 'Adisyo')
             <a style="padding: 5px;background: #ff0a0a;border-color: #fff; font-size: 14px" class="btn btn-primary btn-rounded">

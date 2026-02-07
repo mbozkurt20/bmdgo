@@ -1,18 +1,16 @@
 <?php
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers;
 
 use App\Helpers\OrdersHelper;
 use App\Helpers\OrderStatus;
-use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\CustomerAddress;
-use App\Models\Restaurant;
 use App\Models\Order;
+use App\Models\Restaurant;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
-class OrderController extends Controller
+class EntegraWebhookController extends Controller
 {
     public function addOrder(Request $request)
     {
@@ -97,6 +95,11 @@ class OrderController extends Controller
                 break;
         }
 
+        //otomatik onaya göre status belirler
+        $status =  json_decode($restaurant['getir'])->otomatikOnay || json_decode($restaurant['getir'])->otomatikOnay == 'true'
+            ? OrderStatus::PREPARED
+            : OrderStatus::PENDING;
+
         $orderData = [
             'platform' => $platform,
             'customer_id' => $create->id,
@@ -104,7 +107,7 @@ class OrderController extends Controller
             'status_request_count' => 0,
             'restaurant_id' => $restaurant->id,
             'courier_id' => -1,
-            'status' => OrderStatus::PREPARED,
+            'status' => $status,
             'tracking_id' => $orderData['shortCode'],
             'full_name' => $orderData['client']['name'],
             'phone' =>  $orderData['client']['contactPhoneNumber'],

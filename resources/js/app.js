@@ -1,36 +1,9 @@
-/**
- * Projenin JS bağımlılıklarını yükle
- */
 require('./bootstrap');
 window.Vue = require('vue');
 
-// SweetAlert2'yi import et
-import Swal from 'sweetalert2';
-window.Swal = Swal;
-
-// ------------------------------------------------------------
-
-/**
- * Vue Bileşenlerini Kayıt Et
- */
-
-// Manuel bileşen kaydı
-Vue.component('create-screen', require('./components/orders/create-screen.vue').default);
-
-// Otomatik tarama istersen, şu satırların yorumunu kaldır:
-// const files = require.context('./components', true, /\.vue$/i);
-// files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default));
-
-// ------------------------------------------------------------
-
-/**
- * Vue Instance oluştur
- */
 const app = new Vue({
     el: '#app',
 });
-
-// ------------------------------------------------------------
 
 /**
  * Laravel Echo & Pusher Kurulumu
@@ -44,8 +17,6 @@ window.Echo = new Echo({
     cluster: process.env.MIX_PUSHER_APP_CLUSTER,
     forceTLS: true
 });
-
-// ------------------------------------------------------------
 
 /**
  * Gerçek zamanlı "order-assigned" kanalını dinle

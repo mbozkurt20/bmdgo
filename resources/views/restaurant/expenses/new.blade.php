@@ -40,8 +40,11 @@
                                         <input required type="text" class="form-control" name="title" placeholder="Gider Başlığı">
                                     </div>
                                     <div class="mb-3 col-md-4">
-                                        <label class="form-label">Tutar</label>
-                                        <input required type="number" class="form-control" name="amount" placeholder="Gider Tutarı">
+                                        <x-money-input
+                                            name="amount"
+                                            label="Gider Tutarı"
+                                            required="true"
+                                        />
                                     </div>
 
                                     <div class="mb-3 col-md-4">
@@ -50,7 +53,7 @@
                                     </div>
 
                                     <div class="mb-3 col-md-4">
-                                        <label class="form-label">Ödeme Method</label>
+                                        <label class="form-label">Ödeme Türü</label>
                                         <select required class="form-control" name="payment_method" id="">
                                             <option selected value="Nakit">Nakit</option>
                                             <option value="Kredi Kartı">Kredi Kartı</option>

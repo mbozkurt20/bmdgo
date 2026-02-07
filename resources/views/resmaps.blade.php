@@ -585,7 +585,7 @@
                         <div class="col-md-6">
                             <button
                                 class="order-card btn-group-custom bg-secondary order-btn d-flex justify-content-between align-items-center w-100">
-                                <img src="{{ asset('theme/images/GetirYemek_Logo.png') }}"
+                                <img src="{{ asset('theme/images/platforms/getir.png') }}"
                                      style="background-repeat: no-repeat; background-position:center" width="77px"
                                      height="14px" alt="">
                                 <span>Getir Siparişleri</span>
@@ -596,7 +596,7 @@
                         <div class="col-md-6">
                             <button
                                 class="order-card btn-group-custom bg-primary order-btn d-flex justify-content-between align-items-center w-100">
-                                <img src="{{ asset('theme/images/trendyolyemek.png') }}"
+                                <img src="{{ asset('theme/images/platforms/trendyol.png') }}"
                                      style="background-repeat: no-repeat; background-position:center" width="71px"
                                      height="14px" alt="">
                                 <span>Trendyol Yemek Siparişleri</span>
@@ -609,7 +609,7 @@
                             <button
                                 class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100"
                                 style="background: #F90050">
-                                <img src="{{ asset('theme/images/Yemeksepeti_Logo.png') }}"
+                                <img src="{{ asset('theme/images/platforms/yemeksepeti.png') }}"
                                      style="background-repeat: no-repeat; background-position:center" width="79px"
                                      height="15px" alt="">
                                 <span>Yemeksepeti Siparişleri</span>
@@ -621,7 +621,7 @@
                             <button
                                 class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100"
                                 style="background: #363A86">
-                                <img src="{{ asset('theme/images/MigrosYemek_logo.png') }}"
+                                <img src="{{ asset('theme/images/platforms/migros.png') }}"
                                      style="background-repeat: no-repeat; background-position:center" width="69px"
                                      height="28px" alt="">
                                 <span>Migros Yemek Siparişleri</span>
@@ -634,7 +634,7 @@
                                 class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100"
                                 style="background: #1da713">
                                 <i class="fa-solid fa-phone" style="color: #fff;font-size:18px;padding-left:10px"></i>
-                                <span>Telefonla Gelen Sipariş</span>
+                                <span>Telefon Siparişi</span>
                                 <span class="badge bg-light text-dark order-number">{{ count($telefonsiparis) }}</span>
                             </button>
                         </div>
@@ -2135,41 +2135,6 @@
                 },
                 error: function() {
                     console.log("Customer selection error");
-                }
-            });
-        }
-
-        function CreateCustomer() {
-            $.ajax({
-                type: 'POST',
-                url: '/restaurant/orders/customeradd?_token=' + '{{ csrf_token() }}',
-                data: $('#customerForm').serialize(),
-                success: function(response) {
-                    // Müşteri bilgilerini güncelle
-                    $('.customer').html(response.customer);
-                    $('#customer_id').val(response.customerid); // Burada ID'yi güncelliyoruz
-                    $('#yeniMusteri').modal('hide');
-
-                    // Başarılı mesajı göster
-                    Swal.fire({
-                        title: 'Başarılı!',
-                        text: 'Müşteri başarılı bir şekilde eklendi.',
-                        icon: 'success',
-                        confirmButtonText: 'Tamam'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.href = window.location.pathname + "?showModal=Orders";
-                        }
-                    });
-                },
-                error: function() {
-                    console.log("Customer creation error");
-                    Swal.fire({
-                        title: 'Hata!',
-                        text: 'Müşteri eklenirken bir hata oluştu.',
-                        icon: 'error',
-                        confirmButtonText: 'Tamam'
-                    });
                 }
             });
         }

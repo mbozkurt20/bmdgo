@@ -18,7 +18,7 @@ class AdminFactory extends Factory
 
     public function definition()
     {
-        if (env('TEST_MODE')){
+        if (config('site.test_mode')){
             return [
                 'name' => 'Admin',
                 'email' => 'test@admin.com',

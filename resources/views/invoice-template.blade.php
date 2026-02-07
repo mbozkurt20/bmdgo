@@ -115,7 +115,7 @@
 <div class="invoice-container">
     <header>
         <img src="{{ config('site.invoice_logo') }}" alt="Logo" class="logo" />
-        <div class="company-name">{{ env('APP_NAME') }}</div>
+        <div class="company-name">{{ config('site.name') }}</div>
     </header>
 
     <div class="invoice-title">Fatura Detayları</div>

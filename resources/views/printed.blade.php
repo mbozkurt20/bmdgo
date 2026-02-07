@@ -144,7 +144,7 @@
     <div class="section"></div>
 
     <div class="legalcopy">
-        - {{ env('APP_NAME') }} Bizi Tercih Ettiğiniz İçin Teşekkür Ederiz -
+        - {{ config('site.name') }} Bizi Tercih Ettiğiniz İçin Teşekkür Ederiz -
     </div>
 </div>
 

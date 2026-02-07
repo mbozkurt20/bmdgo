@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\CourierHelper;
 use App\Helpers\CourierStatus;
 use App\Helpers\NotificationHelper;
 use App\Helpers\OrdersHelper;
@@ -13,6 +14,7 @@ use App\Models\Courier;
 use App\Models\Admin;
 use App\Models\Order;
 use App\Models\CourierOrder;
+use App\Models\ProgressPaymentRecord;
 use App\Models\Restaurant;
 use App\Services\PushNotificationService;
 use Carbon\Carbon;
@@ -62,11 +64,11 @@ class CourierController extends Controller
 
     public function create(Request $request)
     {
-        $testMode = env('TEST_MODE');
+        $testMode =config('site.test_mode');
 
         if ($testMode) {
-            if (Courier::count() > env('TEST_MODE_LIMIT')) {
-                return redirect()->back()->with('test', 'Test Modu: Üzgünüz, En Fazla ' . env('TEST_MODE_LIMIT') . ' Kayıt Ekleyebilirsiniz');
+            if (Courier::count() > config('site.test_mode_limit')) {
+                return redirect()->back()->with('test', 'Test Modu: Üzgünüz, En Fazla ' . config('site.test_mode_limit') . ' Kayıt Ekleyebilirsiniz');
             }
         }
 
@@ -129,6 +131,10 @@ class CourierController extends Controller
 
         $courier = Courier::whereId($request->input('id'))->first();
 
+        if ($courier->price_type != $request->get('price_type') && CourierHelper::hasReceivable($courier->id)) {
+            return redirect()->back()->with('test', 'Kurye ödeme türünü değiştirmek için kurye hakedişini ödemelisiniz!!');
+        }
+
         $courier->update([
             'name' => $request->input('name'),
             'phone' => $request->input('phone'),
@@ -187,74 +193,74 @@ class CourierController extends Controller
     {
         $courier = Courier::findOrFail($id);
 
-        // Tarih aralığı alıyoruz (varsayılan: bugün)
+        // Tarih aralığı (varsayılan: bugün)
         $startDate = $request->input('start_date', Carbon::today()->toDateString());
         $endDate = $request->input('end_date', Carbon::today()->toDateString());
 
         $startDateObj = Carbon::parse($startDate)->startOfDay();
         $endDateObj = Carbon::parse($endDate)->endOfDay();
 
-        // Kurye'nin eşleşmiş siparişleri
-        $courierOrderIds = CourierOrder::where('courier_id', $courier->id)
-            ->whereBetween('created_at', [$startDateObj, $endDateObj])
-            ->pluck('order_id');
-
-        // Sipariş listesi (admin ekranında tablo için)
-        $orders = Order::whereIn('id', $courierOrderIds)
+        // Siparişleri Getir
+        $orders = Order::where('courier_id', $courier->id)
             ->whereBetween('created_at', [$startDateObj, $endDateObj])
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Teslim edilen siparişler
+        // Sadece Teslim Edilenler Üzerinden Hesaplama Yap
         $deliveredOrders = $orders->where('status', OrderStatus::DELIVERED);
 
-        // Ödeme yöntemine göre filtreleme
-        $cashOrders = $deliveredOrders->whereIn('payment_method', ['Kapıda Nakit İle Ödeme', 'Nakit']);
-        $cardOrders = $deliveredOrders->whereIn('payment_method', ['Kapıda Kredi Kartı ile Ödeme', 'Kredi Kartı', 'Online Ödeme']);
-        $ticketOrders = $deliveredOrders->whereIn('payment_method', ['Kapıda Ticket ile Ödeme','Ticket','Ticket Online']);
-        $ticketOrders = $deliveredOrders->whereIn('payment_method', ['Kapıda Sodexo ile Ödeme','Sodexo','Sodexo Online']);
-        $ticketOrders = $deliveredOrders->whereIn('payment_method', ['Kapıda Multinet ile Ödeme','Multinet','Multinet Online']);
-        $ticketOrders = $deliveredOrders->whereIn('payment_method', ['Kapıda Pluxee ile Ödeme','Pluxee','Pluxee Online']);
+        // Ödeme Yöntemi Gruplama
+        $cashMethods = ['Kapıda Nakit İle Ödeme', 'Nakit', 'Kapıda Nakit ile Ödeme'];
+        $cardMethods = ['Kapıda Kredi Kartı ile Ödeme', 'Kredi Kartı', 'Online Ödeme'];
+        $ticketMethods = [
+            'Kapıda Ticket ile Ödeme','Ticket','Ticket Online',
+            'Kapıda Sodexo ile Ödeme','Sodexo','Sodexo Online',
+            'Kapıda Multinet ile Ödeme','Multinet','Multinet Online',
+            'Kapıda Pluxee ile Ödeme','Pluxee','Pluxee Online'
+        ];
 
-        // Kazanç hesaplama
+        $cashOrders = $deliveredOrders->whereIn('payment_method', $cashMethods);
+        $cardOrders = $deliveredOrders->whereIn('payment_method', $cardMethods);
+        $ticketOrders = $deliveredOrders->whereIn('payment_method', $ticketMethods);
+
+        // Kazanç Hesaplama Parametreleri
+        $totalEarnings = 0;
+        $info = "";
+        $orderCount = $deliveredOrders->count();
+
         if ($courier->price_type == 'package') {
-            // Paket başı ücretlendirme
-            $totalCash = $cashOrders->count() * $courier->price;
-            $totalCreditCard = $cardOrders->count() * $courier->price;
-            $totalTicket = $ticketOrders->count() * $courier->price;
+            $unitPrice = (float) $courier->price;
+            $totalEarnings = $orderCount * $unitPrice;
+            $info = "Teslim edilen {$orderCount} paket için paket başı " . number_format($unitPrice, 2) . " ₺ üzerinden hesaplanmıştır.";
         } else {
-            // Km başı ücretlendirme
-            $kmPrice = $courier->km_price;
+            $kmPrice = (float) $courier->km_price;
+            $fixedPrice = (float) $courier->fixed_price;
+            $externalKm = (float) $courier->km_distance_later;
 
-            $totalCash = $cashOrders->sum(fn($o) => $o->distance * $kmPrice);
-            $totalCreditCard = $cardOrders->sum(fn($o) => $o->distance * $kmPrice);
-            $totalTicket = $ticketOrders->sum(fn($o) => $o->distance * $kmPrice);
+            $distanceEarnings = $deliveredOrders->sum(function($o) use ($kmPrice, $externalKm) {
+                $orderKm = (float) $o->distance; // Veri KM cinsinden string ise
+                $payableKm = max(0, $orderKm - $externalKm);
+                return $payableKm * $kmPrice;
+            });
+
+            $fixedTotal = $fixedPrice * $orderCount;
+            $totalEarnings = $distanceEarnings + $fixedTotal;
+
+            $info = "Paket başı sabit " . number_format($fixedPrice, 2) . " ₺ + ilk {$externalKm} km sonrası için km başı " . number_format($kmPrice, 2) . " ₺ eklenmiştir.";
         }
 
         $summary = [
-            'order_count' => $deliveredOrders->count(),
-            'cash_orders' => $cashOrders->count(),
-            'card_orders' => $cardOrders->count(),
-            'ticket_orders' => $ticketOrders->count(),
-        ];
-
-        $totals = [
-            'cash' => $totalCash,
-            'credit_card' => $totalCreditCard,
-            'ticket' => $totalTicket,
-            'overall' => $totalCash + $totalCreditCard + $totalTicket,
+            'order_count' => $orderCount,
+            'cash_count' => $cashOrders->count(),
+            'card_count' => $cardOrders->count(),
+            'ticket_count' => $ticketOrders->count(),
+            'info' => $info
         ];
 
         return view('admin.couriers.report', compact(
-            'courier',
-            'orders',
-            'startDate',
-            'endDate',
-            'summary',
-            'totals'
+            'courier', 'orders', 'startDate', 'endDate', 'summary', 'totalEarnings'
         ));
     }
-
 
     public function maps()
     {

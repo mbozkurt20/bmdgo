@@ -82,17 +82,11 @@
                                     </div>
 
                                     <div class="mb-4 text-dark">
-                                        <label>Ödeme Tutarı</label>
-                                        <input
-                                            type="text"
-                                            class="form-control"
-                                            placeholder="0,00"
-                                            name="amount_display"
-                                            oninput="formatMoney(this)"
-                                            inputmode="decimal"
-                                            autocomplete="off"
-                                        >
-                                        <input type="hidden" name="amount">
+                                        <x-money-input
+                                            name="amount"
+                                            label="Ödeme Tutarı"
+                                            required="true"
+                                        />
                                     </div>
 
                                     <div class="mb-4 text-dark">
@@ -130,11 +124,15 @@
                         </button>
                     </div>
 
-
                     <div class="col-xl-12 mt-5" id="reportList">
                         <div class="card shadow-sm border-0">
                             <div class="card-body">
                                 <h4 class="card-title mb-4 text-center" id="selected-courier" style="font-weight: 700;"></h4>
+
+                                <div id="calculation_info_box" class="alert alert-info shadow-sm mb-4" style="display: none;">
+                                    <i class="fa fa-calculator me-2"></i> <span id="calculation_info_text"></span>
+                                </div>
+
                                 <p id="fixed_price_text" style="display: none" class="size-7 text-danger">Aşağıda ki Kalan Ödeme ve Toplam Hakediş, Sabit Ücret hariç km üzerinden hesaplanmaktadır.</p>
                                 <div class="row text-center">
                                     <div id="fixed_price" style="display: none" class=" col-md-6 mb-3">
@@ -143,16 +141,16 @@
                                             <h4 class="text-white mb-0" id="fixed-amount">0₺</h4>
                                         </div>
                                     </div>
-                                    <div id="km_price" style="display: none" class=" col-md-6 mb-3">
+                                    <div id="km_price_card" style="display: none" class=" col-md-6 mb-3">
                                         <div class="p-3 border rounded bg-ok">
-                                            <h6 class="mb-1 text-white">Km Başı Ücret</h6>
-                                            <h4 class="text-white mb-0" id="fixed-amount">0₺</h4>
+                                            <p class="fw-bold mb-1 text-white">Km Başı Ücret</p>
+                                            <h4 class="text-white mb-0" id="km-amount">0₺</h4>
                                         </div>
                                     </div>
-                                    <div id="km_distance_later" style="display: none" class=" col-md-6 mb-3">
+                                    <div id="km_distance_later_card" style="display: none" class=" col-md-6 mb-3">
                                         <div class="p-3 border rounded bg-ok">
-                                            <h6 class="mb-1 text-white">Km sonrası hesaplam 4</h6>
-                                            <h4 class="text-white mb-0" id="fixed-amount">0₺</h4>
+                                            <p class="fw-bold mb-1 text-white">Muaf KM (Sonrası)</p>
+                                            <h4 class="text-white mb-0" id="later-amount">0 KM</h4>
                                         </div>
                                     </div>
 
@@ -247,7 +245,7 @@
                     text: 'Lütfen bir kurye seçiniz.',
                     confirmButtonText: 'Tamam'
                 });
-                return; // İşlem devam etmesin
+                return;
             }
 
             $.ajax({
@@ -255,30 +253,45 @@
                 url: '/admin/progress-payment/courier' + '?_token=' + '{{ csrf_token() }}',
                 data: {courier: courier, start: start, end: end},
                 success: function (response) {
-                    if (response.courier.price_type == 'fixed'){
-                        document.getElementById('fixed_price').style.display = 'block'
-                        document.getElementById('fixed_price_text').style.display = 'block'
-                    }else {
-                        document.getElementById('fixed_price').style.display = 'none'
-                        document.getElementById('fixed_price_text').style.display = 'none'
+                    // 1. Bilgilendirme Metni
+                    if (response.calculation_info) {
+                        $("#calculation_info_text").text(response.calculation_info);
+                        $("#calculation_info_box").fadeIn();
+                    } else {
+                        $("#calculation_info_box").hide();
                     }
+
+                    // 2. Fiyat Tipine Göre Alanları Gizle/Göster
+                    if (response.courier.price_type !== 'package'){
+                        document.getElementById('fixed_price').style.display = 'block';
+                        document.getElementById('fixed_price_text').style.display = 'block';
+                        document.getElementById('km_price_card').style.display = 'block';
+                        document.getElementById('km_distance_later_card').style.display = 'block';
+                    } else {
+                        document.getElementById('fixed_price').style.display = 'none';
+                        document.getElementById('fixed_price_text').style.display = 'none';
+                        document.getElementById('km_price_card').style.display = 'none';
+                        document.getElementById('km_distance_later_card').style.display = 'none';
+                    }
+
+                    // 3. Verileri Yazdır
                     $("#selected-courier").text(response.courier.name);
                     $("#order-count").html(response.order_count + ' Adet');
-                    $("#fixed-amount").html(
-                        Number(response.fixed_amount).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ₺'
-                    );
-                    $("#total-progress-payment").html(
-                        Number(response.total_progress_payment).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ₺'
-                    );
-                    $("#paid-amount").html(
-                        Number(response.paidAmount).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ₺'
-                    );
+
+                    // Formatlama yardımcı fonksiyonu
+                    const formatNum = (num) => Number(num).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+                    $("#fixed-amount").html(formatNum(response.fixed_amount) + ' ₺');
+                    $("#km-amount").html(formatNum(response.courier.km_price) + ' ₺');
+                    $("#later-amount").html(response.courier.km_distance_later + ' KM');
+
+                    $("#total-progress-payment").html(formatNum(response.total_progress_payment) + ' ₺');
+                    $("#paid-amount").html(formatNum(response.paidAmount) + ' ₺');
 
                     let remaining = Number(response.total_progress_payment) - Number(response.paidAmount);
-                    $("#remaining-amount").html(
-                        remaining.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ₺'
-                    );
-                    // Tabloyu güncelle
+                    $("#remaining-amount").html(formatNum(remaining) + ' ₺');
+
+                    // 4. Tabloyu güncelle
                     $("#paymentsTable tbody").html(response.records_html);
 
                     Swal.fire({
@@ -290,10 +303,6 @@
                     });
                 },
                 error: function (xhr, status, error) {
-                    console.error("AJAX Error:", error);
-                    console.log("Status:", status);
-                    console.log("Response:", xhr.responseText);
-
                     Swal.fire({
                         icon: 'error',
                         title: 'Hata',
@@ -305,11 +314,10 @@
         }
 
     </script>
-    <!-- Search & Delete Scripts -->
     <script type="text/javascript">
         $(document).ready(function () {
             var table = $('#paymentsTable').DataTable({
-                order: [[3, "desc"]], // created_at sütunu
+                order: [[3, "desc"]],
                 language: {
                     search: "Ara:",
                     url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/tr.json",
@@ -360,32 +368,6 @@
         }
     </script>
 
-    <script>
-        function formatMoney(el) {
-            let value = el.value;
 
-            // Sadece rakam ve virgül
-            value = value.replace(/[^0-9,]/g, '');
-
-            // Virgülden fazlasını sil
-            if (value.indexOf(',') !== -1) {
-                const parts = value.split(',');
-                value = parts[0] + ',' + parts[1].slice(0, 2);
-            }
-
-            // Binlik ayırıcı ekle
-            let parts = value.split(',');
-            parts[0] = parts[0]
-                .replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-
-            el.value = parts.join(',');
-
-            // Backend için: 12.244,55 → 12244.55
-            const hidden = document.querySelector('input[name="amount"]');
-            hidden.value = el.value
-                .replace(/\./g, '')
-                .replace(',', '.');
-        }
-    </script>
 
 @endsection

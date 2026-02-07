@@ -43,7 +43,7 @@ class ProgressPaymentController extends Controller
             'payable_id' => 'required|integer',
             'payment_date' => 'required|date',
             'note' => 'nullable|string',
-            'amount' => 'nullable|string'
+            'amount' => 'required|string'
         ]);
 
         ProgressPaymentRecord::create([
@@ -103,16 +103,19 @@ class ProgressPaymentController extends Controller
         ]);
     }
 
-    public function courierFilter(Request $request){
+    public function courierFilter(Request $request) {
         $courier = Courier::find($request->courier);
 
         $startDate = Carbon::createFromFormat('Y-m-d', $request->start)->startOfDay();
         $endDate = Carbon::createFromFormat('Y-m-d', $request->end)->endOfDay();
 
-        $orderCount = Order::where('courier_id', $courier->id)
-            ->where('status',OrderStatus::DELIVERED)
+        // Temel Sorgular
+        $deliveredOrders = Order::where('courier_id', $courier->id)
+            ->where('status', OrderStatus::DELIVERED)
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->count();
+            ->get();
+
+        $orderCount = $deliveredOrders->count();
 
         $paidAmount = ProgressPaymentRecord::where('payable_type', 'courier')
             ->where('payable_id', $courier->id)
@@ -125,48 +128,44 @@ class ProgressPaymentController extends Controller
             ->orderBy('payment_date', 'desc')
             ->get();
 
-        $courierOrderIds = CourierOrder::where('courier_id', $courier->id)
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->pluck('order_id');
-
-        // Sipariş listesi (admin ekranında tablo için)
-        $orders = Order::whereIn('id', $courierOrderIds)
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        // Tabloda göstermek için kayıtları HTML'e çevireceğiz
         $recordsHtml = view('admin.progressPayment._courier_records', compact('records'))->render();
 
-        $totalProgressPayment = floatval($courier->price) * $orderCount;
-
-        // Teslim edilen siparişler
-        $deliveredOrders = $orders->where('status', OrderStatus::DELIVERED);
-
+        // Hakediş Hesaplama
         $total = 0;
+        $info = "";
+        $fixedTotal = 0;
 
         if ($courier->price_type == 'package') {
-            $total+= $deliveredOrders->count() * $courier->price;
+            $unitPrice = (float) $courier->price;
+            $total = $orderCount * $unitPrice;
+
+            $info = "Hakediş, teslim edilen {$orderCount} paket üzerinden, paket başı " . number_format($unitPrice, 2) . " TL olarak hesaplanmıştır.";
         } else {
             $kmPrice = (float) $courier->km_price;
+            $fixedPrice = (float) $courier->fixed_price;
+            $externalKm = (float) $courier->km_distance_later; // Hariç tutulacak mesafe (km)
 
-            $distanceTotal = $deliveredOrders->sum(
-                fn($o) => ($o->distance / 1000) * $kmPrice
-            );
+            $distanceTotal = $deliveredOrders->sum(function($o) use ($kmPrice, $externalKm) {
+                // String gelen "4.708..." değerini sayıya çeviriyoruz.
+                // Eğer veritabanında metre ise /1000 yapın, doğrudan km ise bölmeyin.
+                $orderKm = (float) $o->distance;
+                $payableKm = max(0, $orderKm - $externalKm); // Muafiyeti düş, eksiye inme
+                return $payableKm * $kmPrice;
+            });
 
-            $fixedTotal = (float) $courier->fixed_price * $orderCount;
+            $fixedTotal = $fixedPrice * $orderCount;
+            $total = $distanceTotal + $fixedTotal;
 
-            $total += $distanceTotal;
-            $total += $fixedTotal;
+            $info = "Paket başı sabit " . number_format($fixedPrice, 2) . " TL'ye ek olarak; sipariş mesafelerinden ilk {$externalKm} km düşülerek, kalan mesafe için km başına " . number_format($kmPrice, 2) . " TL eklenmiştir.";
         }
 
-
         return response()->json([
-            'paidAmount' => number_format($paidAmount, 2, '.', ''), // 2 basamak
+            'paidAmount' => number_format($paidAmount, 2, '.', ''),
             'courier' => $courier,
             'order_count' => $orderCount,
-            'fixed_amount' => $fixedTotal ?? 0,
-            'total_progress_payment' =>  number_format($total,2,'.',''),
+            'fixed_amount' => number_format($fixedTotal, 2, '.', ''),
+            'total_progress_payment' => number_format($total, 2, '.', ''),
+            'calculation_info' => $info, // Frontend'de göstermek için ekledik
             'records_html' => $recordsHtml,
         ]);
     }

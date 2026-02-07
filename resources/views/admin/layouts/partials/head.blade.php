@@ -6,13 +6,13 @@
     <meta name="author" content>
     <meta name="robots" content>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="{{env('APP_NAME')}} :  Admin Ekranı">
-    <meta property="og:title" content="{{env('APP_NAME')}} :  Admin Ekranı">
-    <meta property="og:description" content="{{env('APP_NAME')}} :  Admin Ekranı">
+    <meta name="description" content="{{config('site.name')}} :  Admin Ekranı">
+    <meta property="og:title" content="{{config('site.name')}} :  Admin Ekranı">
+    <meta property="og:description" content="{{config('site.name')}} :  Admin Ekranı">
     <meta property="og:image" content="images/social-image.png">
     <meta name="format-detection" content="telephone=no">
 
-    <title>Yönetici - {{env('APP_NAME')}}</title>
+    <title>Yönetici - {{config('site.name')}}</title>
 
     @vite('resources/js/app.js')
 

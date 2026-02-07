@@ -136,7 +136,7 @@
                                                                     onchange="Courier(event,{{ $order->id }})">
                                                                     <option value="0">Kurye Seç
                                                                     </option>
-                                                                    <option value="-1">{{env('APP_NAME')}}
+                                                                    <option value="-1">{{config('site.name')}}
                                                                     </option>
                                                                     @foreach ($couriers as $courier)
                                                                         <option

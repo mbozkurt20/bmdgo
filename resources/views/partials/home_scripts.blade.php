@@ -93,10 +93,82 @@
             // Select box'ı eski haline getirmek isteyebilirsiniz (isteğe bağlı)
         } else {
             // Diğer durumlar için doğrudan güncelle
-            sendOrderStatusUpdate(action, tracking_id, platform, null, id)
+            sendOrderStatusUpdate(action, tracking_id, platform, null, null)
                 .finally(() => loadingSpan.remove());
         }
     }
+
+    async function handleCancelClick(orderId, platform) {
+        const platformsWithReasons = ['getir', 'trendyol', 'migros', 'yemeksepeti'];
+        const modalElement = document.getElementById('cancelModal' + orderId);
+        // HTML'deki ID ile aynı olmalı
+        const reasonArea = document.getElementById('reasonSelectionArea' + orderId);
+
+        if (!reasonArea) return; // Element yoksa hata vermemesi için
+
+        reasonArea.innerHTML = '<div class="spinner-border spinner-border-sm text-danger"></div> Nedenler yükleniyor...';
+
+        var myModal = new bootstrap.Modal(modalElement);
+        myModal.show();
+
+        // Platform kontrolü (küçük harf duyarlılığı için)
+        const currentPlatform = platform ? platform.toLowerCase() : '';
+
+        if (platformsWithReasons.includes(currentPlatform)) {
+            try {
+                const response = await fetch(`/get-reasons?platform=${currentPlatform}`);
+                const reasons = await response.json();
+
+                let options = reasons.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+                reasonArea.innerHTML = `
+            <label class="form-label">Platform İptal Nedeni</label>
+            <select class="form-select mb-3" id="platformReasonId${orderId}">
+                ${options}
+            </select>`;
+            } catch (error) {
+                reasonArea.innerHTML = '<p class="text-danger small">Platform nedenleri yüklenemedi.</p>';
+            }
+        } else {
+            reasonArea.innerHTML = '';
+        }
+    }
+
+    function confirmCancel(orderId, trackingId, platform) {
+        // Butonu bul ve kilitle
+        const confirmBtn = document.querySelector(`#cancelModal${orderId} .btn-danger`);
+        const originalText = confirmBtn.innerHTML;
+
+        confirmBtn.disabled = true;
+        confirmBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> İşleniyor...`;
+
+        const reasonId = document.getElementById('platformReasonId' + orderId)?.value || null;
+        const note = document.getElementById('cancelReason' + orderId).value;
+
+        // Parametre sırasına dikkat: orderId'yi sendOrderStatusUpdate'e doğru sırayla gönderiyoruz
+        sendOrderStatusUpdate('UNSUPPLIED', trackingId, platform, note, orderId, reasonId)
+            .catch(() => {
+                // Hata olursa butonu eski haline getir
+                confirmBtn.disabled = false;
+                confirmBtn.innerHTML = originalText;
+            });
+    }
+
+    function updateStatusDirectly(id, nextStatus) {
+        const tracking_id = $('#tracking_' + id).val();
+        const platform = $('#platform_' + id).val();
+        const container = document.getElementById(`action-container-${id}`);
+
+        if (container) {
+            container.innerHTML = `
+            <div class="text-center">
+                <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                <div class="small">İşleniyor...</div>
+            </div>`;
+        }
+
+        sendOrderStatusUpdate(nextStatus, tracking_id, platform, null, null);
+    }
+
     function cancelOrder(id) {
         var tracking_id = $('#tracking_' + id).val();
         var platform = $('#platform_' + id).val();
@@ -112,7 +184,7 @@
         const btn = event.target;
         btn.disabled = true;
 
-        sendOrderStatusUpdate(action, tracking_id, platform, cancelReason, id)
+        sendOrderStatusUpdate(action, tracking_id, platform, cancelReason, null)
             .then(() => {
                 // Modalı kapat
                 const modalEl = document.getElementById('cancelModal' + id);
@@ -124,42 +196,60 @@
             });
     }
 
-    async function sendOrderStatusUpdate(action, tracking_id, platform, message, orderId) {
-        var requestData = {
-            action: action,
-            tracking_id: tracking_id,
-            _token: '{{ csrf_token() }}'
-        };
+    async function sendOrderStatusUpdate(action, tracking_id, platform, message, orderId, entegraReasonId) {
+        // Promise döndürüyoruz ki updateStatusDirectly içindeki .then() çalışsın
+        return new Promise((resolve, reject) => {
+            var requestData = {
+                action: action,
+                tracking_id: tracking_id,
+                _token: '{{ csrf_token() }}'
+            };
 
-        if (message) {
-            requestData.message = message;
-        }
+            if (message) requestData.message = message;
+            if (entegraReasonId) requestData.entegraReasonId = entegraReasonId;
 
-        console.log({platform:platform})
-        $.ajax({
-            type: 'POST',
-            url: '/{{$key}}/' + platform + '/updateOrderStatus',
-            data: requestData,
-            success: function (data) {
-                Swal.fire({
-                    title: 'Sipariş durumu başarıyla değiştirildi.',
-                    icon: 'success',
-                    confirmButtonText: 'Tamam',
-                    confirmButtonColor: '#259a38',
-                    cancelButtonColor: '#ec691e',
-                })
-                $('#cancelModal').modal('hide');
+            $.ajax({
+                type: 'POST',
+                url: '/{{$key}}/' + platform + '/updateOrderStatus',
+                data: requestData,
+                success: function (data) {
+                    Swal.fire({
+                        title: 'Başarılı!',
+                        text: 'Sipariş durumu güncellendi.',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
 
-                refreshOrderTable(data.order);
-            },
-            error: function (xhr, status, error) {
-                Swal.fire({
-                    title: 'Hata oluştu!',
-                    text: xhr.responseText, // Sunucudan gelen hata mesajını göstermek için
-                    icon: 'error',
-                    confirmButtonText: 'Tamam'
-                });
-            }
+                    // --- MODAL VE GRİ EKRAN TEMİZLİĞİ ---
+                    // Dinamik ID ile modalı bul ve kapat
+                    const modalEl = document.getElementById('cancelModal' + orderId);
+                    if (modalEl) {
+                        const modalInstance = bootstrap.Modal.getInstance(modalEl);
+                        if (modalInstance) modalInstance.hide();
+                    }
+
+                    // Manuel Backdrop Temizliği (Garanti yöntem)
+                    $('.modal-backdrop').remove();
+                    $('body').removeClass('modal-open').css({ overflow: '', paddingRight: '' });
+                    // ------------------------------------
+
+                    if (typeof refreshOrderTable === "function") {
+                        refreshOrderTable(data.order);
+                    }
+
+                    resolve(data);
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire({
+                        title: 'Hata oluştu!',
+                        text: xhr.responseText || 'Bir hata meydana geldi.',
+                        icon: 'error',
+                        confirmButtonText: 'Tamam'
+                    });
+                    reject(error);
+                }
+            });
         });
     }
 
@@ -367,7 +457,7 @@
         fetch('/{{$key}}/printed/' + orderId)
             .then(response => () => {
                 console.log({printOrder: response})
-                toastr.success("1 Yeni Sipariş Eklendi ", "Sipariş Başarıyla Eklendi", {
+                toastr.success("Yeni Sipariş Eklendi ", "Sipariş Başarıyla Eklendi", {
                     positionClass: "toast-top-right",
                     closeButton: true,
                     progressBar: true,
@@ -447,27 +537,32 @@
                 loadingSpan.remove();
 
                 if (data.success) {
-                    // Modalı güvenli kapat
                     const modalElement = document.getElementById('Courier' + orderId);
                     const modalInstance = bootstrap.Modal.getInstance(modalElement);
+
+                    // 1. Önce modalı kapatmayı dene
                     if (modalInstance) {
                         modalInstance.hide();
                     }
 
-                    // Ekran kararmasını önle
-                    $('.modal-backdrop').remove();
-                    $('body').removeClass('modal-open').css('overflow', '');
+                    // 2. Bootstrap'in temizlik yapması için 150ms bekle, sonra zorla temizle
+                    setTimeout(() => {
+                        $('.modal-backdrop').remove(); // Kalan gri katmanı sil
+                        $('body').removeClass('modal-open').css({
+                            'overflow': '',
+                            'padding-right': ''
+                        });
+
+                        // 3. Ekran temizlendikten SONRA tabloyu yenile
+                        fetchOrders();
+                    }, 150);
 
                     Swal.fire({
                         title: data.message,
                         icon: 'success',
-                        timer: 2000,
+                        timer: 1500,
                         showConfirmButton: false
                     });
-
-                    fetchOrders(); // Tabloyu tazele
-                } else {
-                    Swal.fire('Uyarı', data.message || 'Kurye Atama Başarısız', 'error');
                 }
             },
             error: function (xhr) {
@@ -549,26 +644,26 @@
         } else if (platform.toLowerCase() === 'getir') {
             platformHtml = `
         <span class="d-inline-flex align-items-center border rounded-pill px-2 py-1 small">
-            <img src="{{ asset('theme/images/gy.png') }}" style="height:20px;margin-right:4px;">
+            <img src="{{ asset('theme/images/platforms/getir.png') }}" style="height:35px;margin-right:4px;">
             ${restaurantName}
         </span>`;
         }
         else if (platform.toLowerCase() === 'gpsyemek') {
             platformHtml = `
         <span class="d-inline-flex align-items-center border rounded-pill px-2 py-1 small">
-            <img src="{{ asset('theme/images/gpsyemek.png') }}" style="height:20px;margin-right:4px;">
+            <img src="{{ asset('theme/images/platforms/gpsyemek.png') }}" style="height:20px;margin-right:4px;">
 
         </span>`;
         } else if (platform.toLowerCase() === 'trendyol') {
             platformHtml = `
         <span class="d-inline-flex align-items-center border rounded-pill px-2 py-1 small">
-            <img src="{{ asset('theme/images/trendyolyemek.png') }}" style="height:16px;margin-right:4px;">
+            <img src="{{ asset('theme/images/platforms/trendyol.png') }}" style="height:16px;margin-right:4px;">
             ${restaurantName}
         </span>`;
         } else if (platform.toLowerCase() === 'migros') {
             platformHtml = `
         <span class="d-inline-flex align-items-center border rounded-pill px-2 py-1 small">
-            <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/aff9ed163620751.6556613f80c21.png" style="height:16px;margin-right:4px;">
+            <img src="{{asset('theme/images/platforms/migros.png')}}" style="height:16px;margin-right:4px;">
             ${restaurantName}
         </span>`;
         } else if (platform.toLowerCase() === 'adisyo') {
@@ -621,16 +716,6 @@
     </a>`;
             }
         }
-        // Durum seçenekleri
-        const statusOptions = `
-      <option value="PENDING" ${status == 'PENDING' ? 'selected' : ''}>BEKLEMEDE</option>
-<option value="PREPARED" ${status == 'PREPARED' ? 'selected' : ''}>HAZIRLANIYOR</option>
-<option disabled value="ASSIGNED" ${status == 'ASSIGNED' ? 'selected' : ''}>KURYE ATANDI</option>
-<option disabled value="HANDOVER" ${status == 'HANDOVER' ? 'selected' : ''}>KURYEYE TESLİM EDİLDİ / YOLDA</option>
-<option value="DELIVERED" ${status == 'DELIVERED' ? 'selected' : ''}>TESLİM EDİLDİ</option>
-<option value="UNSUPPLIED" ${status == 'UNSUPPLIED' ? 'selected' : ''}>İPTAL EDİLDİ / TEDARİK YOK</option>
-    `;
-
         return `
 <tr id="data_${order.id}">
     <td>${platformHtml}
@@ -682,32 +767,48 @@
             ${distanceStr}
         </strong>
     </td>
-    <td>
-        <input type="hidden" id="tracking_${order.id}" value="${trackingId}">
-        <input type="hidden" id="platform_${order.id}" value="${platform}">
-        <select class="inline-order-select form-control" onchange="StatusOrderChange(event, ${order.id})" ${status == 'DELIVERED' ||  status == 'UNSUPPLIED' ? 'disabled' : ''}>
-            ${statusOptions}
-        </select>
-        <!-- İptal modal -->
-        <div class="modal fade" id="cancelModal${order.id}">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Siparişi İptal Et</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <label for="cancelReason${order.id}" class="form-label">İptal nedeniniz?</label>
-                        <textarea class="form-control" id="cancelReason${order.id}" rows="4" placeholder="İptal nedeninizi yazın..."></textarea>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Geri Dön</button>
-                        <button type="button" class="btn btn-danger" onclick="cancelOrder(${order.id})">İptal Et</button>
-                    </div>
+ <td>
+    <input type="hidden" id="tracking_${order.id}" value="${trackingId}">
+    <input type="hidden" id="platform_${order.id}" value="${platform}">
+
+    <div class="d-grid gap-1" id="action-container-${order.id}">
+        ${status === 'PENDING'
+            ? `<button class="btn btn-sm btn-primary" onclick="updateStatusDirectly('${order.id}', 'PREPARED')">Hazırlandı</button>`
+            : ''
+        }
+
+        ${status === 'HANDOVER'
+            ? `<button class="btn btn-sm btn-success" onclick="updateStatusDirectly('${order.id}', 'DELIVERED')">Teslim Edildi</button>`
+            : ''
+        }
+
+        ${status !== 'DELIVERED' && status !== 'UNSUPPLIED'
+            ? `<button class="btn btn-sm btn-outline-danger" onclick="handleCancelClick('${order.id}', '${platform}')">İptal Et</button>`
+            : `<span class="badge bg-light text-dark">${status === 'DELIVERED' ? 'Tamamlandı' : 'İptal Edildi'}</span>`
+        }
+    </div>
+
+    <div class="modal fade" id="cancelModal${order.id}" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Siparişi İptal Et (#${order.id})</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-start">
+                    <div id="reasonSelectionArea${order.id}" class="mb-3"></div>
+
+                    <label class="form-label">Notunuz</label>
+                    <textarea class="form-control" id="cancelReason${order.id}" rows="3" placeholder="Ek açıklama..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                    <button type="button" class="btn btn-danger" onclick="confirmCancel('${order.id}','${order.tracking_id}','${order.platform}')">İptali Onayla</button>
                 </div>
             </div>
         </div>
-    </td>
+    </div>
+</td>
     <td>
         <!-- İşlem ikonları -->
         <div class="d-flex">

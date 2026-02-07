@@ -18,12 +18,7 @@ use Pusher\Pusher;
 |
 */
 Route::get('/restaurant/{restaurantId}/menu', [App\Http\Controllers\MenuController::class, 'show'])->name('restaurant.menu');
-
 Route::get('/pSwAIk2Jo6edRFcHME/gpskurye', [\App\Http\Controllers\GpsYemekController::class,'index'])->name('restaurant.couriers.index');
-Route::get('/pSwAIk2Jo6edRFcHME/jobs', [\App\Http\Controllers\JobController::class,'index']);
-
-Route::get('/partner', [App\Http\Controllers\HomeController::class, 'dealer'])->name('dealer');
-Route::post('/new-partner', [App\Http\Controllers\HomeController::class, 'createDealerRequest'])->name('createDealerRequest');
 
 Auth::routes();
 
@@ -32,9 +27,8 @@ include __DIR__ . '/app/adminRoutes.php';
 include __DIR__ . '/app/restaurantRoutes.php';
 include __DIR__ . '/app/partnerRoutes.php';
 
-
-Route::post('/entegra/add-order', [App\Http\Controllers\Api\OrderController::class, 'addOrder']);
-Route::post('/entegra/cancel-order', [App\Http\Controllers\Api\OrderController::class, 'cancelOrder']);
+Route::post('/entegra/add-order', [App\Http\Controllers\EntegraWebhookController::class, 'addOrder']);
+Route::post('/entegra/cancel-order', [App\Http\Controllers\EntegraWebhookController::class, 'cancelOrder']);
 
 Route::post('/paytr/callback', [\App\Http\Controllers\PayTrPaymentController::class, 'paytrCallback'])->name('paytr.callback');
 Route::get('/paytr/success', [\App\Http\Controllers\PayTrPaymentController::class, 'payTrSuccess'])->name('paytr.success');

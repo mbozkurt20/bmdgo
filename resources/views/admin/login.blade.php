@@ -9,14 +9,14 @@
     <meta name="author" content="">
     <meta name="robots" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="{{env('APP_NAME')}}">
-    <meta property="og:title" content="{{env('APP_NAME')}}">
-    <meta property="og:description" content="{{env('APP_NAME')}}">
+    <meta name="description" content="{{config('site.name')}}">
+    <meta property="og:title" content="{{config('site.name')}}">
+    <meta property="og:description" content="{{config('site.name')}}">
     <meta property="og:image" content="https://salero.dexignzone.com/xhtml/social-image.png">
     <meta name="format-detection" content="telephone=no">
 
     <!-- PAGE TITLE HERE -->
-    <title>{{env('APP_NAME')}} - Admin</title>
+    <title>{{config('site.name')}} - Admin</title>
 
     <!-- FAVICONS ICON -->
     <link rel="shortcut icon" type="image/png" href="{{config('site.logo')}}">
@@ -147,7 +147,7 @@
                                 <div class="card-footer">
                                     <div class=" bottom-footer clearfix m-t10 m-b20 row text-center">
                                         <div class="col-lg-12 text-center">
-												<span> © {{env('APP_NAME')}}</span>
+												<span> © {{config('site.name')}}</span>
                                         </div>
                                     </div>
                                 </div>
