@@ -19,6 +19,7 @@ use Pusher\Pusher;
 */
 Route::get('/restaurant/{restaurantId}/menu', [App\Http\Controllers\MenuController::class, 'show'])->name('restaurant.menu');
 Route::get('/pSwAIk2Jo6edRFcHME/gpskurye', [\App\Http\Controllers\GpsYemekController::class,'index'])->name('restaurant.couriers.index');
+Route::get('/pSwAIk2Jo6edRFcHME/jobs', [\App\Http\Controllers\JobController::class,'index']);
 
 Auth::routes();
 

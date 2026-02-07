@@ -7,7 +7,6 @@ use App\Helpers\OrdersHelper;
 use App\Helpers\OrderStatus;
 use App\Helpers\SendSms;
 use App\Jobs\AssignPendingOrders;
-use App\Jobs\ChangeOrderStatusJob;
 use App\Jobs\UpdateOrderStatusJob;
 use App\Models\Admin;
 use App\Models\Courier;

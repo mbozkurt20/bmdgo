@@ -31,7 +31,7 @@
 
     <div class="container-fluid">
         <div class="mb-sm-4 d-flex flex-wrap align-items-center text-head">
-            <h2 class="mb-3 me-auto">Restaurant Hakedişler</h2>
+            <h2 class="mb-3 me-auto">Restaurant Paket Raporu</h2>
             <div>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="javascript:void(0)">Restaurant Hakediş</a></li>
