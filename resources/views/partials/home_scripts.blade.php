@@ -467,7 +467,9 @@
             .catch(err => console.error(err));
     }
 
-    const selectBox = document.getElementById("selectedCourier");
+
+    {{--
+     const selectBox = document.getElementById("selectedCourier");
     const optionsContainer = document.getElementById("courierOptions");
     const options = document.querySelectorAll(".option");
     const courierIdInput = document.getElementById("courierId");
@@ -492,6 +494,7 @@
             optionsContainer.style.display = "none";
         }
     });
+    --}}
 
     function deleteOrder(order) {
         let orderid = order;
