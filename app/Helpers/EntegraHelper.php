@@ -117,6 +117,7 @@ class EntegraHelper {
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
+            CURLOPT_POSTFIELDS => json_encode([]),
             CURLOPT_TIMEOUT => 0,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
@@ -126,7 +127,7 @@ class EntegraHelper {
         $response = curl_exec($curl);
         curl_close($curl);
 
-        return $response;
+        return json_decode($response);
     }
 
     public static function rejectOrderStatuses($orderId){

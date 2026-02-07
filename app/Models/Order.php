@@ -17,7 +17,8 @@ class Order extends Model
         'full_name',
         'phone',
         'pid',
-        'entegra_status', // entegra için kaç istek atılmışı takip eder
+        'entegra_status', // entegra old.stataus
+        'entegra_order_status', // entegra next status
         'payment_method',
         'items',
         'address',

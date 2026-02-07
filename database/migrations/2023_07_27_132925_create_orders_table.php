@@ -24,6 +24,7 @@ class CreateOrdersTable extends Migration
             $table->string('phone');
             $table->string('pid')->nullable(); // entegra order id
             $table->integer('entegra_status')->nullable(); // entegra durum güncelleme istek sayısı
+            $table->integer('entegra_order_status')->nullable(); // entegra durum güncelleme istek sayısı
             $table->text('address');
             $table->string('verify_code')->nullable();
             $table->tinyText('notes')->nullable();

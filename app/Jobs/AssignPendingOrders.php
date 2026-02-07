@@ -88,11 +88,6 @@ class AssignPendingOrders implements ShouldQueue
                     ->count();
 
                 if ($activePackagesCount >= $maxPackageLimit) {
-                    // Kuryenin üzerindeki tüm ASSIGNED paketleri HANDOVER (Yola Çıktı) yap
-                    Order::query()->where('courier_id', $courier->id)
-                        ->where('status', OrderStatus::PREPARED)
-                        ->update(['status' => OrderStatus::ASSIGNED]);
-
                     // Kuryeyi meşgul yap ki yeni paket gelmesin
                     $courier->status = CourierStatus::service;
                     $courier->update();

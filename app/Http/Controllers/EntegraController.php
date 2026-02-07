@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\EntegraStatusEnum;
 use App\Helpers\CourierStatus;
 use App\Helpers\EntegraHelper;
 use App\Helpers\NotificationHelper;
@@ -90,14 +91,14 @@ class EntegraController extends Controller
 
     public function rejectOrder($orderId, Request $request)
     {
-       $res = EntegraHelper::rejectOrder($orderId, $request->all());
+        $res = EntegraHelper::rejectOrder($orderId, $request->all());
 
-       return response()->json(['success' => true, 'res' => $res]);
+        return response()->json(['success' => true, 'res' => $res]);
     }
 
     public function updateOrderStatus(Request $request)
     {
-        $platform = explode('/',$request->path())[1];
+        $platform = explode('/', $request->path())[1];
         $order = Order::query()->where('tracking_id', $request->tracking_id)->first();
 
         if (!$order) {
@@ -108,64 +109,77 @@ class EntegraController extends Controller
         }
 
         $status = $request->input('action');
-        $entegraStatus = $order->entegra_status;
 
-        switch ($status) {
-            case OrderStatus::UNSUPPLIED:
-                $res =  EntegraHelper::updateOrder($order->pid);
+        if ($status == OrderStatus::UNSUPPLIED) {
+            $payload = ['reason' => $request->input('reasonId'), 'note' => $request->input('note')];
+            $response = EntegraHelper::rejectOrder($order->pid, $payload);
 
-                if ($res->success){
-                    // Sipariş iptal edildiyse kuryenin durumu güncelleniyor
-                    $courierOrder = CourierOrder::where('order_id', $order->id)->first();
-                    if ($courierOrder) {
-                        $courier = Courier::find($courierOrder->courier_id);
-                        if ($courier) {
-                            // Kuryenin durumunu güncelle
-                            $courier->status = CourierStatus::active;;
-                            $courier->save();
+            $order->entegra_status = $response->status;
+            $order->entegra_order_status = $response->orderStatus;
 
-                            $order->courier_id = -1;
-                            $order->assigned_at = null;
-                            $order->status = OrderStatus::PREPARED;
-                            $order->update();
-
-                            Log::info('Kurye durumu güncellendi', ['courier_id' => $courier->id]);
-
-                            if (OrdersHelper::getOrderSystem(3)) {
-                                NotificationHelper::add([
-                                    'title' => 'Kurye Paketi Reddetti',
-                                    'description' => $order->tracking_id . ' takip numaralı paket ' . $courier->name . '  kurye tarafından teslim edildi.',
-                                    'url' => route('admin.balance')
-                                ]);
-                            }
-                        }
-                    }
-
-                    $order->entegra_status = $entegraStatus;
-                    $order->update();
-                }
-                break;
-            case OrderStatus::PREPARED:
-                $res =  EntegraHelper::updateOrder($order->pid);
-                dd($res);
-                break;
-            case OrderStatus::DELIVERED:
-                // Sipariş teslim edildiğinde kuryenin durumu güncelleniyor
+            if ($response->success) {
                 $courierOrder = CourierOrder::where('order_id', $order->id)->first();
                 if ($courierOrder) {
                     $courier = Courier::find($courierOrder->courier_id);
                     if ($courier) {
                         // Kuryenin durumunu güncelle
                         $courier->status = CourierStatus::active;;
-                        $courier->update();
+                        $courier->save();
+
+                        $order->courier_id = -1;
+                        $order->assigned_at = null;
+                        $order->status = OrderStatus::PREPARED;
+                        $order->update();
+
                         Log::info('Kurye durumu güncellendi', ['courier_id' => $courier->id]);
+
+                        if (OrdersHelper::getOrderSystem(3)) {
+                            NotificationHelper::add([
+                                'title' => 'Kurye Paketi Reddetti',
+                                'description' => $order->tracking_id . ' takip numaralı paket ' . $courier->name . '  kurye tarafından teslim edildi.',
+                                'url' => route('admin.balance')
+                            ]);
+                        }
                     }
                 }
-                break;
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Üzgünüz, lütfen yeniden deneyiniz.'
+                ], 404);
+            }
+        } else {
+            $response = EntegraHelper::updateOrder($order->pid);
+            if ($response->success) {
+                $order->entegra_status = $response->status;
+                $order->entegra_order_status = $response->orderStatus;
+
+                //BİZİNM PREPARED
+                if ($response->orderStatus == EntegraStatusEnum::PREPARING->value) {
+                    $order->status = OrderStatus::PREPARED;
+                }
+
+                if ($response->orderStatus == EntegraStatusEnum::DELIVERED->value) {
+                    $order->status = OrderStatus::DELIVERED;
+
+                    $courierOrder = CourierOrder::where('order_id', $order->id)->first();
+                    if ($courierOrder) {
+                        $courier = Courier::find($courierOrder->courier_id);
+                        if ($courier) {
+                            $courier->status = CourierStatus::active;;
+                            $courier->update();
+                            Log::info('Kurye durumu güncellendi', ['courier_id' => $courier->id]);
+                        }
+                    }
+                }
+
+                $order->update();
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Üzgünüz, lütfen yeniden deneyiniz.'
+                ], 404);
+            }
         }
-
-
-
-
     }
 }

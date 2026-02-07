@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\EntegraStatusEnum;
 use App\Helpers\CourierStatus;
+use App\Helpers\EntegraHelper;
 use App\Helpers\GeoLocation;
 use App\Helpers\MapHelper;
 use App\Helpers\NotificationHelper;
@@ -75,8 +77,6 @@ class OrderController extends Controller
                 'message' => 'Siparişin kuryesi başarıyla kaldırıldı.'
             ]);
         } else {
-
-
             $courier = Courier::find($courierId);
 
             if (!$order || !$courier) {

@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Enums\EntegraStatusEnum;
 use App\Helpers\OrdersHelper;
 use App\Helpers\OrderStatus;
 use App\Models\Customer;
@@ -95,11 +96,14 @@ class EntegraWebhookController extends Controller
                 break;
         }
 
-        //otomatik onaya göre status belirler
-        $status =  json_decode($restaurant['getir'])->otomatikOnay || json_decode($restaurant['getir'])->otomatikOnay == 'true'
-            ? OrderStatus::PREPARED
-            : OrderStatus::PENDING;
-
+        switch ($orderData['status']){
+            case EntegraStatusEnum::PENDING->value:
+                $status = OrderStatus::PENDING;
+                break;
+            case EntegraStatusEnum::PREPARING->value:
+                $status = OrderStatus::PREPARED;
+                break;
+        }
         $orderData = [
             'platform' => $platform,
             'customer_id' => $create->id,
