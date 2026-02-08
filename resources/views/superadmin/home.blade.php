@@ -61,108 +61,53 @@
             </div>
 
             <div class="col-lg-6">
-                <div class="orders-section" style="margin-bottom: 10px">
-                    <h4>Siparişler</h4>
-                    <style>
-                        .minimal-row {
-                            background: #ffffff;
-                            padding: 20px;
-                            border-radius: 15px;
-                        }
+                <div class="orders-section p-4 border-0 rounded-4 bg-white shadow">
+                    <div class="d-flex align-items-center justify-content-between mb-4 border-bottom pb-3">
+                        <h4 class="fw-bold text-dark m-0">Sipariş Paneli</h4>
+                        <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
+                            Bugün: <strong>{{ count($tumu) }}</strong>
+                        </span>
+                    </div>
 
-                        .stat-item {
-                            display: flex;
-                            flex-direction: column;
-                            align-items: center;
-                            justify-content: center;
-                            padding: 10px;
-                            transition: all 0.3s ease;
-                            border-right: 1px solid #f0f0f0; /* Ayırıcı ince çizgi */
-                        }
-
-                        .stat-item:last-child {
-                            border-right: none;
-                        }
-
-                        .stat-value {
-                            font-size: 22px;
-                            font-weight: 800;
-                            color: #2d3436;
-                            margin-top: 8px;
-                        }
-
-                        .stat-label {
-                            font-size: 20px;
-                            text-transform: uppercase;
-                            letter-spacing: 1px;
-                            color: #a0aec0;
-                            font-weight: 700;
-                        }
-
-                        .platform-icon {
-                            height: 52px;
-                            width: auto;
-                            transition: all 0.3s ease;
-                        }
-
-                        .stat-item:hover .platform-icon {
-                            filter: grayscale(0%);
-                            opacity: 1;
-                            transform: scale(1.1);
-                        }
-
-                        /* Sipariş varsa sayıyı renklendir */
-                        .has-count {
-                            color: #ec691e !important;
-                        }
-                    </style>
-
-                    <div class="minimal-row shadow-sm border">
-                        <div class="row align-items: center;">
-
-                            <div class="col">
-                                <div class="stat-item">
-                                    <span class="stat-label">Toplam</span>
-                                    <span class="stat-value {{ count($tumu) > 0 ? 'has-count' : '' }}">{{ count($tumu) }}</span>
+                    <div class="row g-3">
+                        <div class="col-12 mb-2">
+                            <div class="d-flex align-items-center justify-content-between p-3 rounded-4 bg-secondary-light text-dark fw-bolder shadow-sm transition-hover">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-box bg-white bg-opacity-10 p-2 rounded-3 me-3">
+                                        <i class="fa-solid fa-layer-group fs-5"></i>
+                                    </div>
+                                    <span class="fw-semibold ">Genel Toplam</span>
                                 </div>
+                                <span class="fs-3 fw-bold">{{ count($tumu) }}</span>
                             </div>
-
-                            <div class="col">
-                                <div class="stat-item">
-                                    <span class="stat-label"><i class="fa-solid fa-phone"></i></span>
-                                    <span class="stat-value">{{ count($telefonsiparis) }}</span>
-                                </div>
-                            </div>
-
-                            <div class="col">
-                                <div class="stat-item">
-                                    <img src="{{ asset('theme/images/platforms/getir.png') }}" class="platform-icon" alt="Getir">
-                                    <span class="stat-value">{{ count($getiryemek) }}</span>
-                                </div>
-                            </div>
-
-                            <div class="col">
-                                <div class="stat-item">
-                                    <img src="{{ asset('theme/images/platforms/trendyol.png') }}" class="platform-icon" alt="Trendyol">
-                                    <span class="stat-value">{{ count($trendyol) }}</span>
-                                </div>
-                            </div>
-
-                            <div class="col">
-                                <div class="stat-item">
-                                    <img src="{{ asset('theme/images/platforms/yemeksepeti.png') }}" class="platform-icon" alt="Yemeksepeti">
-                                    <span class="stat-value">{{ count($yemeksepeti) }}</span>
-                                </div>
-                            </div>
-
-                            <div class="col">
-                                <div class="stat-item">
-                                    <img src="{{ asset('theme/images/platforms/migros.png') }}" class="platform-icon" alt="Migros">
-                                    <span class="stat-value">{{ $migros }}</span>
-                                </div>
-                            </div>
-
                         </div>
+
+                        @php
+                            $platforms = [
+                                ['title' => 'Telefon', 'count' => count($telefonsiparis), 'icon' => 'fa-phone', 'color' => '#198754', 'is_img' => false],
+                                ['title' => 'GpsYemek', 'count' => count($gpsyemek), 'img' => 'gpsyemek.png', 'is_img' => true],
+                                ['title' => 'Getir Yemek', 'count' => count($getiryemek), 'img' => 'getir.png', 'is_img' => true],
+                                ['title' => 'Trendyol', 'count' => count($trendyol), 'img' => 'trendyol.png', 'is_img' => true],
+                                ['title' => 'Y.Sepeti', 'count' => count($yemeksepeti), 'img' => 'yemeksepeti.png', 'is_img' => true],
+                                ['title' => 'Migros', 'count' => $migros, 'img' => 'migros.png', 'is_img' => true],
+                            ];
+                        @endphp
+
+                        @foreach($platforms as $p)
+                            <div class="col-4 col-md-4 col-xl-2">
+                                <div class="card h-100 border-0 shadow-sm text-center py-3 px-2 rounded-4 platform-card">
+                                    <div class="platform-logo-container mb-4 d-flex align-items-center justify-content-center bg-white shadow-sm rounded-circle mx-auto" style="width: 45px; height: 45px;">
+                                        @if($p['is_img'])
+                                            <img class="rounded-circle" src="{{ asset('theme/images/platforms/'.$p['img']) }}" style="width: 28px; height: auto;" alt="{{ $p['title'] }}">
+                                        @else
+                                            <i class="fa-solid {{ $p['icon'] }} fs-5" style="color: {{ $p['color'] }}"></i>
+                                        @endif
+                                    </div>
+                                    <div class="fw-bold fs-5 text-dark">{{ $p['count'] }}</div>
+                                    <div class="text-muted  text-primary fw-bold" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px;">{{ $p['title'] }}</div>
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
             </div>

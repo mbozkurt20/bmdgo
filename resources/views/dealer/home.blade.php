@@ -61,75 +61,53 @@
             </div>
 
             <div class="col-lg-6">
-                <div class="orders-section" style="margin-bottom: 10px">
-                    <h4>Siparişler</h4>
+                <div class="orders-section p-4 border-0 rounded-4 bg-white shadow">
+                    <div class="d-flex align-items-center justify-content-between mb-4 border-bottom pb-3">
+                        <h4 class="fw-bold text-dark m-0">Sipariş Paneli</h4>
+                        <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
+                            Bugün: <strong>{{ count($tumu) }}</strong>
+                        </span>
+                    </div>
+
                     <div class="row g-3">
-                        <!-- All Orders Button -->
-                        <div class="col-md-6">
-                            <button
-                                class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100" style="background: #ec691e">
-
-                                <span class="fw-bold">
-                                    <i class="fa-solid fa-box" style="color: #fffdfd;font-size:18px;padding-right:10px"></i>
-                                    Tüm Siparişler</span>
-                                <span class="badge bg-white text-dark order-number">{{ count($tumu) }}</span>
-                            </button>
-                        </div>
-                        <div class="col-md-6">
-                            <button
-                                class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100"
-                                style="background: #259a38">
-                                <i class="fa-solid fa-phone" style="color: #fff;font-size:18px;padding-left:10px"></i>
-                                <span class="fw-bold">Telefon Sipariş</span>
-                                <span class="badge bg-white text-dark order-number">{{ count($telefonsiparis) }}</span>
-                            </button>
+                        <div class="col-12 mb-2">
+                            <div class="d-flex align-items-center justify-content-between p-3 rounded-4 bg-secondary-light text-dark fw-bolder shadow-sm transition-hover">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-box bg-white bg-opacity-10 p-2 rounded-3 me-3">
+                                        <i class="fa-solid fa-layer-group fs-5"></i>
+                                    </div>
+                                    <span class="fw-semibold ">Genel Toplam</span>
+                                </div>
+                                <span class="fs-3 fw-bold">{{ count($tumu) }}</span>
+                            </div>
                         </div>
 
-                        <!-- Getir Orders -->
-                        <div class="col-md-6">
-                            <button
-                                class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100" style="background: #4927b3">
-                                <img src="{{ asset('theme/images/GetirYemek_Logo.png') }}"
-                                     style="background-repeat: no-repeat; background-position:center" width="77px"
-                                     height="14px" alt="">
-                                <span class="badge bg-white text-dark order-number">{{ count($getiryemek) }}</span>
-                            </button>
-                        </div>
-                        <!-- Trendyol Orders -->
-                        <div class="col-md-6">
-                            <button
-                                class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100" style="background: orangered">
-                                <img src="{{ asset('theme/images/platforms/trendyol.png) }}"
-                                     style="background-repeat: no-repeat; background-position:center" width="71px"
-                                     height="14px" alt="">
-                                <span class="badge bg-white text-dark order-number">{{ count($trendyol) }}</span>
-                            </button>
-                        </div>
+                        @php
+                            $platforms = [
+                                ['title' => 'Telefon', 'count' => count($telefonsiparis), 'icon' => 'fa-phone', 'color' => '#198754', 'is_img' => false],
+                                ['title' => 'GpsYemek', 'count' => count($gpsyemek), 'img' => 'gpsyemek.png', 'is_img' => true],
+                                ['title' => 'Getir Yemek', 'count' => count($getiryemek), 'img' => 'getir.png', 'is_img' => true],
+                                ['title' => 'Trendyol', 'count' => count($trendyol), 'img' => 'trendyol.png', 'is_img' => true],
+                                ['title' => 'Y.Sepeti', 'count' => count($yemeksepeti), 'img' => 'yemeksepeti.png', 'is_img' => true],
+                                ['title' => 'Migros', 'count' => $migros, 'img' => 'migros.png', 'is_img' => true],
+                            ];
+                        @endphp
 
-                        <!-- Yemeksepeti Orders -->
-                        <div class="col-md-6">
-                            <button
-                                class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100"
-                                style="background: #F90050">
-                                <img src="{{ asset('theme/images/Yemeksepeti_Logo.png') }}"
-                                     style="background-repeat: no-repeat; background-position:center" width="79px"
-                                     height="15px" alt="">
-                                <span class="badge bg-white text-dark order-number">{{ count($yemeksepeti) }}</span>
-                            </button>
-                        </div>
-                        <!-- Migros Orders -->
-                        <div class="col-md-6">
-                            <button
-                                class="order-card btn-group-custom order-btn d-flex justify-content-between align-items-center w-100"
-                                style="background: #363A86">
-                                <img src="{{ asset('theme/images/MigrosYemek_logo.png') }}"
-                                     style="background-repeat: no-repeat; background-position:center" width="69px"
-                                     height="28px" alt="">
-                                <span class="badge bg-white text-dark order-number">{{ $migros }}</span>
-                            </button>
-                        </div>
-                        <!-- Phone Orders -->
-
+                        @foreach($platforms as $p)
+                            <div class="col-4 col-md-4 col-xl-2">
+                                <div class="card h-100 border-0 shadow-sm text-center py-3 px-2 rounded-4 platform-card">
+                                    <div class="platform-logo-container mb-4 d-flex align-items-center justify-content-center bg-white shadow-sm rounded-circle mx-auto" style="width: 45px; height: 45px;">
+                                        @if($p['is_img'])
+                                            <img class="rounded-circle" src="{{ asset('theme/images/platforms/'.$p['img']) }}" style="width: 28px; height: auto;" alt="{{ $p['title'] }}">
+                                        @else
+                                            <i class="fa-solid {{ $p['icon'] }} fs-5" style="color: {{ $p['color'] }}"></i>
+                                        @endif
+                                    </div>
+                                    <div class="fw-bold fs-5 text-dark">{{ $p['count'] }}</div>
+                                    <div class="text-muted  text-primary fw-bold" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px;">{{ $p['title'] }}</div>
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
             </div>

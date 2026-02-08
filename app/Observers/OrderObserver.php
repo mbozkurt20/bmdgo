@@ -74,72 +74,71 @@ class OrderObserver
 
     public function updated(Order $order)
     {
-        $order = Order::find($order->id);
+        // 1. Sonsuz döngüyü ve gereksiz tetiklenmeyi önlemek için sadece status değiştiyse devam et
+        if (!$order->wasChanged('status')) {
+            return;
+        }
 
-        /*
-         * Şu anki status’u öğrenmek:
-         * $currentStatus = OrderStatusLog::where('order_id', $orderId)
-    ->orderByDesc('changed_at')
-    ->first();
+        Log::info("✅ Order #{$order->id} durumu değişti: {$order->status}");
 
-        Status sürelerini almak:
-$statusDurations = OrderStatusLog::where('order_id', $orderId)
-    ->get(['status', 'duration_seconds']);
-
-        Restoran bazlı ortalama süre raporu:
-$avgDurations = OrderStatusLog::select('restaurant_id', 'status', DB::raw('AVG(duration_seconds) as avg_time'))
-    ->groupBy('restaurant_id', 'status')
-    ->get();
-         */
-        Log::info('✅ Order updated event tetiklendi', [
-            'id' => $order->id,
-            'phone' => $order->phone,
-            'status' => $order->status
-        ]);
-
-        $newStatus = $order->status;
-
+        // Status değişim mantığını çalıştır
         $or = new OrderStatusService();
-        $or->changeStatus($order, $newStatus);
+        $or->changeStatus($order, $order->status);
 
-        $restaurant = Restaurant::find($order->restaurant_id);
+        $restaurant = $order->restaurant; // Relation üzerinden erişmek daha performanslıdır
 
-        //sipariş kuryeye verildiyse
+        // 2. HANDOVER (Yola Çıktı) Bildirimi
         if ($order->status == OrderStatus::HANDOVER) {
-            if ($order->restaurant->admin->is_sms){
-                SendSms::send($order->phone, 'Sayın ' . $order->full_name . ', ' . $order->tracking_id . ' numaralı siparişiniz yola çıkmıştır.', $restaurant->admin_id);
+            if ($restaurant->admin->is_sms) {
+                SendSms::send($order->phone, "Sayın {$order->full_name}, {$order->tracking_id} numaralı siparişiniz yola çıkmıştır.", $restaurant->admin_id);
             }
         }
 
-        if ($order && Admin::where('id', $restaurant->admin_id)->first()->auto_orders && $order->status == OrderStatus::PREPARED) {
+        // 3. PREPARED (Hazır) -> Atama Başlat
+        // auto_orders kontrolünü optimize ettik
+        if ($order->status == OrderStatus::PREPARED && optional($restaurant->admin)->auto_orders) {
             dispatch(new AssignPendingOrders());
         }
 
+        // 4. DELIVERED (Teslim Edildi) -> Kuryeyi Boşa Çıkar
         if ($order->status == OrderStatus::DELIVERED) {
-            if ($order->restaurant->admin->is_sms){
-                SendSms::send($order->phone, 'Sayın ' . $order->full_name . ', ' . $order->tracking_id . ' numaralı siparişiniz teslim edilmiştir. \n \n Bizi tercih ettiğiniz için teşekkür ederiz.', $restaurant->admin_id);
+            if ($restaurant->admin->is_sms) {
+                SendSms::send($order->phone, "Sayın {$order->full_name}, siparişiniz teslim edilmiştir.", $restaurant->admin_id);
             }
 
-            if ($order->courier_id != -1){
-                $courier = Courier::find($order->courier_id);
-                $courier->status = CourierStatus::active;
-                $courier->update();
+            if ($order->courier_id != -1) {
+                $courier = $order->courier;
+                // Sadece kurye meşgulse (service) active çek ki CourierObserver tetiklensin
+                if ($courier && $courier->status !== CourierStatus::active) {
+                    $courier->update(['status' => CourierStatus::active]);
+                }
             }
         }
 
-        $pusher = new Pusher(
-            config('broadcasting.connections.pusher.key'),
-            config('broadcasting.connections.pusher.secret'),
-            config('broadcasting.connections.pusher.app_id'),
-            config('broadcasting.connections.pusher.options')
-        );
+        // 5. Pusher Bildirimi (Bunu bir Job içine almanız şiddetle önerilir)
+        $this->dispatchPusherNotification($order, $restaurant);
+    }
 
-        $order = Order::where('id', $order->id)
-            ->with(['restaurant', 'courier'])
-            ->first();
+    /**
+     * Pusher bildirimini gönderir
+     */
+    protected function dispatchPusherNotification($order, $restaurant)
+    {
+        try {
+            $pusher = new Pusher(
+                config('broadcasting.connections.pusher.key'),
+                config('broadcasting.connections.pusher.secret'),
+                config('broadcasting.connections.pusher.app_id'),
+                config('broadcasting.connections.pusher.options')
+            );
 
-        $pusher->trigger("admin-{$restaurant->admin_id}", "update-order", ['order' => $order]);
-        $pusher->trigger("restaurant-{$restaurant->id}", "update-order", ['order' => $order]);
+            $orderData = Order::where('id', $order->id)->with(['restaurant', 'courier'])->first();
+
+            $pusher->trigger("admin-{$restaurant->admin_id}", "update-order", ['order' => $orderData]);
+            $pusher->trigger("restaurant-{$restaurant->id}", "update-order", ['order' => $orderData]);
+        } catch (\Exception $e) {
+            Log::error("Pusher Hatası: " . $e->getMessage());
+        }
     }
 
     /**

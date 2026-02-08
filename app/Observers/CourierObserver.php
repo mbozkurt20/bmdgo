@@ -2,6 +2,8 @@
 
 namespace App\Observers;
 
+use App\Helpers\CourierStatus;
+use App\Jobs\AssignPendingOrders;
 use App\Models\Courier;
 use App\Models\CourierStatusMovement;
 use Illuminate\Support\Facades\Log;
@@ -17,6 +19,12 @@ class CourierObserver
 
         $oldStatus = $courier->getOriginal('status');
         $newStatus = $courier->status;
+
+// CourierObserver.php içinde
+        if ($courier->wasChanged('status') && $courier->status == CourierStatus::active) {
+            // Kurye artık boşta, bekleyen siparişleri ona yönlendir
+            dispatch(new AssignPendingOrders());
+        }
 
         Log::info("Kurye #{$courier->id} statüsü değişti: {$oldStatus} -> {$newStatus}");
 
@@ -39,7 +47,6 @@ class CourierObserver
             // 3. Yeni statü için kayıt başlat
             // Eğer kuryeye son atanan siparişi bağlamak istersen:
             // $orderId = $courier->orders()->latest()->first()?->id;
-
             CourierStatusMovement::create([
                 'courier_id' => $courier->id,
                 'status'     => $newStatus,
