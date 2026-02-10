@@ -97,10 +97,10 @@ class EntegraWebhookController extends Controller
         }
 
         switch ($orderData['status']){
-            case EntegraStatusEnum::PENDING->value:
+            case EntegraStatusEnum::PENDING:
                 $status = OrderStatus::PENDING;
                 break;
-            case EntegraStatusEnum::PREPARING->value:
+            case EntegraStatusEnum::PREPARING:
                 $status = OrderStatus::PREPARED;
                 break;
         }

@@ -2,10 +2,12 @@
 
 namespace App\Enums;
 
-enum EntegraStatusEnum: int
+class EntegraStatusEnum
 {
-    case PENDING   = 400;
-    case PREPARING = 500;
-    case HANDOVER  = 700;
-    case DELIVERED = 900;
+    public const PENDING      = 400;
+    public const PREPARING    = 500;
+    public const HANDOVER     = 700;
+    public const DELIVERED    = 900;
+    public const UNSUPPLIED   = 1600;
+    public const OUT_OF_STOCK = 1500;
 }

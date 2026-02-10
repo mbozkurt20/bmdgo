@@ -16,10 +16,10 @@ Route::middleware('jwt.courier')->group(function () {
         Route::post('/profile/update-password', [\App\Http\Controllers\Api\v2\Courier\Profile\IndexController::class, 'updatePassword']);
         Route::post('/profile/update-status', [\App\Http\Controllers\Api\v2\Courier\Profile\IndexController::class, 'updateStatus']);
         Route::post('/location', [\App\Http\Controllers\Api\v2\Courier\Profile\IndexController::class, 'updateLocation']);
-        Route::get('/orders', [\App\Http\Controllers\Api\v2\Courier\Orders\OrderController::class, 'index']);
-        Route::get('/old-orders', [\App\Http\Controllers\Api\v2\Courier\Orders\OrderController::class, 'oldOrders']);
+        Route::get('/orders', [\App\Http\Controllers\Api\v2\Courier\Orders\OrderController::class, 'activeOrders']);
+        Route::get('/old-orders', [\App\Http\Controllers\Api\v2\Courier\Orders\OrderController::class, 'pastOrdes']);
         Route::get('/report', [\App\Http\Controllers\Api\v2\Courier\Orders\OrderController::class, 'report']);
-        Route::post('/order/{orderId}/status', [\App\Http\Controllers\Api\v2\Courier\Orders\OrderController::class, 'status']);
+        Route::post('/order/{orderId}/status', [\App\Http\Controllers\Api\v2\Courier\Orders\OrderController::class, 'changeStatus']);
         Route::post('/order/{orderId}/transfer', [\App\Http\Controllers\Api\v2\Courier\Orders\OrderController::class, 'transfer']);
         Route::post('/order/{orderId}/verify', [\App\Http\Controllers\Api\v2\Courier\Orders\OrderController::class, 'verifyOrderCode']);
     });

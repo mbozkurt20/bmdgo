@@ -13,32 +13,11 @@ use App\Models\Order;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
-
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
 Route::get('/getPlatformGpsyemek', [App\Http\Controllers\GpsYemekController::class, 'index']);
-Route::get('/getPlatformYemekSepeti', [App\Http\Controllers\YemekSepetiController::class, 'index']);
-Route::get('/getPlatformGetirYemek', [App\Http\Controllers\GetirYemekController::class, 'index']);
-Route::get('/getPlatformTrendyolYemek', [App\Http\Controllers\TrendyolYemekController::class, 'index']);
-Route::get('/getPlatformAdisyo', [App\Http\Controllers\AdisyoController::class, 'index']);
-
-//Kurye App
-/*
-Route::post('/verify/order-code', [App\Http\Controllers\ApiController::class, 'verifyOrderCode']);
-Route::post('/courier/login', [App\Http\Controllers\ApiController::class, 'login']);
-Route::get('/courier/orders/{token}/{id}', [App\Http\Controllers\ApiController::class, 'orders']);
-Route::post('/courier/location/', [App\Http\Controllers\ApiController::class, 'location']);
-
-
-Route::get('/getLocations', [App\Http\Controllers\ApiController::class, 'getLocations']);
-Route::get('/courier/status/{token}/{user_id}/{status}', [App\Http\Controllers\ApiController::class, 'status']);
-Route::get('/courier/status/{token}/{user_id}', [App\Http\Controllers\ApiController::class, 'status']);
-Route::post('/courier/order_status', [App\Http\Controllers\ApiController::class, 'order_status']);
-Route::post('/courier/reports/', [App\Http\Controllers\ApiController::class, 'reports']);
-*/
 
 include __DIR__."/api/courier/v2.php";
 

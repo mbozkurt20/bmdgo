@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Helpers;
+namespace App\Services;
 
-class EntegraHelper {
+class EntegraService {
 
     // Değişken yerine sabit (const) kullanmak statik metodlar için en temiz yoldur.
     private const BASE_URL = 'https://entegra.gpsyazilim.com/api/v1';
@@ -142,6 +142,8 @@ class EntegraHelper {
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => json_encode([]),
+
         ));
 
         $response = curl_exec($curl);

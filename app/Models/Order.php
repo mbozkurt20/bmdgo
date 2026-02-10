@@ -17,8 +17,8 @@ class Order extends Model
         'full_name',
         'phone',
         'pid',
-        'entegra_status', // entegra old.stataus
-        'entegra_order_status', // entegra next status
+        'entegra_current_status', // entegra old.stataus
+        'entegra_next_status', // entegra next status
         'payment_method',
         'items',
         'address',

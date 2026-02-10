@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\EntegraHelper;
 use App\Models\Admin;
 use App\Models\Restaurant;
+use App\Services\EntegraService;
 use App\Services\VatanSmsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -34,14 +34,14 @@ class MyController extends Controller
         }
 
         if (!$restaurant->entegra_restaurant_id){
-            $businessRes = EntegraHelper::newBusiness([
+            $businessRes = EntegraService::newBusiness([
                 'name' => $restaurant->name,
                 'email' => $restaurant->email,
                 'password' => $restaurant->name.'.'.$restaurant->code
             ]);
 
             if ($businessRes->success){
-                $restaurantRes = EntegraHelper::newRestaurant([
+                $restaurantRes = EntegraService::newRestaurant([
                     'name' => $restaurant->name,
                     'businessId' => $businessRes->data->id,
                     'website' => 'https://app.gpskurye.com',
@@ -53,7 +53,7 @@ class MyController extends Controller
             }
         }
 
-        $providerRes = EntegraHelper::patchProvider($restaurant,$platform);
+        $providerRes = EntegraService::patchProvider($restaurant,$platform);
 
         if ($providerRes['success']){
             $restaurant->update();

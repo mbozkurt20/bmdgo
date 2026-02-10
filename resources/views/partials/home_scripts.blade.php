@@ -98,58 +98,126 @@
         }
     }
 
-    async function handleCancelClick(orderId, platform) {
+    async function handleCancelClick(orderId, platform, trackingId, event) {
+        const btn = event ? event.currentTarget : null;
+        const originalContent = btn ? btn.innerHTML : '';
+
         const platformsWithReasons = ['getir', 'trendyol', 'migros', 'yemeksepeti'];
-        const modalElement = document.getElementById('cancelModal' + orderId);
-        // HTML'deki ID ile aynı olmalı
-        const reasonArea = document.getElementById('reasonSelectionArea' + orderId);
-
-        if (!reasonArea) return; // Element yoksa hata vermemesi için
-
-        reasonArea.innerHTML = '<div class="spinner-border spinner-border-sm text-danger"></div> Nedenler yükleniyor...';
-
-        var myModal = new bootstrap.Modal(modalElement);
-        myModal.show();
-
-        // Platform kontrolü (küçük harf duyarlılığı için)
         const currentPlatform = platform ? platform.toLowerCase() : '';
 
-        if (platformsWithReasons.includes(currentPlatform)) {
-            try {
-                const response = await fetch(`/get-reasons?platform=${currentPlatform}`);
-                const reasons = await response.json();
+        const modalElement = document.getElementById('cancelModal' + orderId);
+        const reasonArea = document.getElementById('reasonSelectionArea' + orderId);
 
-                let options = reasons.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
-                reasonArea.innerHTML = `
-            <label class="form-label">Platform İptal Nedeni</label>
-            <select class="form-select mb-3" id="platformReasonId${orderId}">
-                ${options}
-            </select>`;
-            } catch (error) {
-                reasonArea.innerHTML = '<p class="text-danger small">Platform nedenleri yüklenemedi.</p>';
-            }
-        } else {
+        let myModal = bootstrap.Modal.getInstance(modalElement);
+        if (!myModal) myModal = new bootstrap.Modal(modalElement);
+
+        if (!platformsWithReasons.includes(currentPlatform)) {
             reasonArea.innerHTML = '';
+            myModal.show();
+            return;
+        }
+
+        try {
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status"></span> Bekleniyor...`;
+            }
+
+            const response = await fetch(`/{{$key}}/entegra/reject-statuses/${orderId}`);
+            const result = await response.json();
+
+            // DERİN VERİ KONTROLÜ: result.data.data.data (JSON yapına göre)
+            const reasons = (result.data && result.data.data && result.data.data.data)
+                ? result.data.data.data
+                : [];
+
+            // Başarısızlık veya Boş Liste Kontrolü
+            if (!result.success || reasons.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Uyarı',
+                    text: 'İptal nedenleri yüklenemedi veya sipariş iptal edilemez durumda.',
+                    confirmButtonText: 'Tamam'
+                });
+                return;
+            }
+
+            // HTML Oluşturma (Card/List Group Tasarımı)
+            let html = '<label class="form-label mb-2 fw-bold text-muted small">İPTAL NEDENİ SEÇİNİZ</label>';
+            html += '<div class="list-group shadow-sm border rounded">';
+
+            reasons.forEach((item, index) => {
+                html += `
+            <div class="list-group-item list-group-item-action border-0 border-bottom">
+                <div class="form-check w-100 cursor-pointer">
+                    <input class="form-check-input mt-2" type="radio"
+                           name="platformReasonId${orderId}"
+                           id="reason_${orderId}_${index}"
+                           value="${item.name}"
+                           ${index === 0 ? 'checked' : ''}>
+                    <label class="form-check-label d-block p-2 cursor-pointer stretched-link" for="reason_${orderId}_${index}">
+                        <span class="fw-bold text-dark d-block" style="font-size: 0.9rem;">${item.description}</span>
+                    </label>
+                </div>
+            </div>`;
+            });
+
+            html += '</div>';
+            reasonArea.innerHTML = html;
+
+            myModal.show();
+
+        } catch (error) {
+            console.error("Hata:", error);
+            Swal.fire('Hata', 'Bağlantı sağlanamadı.', 'error');
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = originalContent;
+            }
         }
     }
 
     function confirmCancel(orderId, trackingId, platform) {
-        // Butonu bul ve kilitle
+        // 1. Elementleri ve Değerleri Al
+        const noteArea = document.getElementById('cancelReason' + orderId);
+        const selectedReasonElement = document.querySelector(`input[name="platformReasonId${orderId}"]:checked`);
+
+        // Değerleri oku
+        const note = noteArea ? noteArea.value.trim() : '';
+        const reasonKey = selectedReasonElement ? selectedReasonElement.value : null;
+
+        // Eğer platform neden gerektiriyorsa ve seçilmemişse durdur (Opsiyonel Güvenlik)
+        const platformsWithReasons = ['getir', 'trendyol', 'migros', 'yemeksepeti'];
+        if (platformsWithReasons.includes(platform.toLowerCase()) && !reasonKey) {
+            Swal.fire('Uyarı', 'Lütfen bir iptal nedeni seçiniz.', 'warning');
+            return;
+        }
+
+        // 2. Buton Kilitleme ve Yükleme Simgesi
         const confirmBtn = document.querySelector(`#cancelModal${orderId} .btn-danger`);
+        if (!confirmBtn) return;
+
         const originalText = confirmBtn.innerHTML;
-
         confirmBtn.disabled = true;
-        confirmBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> İşleniyor...`;
+        confirmBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status"></span> İşleniyor...`;
 
-        const reasonId = document.getElementById('platformReasonId' + orderId)?.value || null;
-        const note = document.getElementById('cancelReason' + orderId).value;
+        // 3. API İsteği
+        // Parametrelerin sırasını sendOrderStatusUpdate fonksiyonunun tanımına göre kontrol etmelisin
+        sendOrderStatusUpdate('UNSUPPLIED', trackingId, platform, note, orderId, reasonKey)
+            .then(() => {
+                // Başarılı ise modalı kapat (Bootstrap 5)
+                const modalEl = document.getElementById('cancelModal' + orderId);
+                const modalInstance = bootstrap.Modal.getInstance(modalEl);
+                if (modalInstance) modalInstance.hide();
 
-        // Parametre sırasına dikkat: orderId'yi sendOrderStatusUpdate'e doğru sırayla gönderiyoruz
-        sendOrderStatusUpdate('UNSUPPLIED', trackingId, platform, note, orderId, reasonId)
-            .catch(() => {
-                // Hata olursa butonu eski haline getir
+                Swal.fire('Başarılı', 'Sipariş iptal edildi.', 'success');
+            })
+            .catch((err) => {
+                console.error("İptal Hatası:", err);
                 confirmBtn.disabled = false;
                 confirmBtn.innerHTML = originalText;
+                Swal.fire('Hata', 'İptal işlemi başarısız oldu.', 'error');
             });
     }
 
@@ -757,31 +825,38 @@
         }
 
         ${status !== 'DELIVERED' && status !== 'UNSUPPLIED'
-            ? `<button class="btn btn-sm btn-outline-danger" onclick="handleCancelClick('${order.id}', '${platform}')">İptal Et</button>`
+            ? `<button class="btn btn-sm btn-outline-danger" onclick="handleCancelClick('${order.id}', '${platform}', '${trackingId}', event)">İptal Et</button>`
             : `<span class="badge bg-light text-dark">${status === 'DELIVERED' ? 'Tamamlandı' : 'İptal Edildi'}</span>`
         }
     </div>
 
-    <div class="modal fade" id="cancelModal${order.id}" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Siparişi İptal Et (#${order.id})</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body text-start">
-                    <div id="reasonSelectionArea${order.id}" class="mb-3"></div>
+  <div class="modal fade" id="cancelModal${order.id}" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title fw-bold">Siparişi İptal Et</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div id="reasonSelectionArea${order.id}" class="mb-3"></div>
 
-                    <label class="form-label">Notunuz</label>
-                    <textarea class="form-control" id="cancelReason${order.id}" rows="3" placeholder="Ek açıklama..."></textarea>
+                <div class="form-group mt-3">
+                    <label class="form-label fw-bold text-muted small">OPSİYONEL NOT</label>
+                    <textarea class="form-control border-0 shadow-sm" id="cancelReason${order.id}" rows="3"
+                              placeholder="Eklemek istediğiniz notu yazın..."></textarea>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button>
-                    <button type="button" class="btn btn-danger" onclick="confirmCancel('${order.id}','${order.tracking_id}','${order.platform}')">İptali Onayla</button>
-                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Vazgeç</button>
+                <button type="button" class="btn btn-danger px-4 fw-bold"
+                        onclick="confirmCancel('${order.id}','${order.tracking_id}','${order.platform}')">
+                    İptali Onayla
+                </button>
             </div>
         </div>
     </div>
+</div>
+</div>
 </td>
     <td>
         <!-- İşlem ikonları -->

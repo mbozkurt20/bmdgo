@@ -5,27 +5,27 @@ namespace App\Http\Controllers\Api\v2\Courier\Orders;
 
 use App\Enums\EntegraStatusEnum;
 use App\Helpers\CourierStatus;
-use App\Helpers\EntegraHelper;
+use App\Helpers\EntegraStatusHelper;
 use App\Helpers\Json;
 use App\Helpers\NotificationHelper;
 use App\Helpers\OrdersHelper;
 use App\Helpers\OrderStatus;
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\EntegraController;
 use App\Http\Controllers\GpsYemekController;
 use App\Http\Resources\OrderResource;
 use App\Models\CourierOrder;
 use App\Models\Order;
-use App\Models\ProgressPaymentRecord;
+use App\Services\EntegraService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class OrderController extends Controller
 {
-    public function index()
+    public function activeOrders()
     {
         $courier = auth('courier')->user();
         $orders = Order::where('courier_id', $courier->id)
@@ -34,9 +34,9 @@ class OrderController extends Controller
             ->whereIn('status', [OrderStatus::PREPARED, OrderStatus::ASSIGNED, OrderStatus::HANDOVER])
             ->get();
 
-        return Json::success('Siparişler', OrderResource::collection($orders));
+        return Json::success('Aktif Siparişlerim', OrderResource::collection($orders));
     }
-    public function oldOrders(Request $request)
+    public function pastOrdes(Request $request)
     {
         $startDate = $request->query('startDate')
             ? Carbon::parse($request->query('startDate'))->startOfDay() // Change to startOfDay
@@ -53,7 +53,7 @@ class OrderController extends Controller
             ->whereNotIn('status', [OrderStatus::ASSIGNED, OrderStatus::HANDOVER])
             ->get();
 
-        return Json::success('Siparişler', OrderResource::collection($orders));
+        return Json::success('Geçmiş Siparişlerim', OrderResource::collection($orders));
     }
 
     public function transfer(Request $request, $orderId)
@@ -101,9 +101,8 @@ class OrderController extends Controller
         return Json::success('Sipariş boşa çıkarıldı, kurye müsait kuryeye atanıcaktır.');
     }
 
-    public function status(Request $request, $orderId)
+    public function changeStatus(Request $request, $orderId)
     {
-        //gpsyemek PREPARED - HANDOVER - DELIVERED - REJECTED
         $courier = auth('courier')->user();
         $order = Order::find($orderId);
 
@@ -114,170 +113,127 @@ class OrderController extends Controller
         if ($order->courier_id != $courier->id) {
             return Json::error('Size atanmamış bir siparişi güncelleyemezsiniz', 401);
         }
-//
-        //kurye teslim aldı
-        if ($request->input('order_status_id') == 4) {
-            try {
-                DB::transaction(function () use ($order, $courier) {
 
-                    // 1. API KONTROLLERİ (Sadece Entegra platformları için)
-                    $integratedPlatforms = ['getir', 'yemeksepeti', 'trendyol', 'migros'];
+        $statusId = $request->input('order_status_id');
 
-                    if (in_array($order->platform, $integratedPlatforms)) {
-                        $response = EntegraHelper::updateOrder($order->pid);
+        try {
+            return DB::transaction(function () use ($order, $courier, $statusId) {
 
-                        // API başarısızsa işlemi durdur, veritabanını güncelleme
-                        if (!$response || !$response->success) {
-                            throw new \Exception("Entegra sipariş atama hatası: " . ($response->message ?? 'Servis yanıt vermedi'));
-                        }
+                // --- DURUM 4: KURYE TESLİM ALDI (ASSIGNED) ---
+                if ($statusId == 4) {
+                    $order->update([
+                        'courier_id' => $courier->id,
+                        'status' => OrderStatus::ASSIGNED
+                    ]);
+                }
 
-                        // API statülerini işle
-                        $order->entegra_status = $response->status;
-                        $order->entegra_order_status = $response->orderStatus;
-                    }
-
-                    // 2. VERİTABANI GÜNCELLEME (Telefon siparişi ise direkt buraya geçer)
-                    // Kurye atama işlemi
-                    $order->courier_id = $courier->id;
-                    $order->status = OrderStatus::ASSIGNED;
-                    $order->save();
-
-                    // Opsiyonel: Kurye durumunu da burada değiştirmek istersen ekleyebilirsin
-                    // $courier->status = CourierStatus::on_way;
-                    // $courier->save();
-                });
-
-            } catch (\Exception $e) {
-                // Hata durumunda statü değişmez, kullanıcıya bilgi döner
-                return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
-            }
-        }
-
-        //kurye YOLA ÇIKTI
-        if ($request->input('order_status_id') == 3) {
-            try {
-                DB::transaction(function () use ($order, $courier) {
-
-                    // 1. API KONTROLLERİ (Sadece entegrasyonu olanlar için)
+                // --- DURUM 3: KURYE YOLA ÇIKTI (HANDOVER) ---
+                elseif ($statusId == 3) {
                     if ($order->platform === 'gpsyemek') {
                         $gpsResponse = app(GpsYemekController::class)->updateOrder(new Request([
                             'action'      => OrderStatus::HANDOVER,
                             'tracking_id' => $order->tracking_id,
                         ]));
-
-                        // API hata dönerse her şeyi iptal et (Rollback)
                         if (!$gpsResponse) throw new \Exception("GpsYemek API hatası.");
                     }
-
                     elseif (in_array($order->platform, ['getir', 'yemeksepeti', 'trendyol', 'migros'])) {
-                        $response = EntegraHelper::updateOrder($order->pid);
-
-                        // Entegra başarısızsa statü değişmesin
-                        if (!$response || !$response->success) {
-                            throw new \Exception("Entegra entegrasyonu başarısız.");
+                        if ($order->entegra_current_status == EntegraStatusEnum::PREPARING) {
+                            $response = EntegraService::updateOrder($order->pid);
+                            if (!$response->success) {
+                                throw new \Exception('Entegra güncellenemedi: ' . ($response->message ?? 'Hata'));
+                            }
+                            $order->entegra_current_status = $response->status;
+                            $order->entegra_next_status = $response->orderStatus;
                         }
-
-                        // API'den gelen statü bilgilerini doldur
-                        $order->entegra_status = $response->status;
-                        $order->entegra_order_status = $response->orderStatus;
                     }
-
-                    // 2. VERİTABANI GÜNCELLEME (Telefon siparişi vb. ise direkt buraya düşer)
-                    // Eğer yukarıdaki if'lerden biri throw fırlattıysa buraya hiç gelmez.
 
                     $order->courier_id = $courier->id;
                     $order->status = OrderStatus::HANDOVER;
-                    $order->save();
+                    $order->update();
 
-                    $courier->status = CourierStatus::service;
-                    $courier->save();
-                });
+                    $courier->update(['status' => CourierStatus::service]);
+                }
 
-            } catch (\Exception $e) {
-                // Hata durumunda hiçbir veritabanı kaydı değişmez.
-                return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
-            }
-        }
-
-        //teslim edidi
-        if ($request->input('order_status_id') == 1) {
-            try {
-                DB::transaction(function () use ($order, $courier) {
-
-                    // 1. API KONTROLLERİ
+                // --- DURUM 1: PAKET TESLİM EDİLDİ (DELIVERED) ---
+                elseif ($statusId == 1) {
                     if ($order->platform === 'gpsyemek') {
                         $gpsResponse = app(GpsYemekController::class)->updateOrder(new Request([
                             'action'      => OrderStatus::DELIVERED,
                             'tracking_id' => $order->tracking_id,
                         ]));
-
-                        // API tarafında bir sorun varsa işlemi iptal et
                         if (!$gpsResponse) throw new \Exception("GpsYemek servis hatası.");
-                    }
 
-                    elseif (in_array($order->platform, ['getir', 'yemeksepeti', 'trendyol', 'migros'])) {
-                        $response = EntegraHelper::updateOrder($order->pid);
+                        // Gps başarılıysa statüyü güncelle
+                        $order->status = OrderStatus::DELIVERED;
 
-                        // Entegra başarısızsa veya beklenen statü değilse işlemi iptal et
-                        if (!$response || !$response->success) {
-                            throw new \Exception("Entegra güncelleme başarısız.");
+                    } elseif (in_array($order->platform, ['getir', 'yemeksepeti', 'trendyol', 'migros'])) {
+
+                        // Sadece statü HANDOVER ise Entegra'yı güncelle
+                        if ($order->entegra_current_status == EntegraStatusEnum::HANDOVER) {
+                            $response = EntegraService::updateOrder($order->pid);
+
+                            if (!$response->success) {
+                                // Hata durumunda Helper'ı kullanarak statüyü kaydet ve durdur
+                                $order->entegra_current_status = $response->status;
+                                $order->entegra_next_status = $response->orderStatus;
+                                $order->status = EntegraStatusHelper::getNameByValue($response->orderStatus);
+                                $order->update();
+
+                                throw new \Exception('Entegra teslimat hatası: ' . $order->status);
+                            }
+
+                            // Başarılıysa Entegra'dan gelen güncel verileri işle
+                            $order->entegra_current_status = $response->status;
+                            $order->entegra_next_status = $response->orderStatus;
+                            $order->status = OrderStatus::DELIVERED;
+                        } else {
+                            // Zaten teslim edilmişse veya statü uygun değilse de ana statüyü güncelle
+                            $order->status = OrderStatus::DELIVERED;
                         }
-
-                        $order->entegra_status = $response->status;
-                        $order->entegra_order_status = $response->orderStatus;
+                    } else {
+                        // Diğer platformlar için varsayılan işlem
+                        $order->status = OrderStatus::DELIVERED;
                     }
 
-                    // 2. VERİTABANI GÜNCELLEMELERİ (Telefon siparişi vb. ise engelsiz buraya gelir)
+                    $order->update();
+                    $courier->update(['status' => CourierStatus::active]);
 
-                    // Siparişi teslim edildi yap
-                    $order->status = OrderStatus::DELIVERED;
-                    $order->save();
-
-                    // Kuryeyi boşa çıkar (Aktif yap)
-                    $courier->status = CourierStatus::active;
-                    $courier->save();
-
-                    // 3. BİLDİRİM İŞLEMİ
                     if (OrdersHelper::getOrderSystem(3)) {
                         NotificationHelper::add([
                             'title' => 'Paket Teslim Edildi',
-                            'description' => "{$order->tracking_id} takip numaralı paket {$courier->name} kurye tarafından teslim edildi.",
+                            'description' => "{$order->tracking_id} takip numaralı paket teslim edildi.",
                             'url' => route('admin.balance')
                         ]);
                     }
-                });
+                }
 
-            } catch (\Exception $e) {
-                // API hatası olduğunda buraya düşer ve hiçbir statü değişmez
-                return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
-            }
+                // --- DURUM 2: PAKET REDDEDİLDİ ---
+                elseif ($statusId == 2) {
+                    $courier->update(['status' => CourierStatus::active]);
+                    $order->update([
+                        'courier_id' => -1,
+                        'assigned_at' => null,
+                        'status' => OrderStatus::PREPARED
+                    ]);
+
+                    CourierOrder::where('order_id', $order->id)->where('courier_id', $courier->id)->delete();
+
+                    if (OrdersHelper::getOrderSystem(3)) {
+                        NotificationHelper::add([
+                            'title' => 'Kurye Paketi Reddetti',
+                            'description' => $order->tracking_id . ' takip numaralı paket ' . $courier->name . '  kurye tarafından reddedildi..',
+                            'url' => route('admin.balance')
+                        ]);
+                    }
+                }
+
+                return Json::success('Sipariş Durumu Güncellendi', new OrderResource($order));
+            });
+
+        } catch (\Exception $e) {
+            Log::error("Sipariş Güncelleme Hatası: " . $e->getMessage());
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
         }
-
-        //reddedildi edidi
-        if ($request->input('order_status_id') == 2) {
-           $courier->status = CourierStatus::active;
-           $courier->update();
-
-           $order->courier_id = -1;
-           $order->assigned_at = null;
-           $order->status = OrderStatus::PREPARED;
-           $order->update();
-
-           $courierOrder = CourierOrder::where('order_id',$order->id)->where('courier_id',$courier->id)->first();
-           if ($courierOrder) {
-               $courierOrder->delete();
-           }
-
-            if (OrdersHelper::getOrderSystem(3)) {
-                NotificationHelper::add([
-                    'title' => 'Kurye Paketi Reddetti',
-                    'description' => $order->tracking_id . ' takip numaralı paket ' . $courier->name . '  kurye tarafından reddedildi..',
-                    'url' => route('admin.balance')
-                ]);
-            }
-        }
-
-        return Json::success('Sipariş Durumu Güncellendi', new OrderResource($order));
     }
 
     public function report(Request $request)
@@ -370,4 +326,161 @@ class OrderController extends Controller
             return Json::success('Doğrulama Kodu Eşleşmiyor', null, 401);
         }
     }
+
+    /*
+     *     public function changeStatus(Request $request, $orderId)
+    {
+        //gpsyemek PREPARED - HANDOVER - DELIVERED - REJECTED
+        $courier = auth('courier')->user();
+        $order = Order::find($orderId);
+
+        if (!$order) {
+            return response()->json(['message' => 'Sipariş Bulunamadı'], 404);
+        }
+
+        if ($order->courier_id != $courier->id) {
+            return Json::error('Size atanmamış bir siparişi güncelleyemezsiniz', 401);
+        }
+//
+        //KURYE TESLİM ALDI ASSIGNED
+        if ($request->input('order_status_id') == 4) {
+            try {
+                $order->courier_id = $courier->id;
+                $order->status = OrderStatus::ASSIGNED;
+                $order->update();
+            } catch (\Exception $e) {
+                return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+            }
+        }
+
+        // KURYE YOLA ÇIKTI HANDOVER
+        if ($request->input('order_status_id') == 3) {
+            try {
+                DB::transaction(function () use ($order, $courier) {
+
+                    // 1. API KONTROLLERİ (Sadece entegrasyonu olanlar için)
+                    if ($order->platform === 'gpsyemek') {
+                        $gpsResponse = app(GpsYemekController::class)->updateOrder(new Request([
+                            'action'      => OrderStatus::HANDOVER,
+                            'tracking_id' => $order->tracking_id,
+                        ]));
+
+                        if (!$gpsResponse) throw new \Exception("GpsYemek API hatası.");
+                    }
+
+                    elseif (in_array($order->platform, ['getir', 'yemeksepeti', 'trendyol', 'migros'])) {
+                        if ($order->entegra_current_status == EntegraStatusEnum::PREPARING) {
+                            $response = EntegraHelper::updateOrder($order->pid);
+                            Log::info("Response". json_encode($response));
+
+                            if ($response->success) {
+                                Log::info("Success" . json_encode($response));
+                                $order->entegra_current_status = $response->status;
+                                $order->entegra_next_status = $response->orderStatus;
+                            } else {
+                                return response()->json([
+                                    'status' => 'error',
+                                    'message' => 'Üzgünüz, lütfen yeniden deneyiniz.'
+                                ], 404);
+                            }
+                        }
+                    }
+
+                    $order->courier_id = $courier->id;
+                    $order->status = OrderStatus::HANDOVER;
+                    $order->update();
+
+                    $courier->status = CourierStatus::service;
+                    $courier->update();
+                });
+
+            } catch (\Exception $e) {
+                return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+            }
+        }
+
+        // PAKET TESLİM EDİLDİ DELIVERED
+        if ($request->input('order_status_id') == 1) {
+            try {
+                DB::transaction(function () use ($order, $courier) {
+
+                    if ($order->platform === 'gpsyemek') {
+                        $gpsResponse = app(GpsYemekController::class)->updateOrder(new Request([
+                            'action'      => OrderStatus::DELIVERED,
+                            'tracking_id' => $order->tracking_id,
+                        ]));
+
+                        // API tarafında bir sorun varsa işlemi iptal et
+                        if (!$gpsResponse) throw new \Exception("GpsYemek servis hatası.");
+                    }
+
+                    elseif (in_array($order->platform, ['getir', 'yemeksepeti', 'trendyol', 'migros'])) {
+                        if ($order->entegra_current_status == EntegraStatusEnum::HANDOVER) {
+                            $response = EntegraHelper::updateOrder($order->pid);
+                            Log::info("Response". json_encode($response));
+
+                            if ($response->success) {
+                                Log::info("Success" . json_encode($response));
+                                $order->entegra_current_status = $response->status;
+                                $order->entegra_next_status = $response->orderStatus;
+                            } else {
+                                return response()->json([
+                                    'status' => 'error',
+                                    'message' => 'Üzgünüz, lütfen yeniden deneyiniz.'
+                                ], 404);
+                            }
+                        }
+                    }
+
+                    // Siparişi teslim edildi yap
+                    $order->status = OrderStatus::DELIVERED;
+                    $order->update();
+
+                    // Kuryeyi boşa çıkar (Aktif yap)
+                    $courier->status = CourierStatus::active;
+                    $courier->update();
+
+                    // 3. BİLDİRİM İŞLEMİ
+                    if (OrdersHelper::getOrderSystem(3)) {
+                        NotificationHelper::add([
+                            'title' => 'Paket Teslim Edildi',
+                            'description' => "{$order->tracking_id} takip numaralı paket {$courier->name} kurye tarafından teslim edildi.",
+                            'url' => route('admin.balance')
+                        ]);
+                    }
+                });
+
+            } catch (\Exception $e) {
+                // API hatası olduğunda buraya düşer ve hiçbir statü değişmez
+                return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+            }
+        }
+
+        // PAKET REDDEDİLDİ ASSIGNED | OTOMATIK PREPARED DÜŞER ATAMA BEKLER
+        if ($request->input('order_status_id') == 2) {
+           $courier->status = CourierStatus::active;
+           $courier->update();
+
+           $order->courier_id = -1;
+           $order->assigned_at = null;
+           $order->status = OrderStatus::PREPARED;
+           $order->update();
+
+           $courierOrder = CourierOrder::where('order_id',$order->id)->where('courier_id',$courier->id)->first();
+           if ($courierOrder) {
+               $courierOrder->delete();
+           }
+
+            if (OrdersHelper::getOrderSystem(3)) {
+                NotificationHelper::add([
+                    'title' => 'Kurye Paketi Reddetti',
+                    'description' => $order->tracking_id . ' takip numaralı paket ' . $courier->name . '  kurye tarafından reddedildi..',
+                    'url' => route('admin.balance')
+                ]);
+            }
+        }
+
+        return Json::success('Sipariş Durumu Güncellendi', new OrderResource($order));
+    }
+     */
 }
