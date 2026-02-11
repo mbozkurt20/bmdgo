@@ -727,7 +727,7 @@
         let courierSection = '';
         let courierStatusBadge = ''; // Yeni durum rozeti
 
-        if (status === 'UNSUPPLIED' || status === 'DELIVERED' || status === 'HANDOVER') {
+        if (status === 'UNSUPPLIED' || status === 'DELIVERED' || status === 'HANDOVER' || '{{$key == 'restaurant'}}') {
             courierSection = `
         <a style="cursor:pointer;color: #ec691e">
             <i class="fas fa-truck mr-1"></i> ${order.courier ? order.courier.name.substr(0, 10) : 'Kurye Yok'}
