@@ -45,13 +45,6 @@ class EntegraController extends Controller
         ]);
     }
 
-    public function rejectOrder($orderId, Request $request)
-    {
-        $res = EntegraService::rejectOrder($orderId, $request->all());
-
-        return response()->json(['success' => true, 'res' => $res]);
-    }
-
     public function updateOrderStatus(Request $request)
     {
         $platform = explode('/', $request->path())[1];

@@ -121,6 +121,7 @@ class EntegraWebhookController extends Controller
             'promotions' => json_encode([]),
             'coupon' => json_encode([]),
             'sub_amount' => $orderData['totalPrice'],
+            'entegra_current_status' => $orderData['status'],
             'discount' => $orderData['totalDiscount'],
             'amount' => $orderData['totalDiscountedPrice'],
             'notes' => $orderData['clientNote']??null,
