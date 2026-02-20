@@ -75,6 +75,38 @@
                                         <input type="password" name="password" class="form-control" placeholder="Değiştirmek istemiyorsanız boş bırakın">
                                     </div>
 
+                                    <div class="row py-3">
+                                        <div class="col-md-6 mb-4">
+                                            <label class="text-dark fw-bold d-flex justify-content-between" for="distance_limit_km">
+                                                <span><i class="fa fa-map-marked-alt text-primary me-2"></i>Maksimum Sipariş Mesafesi</span>
+                                                <span id="dist_val" class="badge bg-primary rounded-pill">0 km</span>
+                                            </label>
+                                            <input required type="range" name="distance_limit_km" id="distance_limit_km"
+                                                   min="1" max="100" step="1"
+                                                   value="{{ old('distance_limit_km', auth()->user()->distance_limit_km ?? 20) }}"
+                                                   class="form-range custom-range-slider">
+                                            <div class="small text-muted mt-1">
+                                                <i class="fa fa-info-circle me-1"></i>
+                                                Restoranınızın hizmet vereceği **maksimum yarıçapı** belirler. Bu mesafeden uzak müşteriler sipariş veremez ve kurye ataması yapılmaz.
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 mb-4">
+                                            <label class="text-dark fw-bold d-flex justify-content-between" for="max_package_limit">
+                                                <span><i class="fa fa-box-open text-warning me-2"></i>Maksimum Kurye Paket Ataması</span>
+                                                <span id="pkg_val" class="badge bg-warning text-dark rounded-pill">0 Paket</span>
+                                            </label>
+                                            <input required type="range" name="max_package_limit" id="max_package_limit"
+                                                   min="1" max="10" step="1"
+                                                   value="{{ old('max_package_limit', auth()->user()->max_package_limit ?? 4) }}"
+                                                   class="form-range custom-range-slider">
+                                            <div class="small text-muted mt-1">
+                                                <i class="fa fa-info-circle me-1"></i>
+                                                Bir kurye henüz **"Yola Çıkmadı"** durumundayken, üzerine atanabilecek **en fazla** sipariş sayısıdır. Bu sınıra ulaşıldığında kurye otomatik olarak yola çıkarılır.
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div class="mb-3 col-md-6">
                                         <label class="form-label fw-bold">Şehir</label>
                                         <select required class="form-control select2" name="city_id" id="city_id">
@@ -120,6 +152,21 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function updateRangeValues() {
+            $('#dist_val').text($('#distance_limit_km').val() + ' km');
+            $('#pkg_val').text($('#max_package_limit').val() + ' Paket');
+        }
+
+        $(document).on('input', '#distance_limit_km, #max_package_limit', function() {
+            updateRangeValues();
+        });
+
+        $(document).ready(function() {
+            updateRangeValues();
+        });
+    </script>
 
     <script>
         let map, marker, autocomplete;

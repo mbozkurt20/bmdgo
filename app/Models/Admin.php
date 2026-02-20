@@ -41,6 +41,8 @@ class Admin extends Authenticatable
         'vatan_sms_password',
         'vatan_sms_orginator',
         'is_sms', //sms ile doğrulama
+        'distance_limit_km',
+        'max_package_limit',
     ];
 
     /**

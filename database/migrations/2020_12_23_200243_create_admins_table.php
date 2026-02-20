@@ -35,6 +35,8 @@ class CreateAdminsTable extends Migration
             $table->string('vatan_sms_username')->nullable();
             $table->string('vatan_sms_password')->nullable();
             $table->string('vatan_sms_orginator')->nullable();
+            $table->integer('distance_limit_km')->default(50);
+            $table->integer('max_package_limit')->default(4);
             $table->boolean('is_sms')->default(0);
             $table->boolean( 'is_active',)->default(1);
             $table->rememberToken();

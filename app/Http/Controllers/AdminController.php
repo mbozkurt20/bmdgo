@@ -124,6 +124,8 @@ class AdminController extends Controller
         $auth->phone = $request->input('phone');
         $auth->city_id = $request->input('city_id');
         $auth->district_id = $request->input('district_id');
+        $auth->distance_limit_km = $request->input('distance_limit_km');
+        $auth->max_package_limit = $request->input('max_package_limit');
         $auth->update();
 
         return redirect()->back()->with('message', 'Bilgileriniz Güncellenmiştir.');

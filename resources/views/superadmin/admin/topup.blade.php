@@ -47,14 +47,11 @@
                                     <input style="display: none" type="text" value="{{$admin->id}}" name="admin_id">
                                     <div class="mb-4 text-dark">
                                         <label>Kontör Ücreti Seçiniz</label>
-                                        <select required name="top_up_price" id="top_up_price" class="form-control">
-                                            <option value="0.50">0.50₺</option>
-                                            <option value="1.5">1.5₺</option>
-                                            <option value="2">2₺</option>
-                                            <option value="2.5">2.5₺</option>
-                                            <option value="3">3₺</option>
-                                            <option value="4">4₺</option>
-                                        </select>
+                                        <x-money-input
+                                            name="top_up_price"
+                                            label="Bir ücret giriniz"
+                                            required="true"
+                                        />
                                     </div>
                                     <div class="mb-4 text-dark">
                                         <label>Kontör Adet</label>
