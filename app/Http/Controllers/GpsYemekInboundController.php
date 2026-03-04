@@ -146,7 +146,7 @@ class GpsYemekInboundController extends Controller
             return response()->json(['success' => false, 'message' => 'Order not found'], 404);
         }
 
-        if (in_array($status, [OrderStatus::DELIVERED, OrderStatus::UNSUPPLIED, OrderStatus::CANCELLED])) {
+        if (in_array($status, [OrderStatus::DELIVERED, OrderStatus::UNSUPPLIED, 'CANCELLED'])) {
             $courierOrder = CourierOrder::where('order_id', $order->id)->first();
             if ($courierOrder) {
                 $courier = Courier::find($courierOrder->courier_id);
@@ -161,6 +161,11 @@ class GpsYemekInboundController extends Controller
                 $order->courier_id  = -1;
                 $order->assigned_at = null;
             }
+        }
+
+        // bmd-kurye'de CANCELLED sabiti yok, UNSUPPLIED olarak işle
+        if ($status === 'CANCELLED') {
+            $status = OrderStatus::UNSUPPLIED;
         }
 
         $order->status = $status;
