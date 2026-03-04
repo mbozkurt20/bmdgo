@@ -11,6 +11,7 @@ use App\Helpers\OrderStatus;
 use App\Models\CourierOrder;
 use App\Models\Order;
 use App\Models\Courier;
+use App\Services\GpsYemekOutboundService;
 use App\Services\PushNotificationService;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
@@ -119,6 +120,9 @@ class AssignPendingOrders implements ShouldQueue
                         'Takip: ' . $order->tracking_id
                     );
                 }
+
+                // GPS Yemek platformu için ON_THE_WAY bildirimi gönder
+                (new GpsYemekOutboundService())->notifyStatusChange($order, OrderStatus::HANDOVER);
 
                 Log::info("BAŞARILI: Sipariş #{$order->id}, Kurye #{$assignedCourier->id} kişisine atandı.");
 

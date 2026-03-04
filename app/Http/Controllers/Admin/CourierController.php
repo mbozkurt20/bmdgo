@@ -16,6 +16,7 @@ use App\Models\Order;
 use App\Models\CourierOrder;
 use App\Models\ProgressPaymentRecord;
 use App\Models\Restaurant;
+use App\Services\GpsYemekOutboundService;
 use App\Services\PushNotificationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -322,7 +323,28 @@ class CourierController extends Controller
     public function sendCourier($orderId, $courierId)
     {
         $order = Order::find($orderId);
+
+        if (!$order) {
+            echo 'ERR';
+            return;
+        }
+
+        // -1 = kuryeyi siparişten çıkar
+        if ($courierId == -1) {
+            $order->courier_id  = null;
+            $order->assigned_at = null;
+            $order->save();
+            CourierOrder::where('order_id', $order->id)->delete();
+            echo 'OK';
+            return;
+        }
+
         $courier = Courier::find($courierId);
+
+        if (!$courier) {
+            echo 'ERR';
+            return;
+        }
 
         $order->courier_id = $courier->id;
         $order->assigned_at = Carbon::now();
@@ -360,6 +382,9 @@ class CourierController extends Controller
                 'url' => route('admin.balance')
             ]);
         }
+
+        // GPS Yemek platformu için ON_THE_WAY bildirimi gönder
+        (new GpsYemekOutboundService())->notifyStatusChange($order, OrderStatus::HANDOVER);
 
         echo 'OK';
     }
