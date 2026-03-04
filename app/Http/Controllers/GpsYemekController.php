@@ -20,6 +20,8 @@ use Illuminate\Support\Facades\Log;
 
 class GpsYemekController extends Controller
 {
+    const GPS_YEMEK_URL = 'https://gpsyemek.com/api/v1/webhook/orders';
+
     function index()
     {
         $restaurants = Restaurant::all();
@@ -30,62 +32,57 @@ class GpsYemekController extends Controller
 
     public function updateOrder(Request $request)
     {
-        $status = $request->input('action');
+        $status    = $request->input('action');
         $orderCode = $request->input('tracking_id');
-        $order = Order::where('tracking_id', $orderCode)->first();
+        $order     = Order::where('tracking_id', $orderCode)->first();
 
-        if ($status == OrderStatus::PREPARED || $status == OrderStatus::UNSUPPLIED || $status == OrderStatus::DELIVERED || $status == OrderStatus::HANDOVER) {
+        if (in_array($status, [OrderStatus::PREPARED, OrderStatus::UNSUPPLIED, OrderStatus::DELIVERED, OrderStatus::HANDOVER])) {
             $api_token = $order->restaurant->gpsyemek_api_key;
 
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $api_token
-            ])->post('https://gpsyemek.com/api/v1/webhook/orders', [
-                'event' => 'order_updated',
-                'order_code' => $orderCode,
-                'status' => $status,
-                'token' => $api_token,
-            ]);
+            $response = Http::withToken($api_token)
+                ->timeout(5)
+                ->post(self::GPS_YEMEK_URL, [
+                    'event'      => 'order_updated',
+                    'order_code' => $orderCode,
+                    'status'     => $status,
+                ]);
 
-            $response = json_decode($response->body());
+            $result = $response->json();
 
-            if ($response->success) {
-                // API'ye gönderilecek veriyi belirle
+            if ($result['success'] ?? false) {
                 switch ($status) {
                     case 'DELIVERED':
-                        // Sipariş teslim edildiğinde kuryenin durumu güncelleniyor
                         $courierOrder = CourierOrder::where('order_id', $order->id)->first();
                         if ($courierOrder) {
                             $courier = Courier::find($courierOrder->courier_id);
                             if ($courier) {
-                                // Kuryenin durumunu güncelle
-                                $courier->status = CourierStatus::active;;
+                                $courier->status = CourierStatus::active;
                                 $courier->update();
                                 Log::info('Kurye durumu güncellendi', ['courier_id' => $courier->id]);
                             }
                         }
                         break;
+
                     case 'UNSUPPLIED':
-                        // Sipariş iptal edildiyse kuryenin durumu güncelleniyor
                         $courierOrder = CourierOrder::where('order_id', $order->id)->first();
                         if ($courierOrder) {
                             $courier = Courier::find($courierOrder->courier_id);
                             if ($courier) {
-                                // Kuryenin durumunu güncelle
-                                $courier->status = CourierStatus::active;;
+                                $courier->status = CourierStatus::active;
                                 $courier->save();
 
-                                $order->courier_id = -1;
+                                $order->courier_id  = -1;
                                 $order->assigned_at = null;
-                                $order->status = OrderStatus::PREPARED;
+                                $order->status      = OrderStatus::PREPARED;
                                 $order->update();
 
                                 Log::info('Kurye durumu güncellendi', ['courier_id' => $courier->id]);
 
                                 if (OrdersHelper::getOrderSystem(3)) {
                                     NotificationHelper::add([
-                                        'title' => 'Kurye Paketi Reddetti',
-                                        'description' => $order->tracking_id . ' takip numaralı paket ' . $courier->name . '  kurye tarafından teslim edildi.',
-                                        'url' => route('admin.balance')
+                                        'title'       => 'Kurye Paketi Reddetti',
+                                        'description' => $order->tracking_id . ' takip numaralı paket ' . $courier->name . ' kurye tarafından teslim edildi.',
+                                        'url'         => route('admin.balance'),
                                     ]);
                                 }
                             }
@@ -94,27 +91,55 @@ class GpsYemekController extends Controller
                 }
 
                 $order->status = $status;
-                $success = $order->update();
-
-                if ($success) {
-                    return response()->json(['status' => "OK"], 200);
-                } else {
-                    Log::error('Sipariş durumu güncellenemedi', ['order_id' => $order->id]);
-                    return response()->json(['status' => "ERR"], 400);
+                if ($order->update()) {
+                    return response()->json(['status' => 'OK'], 200);
                 }
-            } else {
-                return response()->json(['status' => ""], 200);
-            }
-        }else {
-            $order->status = $status;
-            $success = $order->update();
-            if ($success) {
-                return response()->json(['status' => "OK"], 200);
-            } else {
+
                 Log::error('Sipariş durumu güncellenemedi', ['order_id' => $order->id]);
-                return response()->json(['status' => "ERR"], 400);
+                return response()->json(['status' => 'ERR'], 400);
             }
+
+            return response()->json(['status' => ''], 200);
         }
+
+        $order->status = $status;
+        if ($order->update()) {
+            return response()->json(['status' => 'OK'], 200);
+        }
+
+        Log::error('Sipariş durumu güncellenemedi', ['order_id' => $order->id]);
+        return response()->json(['status' => 'ERR'], 400);
+    }
+
+    /**
+     * GPS Yemek'te restoranı aç veya süresiz kapat.
+     * AJAX ile çağrılır.
+     */
+    public function toggleStatus(Request $request)
+    {
+        $restaurant = Restaurant::find(Auth::user()->id);
+
+        if (!$restaurant || blank($restaurant->gpsyemek_api_key)) {
+            return response()->json(['success' => false, 'message' => 'GPS Yemek API key bulunamadı'], 400);
+        }
+
+        $close = (bool) $request->input('close'); // true = kapat, false = aç
+        $event = $close ? 'restaurant_permanently_close' : 'restaurant_open';
+
+        $response = Http::withToken($restaurant->gpsyemek_api_key)
+            ->timeout(5)
+            ->post(self::GPS_YEMEK_URL, ['event' => $event]);
+
+        $result = $response->json();
+
+        if ($result['success'] ?? false) {
+            $restaurant->gpsyemek_is_open = !$close;
+            $restaurant->save();
+
+            return response()->json(['success' => true, 'is_open' => !$close]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'GPS Yemek yanıt vermedi'], 500);
     }
 
     private function orders($restaurant)
@@ -126,14 +151,26 @@ class GpsYemekController extends Controller
 
         $api_token = $restaurant->gpsyemek_api_key;
 
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $api_token
-        ])->post('https://gpsyemek.com/api/v1/webhook/orders', [
-            'event' => 'get_orders',
-            'token' => $api_token,
-        ]);
+        if (blank($api_token)) {
+            return;
+        }
 
-        $orders = $response->json()['orders'] ?? [];
+        $response = Http::withToken($api_token)
+            ->timeout(5)
+            ->post(self::GPS_YEMEK_URL, ['event' => 'get_orders']);
+
+        $data = $response->json();
+
+        // Restoran açık/kapalı durumunu senkronize et
+        if (isset($data['restaurant_status'])) {
+            $isOpen = !($data['restaurant_status']['permanently_closed'] ?? false);
+            if ($restaurant->gpsyemek_is_open !== $isOpen) {
+                $restaurant->gpsyemek_is_open = $isOpen;
+                $restaurant->save();
+            }
+        }
+
+        $orders = $data['orders'] ?? [];
 
         foreach ($orders as $row) {
             $order = Order::where('tracking_id', $row['order_code'])->first();
@@ -142,77 +179,74 @@ class GpsYemekController extends Controller
             }
 
             $address = json_decode($row['address']);
-            $create = Customer::where('email', $row['customer']['email'])->first();
+            $create  = Customer::where('email', $row['customer']['email'])->first();
+
             if (!$create) {
-                $create = new Customer();
-                $create->restaurant_id = $restaurant->id; // Assuming the authenticated user is the restaurant
-                $create->name = $row['customer']['first_name'] . " " . $row['customer']['last_name'];
-                $create->phone = $row['customer']['phone'];
-                $create->mobile = $row['mobile'];
-                $create->email = $row['customer']['email'] ?? null;
+                $create                = new Customer();
+                $create->restaurant_id = $restaurant->id;
+                $create->name          = $row['customer']['first_name'] . ' ' . $row['customer']['last_name'];
+                $create->phone         = $row['customer']['phone'];
+                $create->mobile        = $row['mobile'] ?? null;
+                $create->email         = $row['customer']['email'] ?? null;
                 $create->save();
 
                 if ($create) {
-                    $addr = new CustomerAddress();
-                    $addr->customer_id = $create->id;
+                    $addr                = new CustomerAddress();
+                    $addr->customer_id   = $create->id;
                     $addr->restaurant_id = $restaurant->id;
-                    $addr->name = $row['customer']['first_name'] . " " . $row['customer']['last_name'] . '-GpsYemek';
-                    $addr->sokak_cadde = ' ';
-                    $addr->bina_no = $address->apartment;
-                    $addr->city_id = ' ';
-                    $addr->kat = ' ';
-                    $addr->latitude = $row['lat'];
-                    $addr->longitude = $row['long'];
-                    $addr->daire_no = ' ';
-                    $addr->mahalle = ' ';
-                    $addr->adres_tarifi = $address->address ?? '';
+                    $addr->name          = $row['customer']['first_name'] . ' ' . $row['customer']['last_name'] . '-GpsYemek';
+                    $addr->sokak_cadde   = ' ';
+                    $addr->bina_no       = $address->apartment ?? '';
+                    $addr->city_id       = ' ';
+                    $addr->kat           = ' ';
+                    $addr->latitude      = $row['lat'];
+                    $addr->longitude     = $row['long'];
+                    $addr->daire_no      = ' ';
+                    $addr->mahalle       = ' ';
+                    $addr->adres_tarifi  = $address->address ?? '';
                     $addr->save();
                 }
             }
 
             $items = [];
-
             foreach ($row['items'] as $item) {
                 $items[] = [
-                    'price' => $item['item_total'],              // toplam fiyat
-                    'unitSellingPrice' => $item['unit_price'],   // birim fiyat
-                    'discountedPrice' => $item['discounted_price'],   // birim fiyat
-                    'quantity' => (string)$item['quantity'],    // string isteniyorsa
-                    'name' => $item['menu_item']['name'],        // ürün adı
-                    'image' => $item['menu_item']['image'],        // ürün adı
-                    'restaurant_id' => $item['restaurant_id'],        // ürün adı
+                    'price'            => $item['item_total'],
+                    'unitSellingPrice' => $item['unit_price'],
+                    'discountedPrice'  => $item['discounted_price'],
+                    'quantity'         => (string) $item['quantity'],
+                    'name'             => $item['menu_item']['name'],
+                    'image'            => $item['menu_item']['image'],
+                    'restaurant_id'    => $item['restaurant_id'],
                 ];
             }
 
-            $orderData = [
-                'platform' => 'gpsyemek',
-                'customer_id' => $create->id,
-                'restaurant_id' => $restaurant->id,
-                'courier_id' => -1,
-                'status' => OrderStatus::PENDING,
-                'tracking_id' => $row['order_code'],
-                'full_name' => $row['customer']['first_name'] . " " . $row['customer']['last_name'],
-                'phone' => $row['customer']['first_name'] . '/' . substr($row['order_code'], -11, 11),
+            Order::create([
+                'platform'       => 'gpsyemek',
+                'customer_id'    => $create->id,
+                'restaurant_id'  => $restaurant->id,
+                'courier_id'     => -1,
+                'status'         => OrderStatus::PENDING,
+                'tracking_id'    => $row['order_code'],
+                'full_name'      => $row['customer']['first_name'] . ' ' . $row['customer']['last_name'],
+                'phone'          => $row['customer']['first_name'] . '/' . substr($row['order_code'], -11, 11),
                 'payment_method' => $row['payment_method_name'],
-                'items' => json_encode($items),
-                'address' => json_decode($row['address'])->address ?? '',
-                'promotions' => json_encode([]),
-                'coupon' => json_encode([]),
-                'sub_amount' => $row['sub_total'],
-                'discount' => 0,
-                'amount' => $row['total'],
-                'notes' => $row['customerNote'] ?? null,
-                'platform_date' => date('d-m-Y, H:i', strtotime($row['created_at'])),
-
-                'distance' => OrdersHelper::haversineDistance(
+                'items'          => json_encode($items),
+                'address'        => json_decode($row['address'])->address ?? '',
+                'promotions'     => json_encode([]),
+                'coupon'         => json_encode([]),
+                'sub_amount'     => $row['sub_total'],
+                'discount'       => 0,
+                'amount'         => $row['total'],
+                'notes'          => $row['customerNote'] ?? null,
+                'platform_date'  => date('d-m-Y, H:i', strtotime($row['created_at'])),
+                'distance'       => OrdersHelper::haversineDistance(
                     $restaurant->latitude,
                     $restaurant->longitude,
                     $row['lat'],
                     $row['long']
-                )
-            ];
-
-            Order::create($orderData);
+                ),
+            ]);
         }
     }
 }

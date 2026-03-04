@@ -79,6 +79,22 @@
                                     @if($key == 'gpsyemek')
                                         <label class="form-label">API Key</label>
                                         <input type="text" class="form-control form-control-sm" name="data[api_key]" value="{{ $val->api_key ?? $restaurant->gpsyemek_api_key }}" required>
+
+                                        <div class="d-flex justify-content-between align-items-center mt-3 p-2" style="background:#fff0f0; border:1px solid #fca5a5; border-radius:10px;">
+                                            <span class="switch-text">
+                                                GPS Yemek Durum
+                                                <small id="gpsyemek-status-text" class="ms-1 fw-bold {{ $restaurant->gpsyemek_is_open ? 'text-success' : 'text-danger' }}">
+                                                    {{ $restaurant->gpsyemek_is_open ? 'Açık' : 'Kapalı' }}
+                                                </small>
+                                            </span>
+                                            <div class="form-check form-switch p-0 m-0">
+                                                <input class="form-check-input ms-0"
+                                                       type="checkbox"
+                                                       id="gpsyemek-toggle"
+                                                       {{ $restaurant->gpsyemek_is_open ? 'checked' : '' }}
+                                                       onchange="toggleGpsYemekStatus(this)">
+                                            </div>
+                                        </div>
                                     @else
                                         <label class="form-label">Restaurant ID</label>
                                         <input type="text" class="form-control form-control-sm mb-2" name="data[information][restaurantId]" value="{{ $val->information->restaurantId ?? '' }}" required>
@@ -149,4 +165,39 @@
             @endforeach
         </div>
     </div>
+@push('scripts')
+<script>
+function toggleGpsYemekStatus(el) {
+    const isOpen     = el.checked;
+    const statusText = document.getElementById('gpsyemek-status-text');
+
+    el.disabled = true;
+
+    fetch('{{ route('gpsyemek.toggle-status') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ close: !isOpen })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            statusText.textContent = data.is_open ? 'Açık' : 'Kapalı';
+            statusText.className   = 'ms-1 fw-bold ' + (data.is_open ? 'text-success' : 'text-danger');
+        } else {
+            el.checked = !isOpen;
+            alert(data.message ?? 'GPS Yemek durumu güncellenemedi.');
+        }
+    })
+    .catch(() => {
+        el.checked = !isOpen;
+        alert('Bağlantı hatası.');
+    })
+    .finally(() => { el.disabled = false; });
+}
+</script>
+@endpush
+
 @endsection

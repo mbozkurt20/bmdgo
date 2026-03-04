@@ -46,6 +46,9 @@ class DashboardController extends Controller
         $migros = Order::where('platform', 'migros')->whereHas('restaurant', function ($query) {
             return $query;
         })->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->count();
+        $gpsyemek = Order::where('platform', 'gpsyemek')->whereHas('restaurant', function ($query) {
+            return $query;
+        })->whereBetween('created_at', [$startTime, $endTime])->orderBy('created_at', 'desc')->get();
 
         $totalExpense = Order::whereBetween('created_at', [$startTime, $endTime])->whereHas('restaurant', function ($query) {
             return $query;
@@ -67,7 +70,7 @@ class DashboardController extends Controller
         $breakCouriers = Courier::where('status', CourierStatus::break)->count();
         $serviceCouriers = Courier::where('status', CourierStatus::service)->count();
 
-        return view('superadmin.home', compact('totalCouriers', 'serviceCouriers', 'idleCouriers', 'breakCouriers', 'totalExpense', 'formattedExpense', 'averageExpense', 'formattedAverageExpense', 'telefonsiparis', 'tumu', 'yemeksepeti', 'getiryemek', 'trendyol', 'couriers', 'migros', 'teslimEdilenSiparisler'));
+        return view('superadmin.home', compact('totalCouriers', 'serviceCouriers', 'idleCouriers', 'breakCouriers', 'totalExpense', 'formattedExpense', 'averageExpense', 'formattedAverageExpense', 'telefonsiparis', 'tumu', 'yemeksepeti', 'getiryemek', 'trendyol', 'couriers', 'migros', 'gpsyemek', 'teslimEdilenSiparisler'));
     }
     public function getCourier()
     {
@@ -302,6 +305,7 @@ class DashboardController extends Controller
         $trendyol = Order::where('platform', 'trendyol')->whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at', 'desc')->get();
         $telefonsiparis = Order::where('platform', 'telefonsiparis')->whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at', 'desc')->get();
         $migros = Order::where('platform', 'migros')->whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at', 'desc')->count();
+        $gpsyemek = Order::where('platform', 'gpsyemek')->whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at', 'desc')->get();
         // Kurye Sayısı - Total number of couriers
         $totalCouriers = Courier::count();
         // Boş Kurye - Count of couriers with "Boş" status
@@ -314,7 +318,7 @@ class DashboardController extends Controller
         $averageExpense = Order::whereBetween('created_at', [$startDate, $endDate])->avg('amount');
         $formattedAverageExpense = number_format($averageExpense, 2, '.', ',');
 
-        return view('superadmin.home', compact('totalCouriers', 'idleCouriers', 'breakCouriers', 'totalExpense', 'formattedExpense', 'averageExpense', 'formattedAverageExpense', 'telefonsiparis', 'tumu', 'yemeksepeti', 'getiryemek', 'trendyol', 'couriers', 'migros', 'startDate', 'endDate'));
+        return view('superadmin.home', compact('totalCouriers', 'idleCouriers', 'breakCouriers', 'totalExpense', 'formattedExpense', 'averageExpense', 'formattedAverageExpense', 'telefonsiparis', 'tumu', 'yemeksepeti', 'getiryemek', 'trendyol', 'couriers', 'migros', 'gpsyemek', 'startDate', 'endDate'));
     }
 
     public function filterOrders(Request $request)
@@ -356,6 +360,7 @@ class DashboardController extends Controller
         $trendyol = Order::where('platform', 'trendyol')->whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at', 'desc')->get();
         $telefonsiparis = Order::where('platform', 'telefonsiparis')->whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at', 'desc')->get();
         $migros = Order::where('platform', 'migros')->whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at', 'desc')->count();
+        $gpsyemek = Order::where('platform', 'gpsyemek')->whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at', 'desc')->get();
 
         $totalExpense = Order::whereBetween('created_at', [$startDate, $endDate])->sum('amount');
         $formattedExpense = number_format($totalExpense, 2, '.', ',');
@@ -372,6 +377,6 @@ class DashboardController extends Controller
         $breakCouriers = Courier::where('status', CourierStatus::break)->count();
 
         // Gerekli diğer veriler ve siparişler ile birlikte view döndürülür
-        return view('superadmin.home', compact('totalCouriers', 'idleCouriers', 'breakCouriers', 'totalExpense', 'orders', 'formattedExpense', 'averageExpense', 'formattedAverageExpense', 'telefonsiparis', 'tumu', 'yemeksepeti', 'getiryemek', 'trendyol', 'couriers', 'migros'));
+        return view('superadmin.home', compact('totalCouriers', 'idleCouriers', 'breakCouriers', 'totalExpense', 'orders', 'formattedExpense', 'averageExpense', 'formattedAverageExpense', 'telefonsiparis', 'tumu', 'yemeksepeti', 'getiryemek', 'trendyol', 'couriers', 'migros', 'gpsyemek'));
     }
 }

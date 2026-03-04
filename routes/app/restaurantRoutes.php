@@ -127,6 +127,7 @@ Route::group(['prefix' => 'restaurant'], function () {
         Route::post('/migros/updateOrderStatus', [App\Http\Controllers\EntegraController::class, 'updateOrderStatus']);
         Route::post('/trendyol/updateOrderStatus', [App\Http\Controllers\EntegraController::class, 'updateOrderStatus']);
         Route::post('/gpsyemek/updateOrderStatus', [App\Http\Controllers\GpsYemekController::class, 'updateOrder']);
+        Route::post('/gpsyemek/toggle-status', [App\Http\Controllers\GpsYemekController::class, 'toggleStatus'])->name('gpsyemek.toggle-status');
 
         Route::get('/entegra/reject-statuses/{orderId}',[\App\Http\Controllers\EntegraController::class, 'getRejectReasons']);
         Route::get('/printed/{orderId}', [App\Http\Controllers\OrderController::class, 'printed']);

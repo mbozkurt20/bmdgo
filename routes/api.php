@@ -19,6 +19,9 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::get('/getPlatformGpsyemek', [App\Http\Controllers\GpsYemekController::class, 'index']);
 
+// GPS Yemek → bmd-kurye push webhook (public, Bearer token ile doğrulama yapılıyor)
+Route::post('/gpsyemek/inbound', [App\Http\Controllers\GpsYemekInboundController::class, 'handle']);
+
 include __DIR__."/api/courier/v2.php";
 
 //Caller App
