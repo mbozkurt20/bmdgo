@@ -52,10 +52,10 @@
             @php
                 $platforms = [
                     'gpsyemek' => ['name' => 'GPS Yemek', 'color' => '#14147a', 'bg' => '#ead9e1', 'img' => 'gpsyemek.png'],
-                    'getir' => ['name' => 'Getir', 'color' => '#ffffff', 'bg' => '#5d3ebc', 'btn_bg' => '#5d3ebc', 'img' => 'GetirYemek_Logo.png'],
+                    'getir' => ['name' => 'Getir', 'color' => '#ffffff', 'bg' => '#5d3ebc', 'btn_bg' => '#5d3ebc', 'img' => 'getir.png'],
                     'yemeksepeti' => ['name' => 'Yemeksepeti', 'color' => '#ffffff', 'bg' => '#fb0050', 'btn_bg' => '#fb0050', 'img' => 'yemeksepeti.png'],
-                    'trendyol' => ['name' => 'Trendyol', 'color' => '#ffffff', 'bg' => '#ff6000', 'btn_bg' => '#ff6000', 'img' => 'trendyolyemek.png'],
-                    'migros' => ['name' => 'Migros', 'color' => '#ffffff', 'bg' => '#ff6000', 'btn_bg' => '#ff6000', 'img' => null]
+                    'trendyol' => ['name' => 'Trendyol', 'color' => '#ffffff', 'bg' => '#ff6000', 'btn_bg' => '#ff6000', 'img' => 'trendyol.png'],
+                    'migros' => ['name' => 'Migros', 'color' => '#ffffff', 'bg' => '#ff6000', 'btn_bg' => '#ff6000', 'img' => 'migros.png']
                 ];
             @endphp
 
@@ -68,7 +68,7 @@
                         <div class="market-card h-100">
                             <div class="card-header" style="background: {{ $info['bg'] }};">
                                 @if($info['img'])
-                                    <img src="{{ asset('theme/images/' . $info['img']) }}" style="height: {{ $key == 'gpsyemek' ? '30px' : '25px' }}">
+                                    <img src="{{ asset('theme/images/platforms/' . $info['img']) }}" style="height: {{ $key == 'gpsyemek' ? '30px' : '25px' }}">
                                 @else
                                     <h4 class="mb-0 text-white fw-bold">MİGROS YEMEK</h4>
                                 @endif
