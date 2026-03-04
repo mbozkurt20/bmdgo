@@ -384,7 +384,9 @@ class CourierController extends Controller
         }
 
         // GPS Yemek platformu için ON_THE_WAY bildirimi gönder
-        (new GpsYemekOutboundService())->notifyStatusChange($order, OrderStatus::HANDOVER);
+        if ($order->platform == 'gpsyemek'){
+            (new GpsYemekOutboundService())->notifyStatusChange($order, OrderStatus::HANDOVER);
+        }
 
         echo 'OK';
     }
