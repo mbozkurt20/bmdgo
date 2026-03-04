@@ -117,7 +117,7 @@ class GpsYemekController extends Controller
      */
     public function toggleStatus(Request $request)
     {
-        $restaurant = Restaurant::find(Auth::user()->id);
+        $restaurant = Auth::user();
 
         if (!$restaurant || blank($restaurant->gpsyemek_api_key)) {
             return response()->json(['success' => false, 'message' => 'GPS Yemek API key bulunamadı'], 400);
@@ -152,6 +152,11 @@ class GpsYemekController extends Controller
         $api_token = $restaurant->gpsyemek_api_key;
 
         if (blank($api_token)) {
+            return;
+        }
+
+        // Restoran GPS Yemek'te kapalıysa sipariş çekme
+        if (!($restaurant->gpsyemek_is_open ?? true)) {
             return;
         }
 

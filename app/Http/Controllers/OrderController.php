@@ -14,6 +14,7 @@ use App\Models\District;
 use App\Models\Printer;
 use App\Models\Restaurant;
 use App\Models\RestaurantCoupon;
+use App\Services\GpsYemekOutboundService;
 use App\Services\PushNotificationService;
 use App\Traits\RequestTrait;
 use App\Models\Categorie;
@@ -132,6 +133,9 @@ class OrderController extends Controller
                 $ser = new PushNotificationService();
                 $ser->sendNotification($courier->fcm_token, $restaurant->restaurant_name . ' Restorandan Yeni Sipariş Atandı', 'Sipariş Takip Kodu:' . $order->tracking_id);
             }
+
+            // GPS Yemek bildirim
+            (new GpsYemekOutboundService())->notifyStatusChange($order, OrderStatus::PREPARED);
 
             return response()->json([
                 'success' => true,
@@ -658,6 +662,9 @@ class OrderController extends Controller
         $saveStatus = $order->update();
 
         if ($saveStatus) {
+            // GPS Yemek bildirim
+            (new GpsYemekOutboundService())->notifyStatusChange($order, $action);
+
             return response()->json(['status' => "OK", 'order' => $order]);
         } else {
             return response()->json(['status' => "ERR"]);
