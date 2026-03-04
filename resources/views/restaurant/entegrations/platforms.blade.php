@@ -68,7 +68,7 @@
                         <div class="market-card h-100">
                             <div class="card-header" style="background: {{ $info['bg'] }};">
                                 @if($info['img'])
-                                    <img src="{{ asset('theme/images/platforms/' . $info['img']) }}" style="height: {{ $key == 'gpsyemek' ? '30px' : '25px' }}">
+                                    <img src="{{ asset('theme/images/platforms/' . $info['img']) }}" style="height: {{ $key == 'gpsyemek' ? '30px' : '50px' }}">
                                 @else
                                     <h4 class="mb-0 text-white fw-bold">MİGROS YEMEK</h4>
                                 @endif
