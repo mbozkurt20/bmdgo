@@ -326,6 +326,7 @@ class CourierController extends Controller
 
         if (!$order) {
             echo 'ERR';
+            Log::info('$order => $order');
             return;
         }
 
@@ -342,6 +343,7 @@ class CourierController extends Controller
         $courier = Courier::find($courierId);
 
         if (!$courier) {
+            Log::info('$courier => $courier');
             echo 'ERR';
             return;
         }
