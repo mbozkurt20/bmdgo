@@ -11,6 +11,7 @@ use App\Models\Customer;
 use App\Models\CustomerAddress;
 use App\Models\Order;
 use App\Models\Restaurant;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -99,6 +100,8 @@ class GpsYemekInboundController extends Controller
                 'quantity'         => (string) $item['quantity'],
                 'name'             => $item['menu_item']['name'],
                 'image'            => $item['menu_item']['image'],
+                'features'        => json_encode($item['menu_item'] ?? []),
+                'product_options' => json_encode($item['options'] ?? []),
                 'restaurant_id'    => $item['restaurant_id'],
             ];
         }
@@ -128,6 +131,7 @@ class GpsYemekInboundController extends Controller
                 $row['lat'] ?? 0,
                 $row['long'] ?? 0
             ),
+            'created_at'      => Carbon::now(),
         ]);
 
         return response()->json(['success' => true]);
